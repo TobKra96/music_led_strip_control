@@ -1,0 +1,26 @@
+.glyphicon.dasboard-glyph{
+    margin-top: 10px;
+    margin-bottom: 20px;
+    font-size: 35px;
+}
+
+.nav-sm span.fa.dasboard-glyph{
+    display: inline-block;
+}
+
+#dashboard-header-1{
+    margin-top: 20px;
+}
+
+li.active-dashboard-item {
+        color: #fff;
+        background-color: #1ABB9C;
+}
+
+.form-space{
+    margin-bottom: 10px;
+}
+
+.center{
+    margin: 25px 0px;
+}
