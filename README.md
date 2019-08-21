@@ -12,7 +12,7 @@ Feature List
 ## Preview
 ![Webinterface Dashboard](https://raw.githubusercontent.com/ElGammler/music_led_strip_control/master/media/webinterface.png)
 
-![Edit Scroll effect with responsive design](https://github.com/ElGammler/music_led_strip_control/blob/master/media/webinterface_scroll_edit.png?raw=true)
+![Edit Scroll effect with responsive design](https://raw.githubusercontent.com/ElGammler/music_led_strip_control/master/media/webinterface_scroll_edit.png)
 
 ## Installation
 Requirements:
