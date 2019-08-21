@@ -1,3 +1,5 @@
+
+
 # Music LED Strip Control
 Feature List
 
@@ -7,6 +9,10 @@ Feature List
 - Customizable colors and color schemes.
 - Multicore optimized for large led strips (900+ leds)
 - Standalone and client compatible for audio processing
+## Preview
+![Webinterface Dashboard](https://raw.githubusercontent.com/ElGammler/music_led_strip_control/master/media/webinterface.png)
+
+![Edit Scroll effect with responsive design](https://github.com/ElGammler/music_led_strip_control/blob/master/media/webinterface_scroll_edit.png?raw=true)
 
 ## Installation
 Requirements:
@@ -87,3 +93,14 @@ We need this version, because 1.16 has a memory leak by using queues.
 	defaults.ctl.card 1
 	defaults.pcm.card 1
 	```
+
+## Used Libraries
+
+ - [Audio Reactive LED Strip by Scott Lawson](https://github.com/scottlawsonbc/audio-reactive-led-strip)
+Thank you for the digital signal processing and some effects. You are the best.
+- [rpi_ws281x by Jeremy Garff](https://github.com/jgarff/rpi_ws281x)
+Awesome library for the led ouput signal. Easy to use.
+- [gentelella by Colorlib](https://github.com/ColorlibHQ/gentelella)
+Fancy looking bootstrap theme.
+Scripts included: Bootstrap, Font Awesome, jQuery-Autocomplete, FullCalendar, Charts.js, Bootstrap Colorpicker, Cropper, dataTables, Date Range Picker for Bootstrap, Dropzone, easyPieChart, ECharts, bootstrap-wysiwyg, Flot, Javascript plotting library for jQuery, gauge.js, iCheck, jquery.inputmask plugin, Ion.RangeSlider, jQuery, jVectorMap, moment.js, Morris.js - pretty time-series line graphs, PNotify - Awesome JavaScript notifications, NProgress, Pace, Parsley, bootstrap-progressbar, select2, Sidebar Transitions - simple off-canvas navigations, Skycons - canvas based wather icons, jQuery Sparklines plugin, switchery - Turns HTML checkbox inputs into beautiful iOS style switches, jQuery Tags Input Plugin, Autosize - resizes text area to fit text, validator - HTML from validator using jQuery, jQuery Smart Wizard
+
