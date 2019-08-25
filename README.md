@@ -10,6 +10,10 @@ Feature List
 - Multicore optimized for large led strips (900+ leds)
 - Standalone and client compatible for audio processing
 ## Preview
+
+![Preview Video](https://raw.githubusercontent.com/ElGammler/music_led_strip_control/master/media/video.gif)
+[Link to the video](https://www.youtube.com/watch?v=jAL1DfeYQI8)
+
 ![Webinterface Dashboard](https://raw.githubusercontent.com/ElGammler/music_led_strip_control/master/media/webinterface.png)
 
 ![Edit Scroll effect with responsive design](https://raw.githubusercontent.com/ElGammler/music_led_strip_control/master/media/webinterface_scroll_edit.png)
@@ -39,7 +43,7 @@ Tested with:
 3. Install python
 `sudo apt-get python3`
 
-4. Clone github repository
+4. Clone the github repository.
 Seach for place you want to install the programm. I will use the following location:
 `/share`
 Navigate to your location with `cd /share`
