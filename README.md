@@ -12,7 +12,9 @@ Feature List
 ## Preview
 
 ![Preview Video](https://raw.githubusercontent.com/ElGammler/music_led_strip_control/master/media/video.gif)
+
 [Link to the video](https://www.youtube.com/watch?v=jAL1DfeYQI8)
+
 
 ![Webinterface Dashboard](https://raw.githubusercontent.com/ElGammler/music_led_strip_control/master/media/webinterface.png)
 
