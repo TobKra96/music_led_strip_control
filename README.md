@@ -1,6 +1,6 @@
 
 
-# Music LED Strip Control
+# Music LED Strip Control (MLSC)
 Feature List
 
 - Audio visualization in realtime
@@ -45,33 +45,33 @@ Tested with:
 3. Install python
 `sudo apt-get python3`
 
-4. Clone the github repository.
-Seach for place you want to install the programm. I will use the following location:
-`/share`
-Navigate to your location with `cd /share`
-If you haven't git install it with `sudo apt-get install git`.
-Clone the repository: `sudo git clone https://github.com/ElGammler/music_led_strip_control.git`
-5. Install all python libraries. I use pip for the most packages: `sudo apt-get install python3-pip`
-- `pip3 install --upgrade pip`
-- `sudo apt-get install libatlas-base-dev`
-- `sudo pip3 install -I numpy==1.17.0` 
-We need this version, because 1.16 has a memory leak by using queues.
-- `sudo pip3 install cython`
-- `sudo pip3 install scipy==1.3.0`
-- `sudo pip3 install flask`
-- `sudo apt-get install portaudio19-dev`
-`sudo pip3 install pyaudio`
-- Install ws281x library:
-`sudo apt-get install build-essential python3-dev git scons swig`
-`sudo git clone https://github.com/jgarff/rpi_ws281x.git`
-`cd rpi_ws281x`
-`sudo scons`
-`cd python`
-`sudo python3 setup.py install`
+4. Clone the github repository.  
+Seach for place you want to install the programm. I will use the following location:  
+`/share`  
+Navigate to your location with `cd /share`  
+If you haven't git install it with `sudo apt-get install git`.  
+Clone the repository: `sudo git clone https://github.com/ElGammler/music_led_strip_control.git`  
+5. Install all python libraries. I use pip for the most packages: `sudo apt-get install python3-pip`  
+`pip3 install --upgrade pip`  
+`sudo apt-get install libatlas-base-dev`  
+`sudo pip3 install -I numpy==1.17.0` 
+We need this version, because 1.16 has a memory leak by using queues.  
+`sudo pip3 install cython`  
+`sudo pip3 install scipy==1.3.0`  
+`sudo pip3 install flask`  
+`sudo apt-get install portaudio19-dev`  
+`sudo pip3 install pyaudio`  
+- Install ws281x library:  
+`sudo apt-get install build-essential python3-dev git scons swig`  
+`sudo git clone https://github.com/jgarff/rpi_ws281x.git`  
+`cd rpi_ws281x`  
+`sudo scons`  
+`cd python`  
+`sudo python3 setup.py install`  
 
 6. Setup microphone
-	Create/edit `/etc/asound.conf`
-	`sudo nano /etc/asound.conf`
+	Create/edit `/etc/asound.conf`  
+	`sudo nano /etc/asound.conf`  
 	Set the file to the following text
 	```
 	pcm.!default {
@@ -99,6 +99,42 @@ We need this version, because 1.16 has a memory leak by using queues.
 	defaults.ctl.card 1
 	defaults.pcm.card 1
 	```
+
+
+## Configure MLSC
+1. Try to start the programm. Go to the location you cloned the repository. In my installation it was:  
+`/share/music_led_strip_control`
+	Go to the server component:  
+	`cd /share/music_led_strip_control/server`  
+	
+	To start the programm enter:  
+	`sudo python3 main.py`  
+2. Now you have to search for your microphone id. Inside the output you should find a list with all available audio sources. It should look like this:
+```
+Found the following audio sources:
+2 - USB Audio Device: - (hw:1,0) - 44100.0
+3 - sysdefault - 48000.0
+7 - spdif - 44100.0
+9 - default - 44100.0
+```  
+In my case I will use "sysdefault". It has the ID 3.
+
+3. Open the webinterface of MLSC
+Search inside your Browser for the hostname of the raspberry pi, or the ip.  
+Navigate to "Edit General Settings/Audio Setting".  
+There should be an input filed to enter the "Audio Source ID".  
+Press "Save".  
+
+4. Now we change the led stip size, to match it with your strip.  
+Go to "Edit General Settings/Device Settings".  
+Enter the count of LEDs you use inside "Numbers of LEDs".  
+Change the mid of your led strip. This will affect the mirror option of many effects.  
+You can use the half of your "Numbers of LEDs" or set a custom number, if you got a corner you want to start the mirror effect. You will get the best results with the half of "Numbers of LEDs".  
+Press "Save".
+
+5. Restart the programm and have fun with MLSC.
+
+See the wiki for more configuration tutorials.
 
 ## Used Libraries
 
