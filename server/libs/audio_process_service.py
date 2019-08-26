@@ -35,6 +35,12 @@ class AudioProcessService:
 
         print("Found the following audio sources:")
 
+        # Select the audio device you wan to use.
+        selected_device_list_index = self._config["audio_config"]["DEVICE_ID"]
+
+        # check if the index is inside the list
+        foundMicIndex = False
+
         #for each audio device, add to list of devices
         for i in range(0,self._numdevices):
             try:
@@ -43,15 +49,26 @@ class AudioProcessService:
                 if device_info["maxInputChannels"] >= 1:
                     self._devices.append(device_info)
                     print(str(device_info["index"]) + " - " + str(device_info["name"])  + " - " + str(device_info["defaultSampleRate"]))
+
+                    if device_info["index"] == selected_device_list_index:
+                        foundMicIndex = True
             except Exception as e:
                 print("Could not get device infos.")
                 print("Unexpected error in AudioProcessService :" + str(e))
-            
-        # Select the audio device you wan to use.
-        selected_device_list_index = self._config["audio_config"]["DEVICE_ID"]
         
+        # Could not find a mic with the selected mic id, so i will use the first device I found.
+        if not foundMicIndex:
+            print("********************************************************")
+            print("*                      Error                           *")
+            print("********************************************************")
+            print("Could not find the mic with the id: " + str(selected_device_list_index))
+            print("Use the first mic as fallback.")
+            print("Please change the id of the mic inside the config.")
+            selected_device_list_index = self._devices[0]["index"]
+
         for device in self._devices:
             if device["index"] == selected_device_list_index:
+                print("Selected ID: " + str(selected_device_list_index))
                 print("Use " + str(device["index"]) + " - " + str(device["name"])  + " - " + str(device["defaultSampleRate"]))
                 self._device_id = device["index"]
                 self._device_name = device["name"]
@@ -92,7 +109,7 @@ class AudioProcessService:
             audio_datas = self._dsp.update(y)
 
             #Check if value is higher than min value
-            if audio_datas[board]["vol"] > self._config["audio_config"]["MIN_VOLUME_THRESHOLD"]:
+            if audio_datas["vol"] > self._config["audio_config"]["MIN_VOLUME_THRESHOLD"]:
                 # Send the new audio data to the effect process.            
                 if self._audio_queue.full():
                     pre_audio_data = self._audio_queue.get()

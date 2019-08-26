@@ -143,11 +143,11 @@ class Effects():
         print("Effects component started.")
 
         while not self._cancel_token:
-            #self.effect_routine()
-            try:
-                self.effect_routine()
-            except Exception as e:
-                print("Error in Effect Service. Routine Restarted. Exception: " + str(e))
+            self.effect_routine()
+            #try:
+                #self.effect_routine()
+            #except Exception as e:
+            #    print("Error in Effect Service. Routine Restarted. Exception: " + str(e))
             
         print("Effects component stopped.")
 
@@ -285,6 +285,26 @@ class Effects():
 
         self.output = np.array([[0 for i in range(led_count)] for i in range(3)])
         self.prev_output = np.array([[0 for i in range(led_count)] for i in range(3)])
+
+        # Twinkle Variables
+        self.rising_stars = []
+        self.descending_stars = []
+        self.output_decay = np.array([[0 for i in range(led_count)] for i in range(3)])
+
+        # Pendulum Variables
+        self.current_direction = True
+        self.current_position = 0
+        self.current_color = [0,0,0]
+        self.current_color_index = 0
+
+        # Rods Variables
+        self.count_since_last_rod = 0
+
+        # Scroll Variables
+        self.output_scroll_high = np.array([[0 for i in range(led_count)] for i in range(3)])
+        self.output_scroll_mid = np.array([[0 for i in range(led_count)] for i in range(3)])
+        self.output_scroll_low = np.array([[0 for i in range(led_count)] for i in range(3)])
+
 
         self.current_freq_detects = {"beat":False,
                                      "low":False,

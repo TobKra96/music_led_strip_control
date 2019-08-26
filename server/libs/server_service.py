@@ -57,7 +57,7 @@ class ServerService:
 
     # Thanks to kasperd
     # https://serverfault.com/questions/690391/finding-local-ip-addresses-using-pythons-stdlib-under-debian-jessie
-    def my_ip():
+    def my_ip(self):
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         try:
             s.connect(('192.0.0.8', 1027))
