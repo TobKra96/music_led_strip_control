@@ -109,11 +109,15 @@ class AudioProcessService:
             audio_datas = self._dsp.update(y)
 
             #Check if value is higher than min value
-            if audio_datas["vol"] > self._config["audio_config"]["MIN_VOLUME_THRESHOLD"]:
-                # Send the new audio data to the effect process.            
-                if self._audio_queue.full():
-                    pre_audio_data = self._audio_queue.get()
-                self._audio_queue.put(audio_datas["mel"])
+            if audio_datas["vol"] < self._config["audio_config"]["MIN_VOLUME_THRESHOLD"]:
+                # Fill the array with zeros, to fade out the effect.
+                audio_datas["mel"] = np.zeros(1)
+
+            # Send the new audio data to the effect process.            
+            if self._audio_queue.full():
+                pre_audio_data = self._audio_queue.get()
+            self._audio_queue.put(audio_datas["mel"])
+                
 
             self.end_time = time.time()
                     
