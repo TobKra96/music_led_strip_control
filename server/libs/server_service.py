@@ -18,11 +18,7 @@ class ServerService:
         self._lost_arrays_counter = 0
         while True:
             
-            hostIP = socket.gethostbyname(socket.gethostname())
-            # CHeck if your on windows or not
-            if hostIP == "127.0.1.1":
-                # No windows.
-                hostIP = check_output(['hostname', '-I'])
+            hostIP = self.my_ip()
             port = 65432
             print("Server listen to " + str(hostIP) + ":" + str(port))
 
@@ -59,7 +55,15 @@ class ServerService:
 
                         start_time = time.time()
 
-
+    # Thanks to kasperd
+    # https://serverfault.com/questions/690391/finding-local-ip-addresses-using-pythons-stdlib-under-debian-jessie
+    def my_ip():
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        try:
+            s.connect(('192.0.0.8', 1027))
+        except socket.error:
+            return None
+        return s.getsockname()[0]
 
     def recv_msg(self, conn):
         # Read message length and unpack it into an integer
