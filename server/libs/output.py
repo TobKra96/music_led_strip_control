@@ -73,7 +73,7 @@ class Output:
         
         #Init FPS Limiter
         self.fps_limiter_start = time.time()
-        self.max_fps = 120
+        self.max_fps = self._config["audio_config"]["FPS"] + 10
         self.min_waiting_time = 1 / self.max_fps
 
         # Init all nessessarry components

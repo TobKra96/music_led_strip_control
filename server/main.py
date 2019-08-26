@@ -1,24 +1,9 @@
-# What we need
-# 1. Webserver for interaction and selection of the modes
-# 2. Communication module, that will receive a byte array and just forward it to the output
-# 3. Output driver
-# 4. Filter
-# 5. Configurations
+#   Main File
+#   ----------------
+# 
+#   The Programm will start here.
+#   This file will only initialize and start the processes.
 #
-#   
-#   Webserver -> Effects -> Output
-#
-#   output_queue
-#   Effects -> Output
-#
-#   effects_queue
-#   Webserver -> Effects
-#
-#   _notification_queues....
-#   Webserver -> NotificationService ----> Output
-#                                      +-> Effects
-#   
-
 
 from libs.output import Output
 from libs.config_service import ConfigService

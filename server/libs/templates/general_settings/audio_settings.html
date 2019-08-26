@@ -14,6 +14,11 @@
           </p>
           <form id="settingsForm" data-parsley-validate class="form-horizontal form-label-left" action method="post" novalidate>
             <div class="form-group">
+              <label class="control-label col-md-3 col-sm-3 col-xs-12" for="DEVICE_ID">Device ID</label>
+              <input id="DEVICE_ID" type="number" name="number" required="required" data-validate-minmax="0,1000" class="col-md-6 col-sm-6 col-xs-12" data-kwimpalastatus="alive" data-kwimpalaid="1554401854198-5">
+            </div>
+
+            <div class="form-group">
               <label class="control-label col-md-3 col-sm-3 col-xs-12" for="FPS">FPS</label>
               <input id="FPS" type="number" name="number" required="required" data-validate-minmax="1,1000" class="col-md-6 col-sm-6 col-xs-12" data-kwimpalastatus="alive" data-kwimpalaid="1554401854198-5">
             </div>
@@ -49,7 +54,7 @@
             </div>
 
             <div class="form-group">
-              <label class="control-label col-md-3 col-sm-3 col-xs-12" for="FRAMES_PER_BUFFER">Frames Per Buffer</label>
+              <label class="control-label col-md-3 col-sm-3 col-xs-12" for="FRAMES_PER_BUFFER">Frames Per Buffer (has effects for the max framerate)</label>
               <input id="FRAMES_PER_BUFFER" type="number" name="number" required="required" data-validate-minmax="1,5000" class="col-md-6 col-sm-6 col-xs-12" data-kwimpalastatus="alive" data-kwimpalaid="1554401854198-5">
             </div>
             

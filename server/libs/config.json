@@ -16,16 +16,16 @@
     },
 
     "audio_config": {
-        "DEFAULT_SAMPLE_RATE": 48000,
-        "DISPLAY_FPS": false,
-        "FPS": 40,
+        "DEFAULT_SAMPLE_RATE": 48000,        
+        "FPS": 60,
         "MAX_BRIGHTNESS": 250,
         "MAX_FREQUENCY": 18000,
         "MIN_FREQUENCY": 20,
         "MIN_VOLUME_THRESHOLD": 0,
         "N_FFT_BINS": 24,
         "N_ROLLING_HISTORY": 4,
-        "FRAMES_PER_BUFFER": 1024
+        "FRAMES_PER_BUFFER": 1024,
+        "DEVICE_ID": 0
     },
 
     "colours": {

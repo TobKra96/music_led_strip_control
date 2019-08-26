@@ -23,7 +23,7 @@ class AudioProcessService:
 
         #Init FPS Limiter
         self.fps_limiter_start = time.time()
-        self.max_fps = 120
+        self.max_fps = self._config["audio_config"]["FPS"] + 10
         self.min_waiting_time = 1 / self.max_fps
 
         # Init pyaudio
@@ -47,8 +47,8 @@ class AudioProcessService:
                 print("Could not get device infos.")
                 print("Unexpected error in AudioProcessService :" + str(e))
             
-        # to test the audio, use 0
-        selected_device_list_index = 2
+        # Select the audio device you wan to use.
+        selected_device_list_index = self._config["audio_config"]["DEVICE_ID"]
         
         for device in self._devices:
             if device["index"] == selected_device_list_index:
@@ -91,11 +91,12 @@ class AudioProcessService:
             # Process the audio stream
             audio_datas = self._dsp.update(y)
 
-            # Send the new audio data to the effect process.
-            
-            if self._audio_queue.full():
-                pre_audio_data = self._audio_queue.get()
-            self._audio_queue.put(audio_datas["mel"])
+            #Check if value is higher than min value
+            if audio_datas[board]["vol"] > self._config["audio_config"]["MIN_VOLUME_THRESHOLD"]:
+                # Send the new audio data to the effect process.            
+                if self._audio_queue.full():
+                    pre_audio_data = self._audio_queue.get()
+                self._audio_queue.put(audio_datas["mel"])
 
             self.end_time = time.time()
                     
