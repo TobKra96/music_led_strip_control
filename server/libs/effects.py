@@ -49,6 +49,7 @@ class Effects():
         # Initials color service and build gradients
         self._color_service = ColorService(self._config)
         self._color_service.build_gradients()
+        self._color_service.build_fadegradients()
         self._color_service.build_slidearrays()
         self._color_service.build_slidearrays()
         self._color_service.build_bubblearrays()
@@ -75,6 +76,8 @@ class Effects():
 
         self.output = np.array([[0 for i in range(led_count)] for i in range(3)])
         self.prev_output = np.array([[0 for i in range(led_count)] for i in range(3)])
+
+        self.speed_counter = 0
 
         # Twinkle Variables
         self.rising_stars = []
@@ -143,11 +146,10 @@ class Effects():
         print("Effects component started.")
 
         while not self._cancel_token:
-            self.effect_routine()
-            #try:
-                #self.effect_routine()
-            #except Exception as e:
-            #    print("Error in Effect Service. Routine Restarted. Exception: " + str(e))
+            try:
+                self.effect_routine()
+            except Exception as e:
+                print("Error in Effect Service. Routine Restarted. Exception: " + str(e))
             
         print("Effects component stopped.")
 
@@ -265,6 +267,7 @@ class Effects():
         # Initials color service and build gradients
         self._color_service = ColorService(self._config)
         self._color_service.build_gradients()
+        self._color_service.build_fadegradients()
         self._color_service.build_slidearrays()
         self._color_service.build_bubblearrays()
 
@@ -368,6 +371,31 @@ class Effects():
             else:
                 self.current_freq_detects[i] = False
 
+
+    def get_roll_steps(self, current_speed):
+        """
+        Calculate the steps for the rollspeed.
+        Up to 1 you can adjust the speed very fine. After this, you need to add decades to increase the speed.
+        """
+        max_counter = 1
+        steps = 0
+
+        self.speed_counter = self.speed_counter + current_speed
+
+        if self.speed_counter > max_counter:
+            self.speed_counter = 0
+
+            if (max_counter/current_speed) < 1:
+
+                steps = int(1 / (max_counter/current_speed))
+            else:
+                steps = 1
+        
+        else:
+            steps = 0
+
+        return steps
+
     def effect_off(self):
         # Build an empty array
         output_array = np.zeros((3, self._config["device_config"]["LED_Count"]))
@@ -424,17 +452,20 @@ class Effects():
                 full_gradient_ref[current_gradient][2][:led_count]
             ])
         
+        # Calculate how many steps the array will roll
+        steps = self.get_roll_steps(current_speed)
+
         # We got the current output array. Now we prepare the next step. We "roll" the array with the specified speed.
         full_gradient_ref[current_gradient] = np.roll(
             full_gradient_ref[current_gradient],
-            current_speed * current_reverse_translated,
+            steps * current_reverse_translated,
             axis = 1
         )
 
         if effect_config["mirror"]:
             # calculate the real mid
             real_mid = led_count / 2
-            # add some tolerence for the real mid
+            # add some tolerance for the real mid
             if (real_mid >= led_mid - 2) and (real_mid <= led_mid + 2):
                 # Use the option with shrinking the array
                 output_array = np.concatenate((output_array[:, ::-2], output_array[:, ::2]), axis=1)
@@ -469,7 +500,7 @@ class Effects():
         else:
             current_reverse_translated = 1
 
-        full_gradient_ref = self._color_service.full_gradients
+        full_gradient_ref = self._color_service.full_fadegradients
 
         # Get the current color we will use for the whole led strip.
         current_color_r = full_gradient_ref[current_gradient][0][0]
@@ -483,10 +514,13 @@ class Effects():
             [current_color_b for i in range(led_count)]
         ])
 
+        # Calculate how many steps the array will roll
+        steps = self.get_roll_steps(current_speed)
+
         # We got the current output array. Now we prepare the next step. We "roll" the array with the specified speed.
         full_gradient_ref[current_gradient] = np.roll(
             full_gradient_ref[current_gradient],
-            current_speed * current_reverse_translated,
+            steps * current_reverse_translated,
             axis = 1
         )
 
@@ -518,17 +552,20 @@ class Effects():
                 full_slide_ref[effect_config["gradient"]][2][:led_count]
             ])
 
+        # Calculate how many steps the array will roll
+        steps = self.get_roll_steps(effect_config["speed"])
+
         # We got the current output array. Now we prepare the next step. We "roll" the array with the specified speed.
         full_slide_ref[effect_config["gradient"]] = np.roll(
             full_slide_ref[effect_config["gradient"]],
-            effect_config["speed"] * current_reverse_translated,
+            steps * current_reverse_translated,
             axis = 1
         )
 
         if effect_config["mirror"]:
             # calculate the real mid
             real_mid = led_count / 2
-            # add some tolerence for the real mid
+            # add some tolerance for the real mid
             if (real_mid >= led_mid - 2) and (real_mid <= led_mid + 2):
                 # Use the option with shrinking the array
                 output_array = np.concatenate((output_array[:, ::-2], output_array[:, ::2]), axis=1)
@@ -568,17 +605,20 @@ class Effects():
                 full_bubble_ref[effect_config["gradient"]][2][:led_count]
             ])
 
+        # Calculate how many steps the array will roll
+        steps = self.get_roll_steps(effect_config["speed"])
+
         # We got the current output array. Now we prepare the next step. We "roll" the array with the specified speed.
         full_bubble_ref[effect_config["gradient"]] = np.roll(
             full_bubble_ref[effect_config["gradient"]],
-            effect_config["speed"] * current_reverse_translated,
+            steps * current_reverse_translated,
             axis = 1
         )
 
         if effect_config["mirror"]:
             # calculate the real mid
             real_mid = led_count / 2
-            # add some tolerence for the real mid
+            # add some tolerance for the real mid
             if (real_mid >= led_mid - 2) and (real_mid <= led_mid + 2):
                 # Use the option with shrinking the array
                 output_array = np.concatenate((output_array[:, ::-2], output_array[:, ::2]), axis=1)
@@ -694,6 +734,9 @@ class Effects():
         # Build an empty array
         output_array = np.zeros((3, self._config["device_config"]["LED_Count"]))
 
+        # Calculate how many steps the array will roll
+        steps = self.get_roll_steps(effect_config["speed"])
+
         if self.current_direction:
             # start                                                       end
             # |-----------------------------------------------------------|
@@ -703,7 +746,7 @@ class Effects():
             if self.current_position == 0:
                 self.current_position = effect_config["pendulum_length"]
 
-            self.current_position = self.current_position + effect_config["speed"]
+            self.current_position = self.current_position + steps
 
             if self.current_position > led_count - 1:
                 self.current_position = led_count - 1
@@ -727,7 +770,7 @@ class Effects():
             if self.current_position == led_count - 1:
                 self.current_position = (led_count - 1) - effect_config["pendulum_length"]
 
-            self.current_position = self.current_position - effect_config["speed"]
+            self.current_position = self.current_position - steps
 
             if self.current_position < 0:
                 self.current_position = 0
@@ -756,25 +799,28 @@ class Effects():
 
         self.count_since_last_rod = self.count_since_last_rod + 1
 
+        # Calculate how many steps the array will roll
+        steps = self.get_roll_steps(effect_config["speed"])
+
         # Not reverse
         # start                         end
         # |-------------------------------|
-        # Move array ---> this direction for "speed" fields
+        # Move array ---> this direction for "steps" fields
 
         # Reverse
         # start                         end
         # |-------------------------------|
-        # Move array <--- this direction for "speed" fields
+        # Move array <--- this direction for "steps" fields
 
         # Build an empty array
         local_output_array = np.zeros((3, self._config["device_config"]["LED_Count"]))
 
         if not effect_config["reverse"]:
-            self.output = np.roll(self.output,effect_config["speed"],axis = 1)
-            self.output[:, :effect_config["speed"]] = np.zeros((3, effect_config["speed"]))
+            self.output = np.roll(self.output,steps,axis = 1)
+            self.output[:, :steps] = np.zeros((3, steps))
         else:
-            self.output = np.roll(self.output,effect_config["speed"] * -1,axis = 1)
-            self.output[:, led_count - effect_config["speed"]:] = np.zeros((3, effect_config["speed"]))
+            self.output = np.roll(self.output,steps * -1,axis = 1)
+            self.output[:, led_count - steps:] = np.zeros((3, steps))
 
         if (self.count_since_last_rod - effect_config["rods_length"]) > effect_config["rods_distance"]:
             self.count_since_last_rod = 0
@@ -795,20 +841,20 @@ class Effects():
 
         if self.count_since_last_rod <= effect_config["rods_length"]:
             if not effect_config["reverse"]:
-                self.output[0, :effect_config["speed"]] = self.current_color[0]
-                self.output[1, :effect_config["speed"]] = self.current_color[1]
-                self.output[2, :effect_config["speed"]] = self.current_color[2]
+                self.output[0, :steps] = self.current_color[0]
+                self.output[1, :steps] = self.current_color[1]
+                self.output[2, :steps] = self.current_color[2]
             else:
-                self.output[0, led_count - effect_config["speed"]:] = self.current_color[0]
-                self.output[1, led_count - effect_config["speed"]:] = self.current_color[1]
-                self.output[2, led_count - effect_config["speed"]:] = self.current_color[2]
+                self.output[0, led_count - steps:] = self.current_color[0]
+                self.output[1, led_count - steps:] = self.current_color[1]
+                self.output[2, led_count - steps:] = self.current_color[2]
 
         local_output_array = self.output
 
         if effect_config["mirror"]:
             # calculate the real mid
             real_mid = led_count / 2
-            # add some tolerence for the real mid
+            # add some tolerance for the real mid
             if (real_mid >= led_mid - 2) and (real_mid <= led_mid + 2):
                 # Use the option with shrinking the array
                 local_output_array = np.concatenate((self.output[:, ::-2], self.output[:, ::2]), axis=1)
@@ -886,27 +932,34 @@ class Effects():
         high_val = (np.array(self._color_service.colour(effect_config["high_color"])) * high_max).astype(int)
         # Scrolling effect window
 
-        high_speed = effect_config["high_speed"]
-        mid_speed = effect_config["mid_speed"]
-        low_speed = effect_config["low_speed"]
+        # Calculate how many steps the array will roll
+        high_steps = effect_config["high_speed"]
+        mid_steps = effect_config["mid_speed"]
+        low_steps = effect_config["low_speed"]
 
-        #self.output[:, speed:] = self.output[:, :-speed]
+        if(high_steps > 0):
+            self.output_scroll_high[:, high_steps:] = self.output_scroll_high[:, :-high_steps]
         
-        self.output_scroll_high[:, high_speed:] = self.output_scroll_high[:, :-high_speed]
-        self.output_scroll_mid[:, mid_speed:] = self.output_scroll_mid[:, :-mid_speed]
-        self.output_scroll_low[:, low_speed:] = self.output_scroll_low[:, :-low_speed]
-        # Create new color originating at the center
-        self.output_scroll_high[0, :high_speed] = high_val[0]
-        self.output_scroll_high[1, :high_speed] = high_val[1]
-        self.output_scroll_high[2, :high_speed] = high_val[2]
+            # Create new color originating at the center
+            self.output_scroll_high[0, :high_steps] = high_val[0]
+            self.output_scroll_high[1, :high_steps] = high_val[1]
+            self.output_scroll_high[2, :high_steps] = high_val[2]
+        
+        if(mid_steps > 0):
+            self.output_scroll_mid[:, mid_steps:] = self.output_scroll_mid[:, :-mid_steps]
 
-        self.output_scroll_mid[0, :mid_speed] = mids_val[0]
-        self.output_scroll_mid[1, :mid_speed] = mids_val[1]
-        self.output_scroll_mid[2, :mid_speed] = mids_val[2]
+            # Create new color originating at the center
+            self.output_scroll_mid[0, :mid_steps] = mids_val[0]
+            self.output_scroll_mid[1, :mid_steps] = mids_val[1]
+            self.output_scroll_mid[2, :mid_steps] = mids_val[2]
 
-        self.output_scroll_low[0, :low_speed] = lows_val[0]
-        self.output_scroll_low[1, :low_speed] = lows_val[1]
-        self.output_scroll_low[2, :low_speed] = lows_val[2]
+        if(low_steps > 0):
+            self.output_scroll_low[:, low_steps:] = self.output_scroll_low[:, :-low_steps]
+
+             # Create new color originating at the center
+            self.output_scroll_low[0, :low_steps] = lows_val[0]
+            self.output_scroll_low[1, :low_steps] = lows_val[1]
+            self.output_scroll_low[2, :low_steps] = lows_val[2]
 
         self.output[0] = self.output_scroll_high[0] + self.output_scroll_mid[0] + self.output_scroll_low[0]
         self.output[1] = self.output_scroll_high[1] + self.output_scroll_mid[1] + self.output_scroll_low[1]
@@ -918,7 +971,7 @@ class Effects():
         if effect_config["mirror"]:
             # calculate the real mid
             real_mid = led_count / 2
-            # add some tolerence for the real mid
+            # add some tolerance for the real mid
             if (real_mid >= led_mid - 2) and (real_mid <= led_mid + 2):
                 # Use the option with shrinking the array
                 output_array = np.concatenate((self.output[:, ::-2], self.output[:, ::2]), axis=1)
@@ -985,7 +1038,7 @@ class Effects():
         if effect_config["mirror"]:
             # calculate the real mid
             real_mid = led_count / 2
-            # add some tolerence for the real mid
+            # add some tolerance for the real mid
             if (real_mid >= led_mid - 2) and (real_mid <= led_mid + 2):
                 # Use the option with shrinking the array
                 output_array = np.concatenate((self.output[:, ::-2], self.output[:, ::2]), axis=1)
@@ -1039,9 +1092,13 @@ class Effects():
                            self._color_service.full_gradients[effect_config["color_mode"]][2][
                                     (led_count if effect_config["reverse_grad"] else 0):
                                     (None if effect_config["reverse_grad"] else led_count):]*r])
+        
+        # Calculate how many steps the array will roll
+        steps = self.get_roll_steps(effect_config["roll_speed"])
+
         self._color_service.full_gradients[effect_config["color_mode"]] = np.roll(
                     self._color_service.full_gradients[effect_config["color_mode"]],
-                    effect_config["roll_speed"]*(-1 if effect_config["reverse_roll"] else 1),
+                    steps*(-1 if effect_config["reverse_roll"] else 1),
                     axis=1)
         output[0] = gaussian_filter1d(output[0], sigma=effect_config["blur"])
         output[1] = gaussian_filter1d(output[1], sigma=effect_config["blur"])
@@ -1053,7 +1110,7 @@ class Effects():
         if effect_config["mirror"]:
             # calculate the real mid
             real_mid = led_count / 2
-            # add some tolerence for the real mid
+            # add some tolerance for the real mid
             if (real_mid >= led_mid - 2) and (real_mid <= led_mid + 2):
                 # Use the option with shrinking the array
                 output = np.concatenate((output[:, ::-2], output[:, ::2]), axis=1)
@@ -1111,9 +1168,13 @@ class Effects():
             for j in range(3):
                 output[j][n:n+m] = color_sets[i][j]*max_values[i]
             n += m
+
+        # Calculate how many steps the array will roll
+        steps = self.get_roll_steps(effect_config["roll_speed"])
+        
         self._color_service.full_gradients[effect_config["color_mode"]] = np.roll(
                     self._color_service.full_gradients[effect_config["color_mode"]],
-                    effect_config["roll_speed"]*(-1 if effect_config["reverse_roll"] else 1),
+                    steps*(-1 if effect_config["reverse_roll"] else 1),
                     axis=1)
         if effect_config["flip_lr"]:
             output = np.fliplr(output)
@@ -1121,7 +1182,7 @@ class Effects():
         if effect_config["mirror"]:
             # calculate the real mid
             real_mid = led_count / 2
-            # add some tolerence for the real mid
+            # add some tolerance for the real mid
             if (real_mid >= led_mid - 2) and (real_mid <= led_mid + 2):
                 # Use the option with shrinking the array
                 output = np.concatenate((output[:, ::-2], output[:, ::2]), axis=1)
@@ -1200,7 +1261,7 @@ class Effects():
         if effect_config["mirror"]:
             # calculate the real mid
             real_mid = led_count / 2
-            # add some tolerence for the real mid
+            # add some tolerance for the real mid
             if (real_mid >= led_mid - 2) and (real_mid <= led_mid + 2):
                 # Use the option with shrinking the array
                 output = np.concatenate((output[:, ::-2], output[:, ::2]), axis=1)
@@ -1298,7 +1359,11 @@ class Effects():
             #output = np.concatenate([output,np.fliplr(output)], axis=1)
             if self.wave_wipe_count > led_count//2:
                 self.wave_wipe_count = led_count//2
-            self.wave_wipe_count += effect_config["wipe_speed"]
+            
+            # Calculate how many steps the array will roll
+            steps = self.get_roll_steps(effect_config["wipe_speed"])
+            
+            self.wave_wipe_count += steps
 
         self._output_queue_lock.acquire()
         if self._output_queue.full():

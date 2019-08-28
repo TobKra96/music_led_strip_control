@@ -6,13 +6,13 @@ class ColorService():
 
         self._config = config
         self.full_gradients = {}
+        self.full_fadegradients = {}
         self.full_slide = {}
         self.full_bubble = {}
 
     def build_gradients(self):
 
         self.full_gradients = {}
-        
 
         for gradient in self._config["gradients"]:
             not_mirrored_gradient = self._easing_gradient_generator(
@@ -27,7 +27,24 @@ class ColorService():
                 (not_mirrored_gradient[:, ::-1], not_mirrored_gradient), 
                 axis = 1
                 )
-                   
+
+    def build_fadegradients(self):
+
+        self.full_fadegradients = {}
+
+        for gradient in self._config["gradients"]:
+            not_mirrored_gradient = self._easing_gradient_generator(
+                self._config["gradients"][gradient], # All colors of the current gradient
+                2000
+            )
+
+            # Mirror the gradient to get seemsles transition from start to the end
+            # [1,2,3,4]
+            # -> [1,2,3,4,4,3,2,1]
+            self.full_fadegradients[gradient] = np.concatenate(
+                (not_mirrored_gradient[:, ::-1], not_mirrored_gradient), 
+                axis = 1
+                )
 
     def _easing_gradient_generator(self, colors, length):
         """
