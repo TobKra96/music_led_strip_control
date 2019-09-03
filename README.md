@@ -11,14 +11,14 @@ Feature List
 - Standalone and client compatible for audio processing
 ## Preview
 
-![Preview Video](https://raw.githubusercontent.com/ElGammler/music_led_strip_control/master/media/video.gif)
+![Preview Video](https://raw.githubusercontent.com/TobKra96/music_led_strip_control/master/media/video.gif)
 
 [Link to the video](https://www.youtube.com/watch?v=jAL1DfeYQI8)
 
 
-![Webinterface Dashboard](https://raw.githubusercontent.com/ElGammler/music_led_strip_control/master/media/webinterface.png)
+![Webinterface Dashboard](https://raw.githubusercontent.com/TobKra96/music_led_strip_control/master/media/webinterface.png)
 
-![Edit Scroll effect with responsive design](https://raw.githubusercontent.com/ElGammler/music_led_strip_control/master/media/webinterface_scroll_edit.png)
+![Edit Scroll effect with responsive design](https://raw.githubusercontent.com/TobKra96/music_led_strip_control/master/media/webinterface_scroll_edit.png)
 
 ## Installation
 Requirements:
@@ -50,7 +50,7 @@ Seach for place you want to install the programm. I will use the following locat
 `/share`  
 Navigate to your location with `cd /share`  
 If you haven't git install it with `sudo apt-get install git`.  
-Clone the repository: `sudo git clone https://github.com/ElGammler/music_led_strip_control.git`  
+Clone the repository: `sudo git clone https://github.com/TobKra96/music_led_strip_control.git`  
 5. Install all python libraries. I use pip for the most packages: `sudo apt-get install python3-pip`  
 `pip3 install --upgrade pip`  
 `sudo apt-get install libatlas-base-dev`  
