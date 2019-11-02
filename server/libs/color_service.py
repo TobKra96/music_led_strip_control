@@ -134,7 +134,8 @@ class ColorService():
             gradient_color_count  = len(self._config["gradients"][gradient])
             current_color = 1
             
-            steps_between_bubbles = int(led_count / (gradient_color_count * effect_config["bubble_repeat"]  + 1))
+            # Get the steps between each bubble
+            steps_between_bubbles = int(led_count / (gradient_color_count * effect_config["bubble_repeat"]))
 
             # First build black array:
             self.full_bubble[gradient] = np.zeros((3, led_count))
@@ -161,8 +162,16 @@ class ColorService():
                     
                 current_color = current_color + 1
 
-            
-            self.full_bubble[gradient] = gaussian_filter1d(self.full_bubble[gradient], sigma=effect_config["blur"])
+            # Build an array, that contains the bubble array three times
+            tmp_gradient_array = self.full_bubble[gradient]
+            tmp_gradient_array = np.concatenate((tmp_gradient_array, tmp_gradient_array), axis=1)
+            tmp_gradient_array = np.concatenate((tmp_gradient_array, tmp_gradient_array), axis=1)
+
+            tmp_gradient_array = gaussian_filter1d(tmp_gradient_array, sigma=effect_config["blur"])
+
+            start_index = led_count - 1
+            end_index = start_index  + led_count
+            self.full_bubble[gradient] = tmp_gradient_array[:, start_index:end_index]
             
 
 
