@@ -23,7 +23,7 @@ Feature List
 ## Installation
 Requirements:
 
- - Raspberry Pi 3 B+ with sd card and power supply
+ - Raspberry Pi 3 or 4 with sd card and power supply
  - LED Strip with WS2812B leds
  - 5V power supply, with enough power for the leds. Each led requires 60 mA.
  - 470 Ω resistor
@@ -31,7 +31,10 @@ Requirements:
  - Microphone
 
 Tested with:
+- Raspberry 3 B+
+- Raspberry 4 B with 4GB RAM. I think the 2 GB variant would work too.
 - Raspbian Buster Lite, version: July 2019
+- Raspbian Buster Lite, version: February 2020
 - Python 3.7.3
 
 1. Setup hardware. 
@@ -43,13 +46,14 @@ Tested with:
 `sudo apt-get upgrade`
 
 3. Install python
-`sudo apt-get python3`
+`sudo apt-get install python3`
 
 4. Clone the github repository.  
 Seach for place you want to install the programm. I will use the following location:  
-`/share`  
+`/share`
+You can create a new folder with `sudo mkdir share`
 Navigate to your location with `cd /share`  
-If you haven't git install it with `sudo apt-get install git`.  
+If you have not yet installed git you can do so with the following command: `sudo apt-get install git`.  
 Clone the repository: `sudo git clone https://github.com/TobKra96/music_led_strip_control.git`  
 5. Install all python libraries. I use pip for the most packages: `sudo apt-get install python3-pip`  
 `pip3 install --upgrade pip`  
