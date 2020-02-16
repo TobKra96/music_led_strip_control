@@ -7,12 +7,11 @@
 
 from libs.output import Output
 from libs.config_service import ConfigService
-from libs.effects import Effects
+from libs.effect_service import EffectService
 from libs.effects_enum import EffectsEnum
 from libs.notification_enum import NotificationEnum
 from libs.notification_service import NotificationService
 from libs.webserver import Webserver
-from libs.server_service import ServerService
 from libs.audio_process_service import AudioProcessService
 
 import numpy as np
@@ -45,8 +44,6 @@ class Main():
         self._effects_queue = Queue(2)
         self._audio_queue_lock = Lock()
         self._audio_queue = Queue(2)
-        self._server_queue_lock = Lock()
-        self._server_queue = Queue(2)
 
         # Prepare all notification queues
         self._notification_queue_output_in = Queue(2)
@@ -93,7 +90,7 @@ class Main():
             self._output_process.start()
 
         # Start the Effect Service
-        self._effects = Effects()
+        self._effects = EffectService()
         self._effects_process = Process(
             target=self._effects.start, 
             args=(
@@ -103,8 +100,6 @@ class Main():
                 self._output_queue, 
                 self._output_queue_lock,
                 self._effects_queue,
-                self._server_queue,
-                self._server_queue_lock,
                 self._audio_queue,
                 self._audio_queue_lock
                 ))
@@ -137,19 +132,6 @@ class Main():
                 ))
         self._webserver_process.start()
         
-        #Start Server
-        self._server = ServerService()
-        self._server_process = Process(
-            target=self._server.start, 
-            args=(
-                self._config_lock, 
-                self._notification_queue_server_in, 
-                self._notification_queue_server_out,
-                self._server_queue,
-                self._server_queue_lock
-                ))
-        self._server_process.start()
-
         #Start audio process
         self._audio = AudioProcessService()
         self._audio_process = Process(
