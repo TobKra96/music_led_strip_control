@@ -13,6 +13,8 @@ import time
 import cProfile
 import random
 from collections import deque
+import time
+from itertools import cycle
 
 # Output array should look like:
 # output = {[r1,r2,r3,r4,r5],[g1,g2,g3,g4,g5],[]}
@@ -129,6 +131,13 @@ class Effects():
         # Setup for "Wave" (don't change these)
         self.wave_wipe_count = 0
 
+        # Setup for "Wiggle" (don't change these)
+        self.bool_lr = 0
+
+        # Setup for "VU Meter" (don't change these)
+        self.max_vol = 0
+        self.vol_history = np.zeros(100)
+
         try:
             # Get the last effect and set it. 
             last_effect_string = self._config["effects"]["last_effect"]
@@ -222,6 +231,14 @@ class Effects():
             self.effect_beat()
         elif self._current_effect == EffectsEnum.effect_wave:
             self.effect_wave()
+        elif self._current_effect == EffectsEnum.effect_beat_slide:
+            self.effect_beat_slide()
+        elif self._current_effect == EffectsEnum.effect_wiggle:
+            self.effect_wiggle()
+        elif self._current_effect == EffectsEnum.effect_vu_meter:
+            self.effect_vu_meter()
+        elif self._current_effect == EffectsEnum.effect_spectrum_analyzer:
+            self.effect_spectrum_analyzer()
 
         if(self._lost_arrays_counter % 100 == 0 and self._lost_arrays_counter != 0):
             print("Effect Service | Lost Arrays: " + str(self._lost_arrays_counter))
@@ -339,6 +356,13 @@ class Effects():
 
         # Setup for "Wave" (don't change these)
         self.wave_wipe_count = 0
+
+        # Setup for "Wiggle" (don't change these)
+        self.bool_lr = 0
+
+        # Setup for "VU Meter" (don't change these)
+        self.max_vol = 0
+        self.vol_history = np.zeros(100)
 
         # Notifiy the master component, that I'm finished.
         self._notification_queue_out.put(NotificationEnum.config_refresh_finished)
@@ -903,10 +927,16 @@ class Effects():
         
         self._audio_queue_lock.acquire()
         if not self._audio_queue.empty():
-            y = self._audio_queue.get()
+            y = self._audio_queue.get()            
         self._audio_queue_lock.release()
 
         # Audio Data is empty
+        if(y is None):
+            return
+
+        y = y["mel"]
+
+        # mel is empty
         if(y is None):
             return
 
@@ -1001,10 +1031,16 @@ class Effects():
         
         self._audio_queue_lock.acquire()
         if not self._audio_queue.empty():
-            y = self._audio_queue.get()
+            y = self._audio_queue.get()            
         self._audio_queue_lock.release()
-        
+
         # Audio Data is empty
+        if(y is None):
+            return
+
+        y = y["mel"]
+
+        # mel is empty
         if(y is None):
             return
 
@@ -1069,8 +1105,14 @@ class Effects():
         if not self._audio_queue.empty():
             y = self._audio_queue.get()
         self._audio_queue_lock.release()
-        
+
         # Audio Data is empty
+        if(y is None):
+            return
+
+        y = y["mel"]
+
+        # mel is empty
         if(y is None):
             return
 
@@ -1139,8 +1181,14 @@ class Effects():
         if not self._audio_queue.empty():
             y = self._audio_queue.get()
         self._audio_queue_lock.release()
-        
+
         # Audio Data is empty
+        if(y is None):
+            return
+
+        y = y["mel"]
+
+        # mel is empty
         if(y is None):
             return
 
@@ -1213,9 +1261,14 @@ class Effects():
         if not self._audio_queue.empty():
             y = self._audio_queue.get()
         self._audio_queue_lock.release()
-        
 
         # Audio Data is empty
+        if(y is None):
+            return
+
+        y = y["mel"]
+
+        # mel is empty
         if(y is None):
             return
 
@@ -1288,11 +1341,16 @@ class Effects():
         
         self._audio_queue_lock.acquire()
         if not self._audio_queue.empty():
-            y = self._audio_queue.get()
+            y = self._audio_queue.get()            
         self._audio_queue_lock.release()
-        
 
         # Audio Data is empty
+        if(y is None):
+            return
+
+        y = y["mel"]
+
+        # mel is empty
         if(y is None):
             return
 
@@ -1328,9 +1386,14 @@ class Effects():
         if not self._audio_queue.empty():
             y = self._audio_queue.get()
         self._audio_queue_lock.release()
-        
 
         # Audio Data is empty
+        if(y is None):
+            return
+
+        y = y["mel"]
+
+        # mel is empty
         if(y is None):
             return
 
@@ -1374,3 +1437,264 @@ class Effects():
 
         self.prev_output = output
 
+#Eigene Effekte
+    def effect_beat_slide(self):
+        effect_config = self._config["effects"]["effect_beat_slide"]
+        led_count = self._config["device_config"]["LED_Count"]
+
+        y = None
+        
+        self._audio_queue_lock.acquire()
+        if not self._audio_queue.empty():
+            y = self._audio_queue.get()
+        self._audio_queue_lock.release()
+
+        # Audio Data is empty
+        if(y is None):
+            return
+
+        y = y["mel"]
+
+        # mel is empty
+        if(y is None):
+            return
+
+        self.update_freq_channels(y)
+        self.detect_freqs()
+
+
+        self.current_color = self._color_service.colour(effect_config["color"])
+
+        # Build an empty array
+        output = np.zeros((3,led_count))
+
+        # Calculate how many steps the array will roll
+        steps = self.get_roll_steps(effect_config["speed"])
+
+        
+        if self.current_position == 0:
+            self.current_position = effect_config["slider_length"]
+
+        self.current_position = self.current_position + steps
+
+        if self.current_position > led_count - 1:
+            self.current_position = 0
+            #self.current_direction = False
+        
+        start_position = self.current_position
+        end_position = start_position - effect_config["slider_length"]
+        if end_position < 0:
+            end_position = 0
+        """
+        output[0, end_position:start_position] = self.current_color[0]
+        output[1, end_position:start_position] = self.current_color[1]
+        output[2, end_position:start_position] = self.current_color[2]
+        """
+
+        """Effect that creates a bar to the beat, where the Slider ends"""
+        if self.current_freq_detects["beat"]:
+            #output = np.zeros((3,led_count))
+            #evtl Zeilenende mit self.current_color[0] ersetzen
+            #time.sleep(0.5)
+            output[0][self.current_position:(self.current_position+effect_config["bar_length"])]=self._color_service.colour(effect_config["color"])[0]
+            output[1][self.current_position:(self.current_position+effect_config["bar_length"])]=self._color_service.colour(effect_config["color"])[1]
+            output[2][self.current_position:(self.current_position+effect_config["bar_length"])]=self._color_service.colour(effect_config["color"])[2]
+           
+            self.current_position = self.current_position+effect_config["bar_length"]
+            
+        else:
+            #output = np.copy(self.prev_output)
+            #output = np.multiply(self.prev_output,effect_config["decay"])
+            """Creates the Slider"""
+            output[0, end_position:start_position] = self.current_color[0]
+            output[1, end_position:start_position] = self.current_color[1]
+            output[2, end_position:start_position] = self.current_color[2]
+       
+        self._output_queue_lock.acquire()
+        if self._output_queue.full():
+            prev_output_array = self._output_queue.get()
+            del prev_output_array
+        self._output_queue.put(output)
+        self._output_queue_lock.release()
+
+        self.prev_output = output
+
+        
+    def effect_wiggle(self):
+        effect_config = self._config["effects"]["effect_wiggle"]
+        led_count = self._config["device_config"]["LED_Count"]
+
+        y = None
+        
+        self._audio_queue_lock.acquire()
+        if not self._audio_queue.empty():
+            y = self._audio_queue.get()
+        self._audio_queue_lock.release()
+
+        # Audio Data is empty
+        if(y is None):
+            return
+
+        y = y["mel"]
+
+        # mel is empty
+        if(y is None):
+            return
+
+        self.update_freq_channels(y)
+        self.detect_freqs()
+
+
+        self.current_color = self._color_service.colour(effect_config["color"])
+
+        # Build an empty array
+        output = np.zeros((3,led_count))
+
+        max_bar_count = led_count//effect_config["bar_length"]
+
+        #myIterator = cycle(range(2))
+
+        
+        """Effect that flashes to the beat"""
+        if self.current_freq_detects["beat"]:
+            output = np.zeros((3,led_count))
+            output[0][:]=self._color_service.colour(effect_config["beat_color"])[0]
+            output[1][:]=self._color_service.colour(effect_config["beat_color"])[1]
+            output[2][:]=self._color_service.colour(effect_config["beat_color"])[2]
+        elif self.current_freq_detects["low"] or self.current_freq_detects["mid"] or self.current_freq_detects["high"]:
+            if self.bool_lr == 0:
+                for bar_count in range (max_bar_count):
+                    if (bar_count % 2) == 0:
+                        output[0, bar_count*effect_config["bar_length"] : (bar_count*effect_config["bar_length"] + effect_config["bar_length"])] = self.current_color[0]
+                        output[1, bar_count*effect_config["bar_length"] : (bar_count*effect_config["bar_length"] + effect_config["bar_length"])] = self.current_color[1]
+                        output[2, bar_count*effect_config["bar_length"] : (bar_count*effect_config["bar_length"] + effect_config["bar_length"])] = self.current_color[2]
+                self.bool_lr = 1
+            else:
+                for bar_count in range (max_bar_count):
+                    if (bar_count % 2) == 1:
+                        output[0, bar_count*effect_config["bar_length"] : (bar_count*effect_config["bar_length"] + effect_config["bar_length"])] = self.current_color[0]
+                        output[1, bar_count*effect_config["bar_length"] : (bar_count*effect_config["bar_length"] + effect_config["bar_length"])] = self.current_color[1]
+                        output[2, bar_count*effect_config["bar_length"] : (bar_count*effect_config["bar_length"] + effect_config["bar_length"])] = self.current_color[2]
+                self.bool_lr = 0
+        else:
+            output = np.copy(self.prev_output)
+            output = np.multiply(self.prev_output,effect_config["decay"])
+       
+        self._output_queue_lock.acquire()
+        if self._output_queue.full():
+            prev_output_array = self._output_queue.get()
+            del prev_output_array
+        self._output_queue.put(output)
+        self._output_queue_lock.release()
+
+        self.prev_output = output
+
+    def effect_vu_meter(self):
+        effect_config = self._config["effects"]["effect_vu_meter"]
+        led_count = self._config["device_config"]["LED_Count"]
+
+        y = None
+        vol = None
+        
+        self._audio_queue_lock.acquire()
+        if not self._audio_queue.empty():
+            y = self._audio_queue.get()            
+        self._audio_queue_lock.release()
+
+        # Audio Data is empty
+        if(y is None):
+            return
+
+        vol = y["vol"]
+
+        # vol is empty       
+        if(vol is None):
+            return
+
+        #roll the history for one.
+        self.vol_history = np.roll(self.vol_history,1,axis = 0)
+        #add the new value
+        self.vol_history[0] = vol
+        
+        normalized_vol = (vol-np.min(self.vol_history)) / (np.max(self.vol_history)-np.min(self.vol_history))
+        
+
+        # Build an empty array
+        output = np.zeros((3,led_count))
+
+        """Effect that lights up more leds when volume gets higher"""
+        output[0][: int(normalized_vol*led_count)]=self._color_service.colour(effect_config["color"])[0]
+        output[1][: int(normalized_vol*led_count)]=self._color_service.colour(effect_config["color"])[1]
+        output[2][: int(normalized_vol*led_count)]=self._color_service.colour(effect_config["color"])[2]
+        
+        
+        if normalized_vol > self.max_vol:
+            self.max_vol = normalized_vol
+
+        """Effect that shows the max. volume"""
+        output[0][int(self.max_vol*led_count)-effect_config["bar_length"] : int(self.max_vol*led_count)]=self._color_service.colour(effect_config["max_vol_color"])[0]
+        output[1][int(self.max_vol*led_count)-effect_config["bar_length"] : int(self.max_vol*led_count)]=self._color_service.colour(effect_config["max_vol_color"])[1]
+        output[2][int(self.max_vol*led_count)-effect_config["bar_length"] : int(self.max_vol*led_count)]=self._color_service.colour(effect_config["max_vol_color"])[2]
+
+        self.max_vol -= effect_config["speed"]/10000
+
+        #print("vol: " + str(y))
+
+        self._output_queue_lock.acquire()
+        if self._output_queue.full():
+            prev_output_array = self._output_queue.get()
+            del prev_output_array
+        self._output_queue.put(output)
+        self._output_queue_lock.release()
+
+        self.prev_output = output
+        
+    def effect_spectrum_analyzer(self):
+        effect_config = self._config["effects"]["effect_spectrum_analyzer"]
+        led_count = self._config["device_config"]["LED_Count"]
+
+        y = None
+        
+        self._audio_queue_lock.acquire()
+        if not self._audio_queue.empty():
+            y = self._audio_queue.get()           
+        self._audio_queue_lock.release()
+
+        # Audio Data is empty
+        if(y is None):
+            return
+
+        y = y["mel"]
+
+        # mel is empty
+        if(y is None):
+            return
+
+        self.update_freq_channels(y)
+        #self.detect_freqs()
+
+
+        #self.current_color = self._color_service.colour(effect_config["color"])
+
+        # Build an empty array
+        output = np.zeros((3,led_count))
+
+        y = np.clip(y, 0, 1)
+
+        for i in range(effect_config["spectrum_count"]):
+            spec_array = y[(len(y)*i) // effect_config["spectrum_count"] : (len(y)*(i+1)) // effect_config["spectrum_count"]]
+            pegel_max = float(np.max(spec_array))
+
+            output[0][i*(led_count//effect_config["spectrum_count"]) : i*(led_count//effect_config["spectrum_count"]) + int(pegel_max*(led_count/effect_config["spectrum_count"]))]=self._color_service.colour(effect_config["color"])[0]
+            output[1][i*(led_count//effect_config["spectrum_count"]) : i*(led_count//effect_config["spectrum_count"]) + int(pegel_max*(led_count/effect_config["spectrum_count"]))]=self._color_service.colour(effect_config["color"])[1]
+            output[2][i*(led_count//effect_config["spectrum_count"]) : i*(led_count//effect_config["spectrum_count"]) + int(pegel_max*(led_count/effect_config["spectrum_count"]))]=self._color_service.colour(effect_config["color"])[2]
+
+       
+        self._output_queue_lock.acquire()
+        if self._output_queue.full():
+            prev_output_array = self._output_queue.get()
+            del prev_output_array
+        self._output_queue.put(output)
+        self._output_queue_lock.release()
+
+        self.prev_output = output
