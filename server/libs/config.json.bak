@@ -7,16 +7,16 @@
     "device_config": {
         "LED_Brightness": 100,
         "LED_Channel": 0,
-        "LED_Count": 900,
+        "LED_Count": 600,
         "LED_Dma": 10,
         "LED_Freq_Hz": 800000,
         "LED_Invert": false,
-        "LED_Pin": 21,
-        "LED_Mid": 450
+        "LED_Pin": 12,
+        "LED_Mid": 300
     },
 
     "audio_config": {
-        "DEFAULT_SAMPLE_RATE": 48000,
+        "DEFAULT_SAMPLE_RATE": 48000,        
         "FPS": 60,
         "MAX_BRIGHTNESS": 250,
         "MAX_FREQUENCY": 18000,
@@ -177,6 +177,29 @@
             "rods_length" : 15,
             "rods_distance": 50,
             "speed": 2
+        },
+		"effect_beat_slide": {
+            "color": "Blue",
+            "speed": 5,
+            "slider_length": 10,
+			"bar_length": 100,
+			"decay": 0.7
+        },
+		"effect_spectrum_analyzer": {
+            "color": "Blue",
+            "spectrum_count": 6
+        },
+		"effect_vu_meter": {
+            "bar_length": 2,
+            "color": "Blue",
+            "max_vol_color": "Red",
+            "speed": 10
+        },
+		"effect_wiggle": {
+            "bar_length": 20,
+            "beat_color": "Blue",
+            "color": "Orange",
+            "decay": 0.7
         },
         "last_effect": "effect_off"
     }
