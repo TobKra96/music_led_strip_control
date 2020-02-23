@@ -178,6 +178,26 @@ class Webserver():
     def effect_rods(): # pylint: disable=E0211
         # Render the effect_rods page
         return render_template('effects/effect_rods.html')
+        
+    @server.route('/effects/effect_beat_slide', methods=['GET', 'POST'])
+    def effect_beat_slide(): # pylint: disable=E0211
+        # Render the effect_beat_slide page
+        return render_template('effects/effect_beat_slide.html')
+
+    @server.route('/effects/effect_wiggle', methods=['GET', 'POST'])
+    def effect_wiggle(): # pylint: disable=E0211
+        # Render the effect_wiggle page
+        return render_template('effects/effect_wiggle.html')
+
+    @server.route('/effects/effect_vu_meter', methods=['GET', 'POST'])
+    def effect_vu_meter(): # pylint: disable=E0211
+        # Render the effect_vu_meter page
+        return render_template('effects/effect_vu_meter.html')
+
+    @server.route('/effects/effect_spectrum_analyzer', methods=['GET', 'POST'])
+    def effect_spectrum_analyzer(): # pylint: disable=E0211
+        # Render the effect_spectrum_analyzer page
+        return render_template('effects/effect_spectrum_analyzer.html')
 
     #####################################################################
     #   Settings Ajax                                                   #
