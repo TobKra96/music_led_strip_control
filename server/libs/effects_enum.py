@@ -17,3 +17,7 @@ class EffectsEnum(Enum):
     effect_twinkle = 15
     effect_pendulum = 16
     effect_rods = 17
+    effect_beat_slide = 18
+    effect_wiggle = 19
+    effect_vu_meter = 20
+    effect_spectrum_analyzer = 21

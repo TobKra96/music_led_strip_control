@@ -35,7 +35,7 @@ class AudioProcessService:
 
         print("Found the following audio sources:")
 
-        # Select the audio device you wan to use.
+        # Select the audio device you want to use.
         selected_device_list_index = self._config["audio_config"]["DEVICE_ID"]
 
         # check if the index is inside the list
@@ -116,7 +116,8 @@ class AudioProcessService:
             # Send the new audio data to the effect process.            
             if self._audio_queue.full():
                 pre_audio_data = self._audio_queue.get()
-            self._audio_queue.put(audio_datas["mel"])
+            #self._audio_queue.put(audio_datas["mel"])
+            self._audio_queue.put(audio_datas)
                 
 
             self.end_time = time.time()
