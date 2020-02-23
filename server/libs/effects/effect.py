@@ -141,3 +141,41 @@ class Effect:
             steps = 0
 
         return steps
+
+    def get_audio_data(self):
+        audio_data = None
+        
+        self._audio_queue_lock.acquire()
+        if not self._audio_queue.empty():
+            audio_data = self._audio_queue.get()
+        self._audio_queue_lock.release()
+
+        return audio_data
+
+    def get_mel(self, audio_data):
+
+        # Audio Data is empty
+        if(audio_data is None):
+            return None
+
+        audio_mel = audio_data["mel"]
+
+        # mel is empty
+        if(audio_mel is None):
+            return None
+
+        return audio_mel
+
+    def get_vol(self, audio_data):
+
+        # Audio Data is empty
+        if(audio_data is None):
+            return None
+
+        audio_vol = audio_data["vol"]
+
+        # vol is empty
+        if(audio_vol is None):
+            return None
+
+        return audio_vol

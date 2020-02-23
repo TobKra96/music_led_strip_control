@@ -18,6 +18,10 @@ from libs.effects.effect_slide import EffectSlide # pylint: disable=E0611, E0401
 from libs.effects.effect_twinkle import EffectTwinkle # pylint: disable=E0611, E0401
 from libs.effects.effect_wave import EffectWave # pylint: disable=E0611, E0401
 from libs.effects.effect_wavelength import EffectWavelength # pylint: disable=E0611, E0401
+from libs.effects.effect_beat_slide import EffectBeatSlide # pylint: disable=E0611, E0401
+from libs.effects.effect_spectrum_analyzer import EffectSpectrumAnalyzer # pylint: disable=E0611, E0401
+from libs.effects.effect_vu_meter import EffectVuMeter # pylint: disable=E0611, E0401
+from libs.effects.effect_wiggle import EffectWiggle # pylint: disable=E0611, E0401
 
 import numpy as np
 import gc as gc
@@ -74,7 +78,11 @@ class EffectService():
             EffectsEnum.effect_bars:EffectBars,
             EffectsEnum.effect_power:EffectPower,
             EffectsEnum.effect_beat:EffectBeat,
-            EffectsEnum.effect_wave:EffectWave
+            EffectsEnum.effect_wave:EffectWave,
+            EffectsEnum.effect_beat_slide:EffectBeatSlide,
+            EffectsEnum.effect_spectrum_analyzer:EffectSpectrumAnalyzer,
+            EffectsEnum.effect_vu_meter:EffectVuMeter,
+            EffectsEnum.effect_wiggle:EffectWiggle
         }
 
         self._initializedEffects = {}

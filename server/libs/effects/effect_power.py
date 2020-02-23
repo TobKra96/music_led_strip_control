@@ -11,16 +11,10 @@ class EffectPower(Effect):
         n_fft_bins = self._config["audio_config"]["N_FFT_BINS"]
         led_mid = self._config["device_config"]["LED_Mid"]
 
-        y = None
-        
-        self._audio_queue_lock.acquire()
-        if not self._audio_queue.empty():
-            y = self._audio_queue.get()
-        self._audio_queue_lock.release()
-        
+        audio_data = self.get_audio_data()
+        y = self.get_mel(audio_data)
 
-        # Audio Data is empty
-        if(y is None):
+        if y is None:
             return
 
         self.update_freq_channels(y)

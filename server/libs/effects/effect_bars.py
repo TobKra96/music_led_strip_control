@@ -8,15 +8,10 @@ class EffectBars(Effect):
         led_count = self._config["device_config"]["LED_Count"]
         led_mid = self._config["device_config"]["LED_Mid"]
 
-        y = None
-        
-        self._audio_queue_lock.acquire()
-        if not self._audio_queue.empty():
-            y = self._audio_queue.get()
-        self._audio_queue_lock.release()
-        
-        # Audio Data is empty
-        if(y is None):
+        audio_data = self.get_audio_data()
+        y = self.get_mel(audio_data)
+
+        if y is None:
             return
 
          # Bit of fiddling with the y values
