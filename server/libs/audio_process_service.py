@@ -1,6 +1,7 @@
 from libs.color_service import ColorService # pylint: disable=E0611, E0401
 from libs.config_service import ConfigService # pylint: disable=E0611, E0401
 from libs.dsp import DSP # pylint: disable=E0611, E0401
+from libs.fps_limiter import FPSLimiter # pylint: disable=E0611, E0401
 
 import numpy as np
 import pyaudio
@@ -22,9 +23,7 @@ class AudioProcessService:
         self._config = ConfigService.instance(self._config_lock).config
 
         #Init FPS Limiter
-        self.fps_limiter_start = time.time()
-        self.max_fps = self._config["audio_config"]["FPS"] + 10
-        self.min_waiting_time = 1 / self.max_fps
+        self._fps_limiter = FPSLimiter(100)
 
         # Init pyaudio
         self._py_audio = pyaudio.PyAudio()
@@ -80,7 +79,7 @@ class AudioProcessService:
         self.start_time = time.time()
         self.ten_seconds_counter = time.time()
 
-        self._dsp = DSP(config_lock)
+        self._dsp = DSP(self._config)
 
         print("Start open Audio stream")
         self.stream = self._py_audio.open(format = pyaudio.paInt16,
@@ -96,7 +95,7 @@ class AudioProcessService:
     def audio_service_routine(self):
         try:
             # Limit the fps to decrease laggs caused by 100 percent cpu
-            self.fps_limiter()
+            self._fps_limiter.fps_limiter()
 
             raw_data_from_stream = self.stream.read(self._frames_per_buffer, exception_on_overflow = False)
 
@@ -134,16 +133,6 @@ class AudioProcessService:
         except IOError:
             print("IOError during reading the Microphone Stream.")
             pass
-
-
-    def fps_limiter(self):
-
-        self.fps_limiter_end = time.time()
-        time_between_last_cycle = self.fps_limiter_end - self.fps_limiter_start
-        if time_between_last_cycle < self.min_waiting_time:
-            sleep(self.min_waiting_time - time_between_last_cycle)
-
-        self.fps_limiter_start = time.time() 
 
        
            

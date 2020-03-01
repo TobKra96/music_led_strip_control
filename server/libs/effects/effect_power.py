@@ -5,11 +5,11 @@ import random
 
 class EffectPower(Effect):
     def run(self):
-        effect_config = self._config["effects"]["effect_power"]
+        effect_config = self._device.device_config["effects"]["effect_power"]
         
-        led_count = self._config["device_config"]["LED_Count"]
+        led_count = self._device.device_config["LED_Count"]
         n_fft_bins = self._config["audio_config"]["N_FFT_BINS"]
-        led_mid = self._config["device_config"]["LED_Mid"]
+        led_mid = self._device.device_config["LED_Mid"]
 
         audio_data = self.get_audio_data()
         y = self.get_mel(audio_data)

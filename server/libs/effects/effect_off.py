@@ -5,6 +5,6 @@ import numpy as np
 class EffectOff(Effect):
     def run(self):
         # Build an empty array
-        output_array = np.zeros((3, self._config["device_config"]["LED_Count"]))
+        output_array = np.zeros((3, self._device.device_config["LED_Count"]))
         
         self._output_queue.put(output_array)

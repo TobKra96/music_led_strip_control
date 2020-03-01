@@ -105,8 +105,8 @@ class EffectService():
         self._fps_limiter.fps_limiter()
 
         # Check the nofitication queue
-        if not self._device.notification_queue_in.empty():
-            self._current_notification_in = self._device.notification_queue_in.get()
+        if not self._device.device_notification_queue_in.empty():
+            self._current_notification_in = self._device.device_notification_queue_in.get()
 
         if hasattr(self, "_current_notification_in"):
             if self._current_notification_in is NotificationEnum.config_refresh:
@@ -126,8 +126,8 @@ class EffectService():
             return
 
         # Check if the effect changed.
-        if not self._device.effects_queue.empty():
-            new_effect = self._device.effects_queue.get()
+        if not self._device.effect_queue.empty():
+            new_effect = self._device.effect_queue.get()
             self._current_effect = new_effect["EFFECT"]
             print("New effect found:" + new_effect["EFFECT"])
 
@@ -169,6 +169,6 @@ class EffectService():
         self._fps_limiter = FPSLimiter(self._device.device_config["FPS"])
         
         # Notifiy the master component, that I'm finished.
-        self._device.notification_queue_out.put(NotificationEnum.config_refresh_finished)
+        self._device.device_notification_queue_out.put(NotificationEnum.config_refresh_finished)
         print("Effects refreshed.")
 

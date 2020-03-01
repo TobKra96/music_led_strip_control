@@ -18,8 +18,8 @@ class EffectPendulum(Effect):
 
     def run(self):
         # Get the config of the current effect
-        effect_config = self._config["effects"]["effect_pendulum"]
-        led_count = self._config["device_config"]["LED_Count"]
+        effect_config = self._device.device_config["effects"]["effect_pendulum"]
+        led_count = self._device.device_config["LED_Count"]
 
         if (self.current_position == 0) or (self.current_position == led_count - 1):
             if effect_config["change_color"]:
@@ -36,7 +36,7 @@ class EffectPendulum(Effect):
                 self.current_color = self._color_service.colour(effect_config["color"])
 
         # Build an empty array
-        output_array = np.zeros((3, self._config["device_config"]["LED_Count"]))
+        output_array = np.zeros((3, self._device.device_config["LED_Count"]))
 
         # Calculate how many steps the array will roll
         steps = self.get_roll_steps(effect_config["speed"])

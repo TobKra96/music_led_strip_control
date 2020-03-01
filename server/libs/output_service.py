@@ -26,8 +26,8 @@ class OutputService:
 
         self._output_queue = self._device.output_queue
         self._output_queue_lock = self._device.output_queue_lock
-        self._notification_queue_in = self._device.notification_queue_in
-        self._notification_queue_out = self._device.notification_queue_out
+        self._device_notification_queue_in = self._device.device_notification_queue_in
+        self._device_notification_queue_out = self._device.device_notification_queue_out
         
         self.ten_seconds_counter = time.time()
         self.sec_ten_seconds_counter = time.time()
@@ -46,7 +46,8 @@ class OutputService:
             }
 
         current_output_enum = OutputsEnum[self._device.device_config["OUTPUT_TYPE"]]
-        self._current_output = self._available_outputs[current_output_enum]()
+        print("Found output: " + str(current_output_enum))
+        self._current_output = self._available_outputs[current_output_enum](self._device)
 
         print("Output component started.")
         while not self._cancel_token:
@@ -58,8 +59,8 @@ class OutputService:
         self._fps_limiter.fps_limiter()
 
         # Check the nofitication queue
-        if not self._notification_queue_in.empty():
-            self._current_notification_in = self._notification_queue_in.get()
+        if not self._device_notification_queue_in.empty():
+            self._current_notification_in = self._device_notification_queue_in.get()
 
         if hasattr(self, "_current_notification_in"):
             if self._current_notification_in is NotificationEnum.config_refresh:
@@ -106,6 +107,6 @@ class OutputService:
         self._config = self._device.config
 
         # Notifiy the master component, that I'm finished.
-        self._notification_queue_out.put(NotificationEnum.config_refresh_finished)
+        self._device_notification_queue_out.put(NotificationEnum.config_refresh_finished)
 
         print("Output refreshed.")

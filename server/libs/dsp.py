@@ -6,8 +6,9 @@ from scipy.ndimage.filters import gaussian_filter1d
 from libs.config_service import ConfigService # pylint: disable=E0611, E0401
 
 class DSP():
-    def __init__(self, config):
+    def __init__(self, config, device_config=None):
         self._config = config
+        self._device_config = device_config
        
         # Initialise filters etc. I've no idea what most of these are for but i imagine i won't be getting rid of them soon 
         n_fft_bins = self._config["audio_config"]["N_FFT_BINS"]
@@ -15,7 +16,10 @@ class DSP():
         frames_per_buffer = self._config["audio_config"]["FRAMES_PER_BUFFER"]
         n_rolling_history = self._config["audio_config"]["N_ROLLING_HISTORY"]
 
-        led_count = self._config["device_config"]["LED_Count"]
+        if device_config is None:
+            led_count = 200
+        else:
+            led_count = self._device_config["LED_Count"]
 
         self.fft_plot_filter = ExpFilter(np.tile(1e-1, n_fft_bins), alpha_decay=0.5, alpha_rise=0.99)
         self.mel_gain =        ExpFilter(np.tile(1e-1, n_fft_bins), alpha_decay=0.01, alpha_rise=0.99)

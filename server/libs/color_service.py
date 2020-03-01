@@ -4,7 +4,7 @@ from scipy.ndimage.filters import gaussian_filter1d
 class ColorService():
     def __init__(self, config, device_config):
 
-        self._config = config,
+        self._config = config
         self._device_config = device_config
         self.full_gradients = {}
         self.full_fadegradients = {}
@@ -15,16 +15,16 @@ class ColorService():
 
         self.full_gradients = {}
 
-        for gradient in self._config["gradients"]:
+        for key in self._config["gradients"].keys():
             not_mirrored_gradient = self._easing_gradient_generator(
-                self._config["gradients"][gradient], # All colors of the current gradient
+                self._config["gradients"][key], # All colors of the current gradient
                 self._device_config["LED_Count"]
             )
 
             # Mirror the gradient to get seemsles transition from start to the end
             # [1,2,3,4]
             # -> [1,2,3,4,4,3,2,1]
-            self.full_gradients[gradient] = np.concatenate(
+            self.full_gradients[key] = np.concatenate(
                 (not_mirrored_gradient[:, ::-1], not_mirrored_gradient), 
                 axis = 1
                 )

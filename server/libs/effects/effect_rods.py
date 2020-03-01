@@ -15,9 +15,9 @@ class EffectRods(Effect):
 
     def run(self):
         # Get the config of the current effect
-        effect_config = self._config["effects"]["effect_rods"]
-        led_count = self._config["device_config"]["LED_Count"]
-        led_mid = self._config["device_config"]["LED_Mid"]
+        effect_config = self._device.device_config["effects"]["effect_rods"]
+        led_count = self._device.device_config["LED_Count"]
+        led_mid = self._device.device_config["LED_Mid"]
 
         self.count_since_last_rod = self.count_since_last_rod + 1
 
@@ -35,7 +35,7 @@ class EffectRods(Effect):
         # Move array <--- this direction for "steps" fields
 
         # Build an empty array
-        local_output_array = np.zeros((3, self._config["device_config"]["LED_Count"]))
+        local_output_array = np.zeros((3, self._device.device_config["LED_Count"]))
 
         if not effect_config["reverse"]:
             self.output = np.roll(self.output,steps,axis = 1)

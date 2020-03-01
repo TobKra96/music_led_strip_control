@@ -8,9 +8,9 @@ class EffectSingle(Effect):
         Show one single color.
         """
         # Get the config of the current effect
-        effect_config = self._config["effects"]["effect_single"]
+        effect_config = self._device.device_config["effects"]["effect_single"]
         # Build an empty array
-        output_array = np.zeros((3, self._config["device_config"]["LED_Count"]))
+        output_array = np.zeros((3, self._device.device_config["LED_Count"]))
         
         # Fill the array with the selected color
         output_array[0][:]=self._config_colours[effect_config["color"]][0]

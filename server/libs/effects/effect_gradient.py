@@ -5,15 +5,15 @@ import numpy as np
 class EffectGradient(Effect):
     def run(self):
         # Get the config of the current effect
-        effect_config = self._config["effects"]["effect_gradient"]
+        effect_config = self._device.device_config["effects"]["effect_gradient"]
 
         # Prepare the needed config inside local variables to enhance the looking of the long array functions.
         current_gradient = effect_config["gradient"]
         current_speed = effect_config["speed"]
         current_reverse = effect_config["reverse"]
 
-        led_count = self._config["device_config"]["LED_Count"]
-        led_mid = self._config["device_config"]["LED_Mid"]
+        led_count = self._device.device_config["LED_Count"]
+        led_mid = self._device.device_config["LED_Mid"]
 
         # Translate the true and false to a number, for the fuction use.
         current_reverse_translated = 0

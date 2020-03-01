@@ -18,13 +18,13 @@ class EffectTwinkle(Effect):
 
     def run(self):
         # Get the config of the current effect
-        effect_config = self._config["effects"]["effect_twinkle"]
-        led_count = self._config["device_config"]["LED_Count"]
+        effect_config = self._device.device_config["effects"]["effect_twinkle"]
+        led_count = self._device.device_config["LED_Count"]
 
         # Rising Star array format: [[r,g,b], [start_position, end_position], percent_brightness]
 
         # Reset output array
-        self.output = np.zeros((3, self._config["device_config"]["LED_Count"]))
+        self.output = np.zeros((3, self._device.device_config["LED_Count"]))
 
 
         # Random add off the stars, depending on speed settings

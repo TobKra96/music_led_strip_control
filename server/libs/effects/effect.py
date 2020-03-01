@@ -26,7 +26,6 @@ class Effect:
         self._audio_queue = self._device.audio_queue
         self._audio_queue_lock = self._device.audio_queue_lock
 
-
         # Initials color service and build gradients
         self._color_service = ColorService(self._config, self._device_config)
         self._color_service.build_gradients()
@@ -39,7 +38,7 @@ class Effect:
         self._math_service = MathService()
 
         # Init dsp
-        self._dsp = DSP(self._config)
+        self._dsp = DSP(self._config, self._device_config)
 
         #Init some variables for the effects
         self.led_count = self._device_config["LED_Count"]

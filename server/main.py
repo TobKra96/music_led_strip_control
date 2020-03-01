@@ -75,6 +75,8 @@ class Main():
                 self._config_lock, 
                 self._notification_queue_device_manager_in, 
                 self._notification_queue_device_manager_out, 
+                self._notification_queue_audio_in, 
+                self._notification_queue_audio_out, 
                 self._notification_queue_webserver_in, 
                 self._notification_queue_webserver_out, 
                 ))

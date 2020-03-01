@@ -67,9 +67,8 @@
         "test": "first"
     },
     "device_configs": {
-        "device_config": {
+        "device_a": {
             "OUTPUT_TYPE": "output_raspi",
-            "DEVICE_ID":"device_a",
             "DEVICE_NAME":"Device A",
             "FPS": 60,
             "LED_Brightness": 100,

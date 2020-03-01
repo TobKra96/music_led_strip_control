@@ -5,9 +5,9 @@ import numpy as np
 class EffectSlide(Effect):
     def run(self):
         # Get the config of the current effect
-        effect_config = self._config["effects"]["effect_slide"]
-        led_count = self._config["device_config"]["LED_Count"]
-        led_mid = self._config["device_config"]["LED_Mid"]
+        effect_config = self._device.device_config["effects"]["effect_slide"]
+        led_count = self._device.device_config["LED_Count"]
+        led_mid = self._device.device_config["LED_Mid"]
 
         # Translate the true and false to a number, for the fuction use.
         current_reverse_translated = 0
