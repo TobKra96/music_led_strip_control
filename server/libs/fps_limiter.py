@@ -3,12 +3,12 @@ import time
 
 class FPSLimiter:
 
-    def __init__(self, config):
-        self._config = config
+    def __init__(self, fps):
+        self._fps = fps
 
         #Init FPS Limiter
         self.fps_limiter_start = time.time()
-        self.max_fps = self._config["audio_config"]["FPS"] + 10
+        self.max_fps = self._fps + 10
         self.min_waiting_time = 1 / self.max_fps
 
     def fps_limiter(self):
