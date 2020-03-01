@@ -36,33 +36,20 @@ from collections import deque
 
 class EffectService():
 
-    def start(self, config_lock, notification_queue_in, notification_queue_out, output_queue, output_queue_lock, effects_queue, audio_queue, audio_queue_lock ):
+    def start(self, device):
         """
         Start the effect service process. You can change the effect by add a new effect enum inside the enum_queue.
         """
 
         print("Start Effect Service component...")
-
-        self._config_lock = config_lock
-        self._notification_queue_in = notification_queue_in
-        self._notification_queue_out = notification_queue_out
-        self._output_queue = output_queue
-        self._output_queue_lock = output_queue_lock
-        self._effects_queue = effects_queue
-        self._audio_queue = audio_queue
-        self._audio_queue_lock = audio_queue_lock
+        self._device = device
 
         self.ten_seconds_counter = time.time()
         self.start_time = time.time()
 
-        # Initial config load.
-        self._config = ConfigService.instance(self._config_lock).config
-        self._config_colours = self._config["colours"]
-        self._config_gradients = self._config["gradients"]
-        
-        self._fps_limiter = FPSLimiter(self._config)
+        self._fps_limiter = FPSLimiter(self._device.device_config["FPS"])
 
-        self._availableEffects = {
+        self._available_effects = {
             EffectsEnum.effect_off: EffectOff,
             EffectsEnum.effect_single:EffectSingle,
             EffectsEnum.effect_gradient:EffectGradient,
@@ -85,13 +72,15 @@ class EffectService():
             EffectsEnum.effect_wiggle:EffectWiggle
         }
 
-        self._initializedEffects = {}
+        self._initialized_effects = {}
+        self._current_effect = {}
+
+
 
         try:
             # Get the last effect and set it. 
-            last_effect_string = self._config["effects"]["last_effect"]
-            last_effect = EffectsEnum[last_effect_string]
-            self._current_effect = last_effect
+            last_effect_string = self._device.device_config["effects"]["last_effect"]
+            self._current_effect = EffectsEnum[last_effect_string]
 
         except Exception:
             print("Could not parse last effect. Set effect to off.")
@@ -116,8 +105,8 @@ class EffectService():
         self._fps_limiter.fps_limiter()
 
         # Check the nofitication queue
-        if not self._notification_queue_in.empty():
-            self._current_notification_in = self._notification_queue_in.get()
+        if not self._device.notification_queue_in.empty():
+            self._current_notification_in = self._device.notification_queue_in.get()
 
         if hasattr(self, "_current_notification_in"):
             if self._current_notification_in is NotificationEnum.config_refresh:
@@ -127,7 +116,7 @@ class EffectService():
             elif self._current_notification_in is NotificationEnum.process_pause:
                 self._skip_effect = True
             elif self._current_notification_in is NotificationEnum.process_stop:
-                self.stop() 
+                self.stop()
 
         # Reset the current in notification, to do it only one time.
         self._current_notification_in = None
@@ -137,24 +126,28 @@ class EffectService():
             return
 
         # Check if the effect changed.
-        if not self._effects_queue.empty():
-            self._current_effect = self._effects_queue.get()
-            print("New effect found:", self._current_effect)
+        if not self._device.effects_queue.empty():
+            new_effect = self._device.effects_queue.get()
+            self._current_effect = new_effect["EFFECT"]
+            print("New effect found:" + new_effect["EFFECT"])
 
+       
         # Something is wrong here, no effect set. So skip until we get a new information.
         if self._current_effect is None:
             print("Effect Service | Could not find effect.")
             return
 
 
-        if(self._current_effect in self._initializedEffects.keys()):
-            self._initializedEffects[self._current_effect].run()
-        else:
-            if self._current_effect in self._availableEffects.keys():
-                self._initializedEffects[self._current_effect] = self._availableEffects[self._current_effect](self._config, self._config_lock, self._output_queue, self._output_queue_lock, self._audio_queue, self._audio_queue_lock)
+        if(not(self._current_effect in self._initialized_effects.keys())):
+            if self._current_effect in self._available_effects.keys():
+                self._initialized_effects[self._current_effect] = self._available_effects[self._current_effect](self._device)
+            else:
+                print("Could not find effect: " + self._current_effect)
+           
+        self._initialized_effects[self._current_effect].run()
 
         self.end_time = time.time()
-                        
+                            
         if time.time() - self.ten_seconds_counter > 10:
             self.ten_seconds_counter = time.time()
             self.time_dif = self.end_time - self.start_time
@@ -171,18 +164,11 @@ class EffectService():
 
     def refresh(self):
         print("Refresh effects...")
-        # Refresh the config
-        ConfigService.instance(self._config_lock).load_config()
-        self._config = ConfigService.instance(self._config_lock).config
+        self._initialized_effects = {}
 
-        # Initial config load.
-        self._config = ConfigService.instance(self._config_lock).config
-        self._config_colours = self._config["colours"]
-        self._config_gradients = self._config["gradients"]
-
-        self._initializedEffects = {}
-
+        self._fps_limiter = FPSLimiter(self._device.device_config["FPS"])
+        
         # Notifiy the master component, that I'm finished.
-        self._notification_queue_out.put(NotificationEnum.config_refresh_finished)
+        self._device.notification_queue_out.put(NotificationEnum.config_refresh_finished)
         print("Effects refreshed.")
 

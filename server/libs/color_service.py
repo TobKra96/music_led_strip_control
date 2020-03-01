@@ -2,9 +2,10 @@ import numpy as np
 from scipy.ndimage.filters import gaussian_filter1d
 
 class ColorService():
-    def __init__(self, config):
+    def __init__(self, config, device_config):
 
-        self._config = config
+        self._config = config,
+        self._device_config = device_config
         self.full_gradients = {}
         self.full_fadegradients = {}
         self.full_slide = {}
@@ -17,7 +18,7 @@ class ColorService():
         for gradient in self._config["gradients"]:
             not_mirrored_gradient = self._easing_gradient_generator(
                 self._config["gradients"][gradient], # All colors of the current gradient
-                self._config["device_config"]["LED_Count"]
+                self._device_config["LED_Count"]
             )
 
             # Mirror the gradient to get seemsles transition from start to the end
@@ -105,7 +106,7 @@ class ColorService():
             return (0,0,0)
 
     def build_slidearrays(self):
-        led_count = self._config["device_config"]["LED_Count"]        
+        led_count = self._device_config["LED_Count"]
 
         self.full_slide = {}
 
@@ -125,8 +126,8 @@ class ColorService():
                     self.full_slide[gradient] = np.concatenate((self.full_slide[gradient], currentColorArray), axis=1)
 
     def build_bubblearrays(self):
-        led_count = self._config["device_config"]["LED_Count"]        
-        effect_config = self._config["effects"]["effect_bubble"]
+        led_count = self._device_config["LED_Count"]    
+        effect_config = self._device_config["effects"]["effect_bubble"]
 
         self.full_bubble = {}
 

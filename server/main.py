@@ -5,9 +5,8 @@
 #   This file will only initialize and start the processes.
 #
 
-from libs.output import Output
+from libs.device_manager import DeviceManager
 from libs.config_service import ConfigService
-from libs.effect_service import EffectService
 from libs.effects_enum import EffectsEnum
 from libs.notification_enum import NotificationEnum
 from libs.notification_service import NotificationService
@@ -46,64 +45,27 @@ class Main():
         self._audio_queue = Queue(2)
 
         # Prepare all notification queues
-        self._notification_queue_output_in = Queue(2)
-        self._notification_queue_output_out = Queue(2)
-
         self._notification_queue_audio_in = Queue(2)
         self._notification_queue_audio_out = Queue(2)
 
-        self._notification_queue_effects_in = Queue(2)
-        self._notification_queue_effects_out = Queue(2)
+        self._notification_queue_device_manager_in = Queue(2)
+        self._notification_queue_device_manager_out = Queue(2)
 
         self._notification_queue_webserver_in = Queue(2)
         self._notification_queue_webserver_out = Queue(2)
 
-        self._notification_queue_server_in = Queue(2)
-        self._notification_queue_server_out = Queue(2)
-
-        # Only activate the output if I'm inside the output mode.
-        if(not self._config["development_config"]["deactivate_output"]):
-            #Start Output Service
-            self._output = Output()
-            self._output_process = Process(
-                target=self._output.start, 
-                args=(
-                    self._config_lock, 
-                    self._notification_queue_output_in, 
-                    self._notification_queue_output_out, 
-                    self._output_queue, 
-                    self._output_queue_lock, 
-                    ))
-            self._output_process.start()
-        else:
-            # Start Output Dummy Service
-            self._output = Output()
-            self._output_process = Process(
-                target=self._output.start_dummy, 
-                args=(
-                    self._config_lock, 
-                    self._notification_queue_output_in, 
-                    self._notification_queue_output_out, 
-                    self._output_queue, 
-                    self._output_queue_lock
-                    ))
-            self._output_process.start()
-
-        # Start the Effect Service
-        self._effects = EffectService()
-        self._effects_process = Process(
-            target=self._effects.start, 
+        # Start the DeviceManager Service
+        self._device_manager = DeviceManager()
+        self._device_manager_process = Process(
+            target=self._device_manager.start, 
             args=(
                 self._config_lock, 
-                self._notification_queue_effects_in, 
-                self._notification_queue_effects_out, 
-                self._output_queue, 
-                self._output_queue_lock,
-                self._effects_queue,
+                self._notification_queue_device_manager_in, 
+                self._notification_queue_device_manager_out, 
                 self._audio_queue,
                 self._audio_queue_lock
                 ))
-        self._effects_process.start()
+        self._device_manager_process.start()
 
         # Start Notification Service
         self._notification_service = NotificationService()
@@ -111,10 +73,8 @@ class Main():
             target=self._notification_service.start, 
             args=(
                 self._config_lock, 
-                self._notification_queue_output_in, 
-                self._notification_queue_output_out, 
-                self._notification_queue_effects_in, 
-                self._notification_queue_effects_out, 
+                self._notification_queue_device_manager_in, 
+                self._notification_queue_device_manager_out, 
                 self._notification_queue_webserver_in, 
                 self._notification_queue_webserver_out, 
                 ))
@@ -138,8 +98,8 @@ class Main():
             target=self._audio.start, 
             args=(
                 self._config_lock, 
-                self._notification_queue_server_in, 
-                self._notification_queue_server_out,
+                self._notification_queue_audio_in, 
+                self._notification_queue_audio_out,
                 self._audio_queue,
                 self._audio_queue_lock
                 ))
@@ -163,8 +123,6 @@ class Main():
 
             print("Stop the programm...")
             
-            self._output_process.terminate()
-            self._effects_process.terminate()
             self._notification_service_process.terminate()
             self._webserver_process.terminate()
 

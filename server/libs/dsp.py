@@ -6,13 +6,9 @@ from scipy.ndimage.filters import gaussian_filter1d
 from libs.config_service import ConfigService # pylint: disable=E0611, E0401
 
 class DSP():
-    def __init__(self, config_lock):
-
-        self._config_lock = config_lock
-
-        # Initial config load.
-        self._config = ConfigService.instance(self._config_lock).config
-        
+    def __init__(self, config):
+        self._config = config
+       
         # Initialise filters etc. I've no idea what most of these are for but i imagine i won't be getting rid of them soon 
         n_fft_bins = self._config["audio_config"]["N_FFT_BINS"]
         min_volume_threshold = self._config["audio_config"]["MIN_VOLUME_THRESHOLD"]

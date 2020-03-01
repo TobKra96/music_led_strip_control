@@ -12,23 +12,23 @@ from collections import deque
 
 class Effect:
 
-    def __init__(self, config, config_lock, output_queue, output_queue_lock, audio_queue, audio_queue_lock):
-
+    def __init__(self, device):
+        self._device = device
+        
         # Initial config load.
-        self._config = config
+        self._config = self._device.config
         self._config_colours = self._config["colours"]
         self._config_gradients = self._config["gradients"]
 
-        self._config_lock = config_lock
-
-        self._output_queue = output_queue
-        self._output_queue_lock = output_queue_lock
-        self._audio_queue = audio_queue
-        self._audio_queue_lock = audio_queue_lock
+        self._device_config = self._device.device_config
+        self._output_queue = self._device.output_queue
+        self._output_queue_lock = self._device.output_queue_lock
+        self._audio_queue = self._device.audio_queue
+        self._audio_queue_lock = self._device.audio_queue_lock
 
 
         # Initials color service and build gradients
-        self._color_service = ColorService(self._config)
+        self._color_service = ColorService(self._config, self._device_config)
         self._color_service.build_gradients()
         self._color_service.build_fadegradients()
         self._color_service.build_slidearrays()
@@ -39,10 +39,10 @@ class Effect:
         self._math_service = MathService()
 
         # Init dsp
-        self._dsp = DSP(self._config_lock)
+        self._dsp = DSP(self._config)
 
         #Init some variables for the effects
-        self.led_count = self._config["device_config"]["LED_Count"]
+        self.led_count = self._device_config["LED_Count"]
         self.n_fft_bins = self._config["audio_config"]["N_FFT_BINS"]
 
         self.prev_spectrum = np.array([self.led_count // 2])
