@@ -45,12 +45,15 @@ class DeviceManager:
             current_device.audio_queue_lock.release()
 
     def init_devices(self):
-        for current_device in self.__config["device_configs"]:
-            self.__devices[current_device["DEVICE_ID"]] = Device(self.__config, current_device)
+        for key in self.__config["device_configs"].keys():
+            device_id = key
+            print("Init device with device id:" + device_id)
+            self.__devices[device_id] = Device(self.__config, self.__config["device_configs"][device_id])
 
     def start_devices(self):
-        for current_device in self.__devices:
-            current_device.start()
+        for key, value in self.__devices.items():
+            print("Start device:" + key)
+            value.start_device()
 
   
     

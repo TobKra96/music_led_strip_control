@@ -18,7 +18,8 @@ class Webserver():
         # Initial config load.
         self._config_instance = ConfigService.instance(self._config_lock)
         self._config = self._config_instance.config
-        self._current_effect = self._config["effects"]["last_effect"]
+        #self._current_effect = self._config["effects"]["last_effect"]
+        self._current_effect = "effect_off"
 
         Webserver.instance = self
 

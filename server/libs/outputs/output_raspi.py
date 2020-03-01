@@ -1,4 +1,4 @@
-from libs.output.output import Output # pylint: disable=E0611, E0401
+from libs.outputs.output import Output # pylint: disable=E0611, E0401
 
 import numpy as np
 
@@ -6,18 +6,18 @@ class OutputRaspi(Output):
     def __init__(self, device):
 
         # Call the constructor of the base class.
-        super(OutputRaspi, self).__init__(self, device)
+        super(OutputRaspi, self).__init__(device)
 
         import _rpi_ws281x as ws # pylint: disable=import-error
 
         # LED strip configuration:
-        self._led_count       = int(self.device_config["LED_Count"])      # Number of LED pixels.
-        self._led_pin         = int(self.device_config["LED_Pin"])        # GPIO pin connected to the pixels (18 uses PWM!).
-        self._led_freq_hz     = int(self.device_config["LED_Freq_Hz"])    # LED signal frequency in hertz (usually 800khz)
-        self._led_dma         = int(self.device_config["LED_Dma"])        # DMA channel to use for generating signal (try 10)
-        self._led_brightness  = int(self.device_config["LED_Brightness"]) # Set to 0 for darkest and 100 for brightest
-        self._led_invert      = int(self.device_config["LED_Invert"])     # True to invert the signal (when using NPN transistor level shift)
-        self._led_channel     = int(self.device_config["LED_Channel"])    # set to '1' for GPIOs 13, 19, 41, 45 or 53
+        self._led_count       = int(self._device_config["LED_Count"])      # Number of LED pixels.
+        self._led_pin         = int(self._device_config["LED_Pin"])        # GPIO pin connected to the pixels (18 uses PWM!).
+        self._led_freq_hz     = int(self._device_config["LED_Freq_Hz"])    # LED signal frequency in hertz (usually 800khz)
+        self._led_dma         = int(self._device_config["LED_Dma"])        # DMA channel to use for generating signal (try 10)
+        self._led_brightness  = int(self._device_config["LED_Brightness"]) # Set to 0 for darkest and 100 for brightest
+        self._led_invert      = int(self._device_config["LED_Invert"])     # True to invert the signal (when using NPN transistor level shift)
+        self._led_channel     = int(self._device_config["LED_Channel"])    # set to '1' for GPIOs 13, 19, 41, 45 or 53
 
         
         self._led_brightness_translated = int(255 * (self._led_brightness / 100))

@@ -5,9 +5,9 @@ from scipy.ndimage.filters import gaussian_filter1d
 
 class EffectWavelength(Effect):
     def run(self):
-        effect_config = self._config["effects"]["effect_wavelength"]
-        led_count = self._config["device_config"]["LED_Count"]
-        led_mid = self._config["device_config"]["LED_Mid"]
+        effect_config = self._device.device_config["effects"]["effect_wavelength"]
+        led_count = self._device.device_config["LED_Count"]
+        led_mid = self._device.device_config["LED_Mid"]
 
         audio_data = self.get_audio_data()
         y = self.get_mel(audio_data)
