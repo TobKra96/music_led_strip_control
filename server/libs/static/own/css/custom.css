@@ -1,4 +1,4 @@
-.glyphicon.dasboard-glyph{
+.dasboard-glyph{
     margin-top: 10px;
     margin-bottom: 20px;
     font-size: 35px;
@@ -23,4 +23,8 @@ li.active-dashboard-item {
 
 .center{
     margin: 25px 0px;
+}
+
+.nav_height{
+    height: 50px;
 }

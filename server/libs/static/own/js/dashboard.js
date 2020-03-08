@@ -85,7 +85,7 @@ function switchEffect(e, listName){
         }
      
     // Click on some of the span elements inside the li element.
-    }else if(e.target && e.target.nodeName == "SPAN"){
+    }else if((e.target && e.target.nodeName == "SPAN")||(e.target && e.target.nodeName == "I")){
         if(e.target.parentElement && e.target.parentElement.nodeName == "LI"){
             if(e.target.parentElement.parentElement && e.target.parentElement.parentElement.id == listName){
                 newActiveEffect = e.target.parentElement.id;
