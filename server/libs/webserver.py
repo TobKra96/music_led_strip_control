@@ -18,8 +18,6 @@ class Webserver():
         # Initial config load.
         self._config_instance = ConfigService.instance(self._config_lock)
         self._config = self._config_instance.config
-        #self._current_effect = self._config["effects"]["last_effect"]
-        self._current_effect = "effect_off"
 
         Webserver.instance = self
 
@@ -50,14 +48,6 @@ class Webserver():
     #####################################################################
 
     # Endpoint for Ajax
-    @server.route('/getActiveEffect', methods=['GET'])
-    def getActiveEffect(): # pylint: disable=E0211
-        # return the current effect if the request is valid.
-        if request.method == 'GET':
-            if request.args.get('active_effect') is not None:
-                return jsonify(active_effect = Webserver.instance._current_effect)
-
-    # Endpoint for Ajax
     @server.route('/setActiveEffect', methods=['POST'])
     def setActiveEffect(): # pylint: disable=E0211
         # set the effect
@@ -65,15 +55,14 @@ class Webserver():
             if request.get_json() is not None:
                 # Get the data in json format.
                 data = request.get_json()
-                print("Set effect to: " + data)
+                print("Set effect to: " + data["activeEffect"])
                 
                 # Save the new active effect inside the config, to remember the last effect after a restart.
-                Webserver.instance._current_effect = data
-                Webserver.instance._config["effects"]["last_effect"] = data
+                Webserver.instance._config = data["settings"]
                 Webserver.instance.save_config()
 
-                # Now send the new effect via effects queue to the effects process.
-                Webserver.instance._effects_queue.put(EffectsEnum[data])
+                # TODO: Put the new effect inside the effect queue
+                # Handle the all_devices action.
 
                 return "active_effect was set.", 200
             return "Could not find active effect. All I got: ", 403
@@ -227,4 +216,8 @@ class Webserver():
                 
                 return "Settings set.", 200
 
+
+    #####################################################################
+    #   Helper                                                          #
+    #####################################################################
 
