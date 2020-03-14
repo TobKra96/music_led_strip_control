@@ -1,34 +1,52 @@
-
+var allSettings;
 var activeEffect = "";
+var currentDevice = "all_devices";
 
+// Init and load all settings
 $( document ).ready(function() {
 
     $.ajax({
-        url: "/getActiveEffect",
+        url: "/getSettings",
         type: "GET", //send it through get method
         data: { 
-            active_effect: true
+          settingsIdentifier: this.settingsIdentifier
         },
         success: function(response) {
-            activeEffect = response.active_effect;
-            setActiveStyle();
+          parseFromSettings(response);
         },
         error: function(xhr) {
           //Do Something to handle error
         }
       });
-    
 });
+
 
 function setActiveEffect(newActiveEffect){
 
-    removeActiveStyle();
-    activeEffect = newActiveEffect;
-        
+    var lastEffect = this.activeEffect;
+    this.activeEffect = newActiveEffect;
+
+    removeActiveStyle(lastEffect);
+    
+    if(this.currentDevice == "all_devices"){
+        var device_configs = this.allSettings["device_configs"]
+        Object.keys(device_configs).forEach(device => {
+            this.allSettings["device_configs"][device]["effects"]["last_effect"] = this.activeEffect
+        });
+    }else{
+        this.allSettings["device_configs"][this.currentDevice]["effects"]["last_effect"] = this.activeEffect
+    }
+    
+
+    var data = {};
+    data["settings"] = this.allSettings;
+    data["device"] = this.currentDevice;
+    data["activeEffect"] = this.activeEffect;
+
     $.ajax({
         url: "/setActiveEffect",
         type: "POST", //send it through get method
-        data: JSON.stringify(activeEffect, null, '\t'),
+        data: JSON.stringify(data, null, '\t'),
         contentType: 'application/json;charset=UTF-8',
         success: function(response) {
             console.log("Set the effect sucessfull. Response: " + response.toString());
@@ -39,16 +57,81 @@ function setActiveEffect(newActiveEffect){
         }
       });
 
-    setActiveStyle();
+    setActiveStyle(this.activeEffect);
 }
 
-function setActiveStyle(){
+function parseFromSettings(allSettings){
+    this.allSettings = allSettings;
+
+    this.BuildDeviceCombobox();
+    this.AddEventListeners();
+    this.UpdateCurrentDevice("all_devices");
+}
+
+/* Device Handling */
+
+function BuildDeviceCombobox(){
+    var device_configs = this.allSettings["device_configs"]
+
+    Object.keys(device_configs).forEach(device => {
+        $( ".dropdown-menu").append( "<a class=\"dropdown-item device_item\" id=\"" + device +"\">" + device_configs[device]["DEVICE_NAME"] + "</a>" );
+    });
     
-    $("#" + activeEffect).addClass("active-dashboard-item");
 }
 
-function removeActiveStyle(){
-    $("#" + activeEffect).removeClass("active-dashboard-item");
+function AddEventListeners(){
+    var elements = document.getElementsByClassName("device_item");
+
+    for (var i = 0; i < elements.length; i++) {
+        elements[i].addEventListener('click', function(e){
+            SwitchDevice(e);
+        });
+    }
+}
+
+function UpdateCurrentDevice(currentDevice){
+    this.currentDevice = currentDevice;
+
+    var text = "";
+    var currentEffect = "";
+    if(this.currentDevice == "all_devices"){
+        text = "Current device: All Devices"
+    }
+    else
+    {
+        text = "Current device: " + this.allSettings["device_configs"][currentDevice]["DEVICE_NAME"]
+        currentEffect = this.allSettings["device_configs"][currentDevice]["effects"]["last_effect"]
+    }
+    
+    $("#selected_device_txt").text(text);
+    if(this.activeEffect != ""){
+        this.removeActiveStyle(this.activeEffect);
+    }
+    
+    this.activeEffect = currentEffect;
+
+    if(this.activeEffect != ""){
+        this.setActiveStyle(this.activeEffect);
+    }
+}
+
+function SwitchDevice(e){
+    var newDeviceId = e.target.id;
+
+    this.UpdateCurrentDevice(newDeviceId);
+}
+
+
+/* Effect Handling */
+
+
+function setActiveStyle(currentEffect){
+    
+    $("#" + currentEffect).addClass("active-dashboard-item");
+}
+
+function removeActiveStyle(currentEffect){
+    $("#" + currentEffect).removeClass("active-dashboard-item");
 }
 
 // locate your element and add the Click Event Listener
@@ -98,3 +181,4 @@ function switchEffect(e, listName){
         setActiveEffect(newActiveEffect);
     }
 }
+

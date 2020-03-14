@@ -64,6 +64,21 @@
                     </div>
 
                     <div class="clearfix"></div>
+                    <div class="left dropdown_position">
+                        <div class="dropdown ">
+                            <button class="btn btn-secondary dropdown-toggle dropdown_color" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Select Device
+                            </button>
+                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                <a class="dropdown-item device_item" id="all_devices">All Devices</a>
+                            </div>
+                        </div>
+
+                        <div class="current_selected_txt" id="selected_device_txt">Current Selected: All Devices</div>
+                    </div>
+                    
+
+                    <div class="clearfix"></div>
 
                     {% block content %}
                     <!-- {{ content }} -->
@@ -91,8 +106,6 @@
         <!-- bootstrap-daterangepicker -->
         <script src="{{ url_for('static', filename='vendors/moment/min/moment.min.js') }}"></script>
         <script src="{{ url_for('static', filename='vendors/bootstrap-daterangepicker/daterangepicker.js') }}"></script>
-        <!-- bootstrap.bundle -->
-        <script src="{{ url_for('static', filename='vendors/bootstrap/dist/js/bootstrap.bundle.min.js') }}" type="text/javascript"></script>
         <!-- bootstrap-wysiwyg -->
         <script src="{{ url_for('static', filename='vendors/bootstrap-wysiwyg/js/bootstrap-wysiwyg.min.js') }}"></script>
         <script src="{{ url_for('static', filename='vendors/jquery.hotkeys/jquery.hotkeys.js') }}"></script>
