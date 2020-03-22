@@ -22,7 +22,7 @@ $( document ).ready(function() {
       });
 });
 
-$("#settingsForm").submit(function(e){
+document.getElementById("save_btn").addEventListener("click",function(e) {
   setSettings();
 });
 
