@@ -1,4 +1,5 @@
 from libs.notification_enum import NotificationEnum # pylint: disable=E0611, E0401
+from libs.notification_item import NotificationItem # pylint: disable=E0611, E0401
 from time import sleep
 
 class NotificationService():
@@ -11,6 +12,8 @@ class NotificationService():
         self._notification_queue_webserver_in = notification_queue_webserver_in
         self._notification_queue_webserver_out = notification_queue_webserver_out
 
+        self._current_notification_item = NotificationItem(NotificationEnum.config_refresh, "all_devices")
+
         self._cancel_token = False
         print("NotificationService component started.")
         while not self._cancel_token:
@@ -20,12 +23,12 @@ class NotificationService():
             sleep(0.5)
 
             if not self._notification_queue_webserver_out.empty():
-                current_webserver_out = self._notification_queue_webserver_out.get()
+                self._current_notification_item = self._notification_queue_webserver_out.get()
 
-                if current_webserver_out is NotificationEnum.config_refresh:
+                if self._current_notification_item.notification_enum is NotificationEnum.config_refresh:
                     
                     print("Reload config..")
-                    self.config_refresh()
+                    self.config_refresh(self._current_notification_item)
                     print("Config reloaded.")
     
     
@@ -33,7 +36,10 @@ class NotificationService():
     def stop(self):
         self._cancel_token = True
 
-    def config_refresh(self):
+    def config_refresh(self, original_notification_item):
+
+        device_id = original_notification_item.device_id
+
         # Summary
         # 1. Pause every process that have to refresh the config.
         # 2. Send the refresh command
@@ -41,36 +47,38 @@ class NotificationService():
         # 4. Continue the processes.
 
         # 1. Pause every process that have to refresh the config.
-        self._notification_queue_device_manager_in.put(NotificationEnum.process_pause)
-        self._notification_queue_audio_in.put(NotificationEnum.process_pause)
+        self._notification_queue_device_manager_in.put(NotificationItem(NotificationEnum.process_pause, device_id))
+        self._notification_queue_audio_in.put(NotificationItem(NotificationEnum.process_pause, device_id))
 
         # 2. Send the refresh command
-        self._notification_queue_device_manager_in.put(NotificationEnum.config_refresh)
-        self._notification_queue_audio_in.put(NotificationEnum.config_refresh)
+        self._notification_queue_device_manager_in.put(NotificationItem(NotificationEnum.config_refresh, device_id))
+        self._notification_queue_audio_in.put(NotificationItem(NotificationEnum.config_refresh, device_id))
 
         # 3. Wait for all to finish the process.
         processes_not_ready = True
 
-        output_ready = False
+        device_ready = False
         effect_ready = False
         while processes_not_ready:
 
             # Check the notification queue of device_manager, if it is ready to continue
             if(not self._notification_queue_device_manager_out.empty()):
                 current_output_out =  self._notification_queue_device_manager_out.get()
-                if current_output_out is NotificationEnum.config_refresh_finished:
-                    output_ready = True
+                if current_output_out.notification_enum is NotificationEnum.config_refresh_finished:
+                    device_ready = True
+                    print("Device refreshed the config.")
 
             # Check the notification queue of audio, if it is ready to continue
             if(not self._notification_queue_audio_out.empty()):
                 current_effects_out =  self._notification_queue_audio_out.get()
-                if current_effects_out is NotificationEnum.config_refresh_finished:
+                if current_effects_out.notification_enum is NotificationEnum.config_refresh_finished:
                     effect_ready = True
+                    print("Audio refreshed the config.")
 
-            if output_ready and effect_ready:
+            if device_ready and effect_ready:
                 processes_not_ready = False
 
         # 4. Continue the processes.
-        self._notification_queue_device_manager_in.put(NotificationEnum.process_continue)
-        self._notification_queue_audio_in.put(NotificationEnum.process_continue)
+        self._notification_queue_device_manager_in.put(NotificationItem(NotificationEnum.process_continue, device_id))
+        self._notification_queue_audio_in.put(NotificationItem(NotificationEnum.process_continue, device_id))
 

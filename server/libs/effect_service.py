@@ -127,9 +127,9 @@ class EffectService():
 
         # Check if the effect changed.
         if not self._device.effect_queue.empty():
-            new_effect = self._device.effect_queue.get()
-            self._current_effect = new_effect["EFFECT"]
-            print("New effect found:" + new_effect["EFFECT"])
+            new_effect_item = self._device.effect_queue.get()
+            self._current_effect = new_effect_item.effect_enum
+            print("New effect found:" + str(new_effect_item.effect_enum))
 
        
         # Something is wrong here, no effect set. So skip until we get a new information.

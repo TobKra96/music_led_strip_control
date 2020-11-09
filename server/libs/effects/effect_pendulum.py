@@ -4,10 +4,10 @@ import numpy as np
 
 class EffectPendulum(Effect):
 
-    def __init__(self, config, config_lock, output_queue, output_queue_lock, audio_queue, audio_queue_lock):
+    def __init__(self, device):
 
         # Call the constructor of the base class.
-        super(EffectPendulum, self).__init__(config, config_lock, output_queue, output_queue_lock, audio_queue, audio_queue_lock)
+        super(EffectPendulum, self).__init__(device)
 
         # Pendulum Variables
         self.current_direction = True

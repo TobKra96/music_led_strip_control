@@ -40,19 +40,20 @@ class Main():
         # Prepare the queue for the output
         self._output_queue_lock = Lock()
         self._output_queue = Queue(2)
-        self._effects_queue = Queue(2)
+        self._effects_queue = Queue(100)
+        self._effects_queue_lock = Lock()
         self._audio_queue_lock = Lock()
         self._audio_queue = Queue(2)
 
         # Prepare all notification queues
-        self._notification_queue_audio_in = Queue(2)
-        self._notification_queue_audio_out = Queue(2)
+        self._notification_queue_audio_in = Queue(100)
+        self._notification_queue_audio_out = Queue(100)
 
-        self._notification_queue_device_manager_in = Queue(2)
-        self._notification_queue_device_manager_out = Queue(2)
+        self._notification_queue_device_manager_in = Queue(100)
+        self._notification_queue_device_manager_out = Queue(100)
 
-        self._notification_queue_webserver_in = Queue(2)
-        self._notification_queue_webserver_out = Queue(2)
+        self._notification_queue_webserver_in = Queue(100)
+        self._notification_queue_webserver_out = Queue(100)
 
         # Start the DeviceManager Service
         self._device_manager = DeviceManager()
@@ -61,7 +62,9 @@ class Main():
             args=(
                 self._config_lock, 
                 self._notification_queue_device_manager_in, 
-                self._notification_queue_device_manager_out, 
+                self._notification_queue_device_manager_out,
+                self._effects_queue,
+                self._effects_queue_lock,
                 self._audio_queue,
                 self._audio_queue_lock
                 ))
@@ -90,7 +93,8 @@ class Main():
                 self._config_lock, 
                 self._notification_queue_webserver_in, 
                 self._notification_queue_webserver_out,
-                self._effects_queue, 
+                self._effects_queue,
+                self._effects_queue_lock, 
                 ))
         self._webserver_process.start()
         
