@@ -8,7 +8,7 @@ class FPSLimiter:
 
         #Init FPS Limiter
         self.fps_limiter_start = time.time()
-        self.max_fps = self._fps + 10
+        self.max_fps = self._fps
         self.min_waiting_time = 1 / self.max_fps
 
     def fps_limiter(self):

@@ -5,10 +5,10 @@ from scipy.ndimage.filters import gaussian_filter1d
 
 class EffectScroll(Effect):
 
-    def __init__(self, config, config_lock, output_queue, output_queue_lock, audio_queue, audio_queue_lock):
+    def __init__(self, device):
 
         # Call the constructor of the base class.
-        super(EffectScroll, self).__init__(config, config_lock, output_queue, output_queue_lock, audio_queue, audio_queue_lock)
+        super(EffectScroll, self).__init__(device)
 
         # Scroll Variables
         self.output_scroll_high = np.array([[0 for i in range(self.led_count)] for i in range(3)])

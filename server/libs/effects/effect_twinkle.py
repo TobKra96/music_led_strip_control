@@ -2,18 +2,19 @@ from libs.effects.effect import Effect # pylint: disable=E0611, E0401
 
 import numpy as np
 import random
+from scipy.ndimage.filters import gaussian_filter1d
 
 class EffectTwinkle(Effect):
 
-    def __init__(self, config, config_lock, output_queue, output_queue_lock, audio_queue, audio_queue_lock):
+    def __init__(self, device):
 
         # Call the constructor of the base class.
-        super(EffectTwinkle, self).__init__(config, config_lock, output_queue, output_queue_lock, audio_queue, audio_queue_lock)
+        super(EffectTwinkle, self).__init__(device)
 
         # Twinkle Variables
         self.rising_stars = []
         self.descending_stars = []
-        self.output_decay = np.array([[0 for i in range(led_count)] for i in range(3)])
+        self.output_decay = np.array([[0 for i in range(self.led_count)] for i in range(3)])
         
 
     def run(self):

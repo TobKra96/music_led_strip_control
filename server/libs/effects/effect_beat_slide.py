@@ -3,10 +3,10 @@ from libs.effects.effect import Effect # pylint: disable=E0611, E0401
 import numpy as np
 
 class EffectBeatSlide(Effect):
-    def __init__(self, config, config_lock, output_queue, output_queue_lock, audio_queue, audio_queue_lock):
+    def __init__(self, device):
 
         # Call the constructor of the base class.
-        super(EffectBeatSlide, self).__init__(config, config_lock, output_queue, output_queue_lock, audio_queue, audio_queue_lock)
+        super(EffectBeatSlide, self).__init__(device)
 
         self.current_position = 0
 

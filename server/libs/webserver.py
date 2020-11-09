@@ -2,6 +2,8 @@
 from libs.config_service import ConfigService # pylint: disable=E0611, E0401
 from libs.effects_enum import EffectsEnum # pylint: disable=E0611, E0401
 from libs.notification_enum import NotificationEnum # pylint: disable=E0611, E0401
+from libs.effect_item import EffectItem # pylint: disable=E0611, E0401
+from libs.notification_item import NotificationItem # pylint: disable=E0611, E0401
 
 from flask import Flask, render_template, request, jsonify
 from time import sleep
@@ -9,11 +11,12 @@ from time import sleep
 server = Flask(__name__)
 
 class Webserver():
-    def start(self, config_lock, notification_queue_in, notification_queue_out, effects_queue):
+    def start(self, config_lock, notification_queue_in, notification_queue_out, effects_queue, effects_queue_lock):
         self._config_lock = config_lock
-        self._notification_queue_in = notification_queue_in
-        self._notification_queue_out = notification_queue_out
-        self._effects_queue = effects_queue
+        self.notification_queue_in = notification_queue_in
+        self.notification_queue_out = notification_queue_out
+        self.effects_queue = effects_queue
+        self.effects_queue_lock = effects_queue_lock
 
         # Initial config load.
         self._config_instance = ConfigService.instance(self._config_lock)
@@ -29,12 +32,10 @@ class Webserver():
 
     def save_config(self):
         self._config_instance.save_config(self._config)
-        self._notification_queue_out.put(NotificationEnum.config_refresh)
 
     def reset_config(self):
         self._config_instance.reset_config()
         self._config = self._config_instance.config
-        self._notification_queue_out.put(NotificationEnum.config_refresh)
 
     @server.route('/', methods=['GET'])
     @server.route('/index', methods=['GET'])
@@ -49,7 +50,7 @@ class Webserver():
 
     # Endpoint for Ajax
     @server.route('/setActiveEffect', methods=['POST'])
-    def setActiveEffect(): # pylint: disable=E0211
+    def SetActiveEffect(): # pylint: disable=E0211
         # set the effect
         if request.method == 'POST':
             if request.get_json() is not None:
@@ -57,16 +58,44 @@ class Webserver():
                 data = request.get_json()
                 print("Set effect to: " + data["activeEffect"])
                 
+                if data["device"] == "all_devices":
+                    for key, value in data["settings"]["device_configs"].items():
+                        Webserver.instance.PutIntoEffectQueue(data["activeEffect"], key)
+                else:
+                    Webserver.instance.PutIntoEffectQueue(data["activeEffect"], data["device"])
+                
+
                 # Save the new active effect inside the config, to remember the last effect after a restart.
                 Webserver.instance._config = data["settings"]
                 Webserver.instance.save_config()
-
                 # TODO: Put the new effect inside the effect queue
                 # Handle the all_devices action.
 
                 return "active_effect was set.", 200
             return "Could not find active effect. All I got: ", 403
         return "Invalid request. (Custom Response)", 403
+
+    def PutIntoEffectQueue(self, effect, device):
+        print("Prepare new EnumItem")
+        effect_item = EffectItem(EffectsEnum[effect], device)
+        print("EnumItem prepared: " + str(effect_item.effect_enum) + " " + effect_item.device_id)
+        Webserver.instance.effects_queue_lock.acquire()
+        Webserver.instance.effects_queue.put(effect_item)
+        Webserver.instance.effects_queue_lock.release()
+        print("EnumItem put into queue.")
+        print("Effect queue id Webserver " + str(id(Webserver.instance.effects_queue)))
+
+    def PutIntoNotificationQueue(self, notificication, device):
+        print("Prepare new Notification")
+        notification_item = NotificationItem(notificication, device)
+        print("Notification Item prepared: " + str(notification_item.notification_enum) + " " + notification_item.device_id)
+        #TODO Add lock
+        Webserver.instance.notification_queue_out.put(notification_item)
+        print("Notification Item put into queue.")
+
+    def RefreshDevice(self, deviceId):
+        self.PutIntoNotificationQueue(NotificationEnum.config_refresh, deviceId)
+
 
     #####################################################################
     #   General Settings                                                #
@@ -195,7 +224,7 @@ class Webserver():
 
     # Endpoint for Ajax
     @server.route('/getSettings', methods=['GET'])
-    def getSettings(): # pylint: disable=E0211
+    def GetSettings(): # pylint: disable=E0211
         if request.method == 'GET':
             # Return the configuration. Not the safest way, but the esiest.
             # TODO: Increase security.
@@ -203,7 +232,7 @@ class Webserver():
 
     #Endpoint for Ajax
     @server.route('/setSettings', methods=['POST'])
-    def setSettings(): # pylint: disable=E0211
+    def SetSettings(): # pylint: disable=E0211
         if request.method == 'POST':
             if request.get_json() is not None:
                 # Get the data in json format.
@@ -213,6 +242,7 @@ class Webserver():
                 Webserver.instance._config = data['settings']
                 print("New general settings set.")
                 Webserver.instance.save_config()
+                Webserver.instance.RefreshDevice(data['device'])
                 
                 return "Settings set.", 200
 

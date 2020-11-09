@@ -45,7 +45,7 @@ class OutputService:
             OutputsEnum.output_mqtt:OutputMptt
             }
 
-        current_output_enum = OutputsEnum[self._device.device_config["OUTPUT_TYPE"]]
+        current_output_enum = OutputsEnum[self._device.device_config["output"]["OUTPUT_TYPE"]]
         print("Found output: " + str(current_output_enum))
         self._current_output = self._available_outputs[current_output_enum](self._device)
 

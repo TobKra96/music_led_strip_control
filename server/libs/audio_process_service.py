@@ -2,6 +2,8 @@ from libs.color_service import ColorService # pylint: disable=E0611, E0401
 from libs.config_service import ConfigService # pylint: disable=E0611, E0401
 from libs.dsp import DSP # pylint: disable=E0611, E0401
 from libs.fps_limiter import FPSLimiter # pylint: disable=E0611, E0401
+from libs.notification_item import NotificationItem # pylint: disable=E0611, E0401
+from libs.notification_enum import NotificationEnum # pylint: disable=E0611, E0401
 
 import numpy as np
 import pyaudio
@@ -27,6 +29,8 @@ class AudioProcessService:
 
         # Init pyaudio
         self._py_audio = pyaudio.PyAudio()
+
+        self._skip_routine = False
 
         self._numdevices = self._py_audio.get_device_count()
         self._default_device_id = self._py_audio.get_default_input_device_info()['index']
@@ -94,6 +98,22 @@ class AudioProcessService:
                 
     def audio_service_routine(self):
         try:
+
+            if not self._notification_queue_in.empty():
+                current_notification_item = self._notification_queue_in.get()
+
+                if current_notification_item.notification_enum is NotificationEnum.config_refresh:
+                    self._config = ConfigService.instance(self._config_lock).config
+                    self._notification_queue_out.put(NotificationItem(NotificationEnum.config_refresh_finished, current_notification_item.device_id))
+
+                elif current_notification_item.notification_enum is NotificationEnum.process_continue:
+                    self._skip_routine = False
+                elif current_notification_item.notification_enum is NotificationEnum.process_pause:
+                    self._skip_routine = True
+
+            if self._skip_routine:
+                return
+
             # Limit the fps to decrease laggs caused by 100 percent cpu
             self._fps_limiter.fps_limiter()
 
@@ -112,12 +132,13 @@ class AudioProcessService:
                 # Fill the array with zeros, to fade out the effect.
                 audio_datas["mel"] = np.zeros(1)
 
+            self._audio_queue_lock.acquire()
             # Send the new audio data to the effect process.            
             if self._audio_queue.full():
                 pre_audio_data = self._audio_queue.get()
             #self._audio_queue.put(audio_datas["mel"])
             self._audio_queue.put(audio_datas)
-                
+            self._audio_queue_lock.release()
 
             self.end_time = time.time()
                     

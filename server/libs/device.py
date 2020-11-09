@@ -38,14 +38,26 @@ class Device:
         self.__output_process.start()
         self.__effect_process.start()
 
-    def refresh_device_config(self, device_config):
-        self.__device_config = device_config
-        # TODO: Inform services via notification queue
-
-    def refresh_config(self, config):
+    def refresh_config(self, config, device_config):
         self.__config = config
-        # TODO: Inform services via notification queue
+        self.__device_config = device_config
 
+        self.__output_process.terminate()
+        self.__effect_process.terminate()
+
+        self.__output_service = OutputService()
+        self.__output_process = Process(
+            target=self.__output_service.start, 
+            args=(self,))
+
+        self.__effect_service = EffectService()
+        self.__effect_process = Process(
+            target=self.__effect_service.start, 
+            args=(self,))
+
+        self.start_device()
+
+        
     def get_config(self):
         return self.__config
 

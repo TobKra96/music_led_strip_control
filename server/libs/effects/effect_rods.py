@@ -4,13 +4,15 @@ import numpy as np
 
 class EffectRods(Effect):
 
-    def __init__(self, config, config_lock, output_queue, output_queue_lock, audio_queue, audio_queue_lock):
+    def __init__(self, device):
 
         # Call the constructor of the base class.
-        super(EffectRods, self).__init__(config, config_lock, output_queue, output_queue_lock, audio_queue, audio_queue_lock)
+        super(EffectRods, self).__init__(device)
 
         # Rods Variables
         self.count_since_last_rod = 0
+        self.current_color = [0,0,0]
+        self.current_color_index = 0
 
 
     def run(self):
