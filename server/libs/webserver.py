@@ -1,14 +1,151 @@
 
 from libs.config_service import ConfigService # pylint: disable=E0611, E0401
-from libs.effects_enum import EffectsEnum # pylint: disable=E0611, E0401
 from libs.notification_enum import NotificationEnum # pylint: disable=E0611, E0401
-from libs.effect_item import EffectItem # pylint: disable=E0611, E0401
 from libs.notification_item import NotificationItem # pylint: disable=E0611, E0401
+from libs.webserver_executer import WebserverExecuter # pylint: disable=E0611, E0401
 
 from flask import Flask, render_template, request, jsonify
 from time import sleep
+import copy
 
 server = Flask(__name__)
+
+# Sites
+# /
+# /index
+# /dashboard
+# /effects/effect_<effect_name>.html
+# /settings/general
+# /settings/devices
+
+# Ajax endpoints
+# /GetDevices
+# in
+#{
+# }
+#
+# return
+#{
+# "<device_id1>" = <device_name1>
+# "<device_id2>" = <device_name2>
+# "<device_id3>" = <device_name3>
+# ...
+# }
+# ------------------------
+#
+# /GetActiveEffect
+# in
+#{
+# "device" = <deviceID>
+# }
+#
+# return
+#{
+# "device" = <deviceID>
+# "effect" = <effectID>
+# }
+# ------------------------
+#
+# /SetActiveEffect
+# { 
+# "device" = <deviceID>
+# "effect" = <effectID>
+# }
+# ------------------------
+#
+# SetActiveEffectForAll
+# { 
+# "effect" = <effectID>
+# }
+# ------------------------
+#
+# /SetEffectSetting
+# { 
+# "device" = <deviceID>
+# "effect" = <effectID>
+# "setting_key" = <setting_key>
+# "setting_value" = <setting_value>
+# }
+# ------------------------
+#
+# /GetEffectSetting
+# in
+# { 
+# "device" = <deviceID>
+# "effect" = <effectID>
+# "setting_key" = <setting_key>
+# }
+#
+# return
+# { 
+# "device" = <deviceID>
+# "effect" = <effectID>
+# "setting_key" = <setting_key>
+# "setting_value" = <setting_value>
+# }
+# ------------------------
+#
+# /SetEffectSettingForAll
+# { 
+# "effect" = <effectID>
+# "setting_key" = <setting_key>
+# "setting_value" = <setting_value>
+# }
+# ------------------------
+#
+# /GetDeviceSetting
+# in
+# { 
+# "device" = <deviceID>
+# "setting_key" = <setting_key>
+# }
+#
+# return
+# { 
+# "device" = <deviceID>
+# "setting_key" = <setting_key>
+# "setting_value" = <setting_value>
+# }
+# ------------------------
+#
+# /SetDeviceSetting
+# { 
+# "device" = <deviceID>
+# "setting_key" = <setting_key>
+# "setting_value" = <setting_value>
+# }
+# ------------------------
+#
+# /GetGeneralSetting
+# in
+# { 
+# "setting_key" = <setting_key>
+# }
+#
+# return
+# { 
+# "setting_key" = <setting_key>
+# "setting_value" = <setting_value>
+# }
+# ------------------------
+#
+# /SetGeneralSetting
+# { 
+# "setting_key" = <setting_key>
+# "setting_value" = <setting_value>
+# }
+# ------------------------
+#
+# /CreateNewDevice
+# { 
+# }
+# ------------------------
+#
+# /ResetSettings
+# { 
+# }
+# ------------------------
+
 
 class Webserver():
     def start(self, config_lock, notification_queue_in, notification_queue_out, effects_queue, effects_queue_lock):
@@ -17,11 +154,8 @@ class Webserver():
         self.notification_queue_out = notification_queue_out
         self.effects_queue = effects_queue
         self.effects_queue_lock = effects_queue_lock
-
-        # Initial config load.
-        self._config_instance = ConfigService.instance(self._config_lock)
-        self._config = self._config_instance.config
-
+        
+        self.webserver_executer = WebserverExecuter(config_lock, notification_queue_in, notification_queue_out, effects_queue, effects_queue_lock)
         Webserver.instance = self
 
         server.config["TEMPLATES_AUTO_RELOAD"] = True
@@ -29,13 +163,12 @@ class Webserver():
 
         while True:
             sleep(10)
+ 
+  
 
-    def save_config(self):
-        self._config_instance.save_config(self._config)
-
-    def reset_config(self):
-        self._config_instance.reset_config()
-        self._config = self._config_instance.config
+    #####################################################################
+    #   Dashboard                                                       #
+    #####################################################################
 
     @server.route('/', methods=['GET'])
     @server.route('/index', methods=['GET'])
@@ -45,80 +178,25 @@ class Webserver():
         return render_template('dashboard.html')
 
     #####################################################################
-    #   Dashboard                                                       #
-    #####################################################################
-
-    # Endpoint for Ajax
-    @server.route('/setActiveEffect', methods=['POST'])
-    def SetActiveEffect(): # pylint: disable=E0211
-        # set the effect
-        if request.method == 'POST':
-            if request.get_json() is not None:
-                # Get the data in json format.
-                data = request.get_json()
-                print("Set effect to: " + data["activeEffect"])
-                
-                if data["device"] == "all_devices":
-                    for key, value in data["settings"]["device_configs"].items():
-                        Webserver.instance.PutIntoEffectQueue(data["activeEffect"], key)
-                else:
-                    Webserver.instance.PutIntoEffectQueue(data["activeEffect"], data["device"])
-                
-
-                # Save the new active effect inside the config, to remember the last effect after a restart.
-                Webserver.instance._config = data["settings"]
-                Webserver.instance.save_config()
-                # TODO: Put the new effect inside the effect queue
-                # Handle the all_devices action.
-
-                return "active_effect was set.", 200
-            return "Could not find active effect. All I got: ", 403
-        return "Invalid request. (Custom Response)", 403
-
-    def PutIntoEffectQueue(self, effect, device):
-        print("Prepare new EnumItem")
-        effect_item = EffectItem(EffectsEnum[effect], device)
-        print("EnumItem prepared: " + str(effect_item.effect_enum) + " " + effect_item.device_id)
-        Webserver.instance.effects_queue_lock.acquire()
-        Webserver.instance.effects_queue.put(effect_item)
-        Webserver.instance.effects_queue_lock.release()
-        print("EnumItem put into queue.")
-        print("Effect queue id Webserver " + str(id(Webserver.instance.effects_queue)))
-
-    def PutIntoNotificationQueue(self, notificication, device):
-        print("Prepare new Notification")
-        notification_item = NotificationItem(notificication, device)
-        print("Notification Item prepared: " + str(notification_item.notification_enum) + " " + notification_item.device_id)
-        #TODO Add lock
-        Webserver.instance.notification_queue_out.put(notification_item)
-        print("Notification Item put into queue.")
-
-    def RefreshDevice(self, deviceId):
-        self.PutIntoNotificationQueue(NotificationEnum.config_refresh, deviceId)
-
-
-    #####################################################################
     #   General Settings                                                #
     #####################################################################
-    @server.route('/device_settings', methods=['GET', 'POST'])
-    def device_settings(): # pylint: disable=E0211
+    @server.route('/general_settings', methods=['GET', 'POST'])
+    def general_settings(): # pylint: disable=E0211
         # Render the general settings page
-        return render_template('/general_settings/device_settings.html')
-
-    @server.route('/audio_settings', methods=['GET', 'POST'])
-    def audio_settings(): # pylint: disable=E0211
-        # Render the audio settings page
-        return render_template('/general_settings/audio_settings.html')
-
+        return render_template('/general_settings/general_settings.html')
+    
     @server.route('/reset_settings', methods=['GET', 'POST'])
     def reset_settings(): # pylint: disable=E0211
         # Render the reset settings page
         return render_template('/general_settings/reset_settings.html')
 
-    @server.route('/reset_settings/reset', methods=['POST'])
-    def reset_settings_command(): # pylint: disable=E0211
-        Webserver.instance.reset_config()
-        return "Settings resetted.", 200
+    #####################################################################
+    #   Device Settings                                                 #
+    #####################################################################
+    @server.route('/device_settings', methods=['GET', 'POST'])
+    def device_settings(): # pylint: disable=E0211
+        # Render the general settings page
+        return render_template('/device_settings/device_settings.html')
 
     #####################################################################
     #   Effects                                                         #
@@ -219,35 +297,100 @@ class Webserver():
         return render_template('effects/effect_spectrum_analyzer.html')
 
     #####################################################################
-    #   Settings Ajax                                                   #
+    #   Ajax Endpoints                                                  #
     #####################################################################
 
-    # Endpoint for Ajax
-    @server.route('/getSettings', methods=['GET'])
-    def GetSettings(): # pylint: disable=E0211
+    # /GetDevices
+    # in
+    #{
+    # }
+    #
+    # return
+    #{
+    # "<device_id1>" = <device_name1>
+    # "<device_id2>" = <device_name2>
+    # "<device_id3>" = <device_name3>
+    # ...
+    # }
+
+    @server.route('/GetDevices', methods=['GET'])
+    def GetDevices(): # pylint: disable=E0211
         if request.method == 'GET':
-            # Return the configuration. Not the safest way, but the esiest.
-            # TODO: Increase security.
-            return jsonify(Webserver.instance._config)
+            data_out = dict()
+            
+            devices = Webserver.instance.webserver_executer.GetDevices()
+            data_out = devices
 
-    #Endpoint for Ajax
-    @server.route('/setSettings', methods=['POST'])
-    def SetSettings(): # pylint: disable=E0211
+            if devices is None:
+                return "Could not find devices: ", 403
+            else:
+                return jsonify(data_out)
+
+
+
+    # /GetActiveEffect
+    # in
+    #{
+    # "device" = <deviceID>
+    # }
+    #
+    # return
+    #{
+    # "device" = <deviceID>
+    # "effect" = <effectID>
+    # }
+    @server.route('/GetActiveEffect', methods=['GET'])
+    def GetActiveEffect(): # pylint: disable=E0211
+        if request.method == 'GET':
+            data_in = request.args.to_dict()         
+            data_out = copy.deepcopy(data_in)
+
+            if not Webserver.instance.webserver_executer.ValidateDataIn(data_in, ("device",)):
+                return "Input data are wrong.", 403
+
+            active_effect = Webserver.instance.webserver_executer.GetActiveEffect(data_in["device"])
+            data_out["effect"] = active_effect
+
+            if active_effect is None:
+                return "Could not find active effect: ", 403
+            else:
+                return jsonify(data_out)
+
+
+    # /SetActiveEffect
+    # { 
+    # "device" = <deviceID>
+    # "effect" = <effectID>
+    # }
+    @server.route('/SetActiveEffect', methods=['POST'])
+    def SetActiveEffect(): # pylint: disable=E0211
         if request.method == 'POST':
-            if request.get_json() is not None:
-                # Get the data in json format.
-                data = request.get_json()
-                #print("Get new settings: " + str(data['settings']))
+            data_in = request.get_json()         
+            data_out = copy.deepcopy(data_in)
 
-                Webserver.instance._config = data['settings']
-                print("New general settings set.")
-                Webserver.instance.save_config()
-                Webserver.instance.RefreshDevice(data['device'])
-                
-                return "Settings set.", 200
+            if not Webserver.instance.webserver_executer.ValidateDataIn(data_in, ("device","effect",)):
+                return "Input data are wrong.", 403
+
+            Webserver.instance.webserver_executer.SetActiveEffect(data_in["device"], data_in["effect"])
+            
+            return jsonify(data_out)
+
+    # SetActiveEffectForAll
+    # { 
+    # "effect" = <effectID>
+    # }
+    @server.route('/SetActiveEffectForAll', methods=['POST'])
+    def SetActiveEffectForAll(): # pylint: disable=E0211
+        if request.method == 'POST':
+            data_in = request.get_json()         
+            data_out = copy.deepcopy(data_in)
+
+            if not Webserver.instance.webserver_executer.ValidateDataIn(data_in, ("effect",)):
+                return "Input data are wrong.", 403
+
+            Webserver.instance.webserver_executer.SetActiveEffectForAll(data_in["effect"])
+            
+            return jsonify(data_out)
 
 
-    #####################################################################
-    #   Helper                                                          #
-    #####################################################################
-
+    

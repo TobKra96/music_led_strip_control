@@ -1,18 +1,14 @@
-var allSettings;
+var devices;
 var activeEffect = "";
 var currentDevice = "all_devices";
 
 // Init and load all settings
 $( document ).ready(function() {
-
     $.ajax({
-        url: "/getSettings",
+        url: "/GetDevices",
         type: "GET", //send it through get method
-        data: { 
-          settingsIdentifier: this.settingsIdentifier
-        },
         success: function(response) {
-          parseFromSettings(response);
+            ParseDevices(response);
         },
         error: function(xhr) {
           //Do Something to handle error
@@ -20,8 +16,37 @@ $( document ).ready(function() {
       });
 });
 
+function ParseDevices(devices){
+    this.currentDevice = "all_devices"
+    this.devices = devices;
 
-function setActiveEffect(newActiveEffect){
+    this.BuildDeviceCombobox();
+    this.AddEventListeners();
+    this.UpdateCurrentDeviceText();
+    this.UpdateActiveEffectTile();
+}
+
+function GetActiveEffect(device){
+        
+    $.ajax({
+        url: "/GetActiveEffect",
+        type: "GET", //send it through get method
+        data: {"device": device},
+        success: function(response) {
+            ParseActiveEffect(response);
+        },
+        error: function(xhr) {
+          //Do Something to handle error
+        }
+      });
+}
+
+function ParseActiveEffect(respond){
+    this.activeEffect = respond["effect"];   
+    this.UpdateActiveEffectTile();
+}
+
+function SetActiveEffect(newActiveEffect){
 
     var lastEffect = this.activeEffect;
     this.activeEffect = newActiveEffect;
@@ -29,52 +54,59 @@ function setActiveEffect(newActiveEffect){
     removeActiveStyle(lastEffect);
     
     if(this.currentDevice == "all_devices"){
-        var device_configs = this.allSettings["device_configs"]
-        Object.keys(device_configs).forEach(device => {
-            this.allSettings["device_configs"][device]["effects"]["last_effect"] = this.activeEffect
-        });
+        var data = {};
+        data["effect"] = this.activeEffect;
+    
+        $.ajax({
+            url: "/SetActiveEffectForAll",
+            type: "POST", //send it through get method
+            data: JSON.stringify(data, null, '\t'),
+            contentType: 'application/json;charset=UTF-8',
+            success: function(response) {
+                console.log("Set the effect sucessfull. Response: " + response.toString());
+            },
+            error: function(xhr) {
+              //Do Something to handle error
+              console.log("Set the effect got an error. Error: " + xhr.responseText);
+            }
+          });
+          
     }else{
-        this.allSettings["device_configs"][this.currentDevice]["effects"]["last_effect"] = this.activeEffect
+        var data = {};
+        data["device"] = this.currentDevice;
+        data["effect"] = this.activeEffect;
+    
+        $.ajax({
+            url: "/SetActiveEffect",
+            type: "POST", //send it through get method
+            data: JSON.stringify(data, null, '\t'),
+            contentType: 'application/json;charset=UTF-8',
+            success: function(response) {
+                console.log("Set the effect sucessfull. Response: " + response.toString());
+            },
+            error: function(xhr) {
+              //Do Something to handle error
+              console.log("Set the effect got an error. Error: " + xhr.responseText);
+            }
+          });
     }
     
 
-    var data = {};
-    data["settings"] = this.allSettings;
-    data["device"] = this.currentDevice;
-    data["activeEffect"] = this.activeEffect;
+    
 
-    $.ajax({
-        url: "/setActiveEffect",
-        type: "POST", //send it through get method
-        data: JSON.stringify(data, null, '\t'),
-        contentType: 'application/json;charset=UTF-8',
-        success: function(response) {
-            console.log("Set the effect sucessfull. Response: " + response.toString());
-        },
-        error: function(xhr) {
-          //Do Something to handle error
-          console.log("Set the effect got an error. Error: " + xhr.responseText);
-        }
-      });
 
+    
     setActiveStyle(this.activeEffect);
 }
 
-function parseFromSettings(allSettings){
-    this.allSettings = allSettings;
-
-    this.BuildDeviceCombobox();
-    this.AddEventListeners();
-    this.UpdateCurrentDevice("all_devices");
-}
 
 /* Device Handling */
 
 function BuildDeviceCombobox(){
-    var device_configs = this.allSettings["device_configs"]
+    var devices = this.devices
 
-    Object.keys(device_configs).forEach(device => {
-        $( ".dropdown-menu").append( "<a class=\"dropdown-item device_item\" id=\"" + device +"\">" + device_configs[device]["DEVICE_NAME"] + "</a>" );
+    Object.keys(devices).forEach(device_key => {
+        $( ".dropdown-menu").append( "<a class=\"dropdown-item device_item\" id=\"" + device_key +"\">" + devices[device_key] + "</a>" );
     });
     
 }
@@ -89,26 +121,24 @@ function AddEventListeners(){
     }
 }
 
-function UpdateCurrentDevice(currentDevice){
-    this.currentDevice = currentDevice;
-
+function UpdateCurrentDeviceText(){
     var text = "";
-    var currentEffect = "";
+    
     if(this.currentDevice == "all_devices"){
         text = "Current device: All Devices"
     }
     else
     {
-        text = "Current device: " + this.allSettings["device_configs"][currentDevice]["DEVICE_NAME"]
-        currentEffect = this.allSettings["device_configs"][currentDevice]["effects"]["last_effect"]
+        text = "Current device: " + this.devices[this.currentDevice]
     }
     
     $("#selected_device_txt").text(text);
     if(this.activeEffect != ""){
         this.removeActiveStyle(this.activeEffect);
     }
-    
-    this.activeEffect = currentEffect;
+}
+
+function UpdateActiveEffectTile(){
 
     if(this.activeEffect != ""){
         this.setActiveStyle(this.activeEffect);
@@ -118,8 +148,20 @@ function UpdateCurrentDevice(currentDevice){
 function SwitchDevice(e){
     var newDeviceId = e.target.id;
 
-    this.UpdateCurrentDevice(newDeviceId);
+    this.currentDevice = newDeviceId;
+
+    if(newDeviceId == "all_devices"){
+        this.removeActiveStyle(this.activeEffect);
+        this.UpdateActiveEffectTile();
+        return;
+    }
+
+    this.GetActiveEffect(newDeviceId);
+
+    this.UpdateCurrentDeviceText();
 }
+
+
 
 
 /* Effect Handling */
@@ -178,7 +220,7 @@ function switchEffect(e, listName){
 
     if(newActiveEffect.length > 0){
         console.log(newActiveEffect + " was clicked");
-        setActiveEffect(newActiveEffect);
+        SetActiveEffect(newActiveEffect);
     }
 }
 
