@@ -3,7 +3,8 @@
 {% block title %}VU Meter Effect{% endblock title %}
 
 {% block content %}
-<input type="hidden" id="settingsIdentifier" value="effect_vu_meter">
+<input type="hidden" id="settingsIdentifier" value="effect">
+<input type="hidden" id="effectIdentifier" value="effect_vu_meter">
 <div class="row">
   <div class="col-md-12">
     <div class="x_panel">
@@ -17,48 +18,29 @@
             <div class="item form-group form-space">
               <label class="control-label col-md-3 col-sm-3 col-xs-12">Color</label>
               <div class="col-md-9 col-sm-9 col-xs-12">
-                <select id="color" class="form-control colours">
+                <select id="color" class="form-control colours setting_input">
                 </select>
               </div>
             </div>
             <div class="item form-group form-space">
               <label class="control-label col-md-3 col-sm-3 col-xs-12">Max-Volume Color</label>
               <div class="col-md-9 col-sm-9 col-xs-12">
-                <select id="max_vol_color" class="form-control colours">
+                <select id="max_vol_color" class="form-control colours setting_input">
                 </select>
               </div>
             </div>
-
-			<!--
-            <div class="item form-group form-space">
-              <label class="control-label col-md-3 col-sm-3 col-xs-12">Gradient</label>
-              <div class="col-md-9 col-sm-9 col-xs-12">
-                <select id="gradient" class="form-control gradients">
-                </select>
-              </div>
-            </div>
-            -->
 			
 			      <div class="item form-group">
               <label class="center control-label col-md-3 col-sm-3 col-xs-12" for="speed">Bar Length</label>
-              <input id="bar_length" class="knob col-md-6 col-sm-6 col-xs-12"  type="number" data-step="1" data-angleoffset="-125" data-anglearc="250" data-max="200" data-width="100" data-height="100" data-cursor=true data-fgColor="#f0ad4e" value="1">
+              <input id="bar_length" class="knob col-md-6 col-sm-6 col-xs-12 setting_input"  type="number" data-step="1" data-angleoffset="-125" data-anglearc="250" data-max="200" data-width="100" data-height="100" data-cursor=true data-fgColor="#f0ad4e" value="1">
             </div>
 
             
             <div class="item form-group">
               <label class="center control-label col-md-3 col-sm-3 col-xs-12" for="speed">Speed</label>
-              <input id="speed" class="knob col-md-6 col-sm-6 col-xs-12"  type="number" data-step="1" data-angleoffset="-125" data-anglearc="250" data-max="100" data-width="100" data-height="100" data-cursor=true data-fgColor="#f0ad4e" value="1">
+              <input id="speed" class="knob col-md-6 col-sm-6 col-xs-12 setting_input"  type="number" data-step="1" data-angleoffset="-125" data-anglearc="250" data-max="100" data-width="100" data-height="100" data-cursor=true data-fgColor="#f0ad4e" value="1">
             </div>
             
-      
-            <!--
-			      <div class="item form-group">
-              <label class="center control-label col-md-3 col-sm-3 col-xs-12" for="speed">Decay</label>
-              <input id="decay" class="knob col-md-6 col-sm-6 col-xs-12"  type="number" data-step="0.01" data-angleoffset="-125" data-anglearc="250" data-max="0.99" data-width="100" data-height="100" data-cursor=true data-fgColor="#f0ad4e" value="1">
-            </div>
-            -->
-          
-
             <div class="text-right">
                 <button type="button" id="save_btn" class="btn btn-success">Save</button>
             </div>

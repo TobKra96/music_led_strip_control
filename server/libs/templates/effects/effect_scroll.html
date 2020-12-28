@@ -3,7 +3,8 @@
 {% block title %}Scroll Effect{% endblock title %}
 
 {% block content %}
-<input type="hidden" id="settingsIdentifier" value="effect_scroll">
+<input type="hidden" id="settingsIdentifier" value="effect">
+<input type="hidden" id="effectIdentifier" value="effect_scroll">
 <div class="row">
   <div class="col-md-12">
     <div class="x_panel">
@@ -17,7 +18,7 @@
             <div class="item form-group form-space">
               <label class="control-label col-md-3 col-sm-3 col-xs-12">Low Color </label>
               <div class="col-md-9 col-sm-9 col-xs-12">
-                <select id="lows_color" class="form-control colours">
+                <select id="lows_color" class="form-control colours setting_input">
                 </select>
               </div>
             </div>
@@ -25,7 +26,7 @@
             <div class="item form-group form-space">
               <label class="control-label col-md-3 col-sm-3 col-xs-12">Mid Color </label>
               <div class="col-md-9 col-sm-9 col-xs-12">
-                <select id="mids_color" class="form-control colours">
+                <select id="mids_color" class="form-control colours setting_input">
                 </select>
               </div>
             </div>
@@ -33,56 +34,56 @@
             <div class="item form-group form-space">
               <label class="control-label col-md-3 col-sm-3 col-xs-12">Heigh Color </label>
               <div class="col-md-9 col-sm-9 col-xs-12">
-                <select id="high_color" class="form-control colours">
+                <select id="high_color" class="form-control colours setting_input">
                 </select>
               </div>
             </div>
 
             <div class="item form-group">
               <label class="center control-label col-md-3 col-sm-3 col-xs-12" for="speed">Decay</label>
-              <input id="decay" class="knob col-md-6 col-sm-6 col-xs-12"  type="number" data-step="0.01" data-angleoffset="-125" data-anglearc="250" data-max="100" data-width="100" data-height="100" data-cursor=true data-fgColor="#f0ad4e" value="1">
+              <input id="decay" class="knob col-md-6 col-sm-6 col-xs-12 setting_input"  type="number" data-step="0.01" data-angleoffset="-125" data-anglearc="250" data-max="100" data-width="100" data-height="100" data-cursor=true data-fgColor="#f0ad4e" value="1">
             </div>
 
             <div class="item form-group">
               <label class="center control-label col-md-3 col-sm-3 col-xs-12" for="speed">Speed High</label>
-              <input id="high_speed" class="knob col-md-6 col-sm-6 col-xs-12"  type="number" data-step="1" data-min="1" data-angleoffset="-125" data-anglearc="250" data-max="20" data-width="100" data-height="100" data-cursor=true data-fgColor="#f0ad4e" value="1">
+              <input id="high_speed" class="knob col-md-6 col-sm-6 col-xs-12 setting_input"  type="number" data-step="1" data-min="1" data-angleoffset="-125" data-anglearc="250" data-max="20" data-width="100" data-height="100" data-cursor=true data-fgColor="#f0ad4e" value="1">
             </div>
 
             <div class="item form-group">
               <label class="center control-label col-md-3 col-sm-3 col-xs-12" for="speed">Speed Mid</label>
-              <input id="mid_speed" class="knob col-md-6 col-sm-6 col-xs-12"  type="number" data-step="1" data-min="1" data-angleoffset="-125" data-anglearc="250" data-max="20" data-width="100" data-height="100" data-cursor=true data-fgColor="#f0ad4e" value="1">
+              <input id="mid_speed" class="knob col-md-6 col-sm-6 col-xs-12 setting_input"  type="number" data-step="1" data-min="1" data-angleoffset="-125" data-anglearc="250" data-max="20" data-width="100" data-height="100" data-cursor=true data-fgColor="#f0ad4e" value="1">
             </div>
 
             <div class="item form-group">
               <label class="center control-label col-md-3 col-sm-3 col-xs-12" for="speed">Speed Low</label>
-              <input id="low_speed" class="knob col-md-6 col-sm-6 col-xs-12"  type="number" data-step="1" data-min="1" data-angleoffset="-125" data-anglearc="250" data-max="20" data-width="100" data-height="100" data-cursor=true data-fgColor="#f0ad4e" value="1">
+              <input id="low_speed" class="knob col-md-6 col-sm-6 col-xs-12 setting_input"  type="number" data-step="1" data-min="1" data-angleoffset="-125" data-anglearc="250" data-max="20" data-width="100" data-height="100" data-cursor=true data-fgColor="#f0ad4e" value="1">
             </div>
 
             <div class="item form-group form-space">
               <label class="control-label col-md-3 col-sm-3 col-xs-12">Mirror</label>
               <div class="col-md-9 col-sm-9 col-xs-12">
-                <input id="mirror" type="checkbox" class="js-switch" data-switchery="true" >
+                <input id="mirror" type="checkbox" class="js-switch setting_input" data-switchery="true" >
               </div>
             </div>
 
             <div class="item form-group">
               <label class="center control-label col-md-3 col-sm-3 col-xs-12" for="speed">Lows Multiplier</label>
-              <input id="lows_multiplier" class="knob col-md-6 col-sm-6 col-xs-12"  type="number" data-step="0.01" data-angleoffset="-125" data-anglearc="250" data-max="10" data-width="100" data-height="100" data-cursor=true data-fgColor="#f0ad4e" value="1">
+              <input id="lows_multiplier" class="knob col-md-6 col-sm-6 col-xs-12 setting_input"  type="number" data-step="0.01" data-angleoffset="-125" data-anglearc="250" data-max="10" data-width="100" data-height="100" data-cursor=true data-fgColor="#f0ad4e" value="1">
             </div>
 
             <div class="item form-group">
               <label class="center control-label col-md-3 col-sm-3 col-xs-12" for="speed">Mids Multiplier</label>
-              <input id="mids_multiplier" class="knob col-md-6 col-sm-6 col-xs-12"  type="number" data-step="0.01" data-angleoffset="-125" data-anglearc="250" data-max="10" data-width="100" data-height="100" data-cursor=true data-fgColor="#f0ad4e" value="1">
+              <input id="mids_multiplier" class="knob col-md-6 col-sm-6 col-xs-12 setting_input"  type="number" data-step="0.01" data-angleoffset="-125" data-anglearc="250" data-max="10" data-width="100" data-height="100" data-cursor=true data-fgColor="#f0ad4e" value="1">
             </div>
 
             <div class="item form-group">
               <label class="center control-label col-md-3 col-sm-3 col-xs-12" for="speed">Highs Multiplier</label>
-              <input id="high_multiplier" class="knob col-md-6 col-sm-6 col-xs-12"  type="number" data-step="0.01" data-angleoffset="-125" data-anglearc="250" data-max="10" data-width="100" data-height="100" data-cursor=true data-fgColor="#f0ad4e" value="1">
+              <input id="high_multiplier" class="knob col-md-6 col-sm-6 col-xs-12 setting_input"  type="number" data-step="0.01" data-angleoffset="-125" data-anglearc="250" data-max="10" data-width="100" data-height="100" data-cursor=true data-fgColor="#f0ad4e" value="1">
             </div>
 
             <div class="item form-group">
               <label class="center control-label col-md-3 col-sm-3 col-xs-12" for="speed">Blur</label>
-              <input id="blur" class="knob col-md-6 col-sm-6 col-xs-12"  type="number" data-step="0.00001" data-angleoffset="-125" data-anglearc="250" data-max="25" data-width="100" data-height="100" data-cursor=true data-fgColor="#f0ad4e" value="1">
+              <input id="blur" class="knob col-md-6 col-sm-6 col-xs-12 setting_input"  type="number" data-step="0.00001" data-angleoffset="-125" data-anglearc="250" data-max="25" data-width="100" data-height="100" data-cursor=true data-fgColor="#f0ad4e" value="1">
             </div>
 
             <div class="text-right">

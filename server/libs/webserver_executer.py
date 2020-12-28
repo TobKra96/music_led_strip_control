@@ -1,6 +1,8 @@
 from libs.config_service import ConfigService # pylint: disable=E0611, E0401
 from libs.effect_item import EffectItem # pylint: disable=E0611, E0401
 from libs.effects_enum import EffectsEnum # pylint: disable=E0611, E0401
+from libs.notification_enum import NotificationEnum # pylint: disable=E0611, E0401
+from libs.notification_item import NotificationItem # pylint: disable=E0611, E0401
 
 class WebserverExecuter:
     def __init__(self, config_lock, notification_queue_in, notification_queue_out, effects_queue, effects_queue_lock):
@@ -40,27 +42,56 @@ class WebserverExecuter:
         for device_key in self._config["device_configs"]:
             self.SetActiveEffect(device_key, effect)
 
-    #def SetEffectSettingForAll(effect, setting_key, setting_value):
 
     # return setting_value
-    #def GetEffectSetting(device, effect, setting_key):
+    def GetEffectSetting(self, device, effect, setting_key):
+        return self._config["device_configs"][device]["effects"][effect][setting_key]
 
-    #def SetEffectSetting(device, effect, setting_key, setting_value):
+    def SetEffectSetting(self, device, effect, setting_key, setting_value):
+        self._config["device_configs"][device]["effects"][effect][setting_key] = setting_value
+        self.SaveConfig()
+
+        self.RefreshDevice(device)
     
+    def SetEffectSettingForAll(self, effect, setting_key, setting_value):
+        for device_key in self._config["device_configs"]:
+            self._config["device_configs"][device_key]["effects"][effect][setting_key] = setting_value
+        
+        self.SaveConfig()
+
+        for device_key in self._config["device_configs"]:
+            self.RefreshDevice(device_key)
+        
+
+            
+
+    def GetColors(self):
+        colors = dict()
+        for colorID in self._config["colours"]:
+            colors[colorID] = colorID
+        return colors
+
+
+    def GetGradients(self):
+        gradients = dict()
+        for gradientID in self._config["gradients"]:
+            gradients[gradientID] = gradientID
+        return gradients
+
     #return setting_value
-    #def GetDeviceSetting(device, setting_key):
+    #def GetDeviceSetting(self,device, setting_key):
 
-    #def SetDeviceSetting(device, setting_key, setting_value):
+    #def SetDeviceSetting(self, device, setting_key, setting_value):
 
-    #def GetGeneralSetting(setting_key):
+    #def GetGeneralSetting(self, setting_key):
 
-    #def SetGeneralSetting(setting_key, setting_value):
+    #def SetGeneralSetting(self, setting_key, setting_value):
 
-    #def CreateNewDevice():
+    #def CreateNewDevice(self):
 
-    #def DeleteDevice(device):
+    #def DeleteDevice(self, device):
 
-    #def ResetSettings():
+    #def ResetSettings(self):
 
     # Helper
 
@@ -80,6 +111,17 @@ class WebserverExecuter:
         self.effects_queue_lock.release()
         print("EnumItem put into queue.")
         print("Effect queue id Webserver " + str(id(self.effects_queue)))
+
+    def PutIntoNotificationQueue(self, notificication, device):
+        print("Prepare new Notification")
+        notification_item = NotificationItem(notificication, device)
+        print("Notification Item prepared: " + str(notification_item.notification_enum) + " " + notification_item.device_id)
+        #TODO Add lock
+        self.notification_queue_out.put(notification_item)
+        print("Notification Item put into queue.")
+
+    def RefreshDevice(self, deviceId):
+        self.PutIntoNotificationQueue(NotificationEnum.config_refresh, deviceId)
 
     def ValidateDataIn(self, dictionary, keys):
         

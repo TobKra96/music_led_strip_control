@@ -3,7 +3,8 @@
 {% block title %}Wave Effect{% endblock title %}
 
 {% block content %}
-<input type="hidden" id="settingsIdentifier" value="effect_wave">
+<input type="hidden" id="settingsIdentifier" value="effect">
+<input type="hidden" id="effectIdentifier" value="effect_wave">
 <div class="row">
   <div class="col-md-12">
     <div class="x_panel">
@@ -17,7 +18,7 @@
             <div class="item form-group form-space">
               <label class="control-label col-md-3 col-sm-3 col-xs-12">Color Wave </label>
               <div class="col-md-9 col-sm-9 col-xs-12">
-                <select id="color_wave" class="form-control colours">
+                <select id="color_wave" class="form-control colours setting_input">
                 </select>
               </div>
             </div>
@@ -25,24 +26,24 @@
             <div class="item form-group form-space">
               <label class="control-label col-md-3 col-sm-3 col-xs-12">Color Flash </label>
               <div class="col-md-9 col-sm-9 col-xs-12">
-                <select id="color_flash" class="form-control colours">
+                <select id="color_flash" class="form-control colours setting_input">
                 </select>
               </div>
             </div>
 
             <div class="item form-group">
               <label class="center control-label col-md-3 col-sm-3 col-xs-12" for="speed">Wipe Length</label>
-              <input id="wipe_len" class="knob col-md-6 col-sm-6 col-xs-12"  type="number" data-step="1" data-angleoffset="-125" data-anglearc="250" data-max="200" data-width="100" data-height="100" data-cursor=true data-fgColor="#f0ad4e" value="1">
+              <input id="wipe_len" class="knob col-md-6 col-sm-6 col-xs-12 setting_input"  type="number" data-step="1" data-angleoffset="-125" data-anglearc="250" data-max="200" data-width="100" data-height="100" data-cursor=true data-fgColor="#f0ad4e" value="1">
             </div>
 
             <div class="item form-group">
               <label class="center control-label col-md-3 col-sm-3 col-xs-12" for="speed">Wipe Speed</label>
-              <input id="wipe_speed" class="knob col-md-6 col-sm-6 col-xs-12"  type="number" data-step="0.01" data-angleoffset="-125" data-anglearc="250" data-max="25" data-width="100" data-height="100" data-cursor=true data-fgColor="#f0ad4e" value="1">
+              <input id="wipe_speed" class="knob col-md-6 col-sm-6 col-xs-12 setting_input"  type="number" data-step="0.01" data-angleoffset="-125" data-anglearc="250" data-max="25" data-width="100" data-height="100" data-cursor=true data-fgColor="#f0ad4e" value="1">
             </div>
 
             <div class="item form-group">
               <label class="center control-label col-md-3 col-sm-3 col-xs-12" for="speed">Decay</label>
-              <input id="decay" class="knob col-md-6 col-sm-6 col-xs-12"  type="number" data-step="0.01" data-angleoffset="-125" data-anglearc="250" data-max="5" data-width="100" data-height="100" data-cursor=true data-fgColor="#f0ad4e" value="1">
+              <input id="decay" class="knob col-md-6 col-sm-6 col-xs-12 setting_input"  type="number" data-step="0.01" data-angleoffset="-125" data-anglearc="250" data-max="5" data-width="100" data-height="100" data-cursor=true data-fgColor="#f0ad4e" value="1">
             </div>
 
             <div class="text-right">
