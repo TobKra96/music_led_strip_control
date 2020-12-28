@@ -1,126 +1,82 @@
 var allSettings;
 var deviceSettings;
 var currentSettings;
+
+
 var settingsIdentifier;
+var effectIdentifier;
+var localSettings = {};
+var currentDevice;
+var colors = {};
+var gradients = {};
+
+var devicesLoading = true;
+var coloresLoading = true;
+var gradientsLoading = true;
 
 // Init and load all settings
 $( document ).ready(function() {
-    this.settingsIdentifier = $("#settingsIdentifier").val();
-
-    $.ajax({
-        url: "/getSettings",
-        type: "GET", //send it through get method
-        data: { 
-          settingsIdentifier: this.settingsIdentifier
-        },
-        success: function(response) {
-          parseFromSettings(response);
-        },
-        error: function(xhr) {
-          //Do Something to handle error
-        }
-      });
+  settingsIdentifier = $("#settingsIdentifier").val();
+  effectIdentifier = $("#effectIdentifier").val();
+  
+  GetDevices();
+  GetColors();
+  GetGradients();
 });
 
-function setSettings(){
-  this.settingsIdentifier = $("#settingsIdentifier").val();
-  // Refresh the settings variable.
-  this.parseToSettings()
-  
-  var data = {};
-  data["settings"] = this.allSettings;
-  data["device"] = this.currentDevice;
-  data["effect"] = this.settingsIdentifier;
+//Check if all initial ajax requests are finished.
+function CheckIfFinishedInitialLoading (){
+  if(!devicesLoading && !coloresLoading && !gradientsLoading){
+    GetLocalSettings();
+  }
+}
 
+function GetDevices(){
   $.ajax({
-    url: "/setSettings",
-    type: "POST", //send it through get method
-    data: JSON.stringify(data, null, '\t'),
-    contentType: 'application/json;charset=UTF-8',
+      url: "/GetDevices",
+      type: "GET", //send it through get method
+      success: function(response) {
+          ParseDevices(response);
+      },
+      error: function(xhr) {
+        //Do Something to handle error
+      }
+    });
+}
+
+function ParseDevices(devices){
+  currentDevice = "all_devices"
+  this.devices = devices;
+
+  BuildDeviceCombobox();
+  UpdateCurrentDeviceText();
+  
+  AddEventListeners();
+
+  devicesLoading = false;
+  CheckIfFinishedInitialLoading();
+}
+
+function GetColors(){
+  $.ajax({
+    url: "/GetColors",
+    type: "GET", //send it through get method
+    data: {     },
     success: function(response) {
-        console.log("Set the effect sucessfull. Response: " + response.toString());
+        ParseGetColors(response);
     },
     error: function(xhr) {
       //Do Something to handle error
-      console.log("Set the effect got an error. Error: " + xhr.responseText);
     }
   });
 }
 
-
-// Parse from the settings variable to the elements inside the html page.
-// (get settings)
-function parseFromSettings(allSettings){
-  this.settingsIdentifier = $("#settingsIdentifier").val();
-  this.allSettings = allSettings;
-
-  this.BuildDeviceCombobox();
-  this.AddEventListeners();
-
-  buildComboboxes();
-  this.UpdateCurrentDevice("all_devices");
- 
-}
-
-
-// Parse from the HTML page (elements) to the settings variable.
-// (set settings)
-function parseToSettings(){
-  this.settingsIdentifier = $("#settingsIdentifier").val();
-
-    Object.keys(this.currentSettings).forEach(currentSettingKey =>{
-      if($("#" + currentSettingKey).length){
-        if($("#" + currentSettingKey).attr('type') == 'checkbox'){
-          this.currentSettings[currentSettingKey] = $("#" + currentSettingKey).is(':checked')
-        }else if($("#" + currentSettingKey).attr('type') == 'number'){
-          this.currentSettings[currentSettingKey] = parseFloat($("#" + currentSettingKey).val());
-        }
-        else{
-          this.currentSettings[currentSettingKey] = $("#" + currentSettingKey).val();
-        }
-      }
-    })
-
-    if(this.settingsIdentifier == 'audio_settings'){
-      this.allSettings['audio_config'] = this.currentSettings
-    }else
-    {
-      if(this.currentDevice == "all_devices"){
-        var device_configs = this.allSettings["device_configs"]
-
-        Object.keys(device_configs).forEach(device => {
-          if(this.settingsIdentifier == 'device_settings'){
-            var clone = JSON.parse(JSON.stringify(this.currentSettings));
-            this.allSettings['device_configs'][device] = clone;
-          }
-          else
-          {
-            var clone = JSON.parse(JSON.stringify(this.currentSettings));
-            this.allSettings['device_configs'][device]['effects'][this.settingsIdentifier] = clone;
-          }
-        });
-        
-      }
-      else
-      {
-        if(this.settingsIdentifier == 'device_settings'){
-          this.allSettings['device_configs'][this.currentDevice] = this.currentSettings
-        }
-        else
-        {
-          this.allSettings['device_configs'][this.currentDevice]['effects'][this.settingsIdentifier] = this.currentSettings
-        }
-      }
-    }
-    
-    
-}
-
-// Build all Comboboxes, we need out of "allSettings".
-function buildComboboxes(){
+function ParseGetColors(response){
   var context = this;
+  this.colors = response;
+
   $('.colours').each(function(){
-    var colours = context.allSettings['colours'];
+    var colours = context.colors;
     for(var currentKey in colours){
       var newOption = new Option(currentKey, currentKey);
       /// jquerify the DOM object 'o' so we can use the html method
@@ -129,8 +85,30 @@ function buildComboboxes(){
     }
   });
 
+  coloresLoading = false;
+  CheckIfFinishedInitialLoading();
+}
+
+function GetGradients(){
+  $.ajax({
+    url: "/GetGradients",
+    type: "GET", //send it through get method
+    data: {     },
+    success: function(response) {
+        ParseGetGradients(response);
+    },
+    error: function(xhr) {
+      //Do Something to handle error
+    }
+  });
+}
+
+function ParseGetGradients(response){
+  var context = this;
+  this.gradients = response;
+
   $('.gradients').each(function(){
-    var gradients = context.allSettings['gradients'];
+    var gradients = context.gradients;
     for(var currentKey in gradients){
       var newOption = new Option(currentKey, currentKey);
       /// jquerify the DOM object 'o' so we can use the html method
@@ -138,7 +116,180 @@ function buildComboboxes(){
       $(this).append(newOption);
     }
   });
+
+  gradientsLoading = false;
+  CheckIfFinishedInitialLoading();
 }
+
+function GetEffectSetting(device, effect, setting_key){
+  $.ajax({
+    url: "/GetEffectSetting",
+    type: "GET", //send it through get method
+    data: {
+      "device": device, 
+      "effect": effect, 
+      "setting_key": setting_key, 
+  },
+    success: function(response) {
+        ParseGetEffectSetting(response);
+    },
+    error: function(xhr) {
+      //Do Something to handle error
+    }
+  });
+}
+
+function ParseGetEffectSetting(response){
+  var setting_key = response["setting_key"];
+  var setting_value = response["setting_value"];
+  localSettings[setting_key] = setting_value;
+
+  SetLocalInput(setting_key, setting_value)
+}
+
+function GetLocalSettings(){
+  var all_setting_keys = GetAllSettingKeys();
+
+  if(currentDevice == "all_devices"){
+    if(Object.keys(devices).length > 0){
+      var first_device_name = Object.keys(devices)[0];
+      Object.keys(all_setting_keys).forEach(setting_id => {
+        GetEffectSetting(first_device_name, effectIdentifier, all_setting_keys[setting_id])
+      })
+    }
+  }else{
+    Object.keys(all_setting_keys).forEach(setting_id => {
+      GetEffectSetting(currentDevice, effectIdentifier, all_setting_keys[setting_id])
+    })
+  }
+  
+
+}
+
+function SetLocalInput(setting_key, setting_value){
+  if($("#" + setting_key).attr('type') == 'checkbox'){
+    if(setting_value){
+      $("#" + setting_key).click();
+    }
+    
+  }else{
+    $("#" + setting_key).val(setting_value);
+  }
+  
+  $("#" + setting_key).trigger('change');
+}
+
+
+
+function GetAllSettingKeys(){
+  var all_setting_keys = $(".setting_input").map(function() {
+    return this.attributes["id"].value;
+  }).get();
+
+  return all_setting_keys;
+}
+
+
+function SetEffectSetting(device, effect, setting_key, setting_value){
+  
+  if(this.currentDevice == "all_devices"){
+      var data = {};
+      data["effect"] = effect;
+      data["setting_key"] = setting_key;
+      data["setting_value"] = setting_value;
+  
+      $.ajax({
+          url: "/SetEffectSettingForAll",
+          type: "POST", //send it through get method
+          data: JSON.stringify(data, null, '\t'),
+          contentType: 'application/json;charset=UTF-8',
+          success: function(response) {
+              console.log("Set the effect sucessfull. Response: " + response.toString());
+          },
+          error: function(xhr) {
+            //Do Something to handle error
+            console.log("Set the effect got an error. Error: " + xhr.responseText);
+          }
+        });
+
+  }else{
+      var data = {};
+      data["device"] = this.currentDevice;
+      data["effect"] = effect;
+      data["setting_key"] = setting_key;
+      data["setting_value"] = setting_value;
+  
+      $.ajax({
+          url: "/SetEffectSetting",
+          type: "POST", //send it through get method
+          data: JSON.stringify(data, null, '\t'),
+          contentType: 'application/json;charset=UTF-8',
+          success: function(response) {
+              console.log("Set the effect sucessfull. Response: " + response.toString());
+          },
+          error: function(xhr) {
+            //Do Something to handle error
+            console.log("Set the effect got an error. Error: " + xhr.responseText);
+          }
+        });
+  }
+  
+}
+
+function SetLocalSettings(){
+  var all_setting_keys = GetAllSettingKeys();
+
+
+  Object.keys(all_setting_keys).forEach(setting_id => {
+    var setting_key = all_setting_keys[setting_id];
+    var setting_value = "";
+    
+    if($("#" + setting_key).length){
+      if($("#" + setting_key).attr('type') == 'checkbox'){
+        setting_value = $("#" + setting_key).is(':checked')
+      }else if($("#" + setting_key).attr('type') == 'number'){
+        setting_value = parseFloat($("#" + setting_key).val());
+      }
+      else{
+        setting_value = $("#" + setting_key).val();
+      }
+    }
+
+    SetEffectSetting(currentDevice, effectIdentifier, setting_key, setting_value)
+  })
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 function resetSettings(){
@@ -170,10 +321,10 @@ function resetSettings(){
 /* Device Handling */
 
 function BuildDeviceCombobox(){
-  var device_configs = this.allSettings["device_configs"]
+  var devices = this.devices
 
-  Object.keys(device_configs).forEach(device => {
-      $( ".dropdown-menu").append( "<a class=\"dropdown-item device_item\" id=\"" + device +"\">" + device_configs[device]["DEVICE_NAME"] + "</a>" );
+  Object.keys(devices).forEach(device_key => {
+      $( ".dropdown-menu").append( "<a class=\"dropdown-item device_item\" id=\"" + device_key +"\">" + devices[device_key] + "</a>" );
   });
   
 }
@@ -188,98 +339,30 @@ function AddEventListeners(){
   }
 }
 
-function UpdateCurrentDevice(currentDevice){
-  this.currentDevice = currentDevice;
-
+function UpdateCurrentDeviceText(){
   var text = "";
+  
   if(this.currentDevice == "all_devices"){
       text = "Current device: All Devices"
   }
   else
   {
-      text = "Current device: " + this.allSettings["device_configs"][currentDevice]["DEVICE_NAME"]
+      text = "Current device: " + this.devices[this.currentDevice]
   }
   
   $("#selected_device_txt").text(text);
-
-  if(this.settingsIdentifier == 'audio_settings')
-  {
-    this.currentSettings = this.allSettings['audio_config']
-  }
-  else
-  {
-    if(this.currentDevice == "all_devices")
-    {
-      if(this.settingsIdentifier == 'device_settings')
-      {
-        this.currentSettings = this.allSettings['default_device']
-      }
-      else
-      {
-        this.currentSettings = this.allSettings['default_device']['effects'][this.settingsIdentifier]
-      }
-    }
-    else
-    {
-      if(this.settingsIdentifier == 'device_settings')
-      {
-        this.currentSettings = this.allSettings['device_configs'][this.currentDevice]
-      }
-      else
-      {
-        this.currentSettings = this.allSettings['device_configs'][this.currentDevice]['effects'][this.settingsIdentifier]
-      }
-    }
-  }
-
   
-
-  if(this.currentSettings == null){
-    // Coulr not find the settings
-    return;
-  }
-
-  Object.keys(this.currentSettings).forEach(currentSettingKey =>{
-    if($("#" + currentSettingKey).attr('type') == 'checkbox'){
-      if(this.currentSettings[currentSettingKey]){
-        $("#" + currentSettingKey).click();
-      }
-      
-    }else{
-      $("#" + currentSettingKey).val(this.currentSettings[currentSettingKey]);
-    }
-    
-    $("#" + currentSettingKey).trigger('change');
-  })
 }
 
 function SwitchDevice(e){
-  var newDeviceId = e.target.id;
-
-  this.UpdateCurrentDevice(newDeviceId);
+  this.currentDevice = e.target.id;
+  GetLocalSettings();
+  UpdateCurrentDeviceText();
 }
 
 document.getElementById("save_btn").addEventListener("click",function(e) {
-  setSettings();
+  SetLocalSettings();
 });
 
 
-function Clone(source) {
-  if (Object.prototype.toString.call(source) === '[object Array]') {
-      var clone = [];
-      for (var i=0; i<source.length; i++) {
-          clone[i] = goclone(source[i]);
-      }
-      return clone;
-  } else if (typeof(source)=="object") {
-      var clone = {};
-      for (var prop in source) {
-          if (source.hasOwnProperty(prop)) {
-              clone[prop] = goclone(source[prop]);
-          }
-      }
-      return clone;
-  } else {
-      return source;
-  }
-}
+

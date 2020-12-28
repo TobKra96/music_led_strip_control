@@ -4,6 +4,10 @@ var currentDevice = "all_devices";
 
 // Init and load all settings
 $( document ).ready(function() {
+    GetDevices();
+});
+
+function GetDevices(){
     $.ajax({
         url: "/GetDevices",
         type: "GET", //send it through get method
@@ -14,7 +18,7 @@ $( document ).ready(function() {
           //Do Something to handle error
         }
       });
-});
+}
 
 function ParseDevices(devices){
     this.currentDevice = "all_devices"
@@ -70,7 +74,7 @@ function SetActiveEffect(newActiveEffect){
               console.log("Set the effect got an error. Error: " + xhr.responseText);
             }
           });
-          
+
     }else{
         var data = {};
         data["device"] = this.currentDevice;
@@ -90,11 +94,6 @@ function SetActiveEffect(newActiveEffect){
             }
           });
     }
-    
-
-    
-
-
     
     setActiveStyle(this.activeEffect);
 }

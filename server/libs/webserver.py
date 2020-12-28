@@ -1,7 +1,6 @@
 
 from libs.config_service import ConfigService # pylint: disable=E0611, E0401
-from libs.notification_enum import NotificationEnum # pylint: disable=E0611, E0401
-from libs.notification_item import NotificationItem # pylint: disable=E0611, E0401
+
 from libs.webserver_executer import WebserverExecuter # pylint: disable=E0611, E0401
 
 from flask import Flask, render_template, request, jsonify
@@ -90,6 +89,26 @@ server = Flask(__name__)
 # "effect" = <effectID>
 # "setting_key" = <setting_key>
 # "setting_value" = <setting_value>
+# }
+# ------------------------
+# /GetColors
+#
+# return
+# { 
+# "<colorID1>" = <colorName1>
+# "<colorID2>" = <colorName2>
+# "<colorID3>" = <colorName3>
+# ...
+# }
+# ------------------------
+# /GetGradients
+#
+# return
+# { 
+# "<gradientID1>" = <gradientName1>
+# "<gradientID2>" = <gradientName2>
+# "<gradientID3>" = <gradientName3>
+# ...
 # }
 # ------------------------
 #
@@ -393,4 +412,122 @@ class Webserver():
             return jsonify(data_out)
 
 
-    
+    # /GetEffectSetting
+    # in
+    # { 
+    # "device" = <deviceID>
+    # "effect" = <effectID>
+    # "setting_key" = <setting_key>
+    # }
+    #
+    # return
+    # { 
+    # "device" = <deviceID>
+    # "effect" = <effectID>
+    # "setting_key" = <setting_key>
+    # "setting_value" = <setting_value>
+    # }
+    @server.route('/GetEffectSetting', methods=['GET'])
+    def GetEffectSetting(): # pylint: disable=E0211
+        if request.method == 'GET':
+            data_in = request.args.to_dict()         
+            data_out = copy.deepcopy(data_in)
+
+            if not Webserver.instance.webserver_executer.ValidateDataIn(data_in, ("device", "effect", "setting_key",)):
+                return "Input data are wrong.", 403
+
+            setting_value = Webserver.instance.webserver_executer.GetEffectSetting(data_in["device"], data_in["effect"], data_in["setting_key"])
+            data_out["setting_value"] = setting_value
+
+            if setting_value is None:
+                return "Could not find settings value: ", 403
+            else:
+                return jsonify(data_out)
+
+
+    # /GetColors
+    #
+    # return
+    # { 
+    # "<colorID1>" = <colorName1>
+    # "<colorID2>" = <colorName2>
+    # "<colorID3>" = <colorName3>
+    # ...
+    # }
+    @server.route('/GetColors', methods=['GET'])
+    def GetColors(): # pylint: disable=E0211
+        if request.method == 'GET':       
+            data_out = dict()
+
+            colors = Webserver.instance.webserver_executer.GetColors()
+            data_out = colors
+
+            if data_out is None:
+                return "Could not find colors.", 403
+            else:
+                return jsonify(data_out)
+
+
+    # /GetGradients
+    #
+    # return
+    # { 
+    # "<gradientID1>" = <gradientName1>
+    # "<gradientID2>" = <gradientName2>
+    # "<gradientID3>" = <gradientName3>
+    # ...
+    # }
+    @server.route('/GetGradients', methods=['GET'])
+    def GetGradients(): # pylint: disable=E0211
+        if request.method == 'GET':       
+            data_out = dict()
+
+            gradients = Webserver.instance.webserver_executer.GetGradients()
+            data_out = gradients
+
+            if data_out is None:
+                return "Could not find gradients.", 403
+            else:
+                return jsonify(data_out)
+
+
+    # /SetEffectSetting
+    # { 
+    # "device" = <deviceID>
+    # "effect" = <effectID>
+    # "setting_key" = <setting_key>
+    # "setting_value" = <setting_value>
+    # }
+    @server.route('/SetEffectSetting', methods=['POST'])
+    def SetEffectSetting(): # pylint: disable=E0211
+        if request.method == 'POST':
+            data_in = request.get_json()         
+            data_out = copy.deepcopy(data_in)
+
+            if not Webserver.instance.webserver_executer.ValidateDataIn(data_in, ("device","effect","setting_key","setting_value", )):
+                return "Input data are wrong.", 403
+
+            Webserver.instance.webserver_executer.SetEffectSetting(data_in["device"], data_in["effect"], data_in["setting_key"], data_in["setting_value"])
+            
+            return jsonify(data_out)
+
+
+   # /SetEffectSettingForAll
+    # { 
+    # "effect" = <effectID>
+    # "setting_key" = <setting_key>
+    # "setting_value" = <setting_value>
+    # }
+    @server.route('/SetEffectSettingForAll', methods=['POST'])
+    def SetEffectSettingForAll(): # pylint: disable=E0211
+        if request.method == 'POST':
+            data_in = request.get_json()         
+            data_out = copy.deepcopy(data_in)
+
+            if not Webserver.instance.webserver_executer.ValidateDataIn(data_in, ("effect","setting_key","setting_value", )):
+                return "Input data are wrong.", 403
+
+            Webserver.instance.webserver_executer.SetEffectSettingForAll(data_in["effect"], data_in["setting_key"], data_in["setting_value"])
+            
+            return jsonify(data_out)
+
