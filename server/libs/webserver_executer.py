@@ -61,9 +61,7 @@ class WebserverExecuter:
 
         for device_key in self._config["device_configs"]:
             self.RefreshDevice(device_key)
-        
 
-            
 
     def GetColors(self):
         colors = dict()
@@ -78,14 +76,39 @@ class WebserverExecuter:
             gradients[gradientID] = gradientID
         return gradients
 
+    def GetGeneralSetting(self, setting_key):
+        return self._config["audio_config"][setting_key]
+
+    def SetGeneralSetting(self, setting_key, setting_value):
+        self._config["audio_config"][setting_key] = setting_value
+        self.SaveConfig()
+
+    def GetOutputTypes(self):
+        output_types = dict()
+        output_types["output_raspi"] = "Output Raspberry Pi"
+        output_types["output_udp"] = "Output Network via UDP"
+        return output_types
+
     #return setting_value
-    #def GetDeviceSetting(self,device, setting_key):
+    def GetDeviceSetting(self,device, setting_key):
+        return self._config["device_configs"][device][setting_key]
 
-    #def SetDeviceSetting(self, device, setting_key, setting_value):
+    def SetDeviceSetting(self, device, setting_key, setting_value):
+        self._config["device_configs"][device][setting_key] = setting_value
+        self.SaveConfig()
 
-    #def GetGeneralSetting(self, setting_key):
+        self.RefreshDevice(device)
 
-    #def SetGeneralSetting(self, setting_key, setting_value):
+    #return setting_value
+    def GetOutputTypeDeviceSetting(self,device, output_type_key, setting_key):
+        return self._config["device_configs"][device]["output"][output_type_key][setting_key]
+
+    def SetOutputTypeDeviceSetting(self, device, output_type_key, setting_key, setting_value):
+        self._config["device_configs"][device]["output"][output_type_key][setting_key] = setting_value
+        self.SaveConfig()
+
+        self.RefreshDevice(device)
+    
 
     #def CreateNewDevice(self):
 
@@ -136,10 +159,14 @@ class WebserverExecuter:
         for currentkey in keys:
             if not (currentkey in dictionary): 
                 print("Error in ValidateDataIn: Could not find the key: " + currentkey)
+                print("Dict:")
+                print(dictionary)
                 return False
             
             if dictionary[currentkey] is None:
                 print("Error in ValidateDataIn: dictionary entry is none. Key: " + currentkey)
+                print("Dict:")
+                print(dictionary)
                 return False
 
         return True

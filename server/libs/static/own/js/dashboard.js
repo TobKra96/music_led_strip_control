@@ -104,6 +104,8 @@ function SetActiveEffect(newActiveEffect){
 function BuildDeviceCombobox(){
     var devices = this.devices
 
+    $( ".dropdown-menu").append("<a class=\"dropdown-item device_item\" id=\"all_devices\">All Devices</a>")
+    
     Object.keys(devices).forEach(device_key => {
         $( ".dropdown-menu").append( "<a class=\"dropdown-item device_item\" id=\"" + device_key +"\">" + devices[device_key] + "</a>" );
     });

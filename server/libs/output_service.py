@@ -2,7 +2,8 @@ from libs.config_service import ConfigService # pylint: disable=E0611, E0401
 from libs.notification_enum import NotificationEnum # pylint: disable=E0611, E0401
 from libs.fps_limiter import FPSLimiter # pylint: disable=E0611, E0401
 from libs.outputs.output_raspi import OutputRaspi # pylint: disable=E0611, E0401
-from libs.outputs.output_mqtt import OutputMptt # pylint: disable=E0611, E0401
+#from libs.outputs.output_mqtt import OutputMptt # pylint: disable=E0611, E0401
+from libs.outputs.output_udp import OutputUDP # pylint: disable=E0611, E0401
 from libs.outputs.output_dummy import OutputDummy # pylint: disable=E0611, E0401
 from libs.output_enum import OutputsEnum # pylint: disable=E0611, E0401
 
@@ -42,10 +43,11 @@ class OutputService:
         self._available_outputs = {
             OutputsEnum.output_dummy: OutputDummy,
             OutputsEnum.output_raspi:OutputRaspi,
-            OutputsEnum.output_mqtt:OutputMptt
+            #OutputsEnum.output_mqtt:OutputMptt,
+            OutputsEnum.output_udp:OutputUDP
             }
 
-        current_output_enum = OutputsEnum[self._device.device_config["output"]["OUTPUT_TYPE"]]
+        current_output_enum = OutputsEnum[self._device.device_config["OUTPUT_TYPE"]]
         print("Found output: " + str(current_output_enum))
         self._current_output = self._available_outputs[current_output_enum](self._device)
 

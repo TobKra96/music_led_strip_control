@@ -164,6 +164,16 @@ server = Flask(__name__)
 # { 
 # }
 # ------------------------
+#
+# /GetOutputTypes
+#
+# return
+# { 
+# "<outputTypeID1>" = <outputTypeName1>
+# "<outputTypeID2>" = <outputTypeName2>
+# "<outputTypeID3>" = <outputTypeName3>
+# ...
+# }
 
 
 class Webserver():
@@ -215,7 +225,7 @@ class Webserver():
     @server.route('/device_settings', methods=['GET', 'POST'])
     def device_settings(): # pylint: disable=E0211
         # Render the general settings page
-        return render_template('/device_settings/device_settings.html')
+        return render_template('/general_settings/device_settings.html')
 
     #####################################################################
     #   Effects                                                         #
@@ -345,7 +355,7 @@ class Webserver():
             else:
                 return jsonify(data_out)
 
-
+    #################################################################
 
     # /GetActiveEffect
     # in
@@ -531,3 +541,178 @@ class Webserver():
             
             return jsonify(data_out)
 
+    #################################################################
+
+    # /GetGeneralSetting
+    # in
+    # { 
+    # "setting_key" = <setting_key>
+    # }
+    #
+    # return
+    # { 
+    # "setting_key" = <setting_key>
+    # "setting_value" = <setting_value>
+    # }
+    @server.route('/GetGeneralSetting', methods=['GET'])
+    def GetGeneralSetting(): # pylint: disable=E0211
+        if request.method == 'GET':
+            data_in = request.args.to_dict()         
+            data_out = copy.deepcopy(data_in)
+
+            if not Webserver.instance.webserver_executer.ValidateDataIn(data_in, ("setting_key",)):
+                return "Input data are wrong.", 403
+
+            setting_value = Webserver.instance.webserver_executer.GetGeneralSetting(data_in["setting_key"])
+            data_out["setting_value"] = setting_value
+
+            if setting_value is None:
+                return "Could not find settings value: ", 403
+            else:
+                return jsonify(data_out)
+
+    # /SetGeneralSetting
+    # { 
+    # "setting_key" = <setting_key>
+    # "setting_value" = <setting_value>
+    # }
+    @server.route('/SetGeneralSetting', methods=['POST'])
+    def SetGeneralSetting(): # pylint: disable=E0211
+        if request.method == 'POST':
+            data_in = request.get_json()         
+            data_out = copy.deepcopy(data_in)
+
+            if not Webserver.instance.webserver_executer.ValidateDataIn(data_in, ("setting_key","setting_value", )):
+                return "Input data are wrong.", 403
+
+            Webserver.instance.webserver_executer.SetGeneralSetting(data_in["setting_key"], data_in["setting_value"])
+            
+            return jsonify(data_out)
+
+
+    # /GetDeviceSetting
+    # in
+    # { 
+    # "device" = <deviceID>
+    # "setting_key" = <setting_key>
+    # }
+    #
+    # return
+    # { 
+    # "device" = <deviceID>
+    # "setting_key" = <setting_key>
+    # "setting_value" = <setting_value>
+    # }
+    @server.route('/GetDeviceSetting', methods=['GET'])
+    def GetDeviceSetting(): # pylint: disable=E0211
+        if request.method == 'GET':
+            data_in = request.args.to_dict()         
+            data_out = copy.deepcopy(data_in)
+
+            if not Webserver.instance.webserver_executer.ValidateDataIn(data_in, ("device", "setting_key",)):
+                return "Input data are wrong.", 403
+
+            setting_value = Webserver.instance.webserver_executer.GetDeviceSetting(data_in["device"], data_in["setting_key"])
+            data_out["setting_value"] = setting_value
+
+            if setting_value is None:
+                return "Could not find settings value: ", 403
+            else:
+                return jsonify(data_out)
+
+
+    # /SetDeviceSetting
+    # { 
+    # "device" = <deviceID>
+    # "setting_key" = <setting_key>
+    # "setting_value" = <setting_value>
+    # }
+    @server.route('/SetDeviceSetting', methods=['POST'])
+    def SetDeviceSetting(): # pylint: disable=E0211
+        if request.method == 'POST':
+            data_in = request.get_json()         
+            data_out = copy.deepcopy(data_in)
+
+            if not Webserver.instance.webserver_executer.ValidateDataIn(data_in, ("device", "setting_key","setting_value", )):
+                return "Input data are wrong.", 403
+
+            Webserver.instance.webserver_executer.SetDeviceSetting(data_in["device"],data_in["setting_key"], data_in["setting_value"])
+            
+            return jsonify(data_out)
+
+    
+    # /GetOutputTypes
+    #
+    # return
+    # { 
+    # "<outputTypeID1>" = <outputTypeName1>
+    # "<outputTypeID2>" = <outputTypeName2>
+    # "<outputTypeID3>" = <outputTypeName3>
+    # ...
+    # }
+    @server.route('/GetOutputTypes', methods=['GET'])
+    def GetOutputTypes(): # pylint: disable=E0211
+        if request.method == 'GET':       
+            data_out = dict()
+
+            output_types = Webserver.instance.webserver_executer.GetOutputTypes()
+            data_out = output_types
+
+            if data_out is None:
+                return "Could not find output_types.", 403
+            else:
+                return jsonify(data_out)
+
+
+    # /GetOutputTypeDeviceSetting
+    # in
+    # { 
+    # "device" = <deviceID>
+    # "output_type_key" = <output_type_key>
+    # "setting_key" = <setting_key>
+    # }
+    #
+    # return
+    # { 
+    # "device" = <deviceID>
+    # "output_type_key" = <output_type_key>
+    # "setting_key" = <setting_key>
+    # "setting_value" = <setting_value>
+    # }
+    @server.route('/GetOutputTypeDeviceSetting', methods=['GET'])
+    def GetOutputTypeDeviceSetting(): # pylint: disable=E0211
+        if request.method == 'GET':
+            data_in = request.args.to_dict()         
+            data_out = copy.deepcopy(data_in)
+
+            if not Webserver.instance.webserver_executer.ValidateDataIn(data_in, ("device", "output_type_key", "setting_key",)):
+                return "Input data are wrong.", 403
+
+            setting_value = Webserver.instance.webserver_executer.GetOutputTypeDeviceSetting(data_in["device"], data_in["output_type_key"],  data_in["setting_key"])
+            data_out["setting_value"] = setting_value
+
+            if setting_value is None:
+                return "Could not find settings value: ", 403
+            else:
+                return jsonify(data_out)
+
+
+    # /SetOutputTypeDeviceSetting
+    # { 
+    # "device" = <deviceID>
+    # "output_type_key" = <output_type_key>
+    # "setting_key" = <setting_key>
+    # "setting_value" = <setting_value>
+    # }
+    @server.route('/SetOutputTypeDeviceSetting', methods=['POST'])
+    def SetOutputTypeDeviceSetting(): # pylint: disable=E0211
+        if request.method == 'POST':
+            data_in = request.get_json()         
+            data_out = copy.deepcopy(data_in)
+
+            if not Webserver.instance.webserver_executer.ValidateDataIn(data_in, ("device", "output_type_key", "setting_key","setting_value", )):
+                return "Input data are wrong.", 403
+
+            Webserver.instance.webserver_executer.SetOutputTypeDeviceSetting(data_in["device"], data_in["output_type_key"], data_in["setting_key"], data_in["setting_value"])
+            
+            return jsonify(data_out)
