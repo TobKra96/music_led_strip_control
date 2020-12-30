@@ -1,8 +1,3 @@
-var allSettings;
-var deviceSettings;
-var currentSettings;
-
-
 var settingsIdentifier;
 var effectIdentifier;
 var localSettings = {};
@@ -262,66 +257,12 @@ function SetLocalSettings(){
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-function resetSettings(){
-
-  var r = confirm("Do you really want to reset the settings?");
-  if (r == false) {
-    return;
-  }
-
-  var message = "resetSettings";
-  $.ajax({
-    url: "/reset_settings/reset",
-    type: "POST", //send it through get method
-    data: JSON.stringify(message, null, '\t'),
-    contentType: 'application/json;charset=UTF-8',
-    success: function(response) {
-        console.log("Set settings were resetted successful. Response: " + response.toString());
-    },
-    error: function(xhr) {
-      //Do Something to handle error
-      console.log("Could not reset the settings. Error: " + xhr.responseText);
-    }
-  });
-
-  location.reload();
-}
-
-
 /* Device Handling */
 
 function BuildDeviceCombobox(){
   var devices = this.devices
+
+  $( ".dropdown-menu").append("<a class=\"dropdown-item device_item\" id=\"all_devices\">All Devices</a>")
 
   Object.keys(devices).forEach(device_key => {
       $( ".dropdown-menu").append( "<a class=\"dropdown-item device_item\" id=\"" + device_key +"\">" + devices[device_key] + "</a>" );

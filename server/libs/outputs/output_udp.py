@@ -4,11 +4,11 @@ import paho.mqtt.publish as publish
 import numpy as np
 import socket
 
-class OutputMptt(Output):
+class OutputUDP(Output):
     def __init__(self, device):
 
         # Call the constructor of the base class.
-        super(OutputMptt, self).__init__(device)
+        super(OutputUDP, self).__init__(device)
 
         output_id = "output_udp"
         #self._mqtt_broker = self._device_config["output"][output_id]["MQTT_Broker"]
