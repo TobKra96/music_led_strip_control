@@ -589,6 +589,7 @@ class Webserver():
             
             return jsonify(data_out)
 
+    #################################################################
 
     # /GetDeviceSetting
     # in
@@ -714,5 +715,52 @@ class Webserver():
                 return "Input data are wrong.", 403
 
             Webserver.instance.webserver_executer.SetOutputTypeDeviceSetting(data_in["device"], data_in["output_type_key"], data_in["setting_key"], data_in["setting_value"])
+            
+            return jsonify(data_out)
+
+
+    # /CreateNewDevice
+    # { 
+    # }
+    @server.route('/CreateNewDevice', methods=['POST'])
+    def CreateNewDevice(): # pylint: disable=E0211
+        if request.method == 'POST':
+                
+            data_out = dict()
+
+            Webserver.instance.webserver_executer.CreateNewDevice()
+            
+            return jsonify(data_out)
+
+
+    # /DeleteDevice
+    # { 
+    # "device" = <deviceID>
+    # }
+    @server.route('/DeleteDevice', methods=['POST'])
+    def DeleteDevice(): # pylint: disable=E0211
+        if request.method == 'POST':
+            data_in = request.get_json()         
+            data_out = copy.deepcopy(data_in)
+
+            if not Webserver.instance.webserver_executer.ValidateDataIn(data_in, ("device",)):
+                return "Input data are wrong.", 403
+
+            Webserver.instance.webserver_executer.DeleteDevice(data_in["device"])
+            
+            return jsonify(data_out)
+
+
+
+     # /ResetSettings
+    # { 
+    # }
+    @server.route('/ResetSettings', methods=['POST'])
+    def ResetSettings(): # pylint: disable=E0211
+        if request.method == 'POST':
+                
+            data_out = dict()
+
+            Webserver.instance.webserver_executer.ResetSettings()
             
             return jsonify(data_out)

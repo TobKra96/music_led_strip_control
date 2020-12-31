@@ -117,6 +117,33 @@ function SetLocalSettings(){
 
 }
 
+function ResetSettings(){
+ 
+  var data = {};
+
+  $.ajax({
+      url: "/ResetSettings",
+      type: "POST", //send it through get method
+      data: JSON.stringify(data, null, '\t'),
+      contentType: 'application/json;charset=UTF-8',
+      success: function(response) {
+          console.log("Reset settings sucessfull. Response: " + response.toString());
+          location.reload();
+      },
+      error: function(xhr) {
+        //Do Something to handle error
+        console.log("Reset settings got an error. Error: " + xhr.responseText);
+      }
+    });
+}
+
 document.getElementById("save_btn").addEventListener("click",function(e) {
   SetLocalSettings();
+});
+
+document.getElementById("reset_btn").addEventListener("click",function(e) {
+  if (confirm('Are you sure you want to reset the config? This will need a restart.')) {
+    ResetSettings(currentDevice);  
+  }
+  
 });

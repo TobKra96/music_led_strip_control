@@ -304,6 +304,47 @@ function SetLocalSettings(){
 
 }
 
+function CreateNewDevice(){
+ 
+  var data = {};
+  
+  $.ajax({
+      url: "/CreateNewDevice",
+      type: "POST", //send it through get method
+      data: JSON.stringify(data, null, '\t'),
+      contentType: 'application/json;charset=UTF-8',
+      success: function(response) {
+          console.log("Create new device sucessfull. Response: " + response.toString());
+          location.reload();
+      },
+      error: function(xhr) {
+        //Do Something to handle error
+        console.log("Create new device got an error. Error: " + xhr.responseText);
+      }
+    });
+}
+
+function DeleteDevice(device){
+ 
+  var data = {};
+  data["device"] = device;
+
+  $.ajax({
+      url: "/DeleteDevice",
+      type: "POST", //send it through get method
+      data: JSON.stringify(data, null, '\t'),
+      contentType: 'application/json;charset=UTF-8',
+      success: function(response) {
+          console.log("Delete device sucessfull. Response: " + response.toString());
+          location.reload();
+      },
+      error: function(xhr) {
+        //Do Something to handle error
+        console.log("Delete device got an error. Error: " + xhr.responseText);
+      }
+    });
+}
+
 
 /* Device Handling */
 
@@ -341,6 +382,21 @@ function SwitchDevice(e){
 
 document.getElementById("save_btn").addEventListener("click",function(e) {
   SetLocalSettings();
+});
+
+document.getElementById("create1_btn").addEventListener("click",function(e) {
+  CreateNewDevice();
+});
+
+document.getElementById("create2_btn").addEventListener("click",function(e) {
+  CreateNewDevice();
+});
+
+document.getElementById("delete_btn").addEventListener("click",function(e) {
+  if (confirm('Are you sure you want to delete the device?')) {
+    DeleteDevice(currentDevice);  
+  }
+  
 });
 
 

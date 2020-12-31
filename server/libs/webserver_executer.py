@@ -59,8 +59,7 @@ class WebserverExecuter:
         
         self.SaveConfig()
 
-        for device_key in self._config["device_configs"]:
-            self.RefreshDevice(device_key)
+        self.RefreshDevice("all_devices")
 
 
     def GetColors(self):
@@ -82,6 +81,8 @@ class WebserverExecuter:
     def SetGeneralSetting(self, setting_key, setting_value):
         self._config["audio_config"][setting_key] = setting_value
         self.SaveConfig()
+
+        self.RefreshDevice("all_devices")
 
     def GetOutputTypes(self):
         output_types = dict()
@@ -110,11 +111,25 @@ class WebserverExecuter:
         self.RefreshDevice(device)
     
 
-    #def CreateNewDevice(self):
+    def CreateNewDevice(self):
+        i = 0
+        while i < 100:
+            new_device_id = "device_" + str(i)
+            if not new_device_id in self._config["device_configs"]:
+                self._config["device_configs"][new_device_id] = self._config["default_device"]
+                self.SaveConfig()
 
-    #def DeleteDevice(self, device):
+                self.RefreshDevice("all_devices")
+                break
+                
+            i += 1
 
-    #def ResetSettings(self):
+    def DeleteDevice(self, device):
+        del self._config["device_configs"][device]
+
+    def ResetSettings(self):
+        self.ResetConfig()
+        self.RefreshDevice("all_devices")
 
     # Helper
 
