@@ -91,6 +91,4 @@ class EffectPendulum(Effect):
 
 
         # Add the output array to the queue
-        self._output_queue_lock.acquire()
-        self._output_queue.put(output_array)
-        self._output_queue_lock.release()
+        self.queue_output_array_blocking(output_array)

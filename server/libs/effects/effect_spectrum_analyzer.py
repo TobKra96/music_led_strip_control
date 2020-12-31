@@ -33,11 +33,6 @@ class EffectSpectrumAnalyzer(Effect):
             output[2][i*(led_count//effect_config["spectrum_count"]) : i*(led_count//effect_config["spectrum_count"]) + int(pegel_max*(led_count/effect_config["spectrum_count"]))]=self._color_service.colour(effect_config["color"])[2]
 
        
-        self._output_queue_lock.acquire()
-        if self._output_queue.full():
-            prev_output_array = self._output_queue.get()
-            del prev_output_array
-        self._output_queue.put(output)
-        self._output_queue_lock.release()
+        self.queue_output_array_noneblocking(output)
 
         self.prev_output = output

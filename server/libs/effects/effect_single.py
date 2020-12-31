@@ -18,6 +18,5 @@ class EffectSingle(Effect):
         output_array[2][:]=self._config_colours[effect_config["color"]][2]
 
         # Add the output array to the queue
-        self._output_queue_lock.acquire()
-        self._output_queue.put(output_array)
-        self._output_queue_lock.release()
+        self.queue_output_array_blocking(output_array)
+                

@@ -90,6 +90,4 @@ class EffectRods(Effect):
                 local_output_array = big_mirrored_array[:, start_of_array:end_of_array]
 
         # Add the output array to the queue
-        self._output_queue_lock.acquire()
-        self._output_queue.put(local_output_array)
-        self._output_queue_lock.release()
+        self.queue_output_array_blocking(local_output_array)

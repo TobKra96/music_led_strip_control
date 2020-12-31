@@ -63,9 +63,6 @@ class EffectBars(Effect):
                 end_of_array = start_of_array + led_count
                 output = big_mirrored_array[:, start_of_array:end_of_array]
        
-        self._output_queue_lock.acquire()
-        if self._output_queue.full():
-            prev_output_array = self._output_queue.get()
-            del prev_output_array
-        self._output_queue.put(output)
-        self._output_queue_lock.release()
+        self.queue_output_array_noneblocking(output)
+        
+        

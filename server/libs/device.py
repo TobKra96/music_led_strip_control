@@ -24,6 +24,19 @@ class Device:
         self.__output_queue = Queue(2)
         self.__output_queue_lock = Lock()
 
+        self.create_processes()
+
+    def start_device(self):
+        print("Start device: " + self.__device_config["DEVICE_NAME"])
+        self.__output_process.start()
+        self.__effect_process.start()
+
+    def stop_device(self):
+        print("Stop device: " + self.__device_config["DEVICE_NAME"])
+        self.__effect_process.terminate()
+        self.__output_process.terminate()
+
+    def create_processes(self):
         self.__output_service = OutputService()
         self.__output_process = Process(
             target=self.__output_service.start, 
@@ -34,16 +47,15 @@ class Device:
             target=self.__effect_service.start, 
             args=(self,))
 
-    def start_device(self):
-        self.__output_process.start()
-        self.__effect_process.start()
-
     def refresh_config(self, config, device_config):
+        print("Refresh config of device: " + self.__device_config["DEVICE_NAME"])
+
+        self.stop_device()
+
         self.__config = config
         self.__device_config = device_config
 
-        self.__output_process.terminate()
-        self.__effect_process.terminate()
+        self.create_processes()
 
         self.__output_service = OutputService()
         self.__output_process = Process(
