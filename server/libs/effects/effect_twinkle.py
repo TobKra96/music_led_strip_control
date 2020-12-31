@@ -91,6 +91,4 @@ class EffectTwinkle(Effect):
         self.output = gaussian_filter1d(self.output, sigma=effect_config["blur"])
 
         # Add the output array to the queue
-        self._output_queue_lock.acquire()
-        self._output_queue.put(self.output)
-        self._output_queue_lock.release()
+        self.queue_output_array_blocking(self.output)

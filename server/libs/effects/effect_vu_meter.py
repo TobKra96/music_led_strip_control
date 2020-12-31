@@ -46,12 +46,7 @@ class EffectVuMeter(Effect):
 
         #print("vol: " + str(y))
 
-        self._output_queue_lock.acquire()
-        if self._output_queue.full():
-            prev_output_array = self._output_queue.get()
-            del prev_output_array
-        self._output_queue.put(output)
-        self._output_queue_lock.release()
+        self.queue_output_array_noneblocking(output)
 
         self.prev_output = output
 
