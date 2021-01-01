@@ -405,6 +405,32 @@
                 "mids_multiplier": 1,
                 "mirror": true
             },
+            "effect_advanced_scroll": {
+                "blur": 0.5,
+                "decay": 1,
+                "subbass_color": "Red",
+                "bass_color": "Orange",
+                "lowmid_color": "Pink",
+                "mid_color": "Yellow",
+                "uppermid_color": "Green",
+                "presence_color": "Light blue",
+                "brilliance_color": "Blue",
+                "subbass_speed": 4,
+                "bass_speed": 4,
+                "lowmid_speed": 4,
+                "mid_speed": 4,
+                "uppermid_speed": 4,
+                "presence_speed": 4,
+                "brilliance_speed": 4,
+                "subbass_multiplier": 1,
+                "bass_multiplier": 1,
+                "lowmid_multiplier": 1,
+                "mid_multiplier": 1,
+                "uppermid_multiplier": 1,
+                "presence_multiplier": 1,
+                "brilliance_multiplier": 1,
+                "mirror": true
+            },
             "effect_single": {
                 "color": "Blue"
             },

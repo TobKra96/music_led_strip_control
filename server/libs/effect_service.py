@@ -13,6 +13,7 @@ from libs.effects.effect_off import EffectOff # pylint: disable=E0611, E0401
 from libs.effects.effect_pendulum import EffectPendulum # pylint: disable=E0611, E0401
 from libs.effects.effect_power import EffectPower # pylint: disable=E0611, E0401
 from libs.effects.effect_rods import EffectRods # pylint: disable=E0611, E0401
+from libs.effects.effect_advanced_scroll import EffectAdvancedScroll # pylint: disable=E0611, E0401
 from libs.effects.effect_scroll import EffectScroll # pylint: disable=E0611, E0401
 from libs.effects.effect_single import EffectSingle # pylint: disable=E0611, E0401
 from libs.effects.effect_slide import EffectSlide # pylint: disable=E0611, E0401
@@ -61,6 +62,7 @@ class EffectService():
             EffectsEnum.effect_twinkle:EffectTwinkle,
             EffectsEnum.effect_pendulum:EffectPendulum,
             EffectsEnum.effect_rods:EffectRods,
+            EffectsEnum.effect_advanced_scroll:EffectAdvancedScroll,
             EffectsEnum.effect_scroll:EffectScroll,
             EffectsEnum.effect_energy:EffectEnergy,
             EffectsEnum.effect_wavelength:EffectWavelength,

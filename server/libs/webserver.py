@@ -93,6 +93,11 @@ class Webserver():
         # Render the effect_energy page
         return render_template('effects/effect_energy.html')
 
+    @server.route('/effects/effect_advanced_scroll', methods=['GET', 'POST'])
+    def effect_advanced_scroll(): # pylint: disable=E0211
+        # Render the effect_advanced_scroll page
+        return render_template('effects/effect_advanced_scroll.html')
+
     @server.route('/effects/effect_wavelength', methods=['GET', 'POST'])
     def effect_wavelength(): # pylint: disable=E0211
         # Render the effect_wavelength page
