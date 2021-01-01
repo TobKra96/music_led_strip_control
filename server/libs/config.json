@@ -462,7 +462,9 @@
                 "bar_length": 2,
                 "color": "Blue",
                 "max_vol_color": "Red",
-                "speed": 50
+                "speed": 50,
+                "gradient": "Spectral",
+                "use_gradient": "true"
             },
             "effect_wave": {
                 "color_flash": "White",
