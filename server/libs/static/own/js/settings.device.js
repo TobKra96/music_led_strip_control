@@ -209,12 +209,11 @@ function GetOutputTypeSettingKeys(output_type){
 }
 
 
-function SetDeviceSetting(device, setting_key, setting_value){
+function SetDeviceSetting(device, settings){
  
       var data = {};
       data["device"] = device;
-      data["setting_key"] = setting_key;
-      data["setting_value"] = setting_value;
+      data["settings"] = settings;
   
       $.ajax({
           url: "/SetDeviceSetting",
@@ -231,14 +230,13 @@ function SetDeviceSetting(device, setting_key, setting_value){
         });
  }
 
- function SetOutputTypeDeviceSetting(device, output_type_key, setting_key, setting_value){
+ function SetOutputTypeDeviceSetting(device, output_type_key, settings){
  
   var data = {};
   data["device"] = device;
   data["output_type_key"] = output_type_key;
-  data["setting_key"] = setting_key;
-  data["setting_value"] = setting_value;
-
+  data["settings"] = settings;
+  
   $.ajax({
       url: "/SetOutputTypeDeviceSetting",
       type: "POST", //send it through get method
@@ -257,7 +255,7 @@ function SetDeviceSetting(device, setting_key, setting_value){
 function SetLocalSettings(){
   var all_device_setting_keys = GetDeviceSettingKeys();
 
-
+  settings_device = {};
   Object.keys(all_device_setting_keys).forEach(setting_id => {
     var setting_key = all_device_setting_keys[setting_id];
     var setting_value = "";
@@ -274,11 +272,17 @@ function SetLocalSettings(){
       }
     }
 
-    SetDeviceSetting(currentDevice, setting_key, setting_value)
+    settings_device[setting_key] = setting_value;
+    
   })
+
+  SetDeviceSetting(currentDevice, settings_device)
+  
 
   Object.keys(output_types).forEach(output_type_key => {
     var all_output_type_setting_keys = GetOutputTypeSettingKeys(output_type_key);
+
+    settings_output_type = {};
 
     Object.keys(all_output_type_setting_keys).forEach(setting_id => {
       var setting_key = all_output_type_setting_keys[setting_id];
@@ -295,9 +299,13 @@ function SetLocalSettings(){
           setting_value = $(elementIdentifier).val();
         }
       }
+      
+      settings_output_type[setting_key] = setting_value;
 
-      SetOutputTypeDeviceSetting(currentDevice, output_type_key, setting_key, setting_value)
+      
     });
+
+    SetOutputTypeDeviceSetting(currentDevice, output_type_key, settings_output_type)
   });
 
   location.reload();

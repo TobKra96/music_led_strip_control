@@ -72,11 +72,10 @@ function GetAllSettingKeys(){
 }
 
 
-function SetGeneralSetting(setting_key, setting_value){
+function SetGeneralSetting(settings){
 
     var data = {};
-    data["setting_key"] = setting_key;
-    data["setting_value"] = setting_value;
+    data["settings"] = settings;
 
     $.ajax({
       url: "/SetGeneralSetting",
@@ -97,6 +96,8 @@ function SetGeneralSetting(setting_key, setting_value){
 function SetLocalSettings(){
   var all_setting_keys = GetAllSettingKeys();
 
+  settings = {};
+
   Object.keys(all_setting_keys).forEach(setting_id => {
     var setting_key = all_setting_keys[setting_id];
     var setting_value = "";
@@ -112,8 +113,11 @@ function SetLocalSettings(){
       }
     }
 
-    SetGeneralSetting(setting_key, setting_value)
+    settings[setting_key] = setting_value;
+    
   })
+
+  SetGeneralSetting(settings)
 
 }
 

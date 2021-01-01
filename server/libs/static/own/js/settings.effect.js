@@ -185,13 +185,12 @@ function GetAllSettingKeys(){
 }
 
 
-function SetEffectSetting(device, effect, setting_key, setting_value){
+function SetEffectSetting(device, effect, settings){
   
   if(this.currentDevice == "all_devices"){
       var data = {};
       data["effect"] = effect;
-      data["setting_key"] = setting_key;
-      data["setting_value"] = setting_value;
+      data["settings"] = settings;
   
       $.ajax({
           url: "/SetEffectSettingForAll",
@@ -211,8 +210,7 @@ function SetEffectSetting(device, effect, setting_key, setting_value){
       var data = {};
       data["device"] = this.currentDevice;
       data["effect"] = effect;
-      data["setting_key"] = setting_key;
-      data["setting_value"] = setting_value;
+      data["settings"] = settings;
   
       $.ajax({
           url: "/SetEffectSetting",
@@ -234,6 +232,7 @@ function SetEffectSetting(device, effect, setting_key, setting_value){
 function SetLocalSettings(){
   var all_setting_keys = GetAllSettingKeys();
 
+  settings = {};
 
   Object.keys(all_setting_keys).forEach(setting_id => {
     var setting_key = all_setting_keys[setting_id];
@@ -250,8 +249,11 @@ function SetLocalSettings(){
       }
     }
 
-    SetEffectSetting(currentDevice, effectIdentifier, setting_key, setting_value)
+    settings[setting_key] = setting_value;
+        
   })
+
+  SetEffectSetting(currentDevice, effectIdentifier, settings)
 
 }
 
