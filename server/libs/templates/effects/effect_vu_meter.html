@@ -15,6 +15,14 @@
           </p>
           <form id="settingsForm" data-parsley-validate class="form-horizontal form-label-left" action method="post" novalidate>
             
+
+            <div class="item form-group form-space">
+              <label class="control-label col-md-3 col-sm-3 col-xs-12">Use Gradient instead of Color</label>
+              <div class="col-md-9 col-sm-9 col-xs-12">
+                <input id="use_gradient" type="checkbox" class="js-switch setting_input" data-switchery="true" >
+              </div>
+            </div>  
+
             <div class="item form-group form-space">
               <label class="control-label col-md-3 col-sm-3 col-xs-12">Color</label>
               <div class="col-md-9 col-sm-9 col-xs-12">
@@ -22,6 +30,15 @@
                 </select>
               </div>
             </div>
+
+            <div class="item form-group form-space">
+              <label class="control-label col-md-3 col-sm-3 col-xs-12">Gradient</label>
+              <div class="col-md-9 col-sm-9 col-xs-12">
+                <select id="gradient" class="form-control gradients setting_input">
+                </select>
+              </div>
+            </div>
+
             <div class="item form-group form-space">
               <label class="control-label col-md-3 col-sm-3 col-xs-12">Max-Volume Color</label>
               <div class="col-md-9 col-sm-9 col-xs-12">

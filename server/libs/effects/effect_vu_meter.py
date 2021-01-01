@@ -29,10 +29,27 @@ class EffectVuMeter(Effect):
         output = np.zeros((3,led_count))
 
         """Effect that lights up more leds when volume gets higher"""
-        output[0][: int(normalized_vol*led_count)]=self._color_service.colour(effect_config["color"])[0]
-        output[1][: int(normalized_vol*led_count)]=self._color_service.colour(effect_config["color"])[1]
-        output[2][: int(normalized_vol*led_count)]=self._color_service.colour(effect_config["color"])[2]
+
+        use_gradient = effect_config["use_gradient"]
+        current_gradient = effect_config["gradient"]
+
+        leds_on = int(normalized_vol*led_count)
+
+        if use_gradient:
+            full_gradient_ref = self._color_service.full_gradients
+
+            output[0][: leds_on]=full_gradient_ref[current_gradient][0][:leds_on]
+            output[1][: leds_on]=full_gradient_ref[current_gradient][1][:leds_on]
+            output[2][: leds_on]=full_gradient_ref[current_gradient][2][:leds_on]
+        else:
+
+            output[0][: leds_on]=self._color_service.colour(effect_config["color"])[0]
+            output[1][: leds_on]=self._color_service.colour(effect_config["color"])[1]
+            output[2][: leds_on]=self._color_service.colour(effect_config["color"])[2]
         
+        
+
+
         
         if normalized_vol > self.max_vol:
             self.max_vol = normalized_vol
@@ -43,8 +60,7 @@ class EffectVuMeter(Effect):
         output[2][int(self.max_vol*led_count)-effect_config["bar_length"] : int(self.max_vol*led_count)]=self._color_service.colour(effect_config["max_vol_color"])[2]
 
         self.max_vol -= effect_config["speed"]/10000
-
-        #print("vol: " + str(y))
+        
 
         self.queue_output_array_noneblocking(output)
 
