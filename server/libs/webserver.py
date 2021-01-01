@@ -78,6 +78,11 @@ class Webserver():
         # Render the effect_fade page
         return render_template('effects/effect_fade.html')
 
+    @server.route('/effects/effect_sync_fade', methods=['GET', 'POST'])
+    def effect_sync_fade(): # pylint: disable=E0211
+        # Render the effect_fade page
+        return render_template('effects/effect_sync_fade.html')
+
     @server.route('/effects/effect_scroll', methods=['GET', 'POST'])
     def effect_scroll(): # pylint: disable=E0211
         # Render the effect_scroll page

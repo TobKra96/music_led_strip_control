@@ -1,5 +1,6 @@
 from libs.device import Device # pylint: disable=E0611, E0401
 from libs.config_service import ConfigService # pylint: disable=E0611, E0401
+from libs.color_service_global import ColorServiceGlobal # pylint: disable=E0611, E0401
 from libs.effect_item import EffectItem # pylint: disable=E0611, E0401
 from libs.notification_item import NotificationItem # pylint: disable=E0611, E0401
 from libs.notification_enum import NotificationEnum # pylint: disable=E0611, E0401
@@ -20,7 +21,6 @@ class DeviceManager:
         self._audio_queue = audio_queue
         self._audio_queue_lock = audio_queue_lock
         self._skip_routine = False
-
         self._devices = {}
         self.init_devices()
         self.start_devices()
@@ -94,10 +94,13 @@ class DeviceManager:
 
     def init_devices(self):
         print("Enter init_devices()")
+
+        self._color_service_global = ColorServiceGlobal(self._config)
+
         for key in self._config["device_configs"].keys():
             device_id = key
             print("Init device with device id:" + device_id)
-            self._devices[device_id] = Device(self._config, self._config["device_configs"][device_id])
+            self._devices[device_id] = Device(self._config, self._config["device_configs"][device_id], self._color_service_global)
         print("Leave init_devices()")
 
     def reinit_devices(self):

@@ -5,7 +5,7 @@ from libs.output_service import OutputService
 
 class Device:
 
-    def __init__(self, config, device_config):
+    def __init__(self, config, device_config, color_service_global):
         self.__config = config
         self.__device_config = device_config
         
@@ -23,6 +23,8 @@ class Device:
 
         self.__output_queue = Queue(2)
         self.__output_queue_lock = Lock()
+
+        self.__color_service_global = color_service_global
 
         self.create_processes()
 
@@ -106,6 +108,9 @@ class Device:
     def get_output_queue_lock(self):
         return self.__output_queue_lock
 
+    def get_color_service_global(self):
+        return self.__color_service_global
+
     config = property(get_config)
     device_config = property(get_device_config)
 
@@ -123,4 +128,6 @@ class Device:
 
     output_queue = property(get_output_queue)
     output_queue_lock = property(get_output_queue_lock)
+
+    color_service_global = property(get_color_service_global)
 
