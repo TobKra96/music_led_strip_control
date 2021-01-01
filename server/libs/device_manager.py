@@ -30,7 +30,7 @@ class DeviceManager:
 
     def routine(self):
         # Check the effect queue
-        self._effect_queue_lock.acquire()
+        #self._effect_queue_lock.acquire()
         if not self._effect_queue.empty():
             current_effect_item = self._effect_queue.get()
             print("Device Manager received new effect: " + str(current_effect_item.effect_enum) + current_effect_item.device_id)
@@ -38,15 +38,24 @@ class DeviceManager:
             current_device.effect_queue_lock.acquire()
             current_device.effect_queue.put(current_effect_item)
             current_device.effect_queue_lock.release()
-        self._effect_queue_lock.release()
+        #self._effect_queue_lock.release()
 
         if not self._notification_queue_in.empty():
             current_notification_item = self._notification_queue_in.get()
+            print("Device Manager received new notification: " + str(current_notification_item.notification_enum) + " - " + str(current_notification_item.device_id))
 
             if current_notification_item.notification_enum is NotificationEnum.config_refresh:
+                
+                devices_count_before_reload = len(self._config["device_configs"].keys())
+                print("Device count before: " + str(devices_count_before_reload))
                 self.reload_config()
+                devices_count_after_reload = len(self._config["device_configs"].keys())
+                print("Device count after: " + str(devices_count_after_reload))
 
-                print("Device Manager received new notification: " + str(current_notification_item.notification_enum) + str(current_notification_item.device_id))
+                if(devices_count_before_reload != devices_count_after_reload):
+                    self.reinit_devices()
+
+                
                 if(current_notification_item.device_id == "all_devices"):
                     for key, value in self._devices.items():
                             self.restart_device(key)
@@ -84,10 +93,21 @@ class DeviceManager:
             value.audio_queue_lock.release()
 
     def init_devices(self):
+        print("Enter init_devices()")
         for key in self._config["device_configs"].keys():
             device_id = key
             print("Init device with device id:" + device_id)
             self._devices[device_id] = Device(self._config, self._config["device_configs"][device_id])
+        print("Leave init_devices()")
+
+    def reinit_devices(self):
+        print("Enter reinit_devices()")
+        for key, value in self._devices.items():
+            self.stop_device(key)
+        self._devices = {}
+        self.init_devices()
+        self.start_devices()
+        print("Leave reinit_devices()")
 
     def start_devices(self):
         for key, value in self._devices.items():
@@ -95,11 +115,20 @@ class DeviceManager:
             value.start_device()
     
     def reload_config(self):
+        print("Enter reload_config()")
         ConfigService.instance(self._config_lock).load_config()
         self._config = ConfigService.instance(self._config_lock).config
+        print("Leave reload_config()")
 
     def restart_device(self, device_id):
+        print("Restart " + device_id)
         self._devices[device_id].refresh_config(self._config, self._config["device_configs"][device_id])
+        print("Restarted " + device_id)
+
+    def stop_device(self, device_id):
+        print("Stop " + device_id)
+        self._devices[device_id].stop_device()
+        print("Stopped " + device_id)
         
 
   
