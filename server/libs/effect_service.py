@@ -7,6 +7,7 @@ from libs.effects.effect_beat import EffectBeat # pylint: disable=E0611, E0401
 from libs.effects.effect_bubble import EffectBubble # pylint: disable=E0611, E0401
 from libs.effects.effect_energy import EffectEnergy # pylint: disable=E0611, E0401
 from libs.effects.effect_fade import EffectFade # pylint: disable=E0611, E0401
+from libs.effects.effect_sync_fade import EffectSyncFade # pylint: disable=E0611, E0401
 from libs.effects.effect_gradient import EffectGradient # pylint: disable=E0611, E0401
 from libs.effects.effect_off import EffectOff # pylint: disable=E0611, E0401
 from libs.effects.effect_pendulum import EffectPendulum # pylint: disable=E0611, E0401
@@ -54,6 +55,7 @@ class EffectService():
             EffectsEnum.effect_single:EffectSingle,
             EffectsEnum.effect_gradient:EffectGradient,
             EffectsEnum.effect_fade:EffectFade,
+            EffectsEnum.effect_sync_fade:EffectSyncFade,
             EffectsEnum.effect_slide:EffectSlide,
             EffectsEnum.effect_bubble:EffectBubble,
             EffectsEnum.effect_twinkle:EffectTwinkle,
@@ -93,10 +95,10 @@ class EffectService():
         print("Effects component started. Device: " + self._device.device_config["DEVICE_NAME"])
 
         while not self._cancel_token:
-            try:
-                self.effect_routine()
-            except Exception as e:
-                print("Error in Effect Service. Routine Restarted. Exception: " + str(e))
+            #try:
+            self.effect_routine()
+            #except Exception as e:
+            #    print("Error in Effect Service. Routine Restarted. Exception: " + str(e))
             
         print("Effects component stopped. Device: " + self._device.device_config["DEVICE_NAME"])
 

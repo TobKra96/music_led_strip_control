@@ -21,3 +21,4 @@ class EffectsEnum(Enum):
     effect_wiggle = 19
     effect_vu_meter = 20
     effect_spectrum_analyzer = 21
+    effect_sync_fade = 22

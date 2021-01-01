@@ -346,9 +346,14 @@
                 "g_multiplier": 1,
                 "mirror": true,
                 "r_multiplier": 1,
-                "scale": 0.8
+                "scale": 1
             },
             "effect_fade": {
+                "gradient": "Spectral",
+                "reverse": false,
+                "speed": 10
+            },
+            "effect_sync_fade": {
                 "gradient": "Spectral",
                 "reverse": false,
                 "speed": 1
@@ -431,7 +436,7 @@
                 "bar_length": 2,
                 "color": "Blue",
                 "max_vol_color": "Red",
-                "speed": 10
+                "speed": 50
             },
             "effect_wave": {
                 "color_flash": "White",
