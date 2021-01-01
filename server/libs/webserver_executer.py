@@ -49,15 +49,19 @@ class WebserverExecuter:
     def GetEffectSetting(self, device, effect, setting_key):
         return self._config["device_configs"][device]["effects"][effect][setting_key]
 
-    def SetEffectSetting(self, device, effect, setting_key, setting_value):
-        self._config["device_configs"][device]["effects"][effect][setting_key] = setting_value
+    def SetEffectSetting(self, device, effect, settings):
+        for setting_key in settings:
+            self._config["device_configs"][device]["effects"][effect][setting_key] = settings[setting_key]
+                
         self.SaveConfig()
 
         self.RefreshDevice(device)
     
-    def SetEffectSettingForAll(self, effect, setting_key, setting_value):
+    def SetEffectSettingForAll(self, effect, settings):
         for device_key in self._config["device_configs"]:
-            self._config["device_configs"][device_key]["effects"][effect][setting_key] = setting_value
+            for setting_key in settings:
+                self._config["device_configs"][device_key]["effects"][effect][setting_key] = settings[setting_key]
+            
         
         self.SaveConfig()
 
@@ -80,8 +84,9 @@ class WebserverExecuter:
     def GetGeneralSetting(self, setting_key):
         return self._config["audio_config"][setting_key]
 
-    def SetGeneralSetting(self, setting_key, setting_value):
-        self._config["audio_config"][setting_key] = setting_value
+    def SetGeneralSetting(self, settings):
+        for setting_key in settings:
+            self._config["audio_config"][setting_key] = settings[setting_key]
         self.SaveConfig()
 
         self.RefreshDevice("all_devices")
@@ -96,8 +101,9 @@ class WebserverExecuter:
     def GetDeviceSetting(self,device, setting_key):
         return self._config["device_configs"][device][setting_key]
 
-    def SetDeviceSetting(self, device, setting_key, setting_value):
-        self._config["device_configs"][device][setting_key] = setting_value
+    def SetDeviceSetting(self, device, settings):
+        for setting_key in settings:
+            self._config["device_configs"][device][setting_key] = settings[setting_key]
         self.SaveConfig()
 
         self.RefreshDevice(device)
@@ -106,8 +112,9 @@ class WebserverExecuter:
     def GetOutputTypeDeviceSetting(self,device, output_type_key, setting_key):
         return self._config["device_configs"][device]["output"][output_type_key][setting_key]
 
-    def SetOutputTypeDeviceSetting(self, device, output_type_key, setting_key, setting_value):
-        self._config["device_configs"][device]["output"][output_type_key][setting_key] = setting_value
+    def SetOutputTypeDeviceSetting(self, device, output_type_key, settings):
+        for setting_key in settings:
+            self._config["device_configs"][device]["output"][output_type_key][setting_key] = settings[setting_key]
         self.SaveConfig()
 
         self.RefreshDevice(device)

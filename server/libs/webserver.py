@@ -348,8 +348,9 @@ class Webserver():
     # { 
     # "device" = <deviceID>
     # "effect" = <effectID>
-    # "setting_key" = <setting_key>
-    # "setting_value" = <setting_value>
+    # "settings" = {
+    #   "<settings_key>" = <setting_value>    
+    # }
     # }
     @server.route('/SetEffectSetting', methods=['POST'])
     def SetEffectSetting(): # pylint: disable=E0211
@@ -357,10 +358,10 @@ class Webserver():
             data_in = request.get_json()         
             data_out = copy.deepcopy(data_in)
 
-            if not Webserver.instance.webserver_executer.ValidateDataIn(data_in, ("device","effect","setting_key","setting_value", )):
+            if not Webserver.instance.webserver_executer.ValidateDataIn(data_in, ("device","effect","settings", )):
                 return "Input data are wrong.", 403
 
-            Webserver.instance.webserver_executer.SetEffectSetting(data_in["device"], data_in["effect"], data_in["setting_key"], data_in["setting_value"])
+            Webserver.instance.webserver_executer.SetEffectSetting(data_in["device"], data_in["effect"], data_in["settings"])
             
             return jsonify(data_out)
 
@@ -368,8 +369,9 @@ class Webserver():
    # /SetEffectSettingForAll
     # { 
     # "effect" = <effectID>
-    # "setting_key" = <setting_key>
-    # "setting_value" = <setting_value>
+    # "settings" = {
+    #   "<settings_key>" = <setting_value>    
+    # }
     # }
     @server.route('/SetEffectSettingForAll', methods=['POST'])
     def SetEffectSettingForAll(): # pylint: disable=E0211
@@ -377,10 +379,10 @@ class Webserver():
             data_in = request.get_json()         
             data_out = copy.deepcopy(data_in)
 
-            if not Webserver.instance.webserver_executer.ValidateDataIn(data_in, ("effect","setting_key","setting_value", )):
+            if not Webserver.instance.webserver_executer.ValidateDataIn(data_in, ("effect","settings", )):
                 return "Input data are wrong.", 403
 
-            Webserver.instance.webserver_executer.SetEffectSettingForAll(data_in["effect"], data_in["setting_key"], data_in["setting_value"])
+            Webserver.instance.webserver_executer.SetEffectSettingForAll(data_in["effect"], data_in["settings"])
             
             return jsonify(data_out)
 
@@ -416,8 +418,9 @@ class Webserver():
 
     # /SetGeneralSetting
     # { 
-    # "setting_key" = <setting_key>
-    # "setting_value" = <setting_value>
+    # "settings" = {
+    #   "<settings_key>" = <setting_value>    
+    # }
     # }
     @server.route('/SetGeneralSetting', methods=['POST'])
     def SetGeneralSetting(): # pylint: disable=E0211
@@ -425,10 +428,10 @@ class Webserver():
             data_in = request.get_json()         
             data_out = copy.deepcopy(data_in)
 
-            if not Webserver.instance.webserver_executer.ValidateDataIn(data_in, ("setting_key","setting_value", )):
+            if not Webserver.instance.webserver_executer.ValidateDataIn(data_in, ("settings", )):
                 return "Input data are wrong.", 403
 
-            Webserver.instance.webserver_executer.SetGeneralSetting(data_in["setting_key"], data_in["setting_value"])
+            Webserver.instance.webserver_executer.SetGeneralSetting(data_in["settings"])
             
             return jsonify(data_out)
 
@@ -468,8 +471,9 @@ class Webserver():
     # /SetDeviceSetting
     # { 
     # "device" = <deviceID>
-    # "setting_key" = <setting_key>
-    # "setting_value" = <setting_value>
+    # "settings" = {
+    #   "<settings_key>" = <setting_value>    
+    # }
     # }
     @server.route('/SetDeviceSetting', methods=['POST'])
     def SetDeviceSetting(): # pylint: disable=E0211
@@ -477,10 +481,10 @@ class Webserver():
             data_in = request.get_json()         
             data_out = copy.deepcopy(data_in)
 
-            if not Webserver.instance.webserver_executer.ValidateDataIn(data_in, ("device", "setting_key","setting_value", )):
+            if not Webserver.instance.webserver_executer.ValidateDataIn(data_in, ("device", "settings", )):
                 return "Input data are wrong.", 403
 
-            Webserver.instance.webserver_executer.SetDeviceSetting(data_in["device"],data_in["setting_key"], data_in["setting_value"])
+            Webserver.instance.webserver_executer.SetDeviceSetting(data_in["device"],data_in["settings"])
             
             return jsonify(data_out)
 
@@ -545,8 +549,9 @@ class Webserver():
     # { 
     # "device" = <deviceID>
     # "output_type_key" = <output_type_key>
-    # "setting_key" = <setting_key>
-    # "setting_value" = <setting_value>
+    # "settings" = {
+    #   "<settings_key>" = <setting_value>    
+    # }
     # }
     @server.route('/SetOutputTypeDeviceSetting', methods=['POST'])
     def SetOutputTypeDeviceSetting(): # pylint: disable=E0211
