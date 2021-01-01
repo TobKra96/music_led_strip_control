@@ -21,7 +21,14 @@ class AudioProcessService:
         self._audio_queue = audio_queue
         self._audio_queue_lock = audio_queue_lock
 
+        self.init_audio_service()
+
+        while True:
+            self.audio_service_routine()
+    
+    def init_audio_service(self):
         # Initial config load.
+        ConfigService.instance(self._config_lock).load_config()
         self._config = ConfigService.instance(self._config_lock).config
 
         #Init FPS Limiter
@@ -93,9 +100,6 @@ class AudioProcessService:
                                     input_device_index = self._device_id,
                                     frames_per_buffer = self._frames_per_buffer)
 
-        while True:
-            self.audio_service_routine()
-                
     def audio_service_routine(self):
         try:
 
@@ -103,7 +107,10 @@ class AudioProcessService:
                 current_notification_item = self._notification_queue_in.get()
 
                 if current_notification_item.notification_enum is NotificationEnum.config_refresh:
-                    self._config = ConfigService.instance(self._config_lock).config
+                    if not self.stream is None:
+                        self.stream.stop_stream()
+                        self.stream.close()
+                    self.init_audio_service()
                     self._notification_queue_out.put(NotificationItem(NotificationEnum.config_refresh_finished, current_notification_item.device_id))
 
                 elif current_notification_item.notification_enum is NotificationEnum.process_continue:

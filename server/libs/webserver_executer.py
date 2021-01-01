@@ -4,6 +4,8 @@ from libs.effects_enum import EffectsEnum # pylint: disable=E0611, E0401
 from libs.notification_enum import NotificationEnum # pylint: disable=E0611, E0401
 from libs.notification_item import NotificationItem # pylint: disable=E0611, E0401
 
+import copy
+
 class WebserverExecuter:
     def __init__(self, config_lock, notification_queue_in, notification_queue_out, effects_queue, effects_queue_lock):
         self._config_lock = config_lock
@@ -116,7 +118,7 @@ class WebserverExecuter:
         while i < 100:
             new_device_id = "device_" + str(i)
             if not new_device_id in self._config["device_configs"]:
-                self._config["device_configs"][new_device_id] = self._config["default_device"]
+                self._config["device_configs"][new_device_id] = copy.deepcopy(self._config["default_device"])
                 self.SaveConfig()
 
                 self.RefreshDevice("all_devices")
@@ -126,6 +128,8 @@ class WebserverExecuter:
 
     def DeleteDevice(self, device):
         del self._config["device_configs"][device]
+        self.SaveConfig()
+        self.RefreshDevice("all_devices")
 
     def ResetSettings(self):
         self.ResetConfig()
