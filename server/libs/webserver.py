@@ -559,10 +559,10 @@ class Webserver():
             data_in = request.get_json()         
             data_out = copy.deepcopy(data_in)
 
-            if not Webserver.instance.webserver_executer.ValidateDataIn(data_in, ("device", "output_type_key", "setting_key","setting_value", )):
+            if not Webserver.instance.webserver_executer.ValidateDataIn(data_in, ("device", "output_type_key", "settings", )):
                 return "Input data are wrong.", 403
 
-            Webserver.instance.webserver_executer.SetOutputTypeDeviceSetting(data_in["device"], data_in["output_type_key"], data_in["setting_key"], data_in["setting_value"])
+            Webserver.instance.webserver_executer.SetOutputTypeDeviceSetting(data_in["device"], data_in["output_type_key"], data_in["settings"])
             
             return jsonify(data_out)
 
