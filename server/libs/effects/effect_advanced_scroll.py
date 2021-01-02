@@ -54,16 +54,13 @@ class EffectAdvancedScroll(Effect):
 
         y = np.clip(y, 0, 1)
         
-        space_counts = 7
-        space = len(y) // space_counts
-
-        subbass = y[:1]
-        bass = y[1:2]
-        lowmid = y[2:5]
-        mid = y[5:12]
-        uppermid = y[12:16]
-        presence = y[16:19]
-        brilliance = y[19:]
+        subbass = y[:int(len(y)* (1/24))]
+        bass = y[int(len(y)* (1/24)):int(len(y)* (2/24))]
+        lowmid = y[int(len(y)* (2/24)):int(len(y)* (5/24))]
+        mid = y[int(len(y)* (5/24)):int(len(y)* (12/24))]
+        uppermid = y[int(len(y)* (12/24)):int(len(y)* (16/24))]
+        presence = y[int(len(y)* (16/24)):int(len(y)* (19/24))]
+        brilliance = y[int(len(y)* (19/24)):]
 
 
         # max values
