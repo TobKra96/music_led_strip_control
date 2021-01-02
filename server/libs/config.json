@@ -322,7 +322,10 @@
             },
             "effect_beat": {
                 "color": "Red",
-                "decay": 0.7
+                "decay": 0.7,
+                "colorful_mode": true,
+                "gradient": "Spectral",
+                "random_color": true
             },
             "effect_beat_slide": {
                 "bar_length": 102,
