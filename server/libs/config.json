@@ -334,6 +334,15 @@
                 "slider_length": 10,
                 "speed": 5
             },
+            "effect_direction_changer": {
+                "color": "Red",
+                "colorful_mode": true,
+                "gradient": "Spectral",
+                "random_color": true,
+                "bars_in_same_direction": 1,
+                "bar_length": 5,
+                "bar_speed": 2
+            },
             "effect_bubble": {
                 "blur": 5,
                 "bubble_lenght": 5,

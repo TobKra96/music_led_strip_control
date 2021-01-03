@@ -4,6 +4,7 @@ var localSettings = {};
 var currentDevice;
 var colors = {};
 var gradients = {};
+var devices = {};
 
 var devicesLoading = true;
 var coloresLoading = true;
@@ -14,7 +15,20 @@ $( document ).ready(function() {
   settingsIdentifier = $("#settingsIdentifier").val();
   effectIdentifier = $("#effectIdentifier").val();
   
-  GetDevices();
+  // Only allow all_devices for sync fade effect.
+  if(effectIdentifier == "effect_sync_fade"){
+    currentDevice = "all_devices"
+    BuildDeviceCombobox();
+    UpdateCurrentDeviceText();
+    
+    AddEventListeners();
+  
+    devicesLoading = false;
+  }
+  else{
+    GetDevices();
+  }
+  
   GetColors();
   GetGradients();
 });

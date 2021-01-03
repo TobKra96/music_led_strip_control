@@ -168,6 +168,10 @@ class Webserver():
         # Render the effect_spectrum_analyzer page
         return render_template('effects/effect_spectrum_analyzer.html')
 
+    @server.route('/effects/effect_direction_changer', methods=['GET', 'POST'])
+    def effect_direction_changer(): # pylint: disable=E0211
+        # Render the effect_direction_changer page
+        return render_template('effects/effect_direction_changer.html')
     #####################################################################
     #   Ajax Endpoints                                                  #
     #####################################################################

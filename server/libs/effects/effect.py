@@ -143,10 +143,10 @@ class Effect:
 
     def get_audio_data(self):
         audio_data = None
-        self._audio_queue_lock.acquire()
+        #self._audio_queue_lock.acquire() 
         if not self._audio_queue.empty():
             audio_data = self._audio_queue.get()
-        self._audio_queue_lock.release()
+        #self._audio_queue_lock.release()
 
         return audio_data
 
