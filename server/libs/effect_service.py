@@ -24,6 +24,8 @@ from libs.effects.effect_beat_slide import EffectBeatSlide # pylint: disable=E06
 from libs.effects.effect_spectrum_analyzer import EffectSpectrumAnalyzer # pylint: disable=E0611, E0401
 from libs.effects.effect_vu_meter import EffectVuMeter # pylint: disable=E0611, E0401
 from libs.effects.effect_wiggle import EffectWiggle # pylint: disable=E0611, E0401
+from libs.effects.effect_direction_changer import EffectDirectionChanger # pylint: disable=E0611, E0401
+
 
 import numpy as np
 import gc as gc
@@ -73,7 +75,8 @@ class EffectService():
             EffectsEnum.effect_beat_slide:EffectBeatSlide,
             EffectsEnum.effect_spectrum_analyzer:EffectSpectrumAnalyzer,
             EffectsEnum.effect_vu_meter:EffectVuMeter,
-            EffectsEnum.effect_wiggle:EffectWiggle
+            EffectsEnum.effect_wiggle:EffectWiggle,
+            EffectsEnum.effect_direction_changer:EffectDirectionChanger
         }
 
         self._initialized_effects = {}
