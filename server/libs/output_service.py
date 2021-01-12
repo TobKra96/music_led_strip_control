@@ -19,14 +19,14 @@ import array
 class OutputService:
 
     def start(self, device):
-        print("Starting Output service..")
         self._device = device
+
+        print("Starting Output service.. Device: " + self._device.device_config["DEVICE_NAME"])
 
         # Initial config load.
         self._config = self._device.config
 
         self._output_queue = self._device.output_queue
-        self._output_queue_lock = self._device.output_queue_lock
         self._device_notification_queue_in = self._device.device_notification_queue_in
         self._device_notification_queue_out = self._device.device_notification_queue_out
         
@@ -51,7 +51,9 @@ class OutputService:
         print("Found output: " + str(current_output_enum))
         self._current_output = self._available_outputs[current_output_enum](self._device)
 
-        print("Output component started.")
+        print("Output component started. Device: " + self._device.device_config["DEVICE_NAME"])
+        self.runfirstprint = 0
+        self.maxprints = 10
         while not self._cancel_token:
             self.output_routine()
            
@@ -60,9 +62,15 @@ class OutputService:
         # Limit the fps to decrease laggs caused by 100 percent cpu
         self._fps_limiter.fps_limiter()
 
+        if self.runfirstprint < self.maxprints:
+            print(self._device.device_config["DEVICE_NAME"] + " | " + str(self.runfirstprint) + "| 1")
+
         # Check the nofitication queue
         if not self._device_notification_queue_in.empty():
             self._current_notification_in = self._device_notification_queue_in.get()
+
+        if self.runfirstprint < self.maxprints:
+            print(self._device.device_config["DEVICE_NAME"] + " | " + str(self.runfirstprint) + "| 2")
 
         if hasattr(self, "_current_notification_in"):
             if self._current_notification_in is NotificationEnum.config_refresh:
@@ -74,6 +82,9 @@ class OutputService:
             elif self._current_notification_in is NotificationEnum.process_stop:
                 self.stop() 
 
+        if self.runfirstprint < self.maxprints:
+            print(self._device.device_config["DEVICE_NAME"] + " | " + str(self.runfirstprint) + "| 3")
+
         # Reset the current in notification, to do it only one time.
         self._current_notification_in = None
 
@@ -81,12 +92,21 @@ class OutputService:
         if self._skip_output:
             if not self._output_queue.empty():
                 skip_output_queue = self._output_queue.get()
+                del skip_output_queue
             return
+
+        if self.runfirstprint < self.maxprints:
+            print(self._device.device_config["DEVICE_NAME"] + " | " + str(self.runfirstprint) + "| 4")
 
         # Check if the queue is empty and stop if its empty.
         if not self._output_queue.empty():
+            if self.runfirstprint < self.maxprints:
+                print(self._device.device_config["DEVICE_NAME"] + " | " + str(self.runfirstprint) + "| 5")
             current_output_array = self._output_queue.get()
             self._current_output.show(current_output_array)
+
+        if self.runfirstprint < self.maxprints:
+            print(self._device.device_config["DEVICE_NAME"] + " | " + str(self.runfirstprint) + "| 6")
 
         self.end_time = time.time()
                     
@@ -96,7 +116,13 @@ class OutputService:
             self.fps = 1 / self.time_dif
             print("Output Service | FPS: " + str(self.fps) + " | Device: " + self._device.device_config["DEVICE_NAME"])
 
+        if self.runfirstprint < self.maxprints:
+            print(self._device.device_config["DEVICE_NAME"] + " | " + str(self.runfirstprint) + "| 7")
+
         self.start_time = time.time()
+
+        if self.runfirstprint < self.maxprints:
+            self.runfirstprint = self.runfirstprint + 1
 
     def stop(self):
         self._cancel_token = True

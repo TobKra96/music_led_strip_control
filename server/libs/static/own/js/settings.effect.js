@@ -10,8 +10,16 @@ var devicesLoading = true;
 var coloresLoading = true;
 var gradientsLoading = true;
 
+var initialized = false;
+
 // Init and load all settings
 $( document ).ready(function() {
+
+  if(initialized){
+    return;
+  }
+  initialized = true;
+
   settingsIdentifier = $("#settingsIdentifier").val();
   effectIdentifier = $("#effectIdentifier").val();
   
@@ -180,7 +188,9 @@ function SetLocalInput(setting_key, setting_value){
     if(setting_value){
       $("#" + setting_key).click();
     }
-    
+  }else if($("#" + setting_key).hasClass('colorpicker_input')){
+    var hexcolor = rgbToHex(setting_value[0], setting_value[1], setting_value[2]);
+    $("#" + setting_key).val("rgb(" + setting_value[0] + "," + setting_value[1] + "," +setting_value[2] + ")");
   }else{
     $("#" + setting_key).val(setting_value);
   }
@@ -258,6 +268,10 @@ function SetLocalSettings(){
       }else if($("#" + setting_key).attr('type') == 'number'){
         setting_value = parseFloat($("#" + setting_key).val());
       }
+      else if($("#" + setting_key).hasClass('colorpicker_input')){
+        rgb_color =  hexToRgb($("#" + setting_key).val());
+        setting_value = rgb_color;
+      }
       else{
         setting_value = $("#" + setting_key).val();
       }
@@ -278,10 +292,10 @@ function SetLocalSettings(){
 function BuildDeviceCombobox(){
   var devices = this.devices
 
-  $( ".dropdown-menu").append("<a class=\"dropdown-item device_item\" id=\"all_devices\">All Devices</a>")
+  $('#deviceDropDownMenuID').append("<a class=\"dropdown-item device_item\" id=\"all_devices\">All Devices</a>")
 
   Object.keys(devices).forEach(device_key => {
-      $( ".dropdown-menu").append( "<a class=\"dropdown-item device_item\" id=\"" + device_key +"\">" + devices[device_key] + "</a>" );
+      $('#deviceDropDownMenuID').append( "<a class=\"dropdown-item device_item\" id=\"" + device_key +"\">" + devices[device_key] + "</a>" );
   });
   
 }
@@ -322,4 +336,25 @@ document.getElementById("save_btn").addEventListener("click",function(e) {
 });
 
 
+$(function() {
+  $('#colorpickerDiv').colorpicker({
+      color: '#000000',
+      format: 'rgb'
+  });
+});
+
+
+function componentToHex(c) {
+  var hex = c.toString(16);
+  return hex.length == 1 ? "0" + hex : hex;
+}
+
+function rgbToHex(r, g, b) {
+  return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
+}
+
+function hexToRgb(str) {
+  var match = str.match(/rgb?\((\d{1,3}), ?(\d{1,3}), ?(\d{1,3})\)?(?:, ?(\d(?:\.\d?))\))?/);
+  return match ? [match[1], match[2], match[3]] : [0,0,0];
+}
 

@@ -38,11 +38,8 @@ class Main():
         self._config = self._config_instance.config        
 
         # Prepare the queue for the output
-        self._output_queue_lock = Lock()
         self._output_queue = Queue(2)
         self._effects_queue = Queue(100)
-        self._effects_queue_lock = Lock()
-        self._audio_queue_lock = Lock()
         self._audio_queue = Queue(2)
 
         # Prepare all notification queues
@@ -64,9 +61,7 @@ class Main():
                 self._notification_queue_device_manager_in, 
                 self._notification_queue_device_manager_out,
                 self._effects_queue,
-                self._effects_queue_lock,
                 self._audio_queue,
-                self._audio_queue_lock
                 ))
         self._device_manager_process.start()
 
@@ -93,8 +88,7 @@ class Main():
                 self._config_lock, 
                 self._notification_queue_webserver_in, 
                 self._notification_queue_webserver_out,
-                self._effects_queue,
-                self._effects_queue_lock, 
+                self._effects_queue
                 ))
         self._webserver_process.start()
         
@@ -106,8 +100,7 @@ class Main():
                 self._config_lock, 
                 self._notification_queue_audio_in, 
                 self._notification_queue_audio_out,
-                self._audio_queue,
-                self._audio_queue_lock
+                self._audio_queue
                 ))
         self._audio_process.start()
 

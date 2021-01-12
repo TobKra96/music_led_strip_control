@@ -22,9 +22,7 @@ class Effect:
 
         self._device_config = self._device.device_config
         self._output_queue = self._device.output_queue
-        self._output_queue_lock = self._device.output_queue_lock
         self._audio_queue = self._device.audio_queue
-        self._audio_queue_lock = self._device.audio_queue_lock
 
         # Initials color service and build gradients
         self._color_service = ColorService(self._config, self._device_config)
@@ -143,10 +141,8 @@ class Effect:
 
     def get_audio_data(self):
         audio_data = None
-        #self._audio_queue_lock.acquire() 
         if not self._audio_queue.empty():
             audio_data = self._audio_queue.get()
-        #self._audio_queue_lock.release()
 
         return audio_data
 
