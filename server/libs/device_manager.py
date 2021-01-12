@@ -8,7 +8,7 @@ import copy
 
 
 class DeviceManager:
-    def start(self, config_lock, notification_queue_in, notification_queue_out, effect_queue, effect_queue_lock , audio_queue, audio_queue_lock):
+    def start(self, config_lock, notification_queue_in, notification_queue_out, effect_queue , audio_queue):
         
         self._config_lock = config_lock
         self._config = ConfigService.instance(self._config_lock).config
@@ -16,10 +16,8 @@ class DeviceManager:
         self._notification_queue_in = notification_queue_in
         self._notification_queue_out = notification_queue_out
         self._effect_queue = effect_queue
-        self._effect_queue_lock = effect_queue_lock
         print("Effect queue id DeviceManager " + str(id(self._effect_queue)))
         self._audio_queue = audio_queue
-        self._audio_queue_lock = audio_queue_lock
         self._skip_routine = False
         self._devices = {}
         self.init_devices()
@@ -30,15 +28,11 @@ class DeviceManager:
 
     def routine(self):
         # Check the effect queue
-        #self._effect_queue_lock.acquire()
         if not self._effect_queue.empty():
             current_effect_item = self._effect_queue.get()
             print("Device Manager received new effect: " + str(current_effect_item.effect_enum) + current_effect_item.device_id)
             current_device = self._devices[current_effect_item.device_id]
-            current_device.effect_queue_lock.acquire()
             current_device.effect_queue.put(current_effect_item)
-            current_device.effect_queue_lock.release()
-        #self._effect_queue_lock.release()
 
         if not self._notification_queue_in.empty():
             current_notification_item = self._notification_queue_in.get()
@@ -76,21 +70,18 @@ class DeviceManager:
 
     def get_audio_data(self):
         audio_data = None
-        self._audio_queue_lock.acquire()
         if not self._audio_queue.empty():
-            audio_data = self._audio_queue.get()
-        self._audio_queue_lock.release()
+            audio_data = self._audio_queue.get(False)
         return audio_data
         
     def refresh_audio_queues(self, audio_data):
         if audio_data is None:
             return
         for key, value in self._devices.items():
-            value.audio_queue_lock.acquire()  
             if value.audio_queue.full():
                 pre_audio_data = value.audio_queue.get()
+                del pre_audio_data
             value.audio_queue.put(copy.deepcopy(audio_data))
-            value.audio_queue_lock.release()
 
     def init_devices(self):
         print("Enter init_devices()")

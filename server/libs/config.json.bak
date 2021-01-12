@@ -341,7 +341,7 @@
                 "random_color": true,
                 "bars_in_same_direction": 1,
                 "bar_length": 5,
-                "bar_speed": 1
+                "bar_speed": 3
             },
             "effect_bubble": {
                 "blur": 5,
@@ -444,7 +444,9 @@
                 "mirror": true
             },
             "effect_single": {
-                "color": "Blue"
+                "color": "Blue",
+                "use_custom_color" : "false",
+                "custom_color" : [0,0,0]
             },
             "effect_slide": {
                 "gradient": "Spectral",

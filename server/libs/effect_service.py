@@ -99,6 +99,9 @@ class EffectService():
         self._skip_effect = False
         print("Effects component started. Device: " + self._device.device_config["DEVICE_NAME"])
 
+        self.runfirstprint = 0
+        self.maxprints = 10
+
         while not self._cancel_token:
             #try:
             self.effect_routine()
@@ -111,10 +114,16 @@ class EffectService():
         # Limit the fps to decrease laggs caused by 100 percent cpu
         self._fps_limiter.fps_limiter()
 
+        if self.runfirstprint < self.maxprints:
+            print("Effect" + self._device.device_config["DEVICE_NAME"] + " | " + str(self.runfirstprint) + " | 1")
+
         # Check the nofitication queue
         if not self._device.device_notification_queue_in.empty():
             self._current_notification_in = self._device.device_notification_queue_in.get()
             print("Effects Service has a new nofitication in. Notification: " + str(self._current_notification_in) + " Device: " + self._device.device_config["DEVICE_NAME"])
+
+        if self.runfirstprint < self.maxprints:
+            print("Effect" + self._device.device_config["DEVICE_NAME"] + " | " + str(self.runfirstprint) + " | 2")
 
         if hasattr(self, "_current_notification_in"):
             if self._current_notification_in is NotificationEnum.config_refresh:
@@ -133,29 +142,36 @@ class EffectService():
         if self._skip_effect:
             return
 
+        if self.runfirstprint < self.maxprints:
+            print("Effect" + self._device.device_config["DEVICE_NAME"] + " | " + str(self.runfirstprint) + " | 3")
+
         # Check if the effect changed.
         if not self._device.effect_queue.empty():
             new_effect_item = self._device.effect_queue.get()
             self._current_effect = new_effect_item.effect_enum
             print("New effect found:" + str(new_effect_item.effect_enum))
 
+        if self.runfirstprint < self.maxprints:
+            print("Effect" + self._device.device_config["DEVICE_NAME"] + " | " + str(self.runfirstprint) + " | 4")
        
         # Something is wrong here, no effect set. So skip until we get a new information.
         if self._current_effect is None:
             print("Effect Service | Could not find effect.")
             return
 
+        if self.runfirstprint < self.maxprints:
+            print("Effect" + self._device.device_config["DEVICE_NAME"] + " | " + str(self.runfirstprint) + " | 5")
 
         if(not(self._current_effect in self._initialized_effects.keys())):
             if self._current_effect in self._available_effects.keys():
                 self._initialized_effects[self._current_effect] = self._available_effects[self._current_effect](self._device)
             else:
                 print("Could not find effect: " + self._current_effect)
-           
-        self._initialized_effects[self._current_effect].run()
+        
+        if self.runfirstprint < self.maxprints:
+            print("Effect" + self._device.device_config["DEVICE_NAME"] + " | " + str(self.runfirstprint) + " | 6")
 
         self.end_time = time.time()
-                            
         if time.time() - self.ten_seconds_counter > 10:
             self.ten_seconds_counter = time.time()
             self.time_dif = self.end_time - self.start_time
@@ -163,6 +179,17 @@ class EffectService():
             print("Effect Service | FPS: " + str(self.fps) + " | Device: " + self._device.device_config["DEVICE_NAME"])
 
         self.start_time = time.time()
+
+        if self.runfirstprint < self.maxprints:
+            print("Effect" + self._device.device_config["DEVICE_NAME"] + " | " + str(self.runfirstprint) + " | 7")
+
+        self._initialized_effects[self._current_effect].run()
+
+        if self.runfirstprint < self.maxprints:
+            print("Effect" + self._device.device_config["DEVICE_NAME"] + " | " + str(self.runfirstprint) + " | 8")
+                            
+        if self.runfirstprint < self.maxprints:
+            self.runfirstprint = self.runfirstprint + 1
 
             
     def stop(self):

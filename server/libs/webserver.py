@@ -10,14 +10,13 @@ server = Flask(__name__)
 
 
 class Webserver():
-    def start(self, config_lock, notification_queue_in, notification_queue_out, effects_queue, effects_queue_lock):
+    def start(self, config_lock, notification_queue_in, notification_queue_out, effects_queue):
         self._config_lock = config_lock
         self.notification_queue_in = notification_queue_in
         self.notification_queue_out = notification_queue_out
         self.effects_queue = effects_queue
-        self.effects_queue_lock = effects_queue_lock
         
-        self.webserver_executer = WebserverExecuter(config_lock, notification_queue_in, notification_queue_out, effects_queue, effects_queue_lock)
+        self.webserver_executer = WebserverExecuter(config_lock, notification_queue_in, notification_queue_out, effects_queue)
         Webserver.instance = self
 
         server.config["TEMPLATES_AUTO_RELOAD"] = True

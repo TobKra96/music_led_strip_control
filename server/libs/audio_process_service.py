@@ -13,13 +13,12 @@ from time import sleep
 
 class AudioProcessService:
        
-    def start(self, config_lock, notification_queue_in, notification_queue_out, audio_queue, audio_queue_lock ):
+    def start(self, config_lock, notification_queue_in, notification_queue_out, audio_queue):
 
         self._config_lock = config_lock
         self._notification_queue_in = notification_queue_in
         self._notification_queue_out = notification_queue_out
         self._audio_queue = audio_queue
-        self._audio_queue_lock = audio_queue_lock
 
         self.init_audio_service()
 
@@ -139,13 +138,11 @@ class AudioProcessService:
                 # Fill the array with zeros, to fade out the effect.
                 audio_datas["mel"] = np.zeros(1)
 
-            self._audio_queue_lock.acquire()
             # Send the new audio data to the effect process.            
-            if self._audio_queue.full():
-                pre_audio_data = self._audio_queue.get()
-            #self._audio_queue.put(audio_datas["mel"])
+            #if self._audio_queue.full():
+            #pre_audio_data = self._audio_queue.get()
+            #del pre_audio_data
             self._audio_queue.put(audio_datas)
-            self._audio_queue_lock.release()
 
             self.end_time = time.time()
                     

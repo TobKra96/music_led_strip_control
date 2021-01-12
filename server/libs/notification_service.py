@@ -23,6 +23,7 @@ class NotificationService():
             sleep(0.5)
 
             if not self._notification_queue_webserver_out.empty():
+                print("NotificationService: New Notification detected.")
                 self._current_notification_item = self._notification_queue_webserver_out.get()
 
                 if self._current_notification_item.notification_enum is NotificationEnum.config_refresh:

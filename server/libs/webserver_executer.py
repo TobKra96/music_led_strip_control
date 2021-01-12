@@ -7,12 +7,11 @@ from libs.notification_item import NotificationItem # pylint: disable=E0611, E04
 import copy
 
 class WebserverExecuter:
-    def __init__(self, config_lock, notification_queue_in, notification_queue_out, effects_queue, effects_queue_lock):
+    def __init__(self, config_lock, notification_queue_in, notification_queue_out, effects_queue):
         self._config_lock = config_lock
         self.notification_queue_in = notification_queue_in
         self.notification_queue_out = notification_queue_out
         self.effects_queue = effects_queue
-        self.effects_queue_lock = effects_queue_lock
 
         # Initial config load.
         self._config_instance = ConfigService.instance(self._config_lock)
@@ -155,9 +154,7 @@ class WebserverExecuter:
         print("Prepare new EnumItem")
         effect_item = EffectItem(EffectsEnum[effect], device)
         print("EnumItem prepared: " + str(effect_item.effect_enum) + " " + effect_item.device_id)
-        self.effects_queue_lock.acquire()
         self.effects_queue.put(effect_item)
-        self.effects_queue_lock.release()
         print("EnumItem put into queue.")
         print("Effect queue id Webserver " + str(id(self.effects_queue)))
 
@@ -165,7 +162,6 @@ class WebserverExecuter:
         print("Prepare new Notification")
         notification_item = NotificationItem(notificication, device)
         print("Notification Item prepared: " + str(notification_item.notification_enum) + " " + notification_item.device_id)
-        #TODO Add lock
         self.notification_queue_out.put(notification_item)
         print("Notification Item put into queue.")
 
