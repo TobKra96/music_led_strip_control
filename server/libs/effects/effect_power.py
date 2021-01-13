@@ -8,7 +8,7 @@ class EffectPower(Effect):
         effect_config = self._device.device_config["effects"]["effect_power"]
         
         led_count = self._device.device_config["LED_Count"]
-        n_fft_bins = self._config["audio_config"]["N_FFT_BINS"]
+        n_fft_bins = self._config["general_settings"]["N_FFT_BINS"]
         led_mid = self._device.device_config["LED_Mid"]
 
         audio_data = self.get_audio_data()

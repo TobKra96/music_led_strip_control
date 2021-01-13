@@ -11,10 +11,10 @@ class DSP():
         self._device_config = device_config
        
         # Initialise filters etc. I've no idea what most of these are for but i imagine i won't be getting rid of them soon 
-        n_fft_bins = self._config["audio_config"]["N_FFT_BINS"]
-        min_volume_threshold = self._config["audio_config"]["MIN_VOLUME_THRESHOLD"]
-        frames_per_buffer = self._config["audio_config"]["FRAMES_PER_BUFFER"]
-        n_rolling_history = self._config["audio_config"]["N_ROLLING_HISTORY"]
+        n_fft_bins = self._config["general_settings"]["N_FFT_BINS"]
+        min_volume_threshold = self._config["general_settings"]["MIN_VOLUME_THRESHOLD"]
+        frames_per_buffer = self._config["general_settings"]["FRAMES_PER_BUFFER"]
+        n_rolling_history = self._config["general_settings"]["N_ROLLING_HISTORY"]
 
         if device_config is None:
             led_count = 200
@@ -57,8 +57,8 @@ class DSP():
         audio_data : dict
             Dict containinng "mel", "vol", "x", and "y"
         """
-        min_frequency = self._config["audio_config"]["MIN_FREQUENCY"]
-        max_frequency = self._config["audio_config"]["MAX_FREQUENCY"]
+        min_frequency = self._config["general_settings"]["MIN_FREQUENCY"]
+        max_frequency = self._config["general_settings"]["MAX_FREQUENCY"]
 
         audio_data = {}
         # Normalize samples between 0 and 1
@@ -94,7 +94,7 @@ class DSP():
         return audio_data
 
     def rfft(self, data, window=None):
-        default_sample_rate = self._config["audio_config"]["DEFAULT_SAMPLE_RATE"]
+        default_sample_rate = self._config["general_settings"]["DEFAULT_SAMPLE_RATE"]
 
         window = 1.0 if window is None else window(len(data))
         ys = np.abs(np.fft.rfft(data * window))
@@ -102,7 +102,7 @@ class DSP():
         return xs, ys
 
     def fft(self, data, window=None):
-        default_sample_rate = self._config["audio_config"]["DEFAULT_SAMPLE_RATE"]
+        default_sample_rate = self._config["general_settings"]["DEFAULT_SAMPLE_RATE"]
 
         window = 1.0 if window is None else window(len(data))
         ys = np.fft.fft(data * window)
@@ -110,12 +110,12 @@ class DSP():
         return xs, ys
 
     def create_mel_bank(self):
-        default_sample_rate = self._config["audio_config"]["DEFAULT_SAMPLE_RATE"]
-        min_frequency = self._config["audio_config"]["MIN_FREQUENCY"]
-        max_frequency = self._config["audio_config"]["MAX_FREQUENCY"]
-        frames_per_buffer = self._config["audio_config"]["FRAMES_PER_BUFFER"]
-        n_rolling_history = self._config["audio_config"]["N_ROLLING_HISTORY"]
-        n_fft_bins = self._config["audio_config"]["N_FFT_BINS"]
+        default_sample_rate = self._config["general_settings"]["DEFAULT_SAMPLE_RATE"]
+        min_frequency = self._config["general_settings"]["MIN_FREQUENCY"]
+        max_frequency = self._config["general_settings"]["MAX_FREQUENCY"]
+        frames_per_buffer = self._config["general_settings"]["FRAMES_PER_BUFFER"]
+        n_rolling_history = self._config["general_settings"]["N_ROLLING_HISTORY"]
+        n_fft_bins = self._config["general_settings"]["N_FFT_BINS"]
 
         samples = int(frames_per_buffer * (n_rolling_history/2))
 
