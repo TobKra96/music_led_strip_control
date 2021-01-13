@@ -138,6 +138,11 @@ class Webserver():
         # Render the effect_beat page
         return render_template('effects/effect_beat.html')
 
+    @server.route('/effects/effect_beat_twinkle', methods=['GET', 'POST'])
+    def effect_beat_twinkle(): # pylint: disable=E0211
+        # Render the effect_beat_twinkle page
+        return render_template('effects/effect_beat_twinkle.html')
+
     @server.route('/effects/effect_wave', methods=['GET', 'POST'])
     def effect_wave(): # pylint: disable=E0211
         # Render the effect_wave page

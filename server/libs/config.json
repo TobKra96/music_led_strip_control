@@ -328,6 +328,14 @@
                 "gradient": "Spectral",
                 "random_color": true
             },
+            "effect_beat_twinkle": {
+                "color": "Red",
+                "decay": 0.9,
+                "colorful_mode": true,
+                "gradient": "Spectral",
+                "random_color": true,
+                "star_length":30
+            },
             "effect_beat_slide": {
                 "bar_length": 102,
                 "color": "Blue",

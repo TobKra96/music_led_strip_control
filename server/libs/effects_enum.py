@@ -24,3 +24,4 @@ class EffectsEnum(Enum):
     effect_sync_fade = 22
     effect_advanced_scroll = 23
     effect_direction_changer = 24
+    effect_beat_twinkle = 25

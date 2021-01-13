@@ -19,20 +19,7 @@ class EffectAdvancedScroll(Effect):
         self.output_scroll_presence = np.array([[0 for i in range(self.led_count)] for i in range(3)])
         self.output_scroll_brilliance = np.array([[0 for i in range(self.led_count)] for i in range(3)])
 
-
-
-
-
-
-        self.output_scroll_high = np.array([[0 for i in range(self.led_count)] for i in range(3)])
-        self.output_scroll_lowhigh = np.array([[0 for i in range(self.led_count)] for i in range(3)])
-        self.output_scroll_highmid = np.array([[0 for i in range(self.led_count)] for i in range(3)])
-        self.output_scroll_mid = np.array([[0 for i in range(self.led_count)] for i in range(3)])
-        self.output_scroll_lowmid = np.array([[0 for i in range(self.led_count)] for i in range(3)])
-        self.output_scroll_heighlow = np.array([[0 for i in range(self.led_count)] for i in range(3)])
-        self.output_scroll_low = np.array([[0 for i in range(self.led_count)] for i in range(3)])
-
-
+       
     def run(self):
         effect_config = self._device.device_config["effects"]["effect_advanced_scroll"]
         led_count = self._device.device_config["LED_Count"]
