@@ -94,8 +94,11 @@ class DeviceManager:
             return
         for key, value in self._devices.items():
             if value.audio_queue.full():
-                pre_audio_data = value.audio_queue.get()
-                del pre_audio_data
+                try:
+                    pre_audio_data = value.audio_queue.get(False)
+                    del pre_audio_data
+                except:
+                    pass
             value.audio_queue.put(copy.deepcopy(audio_data))
 
     def init_devices(self):

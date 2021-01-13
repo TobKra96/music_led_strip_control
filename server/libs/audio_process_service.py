@@ -140,8 +140,12 @@ class AudioProcessService:
 
             # Send the new audio data to the effect process.            
             if self._audio_queue.full():
-                pre_audio_data = self._audio_queue.get()
-                del pre_audio_data
+                try:
+                    pre_audio_data = self._audio_queue.get(False)
+                    del pre_audio_data
+                except:
+                    pass
+                
             self._audio_queue.put(audio_datas)
 
             self.end_time = time.time()
