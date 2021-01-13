@@ -154,6 +154,7 @@ function SwitchDevice(e){
     if(newDeviceId == "all_devices"){
         this.removeActiveStyle(this.activeEffect);
         this.UpdateActiveEffectTile();
+        this.UpdateCurrentDeviceText();
         return;
     }
 
