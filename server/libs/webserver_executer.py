@@ -5,6 +5,7 @@ from libs.notification_enum import NotificationEnum # pylint: disable=E0611, E04
 from libs.notification_item import NotificationItem # pylint: disable=E0611, E0401
 
 import copy
+import json
 
 class WebserverExecuter:
     def __init__(self, config_lock, notification_queue_in, notification_queue_out, effects_queue):
@@ -81,11 +82,11 @@ class WebserverExecuter:
         return gradients
 
     def GetGeneralSetting(self, setting_key):
-        return self._config["audio_config"][setting_key]
+        return self._config["general_settings"][setting_key]
 
     def SetGeneralSetting(self, settings):
         for setting_key in settings:
-            self._config["audio_config"][setting_key] = settings[setting_key]
+            self._config["general_settings"][setting_key] = settings[setting_key]
         self.SaveConfig()
 
         self.RefreshDevice("all_devices")
@@ -141,6 +142,21 @@ class WebserverExecuter:
         self.ResetConfig()
         self.RefreshDevice("all_devices")
 
+    def ImportConfig(self, imported_config):
+        if imported_config is None:
+            print("Could not import Config. Config is none.")
+            return False
+        
+        print("Type of Imported config: " + str(type(imported_config)))
+        if type(imported_config) is dict:
+            self._config = imported_config
+            self.SaveConfig()
+            self.RefreshDevice("all_devices")
+            return True
+        else:
+            print("Unknown Type")
+            return False
+
     # Helper
 
     def SaveConfig(self):
@@ -193,5 +209,10 @@ class WebserverExecuter:
 
         return True
 
+    def GetWebserverPort(self):
+        webserver_port = 80
+        if 'WEBSERVER_PORT' in self._config["general_settings"]:
+            webserver_port = self._config["general_settings"]["WEBSERVER_PORT"]
 
+        return webserver_port
     

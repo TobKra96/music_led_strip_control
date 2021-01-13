@@ -13,6 +13,12 @@
           <p> Make your dancefloor ready for the party.
           </p>
           <form id="settingsForm" data-parsley-validate class="form-horizontal form-label-left" action method="post" novalidate>
+            
+            <div class="item form-group">
+              <label class="control-label col-md-3 col-sm-3 col-xs-12" for="WEBSERVER_PORT">Webserver Port (needs a restart)</label>
+              <input id="WEBSERVER_PORT" type="number" name="number" required="required" data-validate-minmax="0,9999999" class="col-md-6 col-sm-6 col-xs-12 setting_input" data-kwimpalastatus="alive" data-kwimpalaid="1554401854198-5">
+            </div>
+            
             <div class="item form-group">
               <label class="control-label col-md-3 col-sm-3 col-xs-12" for="DEVICE_ID">Audio Source ID</label>
               <input id="DEVICE_ID" type="number" name="number" required="required" data-validate-minmax="0,1000" class="col-md-6 col-sm-6 col-xs-12 setting_input" data-kwimpalastatus="alive" data-kwimpalaid="1554401854198-5">
@@ -52,8 +58,7 @@
               <label class="control-label col-md-3 col-sm-3 col-xs-12" for="FRAMES_PER_BUFFER">Frames Per Buffer (has effects for the max framerate)</label>
               <input id="FRAMES_PER_BUFFER" type="number" name="number" required="required" data-validate-minmax="1,5000" class="col-md-6 col-sm-6 col-xs-12 setting_input" data-kwimpalastatus="alive" data-kwimpalaid="1554401854198-5">
             </div>
-            
-            
+                       
 
             <div class="text-right">
               <button type="button" id="save_btn" class="btn btn-success">Save</button>
@@ -61,6 +66,23 @@
               Changes will need a restart.
             </div>
           </form>
+
+          <div class="ln_solid"></div>
+            <h2 id="dashboard-header-2">Import / Export Configuration</h2>
+
+            <div class="item form-group">
+              <a href="/export_config"><button type="button" id="export_btn" class="btn btn-primary">Export Configuration</button></a>
+            </div>
+            
+            <iframe name="dummyframe" id="dummyframe" style="display: none;"></iframe>
+
+            <form method="POST" action="/import_config" target="dummyframe" enctype="multipart/form-data">
+              <input  type="submit" id="import_btn" class="btn btn-primary" value="Import Configuration">  
+              <input type="file" name="imported_config" accept=".json">
+              
+            </form>
+            Restart the Raspberry Pi / Programm after importing a file.
+            Some settings can't be applied on the running system.
         </div> 
       </div>
     </div>

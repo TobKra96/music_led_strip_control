@@ -2,9 +2,12 @@
 from libs.config_service import ConfigService # pylint: disable=E0611, E0401
 from libs.webserver_executer import WebserverExecuter # pylint: disable=E0611, E0401
 
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, send_file
 from time import sleep
+
+from os.path import join, dirname, realpath
 import copy
+import json
 
 server = Flask(__name__)
 
@@ -19,8 +22,11 @@ class Webserver():
         self.webserver_executer = WebserverExecuter(config_lock, notification_queue_in, notification_queue_out, effects_queue)
         Webserver.instance = self
 
+        self.export_config_path = join(dirname(realpath(__file__)), 'config.json')
+
         server.config["TEMPLATES_AUTO_RELOAD"] = True
-        server.run(host='0.0.0.0', port=80)
+        webserver_port = self.webserver_executer.GetWebserverPort()
+        server.run(host='0.0.0.0', port=webserver_port)
 
         while True:
             sleep(10)
@@ -45,11 +51,26 @@ class Webserver():
     def general_settings(): # pylint: disable=E0211
         # Render the general settings page
         return render_template('/general_settings/general_settings.html')
-    
-    @server.route('/reset_settings', methods=['GET', 'POST'])
-    def reset_settings(): # pylint: disable=E0211
-        # Render the reset settings page
-        return render_template('/general_settings/reset_settings.html')
+      
+    @server.route('/export_config')
+    def export_config (): # pylint: disable=E0211
+        print("Send file " + Webserver.instance.export_config_path)
+        return send_file(Webserver.instance.export_config_path, as_attachment=True, cache_timeout=-1)
+
+    @server.route('/import_config', methods=['POST'])
+    def import_config():  # pylint: disable=E0211
+        print("Import Config Request received.")
+        if 'imported_config' not in request.files:
+            print("Could not find the file key.")
+            return "Could not import file.", 404
+        imported_config = request.files['imported_config']
+        content = imported_config.read()
+        print("File Received: " + str(content))
+        if Webserver.instance.webserver_executer.ImportConfig(json.loads(content, encoding='utf-8')):
+            return "File imported." , 200
+        else:
+            return "Could not import file." , 400
+        
 
     #####################################################################
     #   Device Settings                                                 #

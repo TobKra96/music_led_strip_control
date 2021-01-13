@@ -1,5 +1,5 @@
 {
-    "audio_config": {
+    "general_settings": {
         "DEFAULT_SAMPLE_RATE": 48000,
         "DEVICE_ID": 0,
         "FRAMES_PER_BUFFER": 512,
@@ -7,7 +7,8 @@
         "MIN_FREQUENCY": 50,
         "MIN_VOLUME_THRESHOLD": 0,
         "N_FFT_BINS": 24,
-        "N_ROLLING_HISTORY": 4
+        "N_ROLLING_HISTORY": 4,
+        "WEBSERVER_PORT": 80
     },
     "colours": {
         "Black": [
