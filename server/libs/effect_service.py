@@ -25,6 +25,7 @@ from libs.effects.effect_spectrum_analyzer import EffectSpectrumAnalyzer # pylin
 from libs.effects.effect_vu_meter import EffectVuMeter # pylint: disable=E0611, E0401
 from libs.effects.effect_wiggle import EffectWiggle # pylint: disable=E0611, E0401
 from libs.effects.effect_direction_changer import EffectDirectionChanger # pylint: disable=E0611, E0401
+from libs.effects.effect_beat_twinkle import EffectBeatTwinkle # pylint: disable=E0611, E0401
 
 
 import numpy as np
@@ -76,7 +77,8 @@ class EffectService():
             EffectsEnum.effect_spectrum_analyzer:EffectSpectrumAnalyzer,
             EffectsEnum.effect_vu_meter:EffectVuMeter,
             EffectsEnum.effect_wiggle:EffectWiggle,
-            EffectsEnum.effect_direction_changer:EffectDirectionChanger
+            EffectsEnum.effect_direction_changer:EffectDirectionChanger,
+            EffectsEnum.effect_beat_twinkle: EffectBeatTwinkle
         }
 
         self._initialized_effects = {}

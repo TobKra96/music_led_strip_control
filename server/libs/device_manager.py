@@ -6,6 +6,8 @@ from libs.notification_item import NotificationItem # pylint: disable=E0611, E04
 from libs.notification_enum import NotificationEnum # pylint: disable=E0611, E0401
 import copy
 
+import time
+from time import sleep
 
 class DeviceManager:
     def start(self, config_lock, notification_queue_in, notification_queue_out, effect_queue , audio_queue):
@@ -22,6 +24,9 @@ class DeviceManager:
         self._devices = {}
         self.init_devices()
         self.start_devices()
+
+        self.start_time = time.time()
+        self.ten_seconds_counter = time.time()
 
         while True:
             self.routine()
@@ -68,10 +73,20 @@ class DeviceManager:
         audio_data = self.get_audio_data()
         self.refresh_audio_queues(audio_data)
 
+        self.end_time = time.time()
+                    
+        if time.time() - self.ten_seconds_counter > 10:
+            self.ten_seconds_counter = time.time()
+            self.time_dif = self.end_time - self.start_time
+            self.fps = 1 / self.time_dif
+            print("Device Manager | FPS: " + str(self.fps))
+
+        self.start_time = time.time()
+
     def get_audio_data(self):
         audio_data = None
         if not self._audio_queue.empty():
-            audio_data = self._audio_queue.get(False)
+            audio_data = self._audio_queue.get()
         return audio_data
         
     def refresh_audio_queues(self, audio_data):
