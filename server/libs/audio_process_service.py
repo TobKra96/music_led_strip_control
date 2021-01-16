@@ -84,8 +84,7 @@ class AudioProcessService:
                 self._device_rate = int(device["defaultSampleRate"])
                 self._config["general_settings"]["DEFAULT_SAMPLE_RATE"] = self._device_rate
                 self._frames_per_buffer = self._config["general_settings"]["FRAMES_PER_BUFFER"]
-
-        
+     
         self.start_time = time.time()
         self.ten_seconds_counter = time.time()
 
@@ -121,7 +120,7 @@ class AudioProcessService:
                 return
 
             # Limit the fps to decrease laggs caused by 100 percent cpu
-            self._fps_limiter.fps_limiter()
+            #self._fps_limiter.fps_limiter()
 
             raw_data_from_stream = self.stream.read(self._frames_per_buffer, exception_on_overflow = False)
 
@@ -141,12 +140,13 @@ class AudioProcessService:
             # Send the new audio data to the effect process.            
             if self._audio_queue.full():
                 try:
-                    pre_audio_data = self._audio_queue.get(False)
+                    pre_audio_data = self._audio_queue.get()
                     del pre_audio_data
                 except:
+                    #print("Empty audio queue of device_manager")
                     pass
-                
-            self._audio_queue.put(audio_datas)
+            
+            self._audio_queue.put(audio_datas, False)
 
             self.end_time = time.time()
                     
