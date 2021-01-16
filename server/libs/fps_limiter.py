@@ -16,7 +16,9 @@ class FPSLimiter:
         self.fps_limiter_end = time.time()
         time_between_last_cycle = self.fps_limiter_end - self.fps_limiter_start
         if time_between_last_cycle < self.min_waiting_time:
-            sleep(self.min_waiting_time - time_between_last_cycle)
+            time_diff = self.min_waiting_time - time_between_last_cycle
+            if time_diff > 0.0001:
+                sleep(time_diff)
 
         self.fps_limiter_start = time.time()
     

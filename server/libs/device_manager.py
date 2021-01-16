@@ -4,6 +4,7 @@ from libs.color_service_global import ColorServiceGlobal # pylint: disable=E0611
 from libs.effect_item import EffectItem # pylint: disable=E0611, E0401
 from libs.notification_item import NotificationItem # pylint: disable=E0611, E0401
 from libs.notification_enum import NotificationEnum # pylint: disable=E0611, E0401
+from libs.fps_limiter import FPSLimiter # pylint: disable=E0611, E0401
 import copy
 
 import time
@@ -20,6 +21,10 @@ class DeviceManager:
         self._effect_queue = effect_queue
         print("Effect queue id DeviceManager " + str(id(self._effect_queue)))
         self._audio_queue = audio_queue
+
+        #Init FPS Limiter
+        self._fps_limiter = FPSLimiter(200)
+
         self._skip_routine = False
         self._devices = {}
         self.init_devices()
@@ -53,7 +58,6 @@ class DeviceManager:
 
                 if(devices_count_before_reload != devices_count_after_reload):
                     self.reinit_devices()
-
                 
                 if(current_notification_item.device_id == "all_devices"):
                     for key, value in self._devices.items():
@@ -67,9 +71,12 @@ class DeviceManager:
             elif current_notification_item.notification_enum is NotificationEnum.process_pause:
                 self._skip_routine = True
 
+        # Limit the fps to decrease laggs caused by 100 percent cpu
+        self._fps_limiter.fps_limiter()
+
         if self._skip_routine:
             return
-
+      
         audio_data = self.get_audio_data()
         self.refresh_audio_queues(audio_data)
 
@@ -83,10 +90,13 @@ class DeviceManager:
 
         self.start_time = time.time()
 
+        
+
     def get_audio_data(self):
         audio_data = None
         if not self._audio_queue.empty():
             audio_data = self._audio_queue.get()
+            
         return audio_data
         
     def refresh_audio_queues(self, audio_data):
@@ -98,8 +108,12 @@ class DeviceManager:
                     pre_audio_data = value.audio_queue.get(False)
                     del pre_audio_data
                 except:
+                    #print("Empty audio queue of devices.")
                     pass
-            value.audio_queue.put(copy.deepcopy(audio_data))
+
+            audio_copy = copy.deepcopy(audio_data)
+            value.audio_queue.put(audio_copy)
+            
 
     def init_devices(self):
         print("Enter init_devices()")
@@ -140,8 +154,7 @@ class DeviceManager:
     def stop_device(self, device_id):
         print("Stop " + device_id)
         self._devices[device_id].stop_device()
-        print("Stopped " + device_id)
-        
+        print("Stopped " + device_id)        
 
   
     
