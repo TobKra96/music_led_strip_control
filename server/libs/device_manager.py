@@ -112,7 +112,10 @@ class DeviceManager:
                     pass
 
             audio_copy = copy.deepcopy(audio_data)
-            value.audio_queue.put(audio_copy)
+            try:
+                value.audio_queue.put(audio_copy, block=True, timeout=0.33)
+            except:
+                pass
             
 
     def init_devices(self):

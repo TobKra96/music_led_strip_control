@@ -455,7 +455,7 @@
             "effect_single": {
                 "color": "Blue",
                 "use_custom_color" : "false",
-                "custom_color" : [0,0,0]
+                "custom_color" : [0,0,255]
             },
             "effect_slide": {
                 "gradient": "Spectral",
