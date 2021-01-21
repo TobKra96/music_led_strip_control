@@ -301,7 +301,7 @@
                 "LED_Dma": 10,
                 "LED_Freq_Hz": 800000,
                 "LED_Invert": false,
-                "LED_Pin": 21
+                "LED_Pin": 18
             },
             "output_mqtt":{
                 "MQTT_Broker":"localhost",

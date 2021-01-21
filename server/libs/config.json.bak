@@ -301,7 +301,7 @@
                 "LED_Dma": 10,
                 "LED_Freq_Hz": 800000,
                 "LED_Invert": false,
-                "LED_Pin": 21
+                "LED_Pin": 18
             },
             "output_mqtt":{
                 "MQTT_Broker":"localhost",
@@ -455,7 +455,7 @@
             "effect_single": {
                 "color": "Blue",
                 "use_custom_color" : "false",
-                "custom_color" : [0,0,0]
+                "custom_color" : [0,0,255]
             },
             "effect_slide": {
                 "gradient": "Spectral",
