@@ -1,0 +1,3048 @@
+{
+    "colours": {
+        "Black": [
+            0,
+            0,
+            0
+        ],
+        "Blue": [
+            0,
+            0,
+            255
+        ],
+        "Green": [
+            0,
+            255,
+            0
+        ],
+        "Light blue": [
+            0,
+            247,
+            161
+        ],
+        "Orange": [
+            255,
+            40,
+            0
+        ],
+        "Pink": [
+            255,
+            0,
+            178
+        ],
+        "Purple": [
+            255,
+            0,
+            200
+        ],
+        "Red": [
+            255,
+            0,
+            0
+        ],
+        "White": [
+            255,
+            255,
+            255
+        ],
+        "Yellow": [
+            255,
+            255,
+            0
+        ]
+    },
+    "default_device": {
+        "DEVICE_NAME": "Default Device",
+        "FPS": 60,
+        "LED_Count": 124,
+        "LED_Mid": 64,
+        "OUTPUT_TYPE": "output_raspi",
+        "effects": {
+            "effect_advanced_scroll": {
+                "bass_color": "Orange",
+                "bass_multiplier": 1,
+                "bass_speed": 4,
+                "blur": 0.5,
+                "brilliance_color": "Blue",
+                "brilliance_multiplier": 1,
+                "brilliance_speed": 4,
+                "decay": 1,
+                "lowmid_color": "Pink",
+                "lowmid_multiplier": 1,
+                "lowmid_speed": 4,
+                "mid_color": "Yellow",
+                "mid_multiplier": 1,
+                "mid_speed": 4,
+                "mirror": true,
+                "presence_color": "Light blue",
+                "presence_multiplier": 1,
+                "presence_speed": 4,
+                "subbass_color": "Red",
+                "subbass_multiplier": 1,
+                "subbass_speed": 4,
+                "uppermid_color": "Green",
+                "uppermid_multiplier": 1,
+                "uppermid_speed": 4
+            },
+            "effect_bars": {
+                "color_mode": "Spectral",
+                "flip_lr": false,
+                "mirror": false,
+                "resolution": 4,
+                "reverse_roll": false,
+                "roll_speed": 0
+            },
+            "effect_beat": {
+                "color": "Red",
+                "colorful_mode": true,
+                "decay": 0.7,
+                "gradient": "Spectral",
+                "random_color": true
+            },
+            "effect_beat_slide": {
+                "bar_length": 102,
+                "color": "Blue",
+                "decay": 0.7,
+                "slider_length": 10,
+                "speed": 5
+            },
+            "effect_beat_twinkle": {
+                "color": "Red",
+                "colorful_mode": true,
+                "decay": 0.7,
+                "gradient": "Spectral",
+                "random_color": true,
+                "star_length": 5
+            },
+            "effect_bubble": {
+                "blur": 5,
+                "bubble_lenght": 5,
+                "bubble_repeat": 2,
+                "gradient": "Spectral",
+                "mirror": false,
+                "reverse": false,
+                "speed": 2
+            },
+            "effect_direction_changer": {
+                "bar_length": 5,
+                "bar_speed": 1,
+                "bars_in_same_direction": 1,
+                "color": "Red",
+                "colorful_mode": true,
+                "gradient": "Spectral",
+                "random_color": true
+            },
+            "effect_energy": {
+                "b_multiplier": 1,
+                "blur": 5,
+                "g_multiplier": 1,
+                "mirror": true,
+                "r_multiplier": 1,
+                "scale": 0.8
+            },
+            "effect_fade": {
+                "gradient": "Spectral",
+                "reverse": false,
+                "speed": 1
+            },
+            "effect_gradient": {
+                "gradient": "Spectral",
+                "mirror": false,
+                "reverse": false,
+                "speed": 1
+            },
+            "effect_music": {
+                "color": "Blue"
+            },
+            "effect_pendulum": {
+                "change_color": false,
+                "color": "Blue",
+                "gradient": "Spectral",
+                "pendulum_length": 10,
+                "speed": 5
+            },
+            "effect_power": {
+                "color_mode": "Spectral",
+                "flip_lr": false,
+                "mirror": true,
+                "s_color": "White",
+                "s_count": 20
+            },
+            "effect_rods": {
+                "change_color": true,
+                "color": "Blue",
+                "gradient": "Spectral",
+                "mirror": false,
+                "reverse": false,
+                "rods_distance": 50,
+                "rods_length": 15,
+                "speed": 2
+            },
+            "effect_scroll": {
+                "blur": 0.5,
+                "decay": 1,
+                "high_color": "Blue",
+                "high_multiplier": 1,
+                "high_speed": 4,
+                "low_speed": 4,
+                "lows_color": "Red",
+                "lows_multiplier": 1,
+                "mid_speed": 4,
+                "mids_color": "Green",
+                "mids_multiplier": 1,
+                "mirror": true
+            },
+            "effect_single": {
+                "color": "Blue",
+                "custom_color": [
+                    0,
+                    0,
+                    0
+                ],
+                "use_custom_color": "false"
+            },
+            "effect_slide": {
+                "gradient": "Spectral",
+                "mirror": false,
+                "reverse": false,
+                "speed": 2
+            },
+            "effect_spectrum": {
+                "b_multiplier": 1,
+                "g_multiplier": 1,
+                "r_multiplier": 1
+            },
+            "effect_spectrum_analyzer": {
+                "color": "Blue",
+                "spectrum_count": 6
+            },
+            "effect_sync_fade": {
+                "gradient": "Spectral",
+                "reverse": false,
+                "speed": 1
+            },
+            "effect_twinkle": {
+                "blur": 1,
+                "gradient": "Spectral",
+                "star_appears_speed": 25,
+                "star_descending_speed": 5,
+                "star_rising_speed": 5,
+                "stars_count": 10,
+                "stars_length": 5
+            },
+            "effect_vu_meter": {
+                "bar_length": 2,
+                "color": "Blue",
+                "gradient": "Spectral",
+                "max_vol_color": "Red",
+                "speed": 50,
+                "use_gradient": "true"
+            },
+            "effect_wave": {
+                "color_flash": "White",
+                "color_wave": "Red",
+                "decay": 0.7,
+                "wipe_len": 5,
+                "wipe_speed": 2
+            },
+            "effect_wavelength": {
+                "blur": 3,
+                "color_mode": "Spectral",
+                "flip_lr": false,
+                "mirror": false,
+                "reverse_grad": false,
+                "reverse_roll": false,
+                "roll_speed": 0
+            },
+            "effect_wiggle": {
+                "bar_length": 20,
+                "beat_color": "Blue",
+                "color": "Orange",
+                "decay": 0.7
+            },
+            "last_effect": "effect_advanced_scroll"
+        },
+        "output": {
+            "output_mqtt": {
+                "MQTT_Broker": "localhost",
+                "MQTT_Path": "led/device_a"
+            },
+            "output_raspi": {
+                "LED_Brightness": 100,
+                "LED_Channel": 0,
+                "LED_Dma": 10,
+                "LED_Freq_Hz": 800000,
+                "LED_Invert": false,
+                "LED_Pin": 21
+            },
+            "output_udp": {
+                "UDP_Client_IP": "127.0.0.1",
+                "UDP_Client_Port": "7777"
+            }
+        }
+    },
+    "development_config": {
+        "deactivate_output": false,
+        "test": "first"
+    },
+    "device_configs": {
+        "device_0": {
+            "DEVICE_NAME": "Raspberry",
+            "FPS": 60,
+            "LED_Count": 144,
+            "LED_Mid": 72,
+            "OUTPUT_TYPE": "output_raspi",
+            "effects": {
+                "effect_advanced_scroll": {
+                    "bass_color": "Orange",
+                    "bass_multiplier": 1,
+                    "bass_speed": 4,
+                    "blur": 0.5,
+                    "brilliance_color": "Blue",
+                    "brilliance_multiplier": 1,
+                    "brilliance_speed": 4,
+                    "decay": 1,
+                    "lowmid_color": "Pink",
+                    "lowmid_multiplier": 1,
+                    "lowmid_speed": 4,
+                    "mid_color": "Yellow",
+                    "mid_multiplier": 1,
+                    "mid_speed": 4,
+                    "mirror": true,
+                    "presence_color": "Light blue",
+                    "presence_multiplier": 1,
+                    "presence_speed": 4,
+                    "subbass_color": "Red",
+                    "subbass_multiplier": 1,
+                    "subbass_speed": 4,
+                    "uppermid_color": "Green",
+                    "uppermid_multiplier": 1,
+                    "uppermid_speed": 4
+                },
+                "effect_bars": {
+                    "color_mode": "Spectral",
+                    "flip_lr": false,
+                    "mirror": false,
+                    "resolution": 4,
+                    "reverse_roll": false,
+                    "roll_speed": 0
+                },
+                "effect_beat": {
+                    "color": "Red",
+                    "colorful_mode": true,
+                    "decay": 0.7,
+                    "gradient": "Spectral",
+                    "random_color": true
+                },
+                "effect_beat_slide": {
+                    "bar_length": 102,
+                    "color": "Blue",
+                    "decay": 0.7,
+                    "slider_length": 10,
+                    "speed": 5
+                },
+                "effect_beat_twinkle": {
+                    "color": "Red",
+                    "colorful_mode": true,
+                    "decay": 0.7,
+                    "gradient": "Spectral",
+                    "random_color": true,
+                    "star_length": 5
+                },
+                "effect_bubble": {
+                    "blur": 5,
+                    "bubble_lenght": 5,
+                    "bubble_repeat": 2,
+                    "gradient": "Spectral",
+                    "mirror": false,
+                    "reverse": false,
+                    "speed": 2
+                },
+                "effect_direction_changer": {
+                    "bar_length": 5,
+                    "bar_speed": 1,
+                    "bars_in_same_direction": 1,
+                    "color": "Red",
+                    "colorful_mode": true,
+                    "gradient": "Spectral",
+                    "random_color": true
+                },
+                "effect_energy": {
+                    "b_multiplier": 1,
+                    "blur": 5,
+                    "g_multiplier": 1,
+                    "mirror": true,
+                    "r_multiplier": 1,
+                    "scale": 0.8
+                },
+                "effect_fade": {
+                    "gradient": "Spectral",
+                    "reverse": false,
+                    "speed": 1
+                },
+                "effect_gradient": {
+                    "gradient": "Spectral",
+                    "mirror": false,
+                    "reverse": false,
+                    "speed": 1
+                },
+                "effect_music": {
+                    "color": "Blue"
+                },
+                "effect_pendulum": {
+                    "change_color": false,
+                    "color": "Blue",
+                    "gradient": "Spectral",
+                    "pendulum_length": 10,
+                    "speed": 5
+                },
+                "effect_power": {
+                    "color_mode": "Spectral",
+                    "flip_lr": false,
+                    "mirror": true,
+                    "s_color": "White",
+                    "s_count": 20
+                },
+                "effect_rods": {
+                    "change_color": true,
+                    "color": "Blue",
+                    "gradient": "Spectral",
+                    "mirror": false,
+                    "reverse": false,
+                    "rods_distance": 50,
+                    "rods_length": 15,
+                    "speed": 2
+                },
+                "effect_scroll": {
+                    "blur": 0.5,
+                    "decay": 1,
+                    "high_color": "Blue",
+                    "high_multiplier": 1,
+                    "high_speed": 4,
+                    "low_speed": 4,
+                    "lows_color": "Red",
+                    "lows_multiplier": 1,
+                    "mid_speed": 4,
+                    "mids_color": "Green",
+                    "mids_multiplier": 1,
+                    "mirror": true
+                },
+                "effect_single": {
+                    "color": "Blue",
+                    "custom_color": [
+                        0,
+                        0,
+                        0
+                    ],
+                    "use_custom_color": "false"
+                },
+                "effect_slide": {
+                    "gradient": "Spectral",
+                    "mirror": false,
+                    "reverse": false,
+                    "speed": 2
+                },
+                "effect_spectrum": {
+                    "b_multiplier": 1,
+                    "g_multiplier": 1,
+                    "r_multiplier": 1
+                },
+                "effect_spectrum_analyzer": {
+                    "color": "Blue",
+                    "spectrum_count": 6
+                },
+                "effect_sync_fade": {
+                    "gradient": "Spectral",
+                    "reverse": false,
+                    "speed": 1
+                },
+                "effect_twinkle": {
+                    "blur": 1,
+                    "gradient": "Spectral",
+                    "star_appears_speed": 25,
+                    "star_descending_speed": 5,
+                    "star_rising_speed": 5,
+                    "stars_count": 10,
+                    "stars_length": 5
+                },
+                "effect_vu_meter": {
+                    "bar_length": 2,
+                    "color": "Blue",
+                    "gradient": "Spectral",
+                    "max_vol_color": "Red",
+                    "speed": 50,
+                    "use_gradient": "true"
+                },
+                "effect_wave": {
+                    "color_flash": "White",
+                    "color_wave": "Red",
+                    "decay": 0.7,
+                    "wipe_len": 5,
+                    "wipe_speed": 2
+                },
+                "effect_wavelength": {
+                    "blur": 3,
+                    "color_mode": "Spectral",
+                    "flip_lr": false,
+                    "mirror": false,
+                    "reverse_grad": false,
+                    "reverse_roll": false,
+                    "roll_speed": 0
+                },
+                "effect_wiggle": {
+                    "bar_length": 20,
+                    "beat_color": "Blue",
+                    "color": "Orange",
+                    "decay": 0.7
+                },
+                "last_effect": "effect_advanced_scroll"
+            },
+            "output": {
+                "output_mqtt": {
+                    "MQTT_Broker": "localhost",
+                    "MQTT_Path": "led/device_a"
+                },
+                "output_raspi": {
+                    "LED_Brightness": 100,
+                    "LED_Channel": 0,
+                    "LED_Dma": 10,
+                    "LED_Freq_Hz": 800000,
+                    "LED_Invert": false,
+                    "LED_Pin": 18
+                },
+                "output_udp": {
+                    "UDP_Client_IP": "127.0.0.1",
+                    "UDP_Client_Port": 7777
+                }
+            }
+        },
+        "device_1": {
+            "DEVICE_NAME": "LED Stick 1",
+            "FPS": 60,
+            "LED_Count": 60,
+            "LED_Mid": 30,
+            "OUTPUT_TYPE": "output_udp",
+            "effects": {
+                "effect_advanced_scroll": {
+                    "bass_color": "Orange",
+                    "bass_multiplier": 1,
+                    "bass_speed": 4,
+                    "blur": 0.5,
+                    "brilliance_color": "Blue",
+                    "brilliance_multiplier": 1,
+                    "brilliance_speed": 4,
+                    "decay": 1,
+                    "lowmid_color": "Pink",
+                    "lowmid_multiplier": 1,
+                    "lowmid_speed": 4,
+                    "mid_color": "Yellow",
+                    "mid_multiplier": 1,
+                    "mid_speed": 4,
+                    "mirror": true,
+                    "presence_color": "Light blue",
+                    "presence_multiplier": 1,
+                    "presence_speed": 4,
+                    "subbass_color": "Red",
+                    "subbass_multiplier": 1,
+                    "subbass_speed": 4,
+                    "uppermid_color": "Green",
+                    "uppermid_multiplier": 1,
+                    "uppermid_speed": 4
+                },
+                "effect_bars": {
+                    "color_mode": "Spectral",
+                    "flip_lr": false,
+                    "mirror": false,
+                    "resolution": 4,
+                    "reverse_roll": false,
+                    "roll_speed": 0
+                },
+                "effect_beat": {
+                    "color": "Red",
+                    "colorful_mode": true,
+                    "decay": 0.7,
+                    "gradient": "Spectral",
+                    "random_color": true
+                },
+                "effect_beat_slide": {
+                    "bar_length": 102,
+                    "color": "Blue",
+                    "decay": 0.7,
+                    "slider_length": 10,
+                    "speed": 5
+                },
+                "effect_beat_twinkle": {
+                    "color": "Red",
+                    "colorful_mode": true,
+                    "decay": 0.9,
+                    "gradient": "Spectral",
+                    "random_color": true,
+                    "star_length": 30
+                },
+                "effect_bubble": {
+                    "blur": 5,
+                    "bubble_lenght": 5,
+                    "bubble_repeat": 2,
+                    "gradient": "Spectral",
+                    "mirror": false,
+                    "reverse": false,
+                    "speed": 2
+                },
+                "effect_direction_changer": {
+                    "bar_length": 5,
+                    "bar_speed": 3,
+                    "bars_in_same_direction": 1,
+                    "color": "Red",
+                    "colorful_mode": true,
+                    "gradient": "Spectral",
+                    "random_color": true
+                },
+                "effect_energy": {
+                    "b_multiplier": 1,
+                    "blur": 5,
+                    "g_multiplier": 1,
+                    "mirror": true,
+                    "r_multiplier": 1,
+                    "scale": 0.8
+                },
+                "effect_fade": {
+                    "gradient": "Spectral",
+                    "reverse": false,
+                    "speed": 1
+                },
+                "effect_gradient": {
+                    "gradient": "Spectral",
+                    "mirror": false,
+                    "reverse": false,
+                    "speed": 1
+                },
+                "effect_music": {
+                    "color": "Blue"
+                },
+                "effect_pendulum": {
+                    "change_color": false,
+                    "color": "Blue",
+                    "gradient": "Spectral",
+                    "pendulum_length": 10,
+                    "speed": 5
+                },
+                "effect_power": {
+                    "color_mode": "Spectral",
+                    "flip_lr": false,
+                    "mirror": true,
+                    "s_color": "White",
+                    "s_count": 20
+                },
+                "effect_rods": {
+                    "change_color": true,
+                    "color": "Blue",
+                    "gradient": "Spectral",
+                    "mirror": false,
+                    "reverse": false,
+                    "rods_distance": 50,
+                    "rods_length": 15,
+                    "speed": 2
+                },
+                "effect_scroll": {
+                    "blur": 0.5,
+                    "decay": 1,
+                    "high_color": "Blue",
+                    "high_multiplier": 1,
+                    "high_speed": 4,
+                    "low_speed": 4,
+                    "lows_color": "Red",
+                    "lows_multiplier": 1,
+                    "mid_speed": 4,
+                    "mids_color": "Green",
+                    "mids_multiplier": 1,
+                    "mirror": true
+                },
+                "effect_single": {
+                    "color": "Blue",
+                    "custom_color": [
+                        0,
+                        0,
+                        0
+                    ],
+                    "use_custom_color": "false"
+                },
+                "effect_slide": {
+                    "gradient": "Spectral",
+                    "mirror": false,
+                    "reverse": false,
+                    "speed": 2
+                },
+                "effect_spectrum": {
+                    "b_multiplier": 1,
+                    "g_multiplier": 1,
+                    "r_multiplier": 1
+                },
+                "effect_spectrum_analyzer": {
+                    "color": "Blue",
+                    "spectrum_count": 6
+                },
+                "effect_sync_fade": {
+                    "gradient": "Spectral",
+                    "reverse": false,
+                    "speed": 1
+                },
+                "effect_twinkle": {
+                    "blur": 1,
+                    "gradient": "Spectral",
+                    "star_appears_speed": 25,
+                    "star_descending_speed": 5,
+                    "star_rising_speed": 5,
+                    "stars_count": 10,
+                    "stars_length": 5
+                },
+                "effect_vu_meter": {
+                    "bar_length": 2,
+                    "color": "Blue",
+                    "gradient": "Spectral",
+                    "max_vol_color": "Red",
+                    "speed": 50,
+                    "use_gradient": "true"
+                },
+                "effect_wave": {
+                    "color_flash": "White",
+                    "color_wave": "Red",
+                    "decay": 0.7,
+                    "wipe_len": 5,
+                    "wipe_speed": 2
+                },
+                "effect_wavelength": {
+                    "blur": 3,
+                    "color_mode": "Spectral",
+                    "flip_lr": false,
+                    "mirror": false,
+                    "reverse_grad": false,
+                    "reverse_roll": false,
+                    "roll_speed": 0
+                },
+                "effect_wiggle": {
+                    "bar_length": 20,
+                    "beat_color": "Blue",
+                    "color": "Orange",
+                    "decay": 0.7
+                },
+                "last_effect": "effect_advanced_scroll"
+            },
+            "output": {
+                "output_mqtt": {
+                    "MQTT_Broker": "localhost",
+                    "MQTT_Path": "led/device_a"
+                },
+                "output_raspi": {
+                    "LED_Brightness": 100,
+                    "LED_Channel": 0,
+                    "LED_Dma": 10,
+                    "LED_Freq_Hz": 800000,
+                    "LED_Invert": false,
+                    "LED_Pin": 21
+                },
+                "output_udp": {
+                    "UDP_Client_IP": "172.24.26.120",
+                    "UDP_Client_Port": 7777
+                }
+            }
+        },
+        "device_110": {
+            "DEVICE_NAME": "Schrank klein",
+            "FPS": 60,
+            "LED_Count": 64,
+            "LED_Mid": 32,
+            "OUTPUT_TYPE": "output_udp",
+            "effects": {
+                "effect_advanced_scroll": {
+                    "bass_color": "Orange",
+                    "bass_multiplier": 1,
+                    "bass_speed": 4,
+                    "blur": 0.5,
+                    "brilliance_color": "Blue",
+                    "brilliance_multiplier": 1,
+                    "brilliance_speed": 4,
+                    "decay": 1,
+                    "lowmid_color": "Pink",
+                    "lowmid_multiplier": 1,
+                    "lowmid_speed": 4,
+                    "mid_color": "Yellow",
+                    "mid_multiplier": 1,
+                    "mid_speed": 4,
+                    "mirror": true,
+                    "presence_color": "Light blue",
+                    "presence_multiplier": 1,
+                    "presence_speed": 4,
+                    "subbass_color": "Red",
+                    "subbass_multiplier": 1,
+                    "subbass_speed": 4,
+                    "uppermid_color": "Green",
+                    "uppermid_multiplier": 1,
+                    "uppermid_speed": 4
+                },
+                "effect_bars": {
+                    "color_mode": "Spectral",
+                    "flip_lr": false,
+                    "mirror": false,
+                    "resolution": 4,
+                    "reverse_roll": false,
+                    "roll_speed": 0
+                },
+                "effect_beat": {
+                    "color": "Red",
+                    "colorful_mode": true,
+                    "decay": 0.7,
+                    "gradient": "Spectral",
+                    "random_color": true
+                },
+                "effect_beat_slide": {
+                    "bar_length": 102,
+                    "color": "Blue",
+                    "decay": 0.7,
+                    "slider_length": 10,
+                    "speed": 5
+                },
+                "effect_beat_twinkle": {
+                    "color": "Red",
+                    "colorful_mode": true,
+                    "decay": 0.9,
+                    "gradient": "Spectral",
+                    "random_color": true,
+                    "star_length": 30
+                },
+                "effect_bubble": {
+                    "blur": 5,
+                    "bubble_lenght": 5,
+                    "bubble_repeat": 2,
+                    "gradient": "Spectral",
+                    "mirror": false,
+                    "reverse": false,
+                    "speed": 2
+                },
+                "effect_direction_changer": {
+                    "bar_length": 5,
+                    "bar_speed": 3,
+                    "bars_in_same_direction": 1,
+                    "color": "Red",
+                    "colorful_mode": true,
+                    "gradient": "Spectral",
+                    "random_color": true
+                },
+                "effect_energy": {
+                    "b_multiplier": 1,
+                    "blur": 5,
+                    "g_multiplier": 1,
+                    "mirror": true,
+                    "r_multiplier": 1,
+                    "scale": 0.8
+                },
+                "effect_fade": {
+                    "gradient": "Spectral",
+                    "reverse": false,
+                    "speed": 1
+                },
+                "effect_gradient": {
+                    "gradient": "Spectral",
+                    "mirror": false,
+                    "reverse": false,
+                    "speed": 1
+                },
+                "effect_music": {
+                    "color": "Blue"
+                },
+                "effect_pendulum": {
+                    "change_color": false,
+                    "color": "Blue",
+                    "gradient": "Spectral",
+                    "pendulum_length": 10,
+                    "speed": 5
+                },
+                "effect_power": {
+                    "color_mode": "Spectral",
+                    "flip_lr": false,
+                    "mirror": true,
+                    "s_color": "White",
+                    "s_count": 20
+                },
+                "effect_rods": {
+                    "change_color": true,
+                    "color": "Blue",
+                    "gradient": "Spectral",
+                    "mirror": false,
+                    "reverse": false,
+                    "rods_distance": 50,
+                    "rods_length": 15,
+                    "speed": 2
+                },
+                "effect_scroll": {
+                    "blur": 0.5,
+                    "decay": 1,
+                    "high_color": "Blue",
+                    "high_multiplier": 1,
+                    "high_speed": 4,
+                    "low_speed": 4,
+                    "lows_color": "Red",
+                    "lows_multiplier": 1,
+                    "mid_speed": 4,
+                    "mids_color": "Green",
+                    "mids_multiplier": 1,
+                    "mirror": true
+                },
+                "effect_single": {
+                    "color": "Blue",
+                    "custom_color": [
+                        0,
+                        0,
+                        0
+                    ],
+                    "use_custom_color": "false"
+                },
+                "effect_slide": {
+                    "gradient": "Spectral",
+                    "mirror": false,
+                    "reverse": false,
+                    "speed": 2
+                },
+                "effect_spectrum": {
+                    "b_multiplier": 1,
+                    "g_multiplier": 1,
+                    "r_multiplier": 1
+                },
+                "effect_spectrum_analyzer": {
+                    "color": "Blue",
+                    "spectrum_count": 6
+                },
+                "effect_sync_fade": {
+                    "gradient": "Spectral",
+                    "reverse": false,
+                    "speed": 1
+                },
+                "effect_twinkle": {
+                    "blur": 1,
+                    "gradient": "Spectral",
+                    "star_appears_speed": 25,
+                    "star_descending_speed": 5,
+                    "star_rising_speed": 5,
+                    "stars_count": 10,
+                    "stars_length": 5
+                },
+                "effect_vu_meter": {
+                    "bar_length": 2,
+                    "color": "Blue",
+                    "gradient": "Spectral",
+                    "max_vol_color": "Red",
+                    "speed": 50,
+                    "use_gradient": "true"
+                },
+                "effect_wave": {
+                    "color_flash": "White",
+                    "color_wave": "Red",
+                    "decay": 0.7,
+                    "wipe_len": 5,
+                    "wipe_speed": 2
+                },
+                "effect_wavelength": {
+                    "blur": 3,
+                    "color_mode": "Spectral",
+                    "flip_lr": false,
+                    "mirror": false,
+                    "reverse_grad": false,
+                    "reverse_roll": false,
+                    "roll_speed": 0
+                },
+                "effect_wiggle": {
+                    "bar_length": 20,
+                    "beat_color": "Blue",
+                    "color": "Orange",
+                    "decay": 0.7
+                },
+                "last_effect": "effect_advanced_scroll"
+            },
+            "output": {
+                "output_mqtt": {
+                    "MQTT_Broker": "localhost",
+                    "MQTT_Path": "led/device_a"
+                },
+                "output_raspi": {
+                    "LED_Brightness": 100,
+                    "LED_Channel": 0,
+                    "LED_Dma": 10,
+                    "LED_Freq_Hz": 800000,
+                    "LED_Invert": false,
+                    "LED_Pin": 12
+                },
+                "output_udp": {
+                    "UDP_Client_IP": "172.24.26.110",
+                    "UDP_Client_Port": 7777
+                }
+            }
+        },
+        "device_111": {
+            "DEVICE_NAME": "Essbereich",
+            "FPS": 60,
+            "LED_Count": 284,
+            "LED_Mid": 174,
+            "OUTPUT_TYPE": "output_udp",
+            "effects": {
+                "effect_advanced_scroll": {
+                    "bass_color": "Orange",
+                    "bass_multiplier": 1,
+                    "bass_speed": 4,
+                    "blur": 0.5,
+                    "brilliance_color": "Blue",
+                    "brilliance_multiplier": 1,
+                    "brilliance_speed": 4,
+                    "decay": 1,
+                    "lowmid_color": "Pink",
+                    "lowmid_multiplier": 1,
+                    "lowmid_speed": 4,
+                    "mid_color": "Yellow",
+                    "mid_multiplier": 1,
+                    "mid_speed": 4,
+                    "mirror": true,
+                    "presence_color": "Light blue",
+                    "presence_multiplier": 1,
+                    "presence_speed": 4,
+                    "subbass_color": "Red",
+                    "subbass_multiplier": 1,
+                    "subbass_speed": 4,
+                    "uppermid_color": "Green",
+                    "uppermid_multiplier": 1,
+                    "uppermid_speed": 4
+                },
+                "effect_bars": {
+                    "color_mode": "Spectral",
+                    "flip_lr": false,
+                    "mirror": false,
+                    "resolution": 4,
+                    "reverse_roll": false,
+                    "roll_speed": 0
+                },
+                "effect_beat": {
+                    "color": "Red",
+                    "colorful_mode": true,
+                    "decay": 0.7,
+                    "gradient": "Spectral",
+                    "random_color": true
+                },
+                "effect_beat_slide": {
+                    "bar_length": 102,
+                    "color": "Blue",
+                    "decay": 0.7,
+                    "slider_length": 10,
+                    "speed": 5
+                },
+                "effect_beat_twinkle": {
+                    "color": "Red",
+                    "colorful_mode": true,
+                    "decay": 0.9,
+                    "gradient": "Spectral",
+                    "random_color": true,
+                    "star_length": 30
+                },
+                "effect_bubble": {
+                    "blur": 5,
+                    "bubble_lenght": 5,
+                    "bubble_repeat": 2,
+                    "gradient": "Spectral",
+                    "mirror": false,
+                    "reverse": false,
+                    "speed": 2
+                },
+                "effect_direction_changer": {
+                    "bar_length": 5,
+                    "bar_speed": 3,
+                    "bars_in_same_direction": 1,
+                    "color": "Red",
+                    "colorful_mode": true,
+                    "gradient": "Spectral",
+                    "random_color": true
+                },
+                "effect_energy": {
+                    "b_multiplier": 1,
+                    "blur": 5,
+                    "g_multiplier": 1,
+                    "mirror": true,
+                    "r_multiplier": 1,
+                    "scale": 0.8
+                },
+                "effect_fade": {
+                    "gradient": "Spectral",
+                    "reverse": false,
+                    "speed": 1
+                },
+                "effect_gradient": {
+                    "gradient": "Spectral",
+                    "mirror": false,
+                    "reverse": false,
+                    "speed": 1
+                },
+                "effect_music": {
+                    "color": "Blue"
+                },
+                "effect_pendulum": {
+                    "change_color": false,
+                    "color": "Blue",
+                    "gradient": "Spectral",
+                    "pendulum_length": 10,
+                    "speed": 5
+                },
+                "effect_power": {
+                    "color_mode": "Spectral",
+                    "flip_lr": false,
+                    "mirror": true,
+                    "s_color": "White",
+                    "s_count": 20
+                },
+                "effect_rods": {
+                    "change_color": true,
+                    "color": "Blue",
+                    "gradient": "Spectral",
+                    "mirror": false,
+                    "reverse": false,
+                    "rods_distance": 50,
+                    "rods_length": 15,
+                    "speed": 2
+                },
+                "effect_scroll": {
+                    "blur": 0.5,
+                    "decay": 1,
+                    "high_color": "Blue",
+                    "high_multiplier": 1,
+                    "high_speed": 4,
+                    "low_speed": 4,
+                    "lows_color": "Red",
+                    "lows_multiplier": 1,
+                    "mid_speed": 4,
+                    "mids_color": "Green",
+                    "mids_multiplier": 1,
+                    "mirror": true
+                },
+                "effect_single": {
+                    "color": "Blue",
+                    "custom_color": [
+                        0,
+                        0,
+                        0
+                    ],
+                    "use_custom_color": "false"
+                },
+                "effect_slide": {
+                    "gradient": "Spectral",
+                    "mirror": false,
+                    "reverse": false,
+                    "speed": 2
+                },
+                "effect_spectrum": {
+                    "b_multiplier": 1,
+                    "g_multiplier": 1,
+                    "r_multiplier": 1
+                },
+                "effect_spectrum_analyzer": {
+                    "color": "Blue",
+                    "spectrum_count": 6
+                },
+                "effect_sync_fade": {
+                    "gradient": "Spectral",
+                    "reverse": false,
+                    "speed": 1
+                },
+                "effect_twinkle": {
+                    "blur": 1,
+                    "gradient": "Spectral",
+                    "star_appears_speed": 25,
+                    "star_descending_speed": 5,
+                    "star_rising_speed": 5,
+                    "stars_count": 10,
+                    "stars_length": 5
+                },
+                "effect_vu_meter": {
+                    "bar_length": 2,
+                    "color": "Blue",
+                    "gradient": "Spectral",
+                    "max_vol_color": "Red",
+                    "speed": 50,
+                    "use_gradient": "true"
+                },
+                "effect_wave": {
+                    "color_flash": "White",
+                    "color_wave": "Red",
+                    "decay": 0.7,
+                    "wipe_len": 5,
+                    "wipe_speed": 2
+                },
+                "effect_wavelength": {
+                    "blur": 3,
+                    "color_mode": "Spectral",
+                    "flip_lr": false,
+                    "mirror": false,
+                    "reverse_grad": false,
+                    "reverse_roll": false,
+                    "roll_speed": 0
+                },
+                "effect_wiggle": {
+                    "bar_length": 20,
+                    "beat_color": "Blue",
+                    "color": "Orange",
+                    "decay": 0.7
+                },
+                "last_effect": "effect_advanced_scroll"
+            },
+            "output": {
+                "output_mqtt": {
+                    "MQTT_Broker": "localhost",
+                    "MQTT_Path": "led/device_a"
+                },
+                "output_raspi": {
+                    "LED_Brightness": 100,
+                    "LED_Channel": 0,
+                    "LED_Dma": 10,
+                    "LED_Freq_Hz": 800000,
+                    "LED_Invert": false,
+                    "LED_Pin": 12
+                },
+                "output_udp": {
+                    "UDP_Client_IP": "172.24.26.111",
+                    "UDP_Client_Port": 7777
+                }
+            }
+        },
+        "device_112": {
+            "DEVICE_NAME": "Couchbereich",
+            "FPS": 60,
+            "LED_Count": 200,
+            "LED_Mid": 86,
+            "OUTPUT_TYPE": "output_udp",
+            "effects": {
+                "effect_advanced_scroll": {
+                    "bass_color": "Orange",
+                    "bass_multiplier": 1,
+                    "bass_speed": 4,
+                    "blur": 0.5,
+                    "brilliance_color": "Blue",
+                    "brilliance_multiplier": 1,
+                    "brilliance_speed": 4,
+                    "decay": 1,
+                    "lowmid_color": "Pink",
+                    "lowmid_multiplier": 1,
+                    "lowmid_speed": 4,
+                    "mid_color": "Yellow",
+                    "mid_multiplier": 1,
+                    "mid_speed": 4,
+                    "mirror": true,
+                    "presence_color": "Light blue",
+                    "presence_multiplier": 1,
+                    "presence_speed": 4,
+                    "subbass_color": "Red",
+                    "subbass_multiplier": 1,
+                    "subbass_speed": 4,
+                    "uppermid_color": "Green",
+                    "uppermid_multiplier": 1,
+                    "uppermid_speed": 4
+                },
+                "effect_bars": {
+                    "color_mode": "Spectral",
+                    "flip_lr": false,
+                    "mirror": false,
+                    "resolution": 4,
+                    "reverse_roll": false,
+                    "roll_speed": 0
+                },
+                "effect_beat": {
+                    "color": "Red",
+                    "colorful_mode": true,
+                    "decay": 0.7,
+                    "gradient": "Spectral",
+                    "random_color": true
+                },
+                "effect_beat_slide": {
+                    "bar_length": 102,
+                    "color": "Blue",
+                    "decay": 0.7,
+                    "slider_length": 10,
+                    "speed": 5
+                },
+                "effect_beat_twinkle": {
+                    "color": "Red",
+                    "colorful_mode": true,
+                    "decay": 0.9,
+                    "gradient": "Spectral",
+                    "random_color": true,
+                    "star_length": 30
+                },
+                "effect_bubble": {
+                    "blur": 5,
+                    "bubble_lenght": 5,
+                    "bubble_repeat": 2,
+                    "gradient": "Spectral",
+                    "mirror": false,
+                    "reverse": false,
+                    "speed": 2
+                },
+                "effect_direction_changer": {
+                    "bar_length": 5,
+                    "bar_speed": 3,
+                    "bars_in_same_direction": 1,
+                    "color": "Red",
+                    "colorful_mode": true,
+                    "gradient": "Spectral",
+                    "random_color": true
+                },
+                "effect_energy": {
+                    "b_multiplier": 1,
+                    "blur": 5,
+                    "g_multiplier": 1,
+                    "mirror": true,
+                    "r_multiplier": 1,
+                    "scale": 0.8
+                },
+                "effect_fade": {
+                    "gradient": "Spectral",
+                    "reverse": false,
+                    "speed": 1
+                },
+                "effect_gradient": {
+                    "gradient": "Spectral",
+                    "mirror": false,
+                    "reverse": false,
+                    "speed": 1
+                },
+                "effect_music": {
+                    "color": "Blue"
+                },
+                "effect_pendulum": {
+                    "change_color": false,
+                    "color": "Blue",
+                    "gradient": "Spectral",
+                    "pendulum_length": 10,
+                    "speed": 5
+                },
+                "effect_power": {
+                    "color_mode": "Spectral",
+                    "flip_lr": false,
+                    "mirror": true,
+                    "s_color": "White",
+                    "s_count": 20
+                },
+                "effect_rods": {
+                    "change_color": true,
+                    "color": "Blue",
+                    "gradient": "Spectral",
+                    "mirror": false,
+                    "reverse": false,
+                    "rods_distance": 50,
+                    "rods_length": 15,
+                    "speed": 2
+                },
+                "effect_scroll": {
+                    "blur": 0.5,
+                    "decay": 1,
+                    "high_color": "Blue",
+                    "high_multiplier": 1,
+                    "high_speed": 4,
+                    "low_speed": 4,
+                    "lows_color": "Red",
+                    "lows_multiplier": 1,
+                    "mid_speed": 4,
+                    "mids_color": "Green",
+                    "mids_multiplier": 1,
+                    "mirror": true
+                },
+                "effect_single": {
+                    "color": "Blue",
+                    "custom_color": [
+                        0,
+                        0,
+                        0
+                    ],
+                    "use_custom_color": "false"
+                },
+                "effect_slide": {
+                    "gradient": "Spectral",
+                    "mirror": false,
+                    "reverse": false,
+                    "speed": 2
+                },
+                "effect_spectrum": {
+                    "b_multiplier": 1,
+                    "g_multiplier": 1,
+                    "r_multiplier": 1
+                },
+                "effect_spectrum_analyzer": {
+                    "color": "Blue",
+                    "spectrum_count": 6
+                },
+                "effect_sync_fade": {
+                    "gradient": "Spectral",
+                    "reverse": false,
+                    "speed": 1
+                },
+                "effect_twinkle": {
+                    "blur": 1,
+                    "gradient": "Spectral",
+                    "star_appears_speed": 25,
+                    "star_descending_speed": 5,
+                    "star_rising_speed": 5,
+                    "stars_count": 10,
+                    "stars_length": 5
+                },
+                "effect_vu_meter": {
+                    "bar_length": 2,
+                    "color": "Blue",
+                    "gradient": "Spectral",
+                    "max_vol_color": "Red",
+                    "speed": 50,
+                    "use_gradient": "true"
+                },
+                "effect_wave": {
+                    "color_flash": "White",
+                    "color_wave": "Red",
+                    "decay": 0.7,
+                    "wipe_len": 5,
+                    "wipe_speed": 2
+                },
+                "effect_wavelength": {
+                    "blur": 3,
+                    "color_mode": "Spectral",
+                    "flip_lr": false,
+                    "mirror": false,
+                    "reverse_grad": false,
+                    "reverse_roll": false,
+                    "roll_speed": 0
+                },
+                "effect_wiggle": {
+                    "bar_length": 20,
+                    "beat_color": "Blue",
+                    "color": "Orange",
+                    "decay": 0.7
+                },
+                "last_effect": "effect_advanced_scroll"
+            },
+            "output": {
+                "output_mqtt": {
+                    "MQTT_Broker": "localhost",
+                    "MQTT_Path": "led/device_a"
+                },
+                "output_raspi": {
+                    "LED_Brightness": 100,
+                    "LED_Channel": 0,
+                    "LED_Dma": 10,
+                    "LED_Freq_Hz": 800000,
+                    "LED_Invert": false,
+                    "LED_Pin": 12
+                },
+                "output_udp": {
+                    "UDP_Client_IP": "172.24.26.112",
+                    "UDP_Client_Port": 7777
+                }
+            }
+        },
+        "device_113": {
+            "DEVICE_NAME": "Schrank gro\u00df",
+            "FPS": 60,
+            "LED_Count": 128,
+            "LED_Mid": 64,
+            "OUTPUT_TYPE": "output_udp",
+            "effects": {
+                "effect_advanced_scroll": {
+                    "bass_color": "Orange",
+                    "bass_multiplier": 1,
+                    "bass_speed": 4,
+                    "blur": 0.5,
+                    "brilliance_color": "Blue",
+                    "brilliance_multiplier": 1,
+                    "brilliance_speed": 4,
+                    "decay": 1,
+                    "lowmid_color": "Pink",
+                    "lowmid_multiplier": 1,
+                    "lowmid_speed": 4,
+                    "mid_color": "Yellow",
+                    "mid_multiplier": 1,
+                    "mid_speed": 4,
+                    "mirror": true,
+                    "presence_color": "Light blue",
+                    "presence_multiplier": 1,
+                    "presence_speed": 4,
+                    "subbass_color": "Red",
+                    "subbass_multiplier": 1,
+                    "subbass_speed": 4,
+                    "uppermid_color": "Green",
+                    "uppermid_multiplier": 1,
+                    "uppermid_speed": 4
+                },
+                "effect_bars": {
+                    "color_mode": "Spectral",
+                    "flip_lr": false,
+                    "mirror": false,
+                    "resolution": 4,
+                    "reverse_roll": false,
+                    "roll_speed": 0
+                },
+                "effect_beat": {
+                    "color": "Red",
+                    "colorful_mode": true,
+                    "decay": 0.7,
+                    "gradient": "Spectral",
+                    "random_color": true
+                },
+                "effect_beat_slide": {
+                    "bar_length": 102,
+                    "color": "Blue",
+                    "decay": 0.7,
+                    "slider_length": 10,
+                    "speed": 5
+                },
+                "effect_beat_twinkle": {
+                    "color": "Red",
+                    "colorful_mode": true,
+                    "decay": 0.9,
+                    "gradient": "Spectral",
+                    "random_color": true,
+                    "star_length": 30
+                },
+                "effect_bubble": {
+                    "blur": 5,
+                    "bubble_lenght": 5,
+                    "bubble_repeat": 2,
+                    "gradient": "Spectral",
+                    "mirror": false,
+                    "reverse": false,
+                    "speed": 2
+                },
+                "effect_direction_changer": {
+                    "bar_length": 5,
+                    "bar_speed": 3,
+                    "bars_in_same_direction": 1,
+                    "color": "Red",
+                    "colorful_mode": true,
+                    "gradient": "Spectral",
+                    "random_color": true
+                },
+                "effect_energy": {
+                    "b_multiplier": 1,
+                    "blur": 5,
+                    "g_multiplier": 1,
+                    "mirror": true,
+                    "r_multiplier": 1,
+                    "scale": 0.8
+                },
+                "effect_fade": {
+                    "gradient": "Spectral",
+                    "reverse": false,
+                    "speed": 1
+                },
+                "effect_gradient": {
+                    "gradient": "Spectral",
+                    "mirror": false,
+                    "reverse": false,
+                    "speed": 1
+                },
+                "effect_music": {
+                    "color": "Blue"
+                },
+                "effect_pendulum": {
+                    "change_color": false,
+                    "color": "Blue",
+                    "gradient": "Spectral",
+                    "pendulum_length": 10,
+                    "speed": 5
+                },
+                "effect_power": {
+                    "color_mode": "Spectral",
+                    "flip_lr": false,
+                    "mirror": true,
+                    "s_color": "White",
+                    "s_count": 20
+                },
+                "effect_rods": {
+                    "change_color": true,
+                    "color": "Blue",
+                    "gradient": "Spectral",
+                    "mirror": false,
+                    "reverse": false,
+                    "rods_distance": 50,
+                    "rods_length": 15,
+                    "speed": 2
+                },
+                "effect_scroll": {
+                    "blur": 0.5,
+                    "decay": 1,
+                    "high_color": "Blue",
+                    "high_multiplier": 1,
+                    "high_speed": 4,
+                    "low_speed": 4,
+                    "lows_color": "Red",
+                    "lows_multiplier": 1,
+                    "mid_speed": 4,
+                    "mids_color": "Green",
+                    "mids_multiplier": 1,
+                    "mirror": true
+                },
+                "effect_single": {
+                    "color": "Blue",
+                    "custom_color": [
+                        0,
+                        0,
+                        0
+                    ],
+                    "use_custom_color": "false"
+                },
+                "effect_slide": {
+                    "gradient": "Spectral",
+                    "mirror": false,
+                    "reverse": false,
+                    "speed": 2
+                },
+                "effect_spectrum": {
+                    "b_multiplier": 1,
+                    "g_multiplier": 1,
+                    "r_multiplier": 1
+                },
+                "effect_spectrum_analyzer": {
+                    "color": "Blue",
+                    "spectrum_count": 6
+                },
+                "effect_sync_fade": {
+                    "gradient": "Spectral",
+                    "reverse": false,
+                    "speed": 1
+                },
+                "effect_twinkle": {
+                    "blur": 1,
+                    "gradient": "Spectral",
+                    "star_appears_speed": 25,
+                    "star_descending_speed": 5,
+                    "star_rising_speed": 5,
+                    "stars_count": 10,
+                    "stars_length": 5
+                },
+                "effect_vu_meter": {
+                    "bar_length": 2,
+                    "color": "Blue",
+                    "gradient": "Spectral",
+                    "max_vol_color": "Red",
+                    "speed": 50,
+                    "use_gradient": "true"
+                },
+                "effect_wave": {
+                    "color_flash": "White",
+                    "color_wave": "Red",
+                    "decay": 0.7,
+                    "wipe_len": 5,
+                    "wipe_speed": 2
+                },
+                "effect_wavelength": {
+                    "blur": 3,
+                    "color_mode": "Spectral",
+                    "flip_lr": false,
+                    "mirror": false,
+                    "reverse_grad": false,
+                    "reverse_roll": false,
+                    "roll_speed": 0
+                },
+                "effect_wiggle": {
+                    "bar_length": 20,
+                    "beat_color": "Blue",
+                    "color": "Orange",
+                    "decay": 0.7
+                },
+                "last_effect": "effect_advanced_scroll"
+            },
+            "output": {
+                "output_mqtt": {
+                    "MQTT_Broker": "localhost",
+                    "MQTT_Path": "led/device_a"
+                },
+                "output_raspi": {
+                    "LED_Brightness": 100,
+                    "LED_Channel": 0,
+                    "LED_Dma": 10,
+                    "LED_Freq_Hz": 800000,
+                    "LED_Invert": false,
+                    "LED_Pin": 12
+                },
+                "output_udp": {
+                    "UDP_Client_IP": "172.24.26.113",
+                    "UDP_Client_Port": 7777
+                }
+            }
+        },
+        "device_114": {
+            "DEVICE_NAME": "Fernseher",
+            "FPS": 60,
+            "LED_Count": 216,
+            "LED_Mid": 108,
+            "OUTPUT_TYPE": "output_udp",
+            "effects": {
+                "effect_advanced_scroll": {
+                    "bass_color": "Orange",
+                    "bass_multiplier": 1,
+                    "bass_speed": 4,
+                    "blur": 0.5,
+                    "brilliance_color": "Blue",
+                    "brilliance_multiplier": 1,
+                    "brilliance_speed": 4,
+                    "decay": 1,
+                    "lowmid_color": "Pink",
+                    "lowmid_multiplier": 1,
+                    "lowmid_speed": 4,
+                    "mid_color": "Yellow",
+                    "mid_multiplier": 1,
+                    "mid_speed": 4,
+                    "mirror": true,
+                    "presence_color": "Light blue",
+                    "presence_multiplier": 1,
+                    "presence_speed": 4,
+                    "subbass_color": "Red",
+                    "subbass_multiplier": 1,
+                    "subbass_speed": 4,
+                    "uppermid_color": "Green",
+                    "uppermid_multiplier": 1,
+                    "uppermid_speed": 4
+                },
+                "effect_bars": {
+                    "color_mode": "Spectral",
+                    "flip_lr": false,
+                    "mirror": false,
+                    "resolution": 4,
+                    "reverse_roll": false,
+                    "roll_speed": 0
+                },
+                "effect_beat": {
+                    "color": "Red",
+                    "colorful_mode": true,
+                    "decay": 0.7,
+                    "gradient": "Spectral",
+                    "random_color": true
+                },
+                "effect_beat_slide": {
+                    "bar_length": 102,
+                    "color": "Blue",
+                    "decay": 0.7,
+                    "slider_length": 10,
+                    "speed": 5
+                },
+                "effect_beat_twinkle": {
+                    "color": "Red",
+                    "colorful_mode": true,
+                    "decay": 0.9,
+                    "gradient": "Spectral",
+                    "random_color": true,
+                    "star_length": 30
+                },
+                "effect_bubble": {
+                    "blur": 5,
+                    "bubble_lenght": 5,
+                    "bubble_repeat": 2,
+                    "gradient": "Spectral",
+                    "mirror": false,
+                    "reverse": false,
+                    "speed": 2
+                },
+                "effect_direction_changer": {
+                    "bar_length": 5,
+                    "bar_speed": 3,
+                    "bars_in_same_direction": 1,
+                    "color": "Red",
+                    "colorful_mode": true,
+                    "gradient": "Spectral",
+                    "random_color": true
+                },
+                "effect_energy": {
+                    "b_multiplier": 1,
+                    "blur": 5,
+                    "g_multiplier": 1,
+                    "mirror": true,
+                    "r_multiplier": 1,
+                    "scale": 0.8
+                },
+                "effect_fade": {
+                    "gradient": "Spectral",
+                    "reverse": false,
+                    "speed": 1
+                },
+                "effect_gradient": {
+                    "gradient": "Spectral",
+                    "mirror": false,
+                    "reverse": false,
+                    "speed": 1
+                },
+                "effect_music": {
+                    "color": "Blue"
+                },
+                "effect_pendulum": {
+                    "change_color": false,
+                    "color": "Blue",
+                    "gradient": "Spectral",
+                    "pendulum_length": 10,
+                    "speed": 5
+                },
+                "effect_power": {
+                    "color_mode": "Spectral",
+                    "flip_lr": false,
+                    "mirror": true,
+                    "s_color": "White",
+                    "s_count": 20
+                },
+                "effect_rods": {
+                    "change_color": true,
+                    "color": "Blue",
+                    "gradient": "Spectral",
+                    "mirror": false,
+                    "reverse": false,
+                    "rods_distance": 50,
+                    "rods_length": 15,
+                    "speed": 2
+                },
+                "effect_scroll": {
+                    "blur": 0.5,
+                    "decay": 1,
+                    "high_color": "Blue",
+                    "high_multiplier": 1,
+                    "high_speed": 4,
+                    "low_speed": 4,
+                    "lows_color": "Red",
+                    "lows_multiplier": 1,
+                    "mid_speed": 4,
+                    "mids_color": "Green",
+                    "mids_multiplier": 1,
+                    "mirror": true
+                },
+                "effect_single": {
+                    "color": "Blue",
+                    "custom_color": [
+                        0,
+                        0,
+                        0
+                    ],
+                    "use_custom_color": "false"
+                },
+                "effect_slide": {
+                    "gradient": "Spectral",
+                    "mirror": false,
+                    "reverse": false,
+                    "speed": 2
+                },
+                "effect_spectrum": {
+                    "b_multiplier": 1,
+                    "g_multiplier": 1,
+                    "r_multiplier": 1
+                },
+                "effect_spectrum_analyzer": {
+                    "color": "Blue",
+                    "spectrum_count": 6
+                },
+                "effect_sync_fade": {
+                    "gradient": "Spectral",
+                    "reverse": false,
+                    "speed": 1
+                },
+                "effect_twinkle": {
+                    "blur": 1,
+                    "gradient": "Spectral",
+                    "star_appears_speed": 25,
+                    "star_descending_speed": 5,
+                    "star_rising_speed": 5,
+                    "stars_count": 10,
+                    "stars_length": 5
+                },
+                "effect_vu_meter": {
+                    "bar_length": 2,
+                    "color": "Blue",
+                    "gradient": "Spectral",
+                    "max_vol_color": "Red",
+                    "speed": 50,
+                    "use_gradient": "true"
+                },
+                "effect_wave": {
+                    "color_flash": "White",
+                    "color_wave": "Red",
+                    "decay": 0.7,
+                    "wipe_len": 5,
+                    "wipe_speed": 2
+                },
+                "effect_wavelength": {
+                    "blur": 3,
+                    "color_mode": "Spectral",
+                    "flip_lr": false,
+                    "mirror": false,
+                    "reverse_grad": false,
+                    "reverse_roll": false,
+                    "roll_speed": 0
+                },
+                "effect_wiggle": {
+                    "bar_length": 20,
+                    "beat_color": "Blue",
+                    "color": "Orange",
+                    "decay": 0.7
+                },
+                "last_effect": "effect_advanced_scroll"
+            },
+            "output": {
+                "output_mqtt": {
+                    "MQTT_Broker": "localhost",
+                    "MQTT_Path": "led/device_a"
+                },
+                "output_raspi": {
+                    "LED_Brightness": 100,
+                    "LED_Channel": 0,
+                    "LED_Dma": 10,
+                    "LED_Freq_Hz": 800000,
+                    "LED_Invert": false,
+                    "LED_Pin": 12
+                },
+                "output_udp": {
+                    "UDP_Client_IP": "172.24.26.114",
+                    "UDP_Client_Port": 7777
+                }
+            }
+        },
+        "device_2": {
+            "DEVICE_NAME": "LED Stick 2",
+            "FPS": 60,
+            "LED_Count": 60,
+            "LED_Mid": 30,
+            "OUTPUT_TYPE": "output_udp",
+            "effects": {
+                "effect_advanced_scroll": {
+                    "bass_color": "Orange",
+                    "bass_multiplier": 1,
+                    "bass_speed": 4,
+                    "blur": 0.5,
+                    "brilliance_color": "Blue",
+                    "brilliance_multiplier": 1,
+                    "brilliance_speed": 4,
+                    "decay": 1,
+                    "lowmid_color": "Pink",
+                    "lowmid_multiplier": 1,
+                    "lowmid_speed": 4,
+                    "mid_color": "Yellow",
+                    "mid_multiplier": 1,
+                    "mid_speed": 4,
+                    "mirror": true,
+                    "presence_color": "Light blue",
+                    "presence_multiplier": 1,
+                    "presence_speed": 4,
+                    "subbass_color": "Red",
+                    "subbass_multiplier": 1,
+                    "subbass_speed": 4,
+                    "uppermid_color": "Green",
+                    "uppermid_multiplier": 1,
+                    "uppermid_speed": 4
+                },
+                "effect_bars": {
+                    "color_mode": "Spectral",
+                    "flip_lr": false,
+                    "mirror": false,
+                    "resolution": 4,
+                    "reverse_roll": false,
+                    "roll_speed": 0
+                },
+                "effect_beat": {
+                    "color": "Red",
+                    "colorful_mode": true,
+                    "decay": 0.7,
+                    "gradient": "Spectral",
+                    "random_color": true
+                },
+                "effect_beat_slide": {
+                    "bar_length": 102,
+                    "color": "Blue",
+                    "decay": 0.7,
+                    "slider_length": 10,
+                    "speed": 5
+                },
+                "effect_beat_twinkle": {
+                    "color": "Red",
+                    "colorful_mode": true,
+                    "decay": 0.9,
+                    "gradient": "Spectral",
+                    "random_color": true,
+                    "star_length": 30
+                },
+                "effect_bubble": {
+                    "blur": 5,
+                    "bubble_lenght": 5,
+                    "bubble_repeat": 2,
+                    "gradient": "Spectral",
+                    "mirror": false,
+                    "reverse": false,
+                    "speed": 2
+                },
+                "effect_direction_changer": {
+                    "bar_length": 5,
+                    "bar_speed": 3,
+                    "bars_in_same_direction": 1,
+                    "color": "Red",
+                    "colorful_mode": true,
+                    "gradient": "Spectral",
+                    "random_color": true
+                },
+                "effect_energy": {
+                    "b_multiplier": 1,
+                    "blur": 5,
+                    "g_multiplier": 1,
+                    "mirror": true,
+                    "r_multiplier": 1,
+                    "scale": 0.8
+                },
+                "effect_fade": {
+                    "gradient": "Spectral",
+                    "reverse": false,
+                    "speed": 1
+                },
+                "effect_gradient": {
+                    "gradient": "Spectral",
+                    "mirror": false,
+                    "reverse": false,
+                    "speed": 1
+                },
+                "effect_music": {
+                    "color": "Blue"
+                },
+                "effect_pendulum": {
+                    "change_color": false,
+                    "color": "Blue",
+                    "gradient": "Spectral",
+                    "pendulum_length": 10,
+                    "speed": 5
+                },
+                "effect_power": {
+                    "color_mode": "Spectral",
+                    "flip_lr": false,
+                    "mirror": true,
+                    "s_color": "White",
+                    "s_count": 20
+                },
+                "effect_rods": {
+                    "change_color": true,
+                    "color": "Blue",
+                    "gradient": "Spectral",
+                    "mirror": false,
+                    "reverse": false,
+                    "rods_distance": 50,
+                    "rods_length": 15,
+                    "speed": 2
+                },
+                "effect_scroll": {
+                    "blur": 0.5,
+                    "decay": 1,
+                    "high_color": "Blue",
+                    "high_multiplier": 1,
+                    "high_speed": 4,
+                    "low_speed": 4,
+                    "lows_color": "Red",
+                    "lows_multiplier": 1,
+                    "mid_speed": 4,
+                    "mids_color": "Green",
+                    "mids_multiplier": 1,
+                    "mirror": true
+                },
+                "effect_single": {
+                    "color": "Blue",
+                    "custom_color": [
+                        0,
+                        0,
+                        0
+                    ],
+                    "use_custom_color": "false"
+                },
+                "effect_slide": {
+                    "gradient": "Spectral",
+                    "mirror": false,
+                    "reverse": false,
+                    "speed": 2
+                },
+                "effect_spectrum": {
+                    "b_multiplier": 1,
+                    "g_multiplier": 1,
+                    "r_multiplier": 1
+                },
+                "effect_spectrum_analyzer": {
+                    "color": "Blue",
+                    "spectrum_count": 6
+                },
+                "effect_sync_fade": {
+                    "gradient": "Spectral",
+                    "reverse": false,
+                    "speed": 1
+                },
+                "effect_twinkle": {
+                    "blur": 1,
+                    "gradient": "Spectral",
+                    "star_appears_speed": 25,
+                    "star_descending_speed": 5,
+                    "star_rising_speed": 5,
+                    "stars_count": 10,
+                    "stars_length": 5
+                },
+                "effect_vu_meter": {
+                    "bar_length": 2,
+                    "color": "Blue",
+                    "gradient": "Spectral",
+                    "max_vol_color": "Red",
+                    "speed": 50,
+                    "use_gradient": "true"
+                },
+                "effect_wave": {
+                    "color_flash": "White",
+                    "color_wave": "Red",
+                    "decay": 0.7,
+                    "wipe_len": 5,
+                    "wipe_speed": 2
+                },
+                "effect_wavelength": {
+                    "blur": 3,
+                    "color_mode": "Spectral",
+                    "flip_lr": false,
+                    "mirror": false,
+                    "reverse_grad": false,
+                    "reverse_roll": false,
+                    "roll_speed": 0
+                },
+                "effect_wiggle": {
+                    "bar_length": 20,
+                    "beat_color": "Blue",
+                    "color": "Orange",
+                    "decay": 0.7
+                },
+                "last_effect": "effect_advanced_scroll"
+            },
+            "output": {
+                "output_mqtt": {
+                    "MQTT_Broker": "localhost",
+                    "MQTT_Path": "led/device_a"
+                },
+                "output_raspi": {
+                    "LED_Brightness": 100,
+                    "LED_Channel": 0,
+                    "LED_Dma": 10,
+                    "LED_Freq_Hz": 800000,
+                    "LED_Invert": false,
+                    "LED_Pin": 21
+                },
+                "output_udp": {
+                    "UDP_Client_IP": "172.24.26.121",
+                    "UDP_Client_Port": 7777
+                }
+            }
+        },
+        "device_3": {
+            "DEVICE_NAME": "LED Stick 3",
+            "FPS": 60,
+            "LED_Count": 60,
+            "LED_Mid": 30,
+            "OUTPUT_TYPE": "output_udp",
+            "effects": {
+                "effect_advanced_scroll": {
+                    "bass_color": "Orange",
+                    "bass_multiplier": 1,
+                    "bass_speed": 4,
+                    "blur": 0.5,
+                    "brilliance_color": "Blue",
+                    "brilliance_multiplier": 1,
+                    "brilliance_speed": 4,
+                    "decay": 1,
+                    "lowmid_color": "Pink",
+                    "lowmid_multiplier": 1,
+                    "lowmid_speed": 4,
+                    "mid_color": "Yellow",
+                    "mid_multiplier": 1,
+                    "mid_speed": 4,
+                    "mirror": true,
+                    "presence_color": "Light blue",
+                    "presence_multiplier": 1,
+                    "presence_speed": 4,
+                    "subbass_color": "Red",
+                    "subbass_multiplier": 1,
+                    "subbass_speed": 4,
+                    "uppermid_color": "Green",
+                    "uppermid_multiplier": 1,
+                    "uppermid_speed": 4
+                },
+                "effect_bars": {
+                    "color_mode": "Spectral",
+                    "flip_lr": false,
+                    "mirror": false,
+                    "resolution": 4,
+                    "reverse_roll": false,
+                    "roll_speed": 0
+                },
+                "effect_beat": {
+                    "color": "Red",
+                    "colorful_mode": true,
+                    "decay": 0.7,
+                    "gradient": "Spectral",
+                    "random_color": true
+                },
+                "effect_beat_slide": {
+                    "bar_length": 102,
+                    "color": "Blue",
+                    "decay": 0.7,
+                    "slider_length": 10,
+                    "speed": 5
+                },
+                "effect_beat_twinkle": {
+                    "color": "Red",
+                    "colorful_mode": true,
+                    "decay": 0.9,
+                    "gradient": "Spectral",
+                    "random_color": true,
+                    "star_length": 30
+                },
+                "effect_bubble": {
+                    "blur": 5,
+                    "bubble_lenght": 5,
+                    "bubble_repeat": 2,
+                    "gradient": "Spectral",
+                    "mirror": false,
+                    "reverse": false,
+                    "speed": 2
+                },
+                "effect_direction_changer": {
+                    "bar_length": 5,
+                    "bar_speed": 3,
+                    "bars_in_same_direction": 1,
+                    "color": "Red",
+                    "colorful_mode": true,
+                    "gradient": "Spectral",
+                    "random_color": true
+                },
+                "effect_energy": {
+                    "b_multiplier": 1,
+                    "blur": 5,
+                    "g_multiplier": 1,
+                    "mirror": true,
+                    "r_multiplier": 1,
+                    "scale": 0.8
+                },
+                "effect_fade": {
+                    "gradient": "Spectral",
+                    "reverse": false,
+                    "speed": 1
+                },
+                "effect_gradient": {
+                    "gradient": "Spectral",
+                    "mirror": false,
+                    "reverse": false,
+                    "speed": 1
+                },
+                "effect_music": {
+                    "color": "Blue"
+                },
+                "effect_pendulum": {
+                    "change_color": false,
+                    "color": "Blue",
+                    "gradient": "Spectral",
+                    "pendulum_length": 10,
+                    "speed": 5
+                },
+                "effect_power": {
+                    "color_mode": "Spectral",
+                    "flip_lr": false,
+                    "mirror": true,
+                    "s_color": "White",
+                    "s_count": 20
+                },
+                "effect_rods": {
+                    "change_color": true,
+                    "color": "Blue",
+                    "gradient": "Spectral",
+                    "mirror": false,
+                    "reverse": false,
+                    "rods_distance": 50,
+                    "rods_length": 15,
+                    "speed": 2
+                },
+                "effect_scroll": {
+                    "blur": 0.5,
+                    "decay": 1,
+                    "high_color": "Blue",
+                    "high_multiplier": 1,
+                    "high_speed": 4,
+                    "low_speed": 4,
+                    "lows_color": "Red",
+                    "lows_multiplier": 1,
+                    "mid_speed": 4,
+                    "mids_color": "Green",
+                    "mids_multiplier": 1,
+                    "mirror": true
+                },
+                "effect_single": {
+                    "color": "Blue",
+                    "custom_color": [
+                        0,
+                        0,
+                        0
+                    ],
+                    "use_custom_color": "false"
+                },
+                "effect_slide": {
+                    "gradient": "Spectral",
+                    "mirror": false,
+                    "reverse": false,
+                    "speed": 2
+                },
+                "effect_spectrum": {
+                    "b_multiplier": 1,
+                    "g_multiplier": 1,
+                    "r_multiplier": 1
+                },
+                "effect_spectrum_analyzer": {
+                    "color": "Blue",
+                    "spectrum_count": 6
+                },
+                "effect_sync_fade": {
+                    "gradient": "Spectral",
+                    "reverse": false,
+                    "speed": 1
+                },
+                "effect_twinkle": {
+                    "blur": 1,
+                    "gradient": "Spectral",
+                    "star_appears_speed": 25,
+                    "star_descending_speed": 5,
+                    "star_rising_speed": 5,
+                    "stars_count": 10,
+                    "stars_length": 5
+                },
+                "effect_vu_meter": {
+                    "bar_length": 2,
+                    "color": "Blue",
+                    "gradient": "Spectral",
+                    "max_vol_color": "Red",
+                    "speed": 50,
+                    "use_gradient": "true"
+                },
+                "effect_wave": {
+                    "color_flash": "White",
+                    "color_wave": "Red",
+                    "decay": 0.7,
+                    "wipe_len": 5,
+                    "wipe_speed": 2
+                },
+                "effect_wavelength": {
+                    "blur": 3,
+                    "color_mode": "Spectral",
+                    "flip_lr": false,
+                    "mirror": false,
+                    "reverse_grad": false,
+                    "reverse_roll": false,
+                    "roll_speed": 0
+                },
+                "effect_wiggle": {
+                    "bar_length": 20,
+                    "beat_color": "Blue",
+                    "color": "Orange",
+                    "decay": 0.7
+                },
+                "last_effect": "effect_advanced_scroll"
+            },
+            "output": {
+                "output_mqtt": {
+                    "MQTT_Broker": "localhost",
+                    "MQTT_Path": "led/device_a"
+                },
+                "output_raspi": {
+                    "LED_Brightness": 100,
+                    "LED_Channel": 0,
+                    "LED_Dma": 10,
+                    "LED_Freq_Hz": 800000,
+                    "LED_Invert": false,
+                    "LED_Pin": 21
+                },
+                "output_udp": {
+                    "UDP_Client_IP": "172.24.26.122",
+                    "UDP_Client_Port": 7777
+                }
+            }
+        },
+        "device_4": {
+            "DEVICE_NAME": "LED Stick 4",
+            "FPS": 60,
+            "LED_Count": 60,
+            "LED_Mid": 30,
+            "OUTPUT_TYPE": "output_udp",
+            "effects": {
+                "effect_advanced_scroll": {
+                    "bass_color": "Orange",
+                    "bass_multiplier": 1,
+                    "bass_speed": 4,
+                    "blur": 0.5,
+                    "brilliance_color": "Blue",
+                    "brilliance_multiplier": 1,
+                    "brilliance_speed": 4,
+                    "decay": 1,
+                    "lowmid_color": "Pink",
+                    "lowmid_multiplier": 1,
+                    "lowmid_speed": 4,
+                    "mid_color": "Yellow",
+                    "mid_multiplier": 1,
+                    "mid_speed": 4,
+                    "mirror": true,
+                    "presence_color": "Light blue",
+                    "presence_multiplier": 1,
+                    "presence_speed": 4,
+                    "subbass_color": "Red",
+                    "subbass_multiplier": 1,
+                    "subbass_speed": 4,
+                    "uppermid_color": "Green",
+                    "uppermid_multiplier": 1,
+                    "uppermid_speed": 4
+                },
+                "effect_bars": {
+                    "color_mode": "Spectral",
+                    "flip_lr": false,
+                    "mirror": false,
+                    "resolution": 4,
+                    "reverse_roll": false,
+                    "roll_speed": 0
+                },
+                "effect_beat": {
+                    "color": "Red",
+                    "colorful_mode": true,
+                    "decay": 0.7,
+                    "gradient": "Spectral",
+                    "random_color": true
+                },
+                "effect_beat_slide": {
+                    "bar_length": 102,
+                    "color": "Blue",
+                    "decay": 0.7,
+                    "slider_length": 10,
+                    "speed": 5
+                },
+                "effect_beat_twinkle": {
+                    "color": "Red",
+                    "colorful_mode": true,
+                    "decay": 0.9,
+                    "gradient": "Spectral",
+                    "random_color": true,
+                    "star_length": 30
+                },
+                "effect_bubble": {
+                    "blur": 5,
+                    "bubble_lenght": 5,
+                    "bubble_repeat": 2,
+                    "gradient": "Spectral",
+                    "mirror": false,
+                    "reverse": false,
+                    "speed": 2
+                },
+                "effect_direction_changer": {
+                    "bar_length": 5,
+                    "bar_speed": 3,
+                    "bars_in_same_direction": 1,
+                    "color": "Red",
+                    "colorful_mode": true,
+                    "gradient": "Spectral",
+                    "random_color": true
+                },
+                "effect_energy": {
+                    "b_multiplier": 1,
+                    "blur": 5,
+                    "g_multiplier": 1,
+                    "mirror": true,
+                    "r_multiplier": 1,
+                    "scale": 0.8
+                },
+                "effect_fade": {
+                    "gradient": "Spectral",
+                    "reverse": false,
+                    "speed": 1
+                },
+                "effect_gradient": {
+                    "gradient": "Spectral",
+                    "mirror": false,
+                    "reverse": false,
+                    "speed": 1
+                },
+                "effect_music": {
+                    "color": "Blue"
+                },
+                "effect_pendulum": {
+                    "change_color": false,
+                    "color": "Blue",
+                    "gradient": "Spectral",
+                    "pendulum_length": 10,
+                    "speed": 5
+                },
+                "effect_power": {
+                    "color_mode": "Spectral",
+                    "flip_lr": false,
+                    "mirror": true,
+                    "s_color": "White",
+                    "s_count": 20
+                },
+                "effect_rods": {
+                    "change_color": true,
+                    "color": "Blue",
+                    "gradient": "Spectral",
+                    "mirror": false,
+                    "reverse": false,
+                    "rods_distance": 50,
+                    "rods_length": 15,
+                    "speed": 2
+                },
+                "effect_scroll": {
+                    "blur": 0.5,
+                    "decay": 1,
+                    "high_color": "Blue",
+                    "high_multiplier": 1,
+                    "high_speed": 4,
+                    "low_speed": 4,
+                    "lows_color": "Red",
+                    "lows_multiplier": 1,
+                    "mid_speed": 4,
+                    "mids_color": "Green",
+                    "mids_multiplier": 1,
+                    "mirror": true
+                },
+                "effect_single": {
+                    "color": "Blue",
+                    "custom_color": [
+                        0,
+                        0,
+                        0
+                    ],
+                    "use_custom_color": "false"
+                },
+                "effect_slide": {
+                    "gradient": "Spectral",
+                    "mirror": false,
+                    "reverse": false,
+                    "speed": 2
+                },
+                "effect_spectrum": {
+                    "b_multiplier": 1,
+                    "g_multiplier": 1,
+                    "r_multiplier": 1
+                },
+                "effect_spectrum_analyzer": {
+                    "color": "Blue",
+                    "spectrum_count": 6
+                },
+                "effect_sync_fade": {
+                    "gradient": "Spectral",
+                    "reverse": false,
+                    "speed": 1
+                },
+                "effect_twinkle": {
+                    "blur": 1,
+                    "gradient": "Spectral",
+                    "star_appears_speed": 25,
+                    "star_descending_speed": 5,
+                    "star_rising_speed": 5,
+                    "stars_count": 10,
+                    "stars_length": 5
+                },
+                "effect_vu_meter": {
+                    "bar_length": 2,
+                    "color": "Blue",
+                    "gradient": "Spectral",
+                    "max_vol_color": "Red",
+                    "speed": 50,
+                    "use_gradient": "true"
+                },
+                "effect_wave": {
+                    "color_flash": "White",
+                    "color_wave": "Red",
+                    "decay": 0.7,
+                    "wipe_len": 5,
+                    "wipe_speed": 2
+                },
+                "effect_wavelength": {
+                    "blur": 3,
+                    "color_mode": "Spectral",
+                    "flip_lr": false,
+                    "mirror": false,
+                    "reverse_grad": false,
+                    "reverse_roll": false,
+                    "roll_speed": 0
+                },
+                "effect_wiggle": {
+                    "bar_length": 20,
+                    "beat_color": "Blue",
+                    "color": "Orange",
+                    "decay": 0.7
+                },
+                "last_effect": "effect_advanced_scroll"
+            },
+            "output": {
+                "output_mqtt": {
+                    "MQTT_Broker": "localhost",
+                    "MQTT_Path": "led/device_a"
+                },
+                "output_raspi": {
+                    "LED_Brightness": 100,
+                    "LED_Channel": 0,
+                    "LED_Dma": 10,
+                    "LED_Freq_Hz": 800000,
+                    "LED_Invert": false,
+                    "LED_Pin": 21
+                },
+                "output_udp": {
+                    "UDP_Client_IP": "172.24.26.123",
+                    "UDP_Client_Port": 7777
+                }
+            }
+        },
+        "device_5": {
+            "DEVICE_NAME": "LED Stick 5",
+            "FPS": 60,
+            "LED_Count": 60,
+            "LED_Mid": 30,
+            "OUTPUT_TYPE": "output_udp",
+            "effects": {
+                "effect_advanced_scroll": {
+                    "bass_color": "Orange",
+                    "bass_multiplier": 1,
+                    "bass_speed": 4,
+                    "blur": 0.5,
+                    "brilliance_color": "Blue",
+                    "brilliance_multiplier": 1,
+                    "brilliance_speed": 4,
+                    "decay": 1,
+                    "lowmid_color": "Pink",
+                    "lowmid_multiplier": 1,
+                    "lowmid_speed": 4,
+                    "mid_color": "Yellow",
+                    "mid_multiplier": 1,
+                    "mid_speed": 4,
+                    "mirror": true,
+                    "presence_color": "Light blue",
+                    "presence_multiplier": 1,
+                    "presence_speed": 4,
+                    "subbass_color": "Red",
+                    "subbass_multiplier": 1,
+                    "subbass_speed": 4,
+                    "uppermid_color": "Green",
+                    "uppermid_multiplier": 1,
+                    "uppermid_speed": 4
+                },
+                "effect_bars": {
+                    "color_mode": "Spectral",
+                    "flip_lr": false,
+                    "mirror": false,
+                    "resolution": 4,
+                    "reverse_roll": false,
+                    "roll_speed": 0
+                },
+                "effect_beat": {
+                    "color": "Red",
+                    "colorful_mode": true,
+                    "decay": 0.7,
+                    "gradient": "Spectral",
+                    "random_color": true
+                },
+                "effect_beat_slide": {
+                    "bar_length": 102,
+                    "color": "Blue",
+                    "decay": 0.7,
+                    "slider_length": 10,
+                    "speed": 5
+                },
+                "effect_beat_twinkle": {
+                    "color": "Red",
+                    "colorful_mode": true,
+                    "decay": 0.9,
+                    "gradient": "Spectral",
+                    "random_color": true,
+                    "star_length": 30
+                },
+                "effect_bubble": {
+                    "blur": 5,
+                    "bubble_lenght": 5,
+                    "bubble_repeat": 2,
+                    "gradient": "Spectral",
+                    "mirror": false,
+                    "reverse": false,
+                    "speed": 2
+                },
+                "effect_direction_changer": {
+                    "bar_length": 5,
+                    "bar_speed": 3,
+                    "bars_in_same_direction": 1,
+                    "color": "Red",
+                    "colorful_mode": true,
+                    "gradient": "Spectral",
+                    "random_color": true
+                },
+                "effect_energy": {
+                    "b_multiplier": 1,
+                    "blur": 5,
+                    "g_multiplier": 1,
+                    "mirror": true,
+                    "r_multiplier": 1,
+                    "scale": 0.8
+                },
+                "effect_fade": {
+                    "gradient": "Spectral",
+                    "reverse": false,
+                    "speed": 1
+                },
+                "effect_gradient": {
+                    "gradient": "Spectral",
+                    "mirror": false,
+                    "reverse": false,
+                    "speed": 1
+                },
+                "effect_music": {
+                    "color": "Blue"
+                },
+                "effect_pendulum": {
+                    "change_color": false,
+                    "color": "Blue",
+                    "gradient": "Spectral",
+                    "pendulum_length": 10,
+                    "speed": 5
+                },
+                "effect_power": {
+                    "color_mode": "Spectral",
+                    "flip_lr": false,
+                    "mirror": true,
+                    "s_color": "White",
+                    "s_count": 20
+                },
+                "effect_rods": {
+                    "change_color": true,
+                    "color": "Blue",
+                    "gradient": "Spectral",
+                    "mirror": false,
+                    "reverse": false,
+                    "rods_distance": 50,
+                    "rods_length": 15,
+                    "speed": 2
+                },
+                "effect_scroll": {
+                    "blur": 0.5,
+                    "decay": 1,
+                    "high_color": "Blue",
+                    "high_multiplier": 1,
+                    "high_speed": 4,
+                    "low_speed": 4,
+                    "lows_color": "Red",
+                    "lows_multiplier": 1,
+                    "mid_speed": 4,
+                    "mids_color": "Green",
+                    "mids_multiplier": 1,
+                    "mirror": true
+                },
+                "effect_single": {
+                    "color": "Blue",
+                    "custom_color": [
+                        0,
+                        0,
+                        0
+                    ],
+                    "use_custom_color": "false"
+                },
+                "effect_slide": {
+                    "gradient": "Spectral",
+                    "mirror": false,
+                    "reverse": false,
+                    "speed": 2
+                },
+                "effect_spectrum": {
+                    "b_multiplier": 1,
+                    "g_multiplier": 1,
+                    "r_multiplier": 1
+                },
+                "effect_spectrum_analyzer": {
+                    "color": "Blue",
+                    "spectrum_count": 6
+                },
+                "effect_sync_fade": {
+                    "gradient": "Spectral",
+                    "reverse": false,
+                    "speed": 1
+                },
+                "effect_twinkle": {
+                    "blur": 1,
+                    "gradient": "Spectral",
+                    "star_appears_speed": 25,
+                    "star_descending_speed": 5,
+                    "star_rising_speed": 5,
+                    "stars_count": 10,
+                    "stars_length": 5
+                },
+                "effect_vu_meter": {
+                    "bar_length": 2,
+                    "color": "Blue",
+                    "gradient": "Spectral",
+                    "max_vol_color": "Red",
+                    "speed": 50,
+                    "use_gradient": "true"
+                },
+                "effect_wave": {
+                    "color_flash": "White",
+                    "color_wave": "Red",
+                    "decay": 0.7,
+                    "wipe_len": 5,
+                    "wipe_speed": 2
+                },
+                "effect_wavelength": {
+                    "blur": 3,
+                    "color_mode": "Spectral",
+                    "flip_lr": false,
+                    "mirror": false,
+                    "reverse_grad": false,
+                    "reverse_roll": false,
+                    "roll_speed": 0
+                },
+                "effect_wiggle": {
+                    "bar_length": 20,
+                    "beat_color": "Blue",
+                    "color": "Orange",
+                    "decay": 0.7
+                },
+                "last_effect": "effect_advanced_scroll"
+            },
+            "output": {
+                "output_mqtt": {
+                    "MQTT_Broker": "localhost",
+                    "MQTT_Path": "led/device_a"
+                },
+                "output_raspi": {
+                    "LED_Brightness": 100,
+                    "LED_Channel": 0,
+                    "LED_Dma": 10,
+                    "LED_Freq_Hz": 800000,
+                    "LED_Invert": false,
+                    "LED_Pin": 21
+                },
+                "output_udp": {
+                    "UDP_Client_IP": "172.24.26.124",
+                    "UDP_Client_Port": 7777
+                }
+            }
+        }
+    },
+    "general_settings": {
+        "DEFAULT_SAMPLE_RATE": 48000,
+        "DEVICE_ID": 2,
+        "FRAMES_PER_BUFFER": 512,
+        "MAX_BRIGHTNESS": 250,
+        "MAX_FREQUENCY": 16000,
+        "MIN_FREQUENCY": 50,
+        "MIN_VOLUME_THRESHOLD": 0,
+        "N_FFT_BINS": 24,
+        "N_ROLLING_HISTORY": 4,
+        "WEBSERVER_PORT": 80
+    },
+    "gradients": {
+        "Dancefloor": [
+            [
+                255,
+                0,
+                0
+            ],
+            [
+                255,
+                0,
+                178
+            ],
+            [
+                255,
+                0,
+                200
+            ],
+            [
+                0,
+                0,
+                255
+            ]
+        ],
+        "Fruity": [
+            [
+                255,
+                40,
+                0
+            ],
+            [
+                0,
+                0,
+                255
+            ]
+        ],
+        "Jamaica": [
+            [
+                255,
+                255,
+                0
+            ],
+            [
+                0,
+                247,
+                161
+            ]
+        ],
+        "Jungle": [
+            [
+                0,
+                255,
+                0
+            ],
+            [
+                255,
+                0,
+                0
+            ],
+            [
+                255,
+                40,
+                0
+            ]
+        ],
+        "Jupiter": [
+            [
+                255,
+                216,
+                155
+            ],
+            [
+                25,
+                84,
+                123
+            ]
+        ],
+        "Ocean": [
+            [
+                0,
+                255,
+                0
+            ],
+            [
+                0,
+                247,
+                161
+            ],
+            [
+                0,
+                0,
+                255
+            ]
+        ],
+        "Peach": [
+            [
+                255,
+                40,
+                0
+            ],
+            [
+                255,
+                0,
+                178
+            ]
+        ],
+        "Rust": [
+            [
+                255,
+                40,
+                0
+            ],
+            [
+                255,
+                0,
+                0
+            ]
+        ],
+        "Safari": [
+            [
+                30,
+                150,
+                0
+            ],
+            [
+                255,
+                242,
+                0
+            ],
+            [
+                255,
+                0,
+                0
+            ]
+        ],
+        "Spectral": [
+            [
+                255,
+                0,
+                0
+            ],
+            [
+                255,
+                40,
+                0
+            ],
+            [
+                255,
+                255,
+                0
+            ],
+            [
+                0,
+                255,
+                0
+            ],
+            [
+                0,
+                247,
+                161
+            ],
+            [
+                0,
+                0,
+                255
+            ],
+            [
+                255,
+                0,
+                200
+            ],
+            [
+                255,
+                0,
+                178
+            ]
+        ],
+        "Sunny": [
+            [
+                255,
+                255,
+                0
+            ],
+            [
+                0,
+                247,
+                161
+            ],
+            [
+                255,
+                40,
+                0
+            ],
+            [
+                0,
+                0,
+                255
+            ]
+        ],
+        "Sunset": [
+            [
+                255,
+                0,
+                0
+            ],
+            [
+                255,
+                40,
+                0
+            ],
+            [
+                255,
+                255,
+                0
+            ]
+        ]
+    }
+}

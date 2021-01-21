@@ -5,6 +5,8 @@ from libs.fps_limiter import FPSLimiter # pylint: disable=E0611, E0401
 from libs.notification_item import NotificationItem # pylint: disable=E0611, E0401
 from libs.notification_enum import NotificationEnum # pylint: disable=E0611, E0401
 
+from multiprocessing import Queue
+
 import numpy as np
 import pyaudio
 import sys
@@ -81,14 +83,42 @@ class AudioProcessService:
                 print("Use " + str(device["index"]) + " - " + str(device["name"])  + " - " + str(device["defaultSampleRate"]))
                 self._device_id = device["index"]
                 self._device_name = device["name"]
-                self._device_rate = int(device["defaultSampleRate"])
-                self._config["general_settings"]["DEFAULT_SAMPLE_RATE"] = self._device_rate
+                self._device_rate = self._config["general_settings"]["DEFAULT_SAMPLE_RATE"]
                 self._frames_per_buffer = self._config["general_settings"]["FRAMES_PER_BUFFER"]
      
-        self.start_time = time.time()
-        self.ten_seconds_counter = time.time()
+        self.start_time_1 = time.time()
+        self.ten_seconds_counter_1 = time.time()
+        self.start_time_2 = time.time()
+        self.ten_seconds_counter_2 = time.time()
 
         self._dsp = DSP(self._config)
+
+        self.audio = np.empty((self._frames_per_buffer),dtype="int16")
+
+        self.audio_buffer_queue = Queue(2)
+
+        # callback function to stream audio, another thread.
+        def callback(in_data,frame_count, time_info, status):
+
+            if self._skip_routine:
+                return (self.audio, pyaudio.paContinue)
+           
+            try:
+                self.audio_buffer_queue.put(in_data)
+            except:
+                pass
+#           
+            self.end_time_1 = time.time()
+                    
+            if time.time() - self.ten_seconds_counter_1 > 10:
+                self.ten_seconds_counter_1 = time.time()
+                time_dif = self.end_time_1 - self.start_time_1
+                fps = 1 / time_dif
+                print("Audio Service Callback | FPS: " + str(fps))
+
+            self.start_time_1 = time.time()
+
+            return (self.audio, pyaudio.paContinue)
 
         print("Start open Audio stream")
         self.stream = self._py_audio.open(format = pyaudio.paInt16,
@@ -96,11 +126,11 @@ class AudioProcessService:
                                     rate = self._device_rate,
                                     input = True,
                                     input_device_index = self._device_id,
-                                    frames_per_buffer = self._frames_per_buffer)
+                                    frames_per_buffer = self._frames_per_buffer,
+                                    stream_callback = callback)
 
     def audio_service_routine(self):
         try:
-
             if not self._notification_queue_in.empty():
                 current_notification_item = self._notification_queue_in.get()
 
@@ -119,46 +149,43 @@ class AudioProcessService:
             if self._skip_routine:
                 return
 
-            # Limit the fps to decrease laggs caused by 100 percent cpu
-            #self._fps_limiter.fps_limiter()
-
-            raw_data_from_stream = self.stream.read(self._frames_per_buffer, exception_on_overflow = False)
+            in_data = self.audio_buffer_queue.get()
 
             # Convert the raw string audio stream to an array.
-            y = np.fromstring(raw_data_from_stream, dtype=np.int16)
+            y = np.fromstring(in_data, dtype=np.int16)
             # Use the type float32
             y = y.astype(np.float32)
 
             # Process the audio stream
             audio_datas = self._dsp.update(y)
 
+
             #Check if value is higher than min value
             if audio_datas["vol"] < self._config["general_settings"]["MIN_VOLUME_THRESHOLD"]:
                 # Fill the array with zeros, to fade out the effect.
                 audio_datas["mel"] = np.zeros(1)
 
-            # Send the new audio data to the effect process.            
+
             if self._audio_queue.full():
                 try:
-                    pre_audio_data = self._audio_queue.get()
+                    pre_audio_data = self._audio_queue.get(block=True, timeout=0.033)
                     del pre_audio_data
                 except:
-                    #print("Empty audio queue of device_manager")
                     pass
-            
+                        
             self._audio_queue.put(audio_datas, False)
 
-            self.end_time = time.time()
+            self.end_time_2 = time.time()
                     
-            if time.time() - self.ten_seconds_counter > 10:
-                self.ten_seconds_counter = time.time()
-                self.time_dif = self.end_time - self.start_time
-                self.fps = 1 / self.time_dif
-                print("Audio Service | FPS: " + str(self.fps))
+            if time.time() - self.ten_seconds_counter_2 > 10:
+                self.ten_seconds_counter_2 = time.time()
+                time_dif = self.end_time_2 - self.start_time_2
+                fps = 1 / time_dif
+                print("Audio Service Routine | FPS: " + str(fps))
 
-            self.start_time = time.time()
+            self.start_time_2 = time.time()
+
             
-
         except IOError:
             print("IOError during reading the Microphone Stream.")
             pass
