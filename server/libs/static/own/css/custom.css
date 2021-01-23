@@ -56,3 +56,13 @@ li.active-dashboard-item {
 .current_selected_txt{
     vertical-align: middle;
 }
+
+.logoimage{
+    max-width: 100px;
+    max-height: 50px;
+}
+
+.note{
+    max-width: 50px;
+    max-height: 50px;
+}
