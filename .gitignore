@@ -1,0 +1,6 @@
+
+*.pyc
+
+server/libs/config_.json
+
+.vscode/launch.json

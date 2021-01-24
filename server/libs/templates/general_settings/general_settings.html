@@ -1,0 +1,105 @@
+{% extends "base/base_site.html" %}
+
+{% block title %}General Settings{% endblock title %}
+
+{% block content %}
+<input type="hidden" id="settingsIdentifier" value="general_settings">
+<div class="row">
+  <div class="col-md-12">
+    <div class="x_panel">
+      <div class="x_content">
+        <div class="bs-docs-section">
+          <h2 id="dashboard-header-2">General Settings</h2>
+          <p> Make your dancefloor ready for the party.
+          </p>
+          <form id="settingsForm" data-parsley-validate class="form-horizontal form-label-left" action method="post" novalidate>
+            
+            <div class="item form-group">
+              <label class="control-label col-md-3 col-sm-3 col-xs-12" for="WEBSERVER_PORT">Webserver Port (needs a restart)</label>
+              <input id="WEBSERVER_PORT" type="number" name="number" required="required" data-validate-minmax="0,9999999" class="col-md-6 col-sm-6 col-xs-12 setting_input" data-kwimpalastatus="alive" data-kwimpalaid="1554401854198-5">
+            </div>
+            
+            <div class="item form-group">
+              <label class="control-label col-md-3 col-sm-3 col-xs-12" for="DEVICE_ID">Audio Source ID</label>
+              <input id="DEVICE_ID" type="number" name="number" required="required" data-validate-minmax="0,1000" class="col-md-6 col-sm-6 col-xs-12 setting_input" data-kwimpalastatus="alive" data-kwimpalaid="1554401854198-5">
+            </div>
+
+            <div class="item form-group">
+              <label class="control-label col-md-3 col-sm-3 col-xs-12" for="DEFAULT_SAMPLE_RATE">Default Sample Rate</label>
+              <input id="DEFAULT_SAMPLE_RATE" type="number" name="number" required="required" data-validate-minmax="1,1000000" class="col-md-6 col-sm-6 col-xs-12 setting_input" data-kwimpalastatus="alive" data-kwimpalaid="1554401854198-5">
+            </div>
+
+            <div class="item form-group">
+              <label class="control-label col-md-3 col-sm-3 col-xs-12" for="MAX_FREQUENCY">Max Frequency</label>
+              <input id="MAX_FREQUENCY" type="number" name="number" required="required" data-validate-minmax="1,1000" class="col-md-6 col-sm-6 col-xs-12 setting_input" data-kwimpalastatus="alive" data-kwimpalaid="1554401854198-5">
+            </div>
+
+            <div class="item form-group">
+              <label class="control-label col-md-3 col-sm-3 col-xs-12" for="MIN_FREQUENCY">Min Frequency</label>
+              <input id="MIN_FREQUENCY" type="number" name="number" required="required" data-validate-minmax="1,1000" class="col-md-6 col-sm-6 col-xs-12 setting_input" data-kwimpalastatus="alive" data-kwimpalaid="1554401854198-5">
+            </div>
+
+            <div class="item form-group">
+              <label class="control-label col-md-3 col-sm-3 col-xs-12" for="MIN_VOLUME_THRESHOLD">Min Volue Threshold (What is the minimum volume at which the LED strip reacts?) Not implemented</label>
+              <input id="MIN_VOLUME_THRESHOLD" type="number" name="number" required="required" data-step="0.000001" data-validate-minmax="1,1000" class="col-md-6 col-sm-6 col-xs-12 setting_input" data-kwimpalastatus="alive" data-kwimpalaid="1554401854198-5">
+            </div>
+
+            <div class="item form-group">
+              <label class="control-label col-md-3 col-sm-3 col-xs-12" for="N_FFT_BINS">FFT BINS (How many frequency steps do you want?)</label>
+              <input id="N_FFT_BINS" type="number" name="number" required="required" data-validate-minmax="1,1000" class="col-md-6 col-sm-6 col-xs-12 setting_input" data-kwimpalastatus="alive" data-kwimpalaid="1554401854198-5">
+            </div>
+
+            <div class="item form-group">
+              <label class="control-label col-md-3 col-sm-3 col-xs-12" for="N_ROLLING_HISTORY">Rolling History</label>
+              <input id="N_ROLLING_HISTORY" type="number" name="number" required="required" data-validate-minmax="1,1000" class="col-md-6 col-sm-6 col-xs-12 setting_input" data-kwimpalastatus="alive" data-kwimpalaid="1554401854198-5">
+            </div>
+
+            <div class="item form-group">
+              <label class="control-label col-md-3 col-sm-3 col-xs-12" for="FRAMES_PER_BUFFER">Frames Per Buffer (has effects for the max framerate)</label>
+              <input id="FRAMES_PER_BUFFER" type="number" name="number" required="required" data-validate-minmax="1,5000" class="col-md-6 col-sm-6 col-xs-12 setting_input" data-kwimpalastatus="alive" data-kwimpalaid="1554401854198-5">
+            </div>
+                       
+
+            <div class="text-right">
+              <button type="button" id="save_btn" class="btn btn-success">Save</button>
+              <button type="button" id="reset_btn" class="btn btn-danger">Reset Config</button>
+              Changes will need a restart.
+            </div>
+          </form>
+
+          <div class="ln_solid"></div>
+            <h2 id="dashboard-header-2">Import / Export Configuration</h2>
+
+            <div class="item form-group">
+              <a href="/export_config"><button type="button" id="export_btn" class="btn btn-primary">Export Configuration</button></a>
+            </div>
+            
+            <iframe name="dummyframe" id="dummyframe" style="display: none;"></iframe>
+
+            <form method="POST" action="/import_config" target="dummyframe" enctype="multipart/form-data">
+              <input  type="submit" id="import_btn" class="btn btn-primary" value="Import Configuration">  
+              <input type="file" name="imported_config" accept=".json">
+              
+            </form>
+            Restart the Raspberry Pi / Programm after importing a file.
+            Some settings can't be applied on the running system.
+        </div> 
+      </div>
+    </div>
+    
+  </div>
+  
+</div>
+
+{% endblock content %}
+
+{% block custom_javascripts %}
+<!-- Validator -->
+<script src="{{ url_for('static', filename='vendors/validator/validator.js') }}" type="text/javascript"></script>
+
+<!-- jQuery Knob -->
+<script src="{{ url_for('static', filename='vendors/jquery-knob/js/jquery.knob.js') }}"></script>
+
+<!-- Custom Theme Scripts -->
+<script src="{{ url_for('static', filename='own/js/settings.general.js') }}"></script>
+{% endblock custom_javascripts %}
