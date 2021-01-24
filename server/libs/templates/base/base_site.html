@@ -64,6 +64,21 @@
                     </div>
 
                     <div class="clearfix"></div>
+                    <div id="device_dropdown" class="left dropdown_position">
+                        <div class="dropdown ">
+                            <button class="btn btn-secondary dropdown-toggle dropdown_color" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Select Device
+                            </button>
+                            <div id="deviceDropDownMenuID" class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                
+                            </div>
+                        </div>
+
+                        <div class="current_selected_txt" id="selected_device_txt" style="font-weight: bold;">Current Selected: All Devices</div>
+                    </div>
+                    
+
+                    <div class="clearfix"></div>
 
                     {% block content %}
                     <!-- {{ content }} -->
@@ -74,6 +89,8 @@
 
         {% block javascripts %}
 
+        <!-- popper -->
+        <script src="{{ url_for('static', filename='vendors/popper/popper.min.js') }}" type="text/javascript"></script>
         <!-- jQuery -->
         <script src="{{ url_for('static', filename='vendors/jquery/dist/jquery.min.js') }}"></script>
         <!-- Bootstrap -->

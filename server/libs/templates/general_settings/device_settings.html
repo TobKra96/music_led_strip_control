@@ -13,33 +13,84 @@
           <p>Your LEDs are too bright? You need sunglasses at night?
             Here you can change some general settings that are applied for all effects.
           </p>
-          <form id="settingsForm" data-parsley-validate class="form-horizontal form-label-left" action method="post" novalidate>
-            
-              <div class="form-group">
-                <label class="center control-label col-md-3 col-sm-3 col-xs-12" for="LED_Brightness">LED Brightness</label>
-                <input id="LED_Brightness" class="knob col-md-6 col-sm-6 col-xs-12"  type="number" data-angleoffset="-125" data-anglearc="250" data-width="100" data-height="120" data-cursor=true data-fgColor="#f0ad4e" value="29">
+          <div id="deviceFound">
+            <form id="settingsForm" data-parsley-validate class="form-horizontal form-label-left" action method="post" novalidate>
+
+              <div class="item form-group">
+                <label class="control-label col-md-3 col-sm-3 col-xs-12" for="DEVICE_NAME">Device Name</label>
+                <input id="DEVICE_NAME" type="text" name="text" required="required" class="col-md-6 col-sm-6 col-xs-12 device_setting_input" data-kwimpalastatus="alive" data-kwimpalaid="1554401854198-5">
               </div>
-              
-              <div class="form-group">
+
+              <div class="item form-group">
+                <label class="control-label col-md-3 col-sm-3 col-xs-12" for="FPS">Max FPS</label>
+                <input id="FPS" type="number" name="number" required="required" data-validate-minmax="1,100" class="col-md-6 col-sm-6 col-xs-12 device_setting_input" data-kwimpalastatus="alive" data-kwimpalaid="1554401854198-5">
+              </div>
+
+              <div class="item form-group">
                 <label class="control-label col-md-3 col-sm-3 col-xs-12" for="LED_Count">Numbers of LEDs</label>
-                <input id="LED_Count" type="number" name="number" required="required" data-validate-minmax="1,1500" class="col-md-6 col-sm-6 col-xs-12" data-kwimpalastatus="alive" data-kwimpalaid="1554401854198-5">
+                <input id="LED_Count" type="number" name="number" required="required" data-validate-minmax="1,1500" class="col-md-6 col-sm-6 col-xs-12 device_setting_input" data-kwimpalastatus="alive" data-kwimpalaid="1554401854198-5">
               </div>
 
-              <div class="form-group">
-                <label class="control-label col-md-3 col-sm-3 col-xs-12" for="LED_Count">LED Pin</label>
-                <input id="LED_Pin" type="number" name="number" required="required" data-validate-minmax="1,100" class="col-md-6 col-sm-6 col-xs-12" data-kwimpalastatus="alive" data-kwimpalaid="1554401854198-5">
-              </div>
-
-              <div class="form-group">
+              <div class="item form-group">
                 <label class="control-label col-md-3 col-sm-3 col-xs-12" for="LED_Mid">LED Mid</label>
-                <input id="LED_Mid" type="number" name="number" required="required" data-validate-minmax="1,2000" class="col-md-6 col-sm-6 col-xs-12" data-kwimpalastatus="alive" data-kwimpalaid="1554401854198-5">
+                <input id="LED_Mid" type="number" name="number" required="required" data-validate-minmax="1,2000" class="col-md-6 col-sm-6 col-xs-12 device_setting_input" data-kwimpalastatus="alive" data-kwimpalaid="1554401854198-5">
               </div>
+
+              <div class="item form-group">
+                <label class="control-label col-md-3 col-sm-3 col-xs-12">Used Output Type</label>
+                
+                <select id="OUTPUT_TYPE" class="form-control col-md-6 col-sm-6 col-xs-12 output_type device_setting_input">
+                </select>
+                
+              </div>
+
+              <div class="ln_solid"></div>
+              <h4 id="dashboard-header-2">Output Raspberry Pi</h2>
+
+              <div class="item form-group">
+                <label class="center control-label col-md-3 col-sm-3 col-xs-12" for="LED_Brightness">LED Brightness</label>
+                <input id="LED_Brightness" class="knob col-md-6 col-sm-6 col-xs-12 output_raspi"  type="number" data-angleoffset="-125" data-anglearc="250" data-width="100" data-height="120" data-cursor=true data-fgColor="#f0ad4e" value="29">
+              </div>
+                      
+              <div class="item form-group">
+                <label class="control-label col-md-3 col-sm-3 col-xs-12" for="LED_Count">LED Pin (GPIO Pin)</label>
+                <input id="LED_Pin" type="number" name="number" required="required" data-validate-minmax="1,100" class="col-md-6 col-sm-6 col-xs-12 output_raspi" data-kwimpalastatus="alive" data-kwimpalaid="1554401854198-5">
+              </div>
+
+              <div class="ln_solid"></div>
+              <h4 id="dashboard-header-2">Output Network via UDP</h2>
+
+              <div class="item form-group">
+                <label class="control-label col-md-3 col-sm-3 col-xs-12" for="UDP_Client_IP">UDP CLient IP Address</label>
+                <input id="UDP_Client_IP" type="text" name="text" required="required" class="col-md-6 col-sm-6 col-xs-12 output_udp" data-kwimpalastatus="alive" data-kwimpalaid="1554401854198-5">
+              </div>
+
+              <div class="item form-group">
+                <label class="control-label col-md-3 col-sm-3 col-xs-12" for="UDP_Client_Port">UDP Client Port</label>
+                <input id="UDP_Client_Port" type="number" name="number" required="required" data-validate-minmax="1,100000" class="col-md-6 col-sm-6 col-xs-12 output_udp" data-kwimpalastatus="alive" data-kwimpalaid="1554401854198-5">
+              </div>
+
+
 
               <div class="text-right">
-                  <button type="submit" id="save_btn" class="btn btn-success">Save</button>
+                  <button type="button" id="save_btn" class="btn btn-success">Save</button>
+                  <button type="button" id="create1_btn" class="btn btn-primary">Create Device</button>
+                  <button type="button" id="delete_btn" class="btn btn-danger">Delete Device</button>
               </div>
-            
-          </form>
+                            
+            </form>
+          </div>
+          <div id="noDeviceFound">
+            <form id="noDeviceForm" data-parsley-validate class="form-horizontal form-label-left" action method="post" novalidate style="display: none;"></form>
+              <div class="item form-group">
+                <h2 id="dashboard-header-2" class="red">No device found. Please create one.</h2>
+              </div>
+                <div class="text-right">
+                  <button type="button" id="create2_btn" class="btn btn-primary">Create Device</button>
+              </div>
+            </form>
+          </div>
+          
         </div> 
       </div>
     </div>
@@ -58,5 +109,5 @@
 <script src="{{ url_for('static', filename='vendors/jquery-knob/js/jquery.knob.js') }}"></script>
 
 <!-- Custom Theme Scripts -->
-<script src="{{ url_for('static', filename='own/js/settings.js') }}"></script>
+<script src="{{ url_for('static', filename='own/js/settings.device.js') }}"></script>
 {% endblock custom_javascripts %}

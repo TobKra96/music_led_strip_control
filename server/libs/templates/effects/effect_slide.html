@@ -3,7 +3,8 @@
 {% block title %}Slide Effect{% endblock title %}
 
 {% block content %}
-<input type="hidden" id="settingsIdentifier" value="effect_slide">
+<input type="hidden" id="settingsIdentifier" value="effect">
+<input type="hidden" id="effectIdentifier" value="effect_slide">
 <div class="row">
   <div class="col-md-12">
     <div class="x_panel">
@@ -13,35 +14,35 @@
           <p>Edit the Slide effect.
           </p>
           <form id="settingsForm" data-parsley-validate class="form-horizontal form-label-left" action method="post" novalidate>
-            <div class="form-group form-space">
+            <div class="item form-group form-space">
               <label class="control-label col-md-3 col-sm-3 col-xs-12">Gradient </label>
               <div class="col-md-9 col-sm-9 col-xs-12">
-                <select id="gradient" class="form-control gradients">
+                <select id="gradient" class="form-control gradients setting_input">
                 </select>
               </div>
             </div>
 
-            <div class="form-group form-space">
+            <div class="item form-group form-space">
               <label class="control-label col-md-3 col-sm-3 col-xs-12">Mirror</label>
               <div class="col-md-9 col-sm-9 col-xs-12">
-                <input id="mirror" type="checkbox" class="js-switch" data-switchery="true" >
+                <input id="mirror" type="checkbox" class="js-switch setting_input" data-switchery="true" >
               </div>
             </div>  
            
-              <div class="form-group form-space">
+              <div class="item form-group form-space">
                 <label class="control-label col-md-3 col-sm-3 col-xs-12">Reverse</label>
                 <div class="col-md-9 col-sm-9 col-xs-12">
-                  <input id="reverse" type="checkbox" class="js-switch" data-switchery="true" >
+                  <input id="reverse" type="checkbox" class="js-switch setting_input" data-switchery="true" >
                 </div>
               </div>  
 
-              <div class="form-group">
+              <div class="item form-group">
                 <label class="center control-label col-md-3 col-sm-3 col-xs-12" for="speed">Speed</label>
-                <input id="speed" class="knob col-md-6 col-sm-6 col-xs-12"  type="number" data-step="0.01" data-angleoffset="-125" data-anglearc="250" data-max="10" data-width="100" data-height="100" data-cursor=true data-fgColor="#f0ad4e" value="1">
+                <input id="speed" class="knob col-md-6 col-sm-6 col-xs-12 setting_input"  type="number" data-step="0.01" data-angleoffset="-125" data-anglearc="250" data-max="10" data-width="100" data-height="100" data-cursor=true data-fgColor="#f0ad4e" value="1">
               </div>
 
               <div class="text-right">
-                  <button type="submit" id="save_btn" class="btn btn-success">Save</button>
+                  <button type="button" id="save_btn" class="btn btn-success">Save</button>
               </div>
           </form>
         </div> 
@@ -67,5 +68,5 @@
 <script src="{{ url_for('static', filename='vendors/jquery-knob/js/jquery.knob.js') }}"></script>
 
 <!-- Custom Theme Scripts -->
-<script src="{{ url_for('static', filename='own/js/settings.js') }}"></script>
+<script src="{{ url_for('static', filename='own/js/settings.effect.js') }}"></script>
 {% endblock custom_javascripts %}

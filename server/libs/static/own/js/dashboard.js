@@ -1,54 +1,181 @@
-
+var devices;
 var activeEffect = "";
+var currentDevice = "all_devices";
 
+// Init and load all settings
 $( document ).ready(function() {
-
-    $.ajax({
-        url: "/getActiveEffect",
-        type: "GET", //send it through get method
-        data: { 
-            active_effect: true
-        },
-        success: function(response) {
-            activeEffect = response.active_effect;
-            setActiveStyle();
-        },
-        error: function(xhr) {
-          //Do Something to handle error
-        }
-      });
-    
+    GetDevices();
 });
 
-function setActiveEffect(newActiveEffect){
-
-    removeActiveStyle();
-    activeEffect = newActiveEffect;
-        
+function GetDevices(){
     $.ajax({
-        url: "/setActiveEffect",
-        type: "POST", //send it through get method
-        data: JSON.stringify(activeEffect, null, '\t'),
-        contentType: 'application/json;charset=UTF-8',
+        url: "/GetDevices",
+        type: "GET", //send it through get method
         success: function(response) {
-            console.log("Set the effect sucessfull. Response: " + response.toString());
+            ParseDevices(response);
         },
         error: function(xhr) {
           //Do Something to handle error
-          console.log("Set the effect got an error. Error: " + xhr.responseText);
         }
       });
-
-    setActiveStyle();
 }
 
-function setActiveStyle(){
+function ParseDevices(devices){
+    this.currentDevice = "all_devices"
+    this.devices = devices;
+
+    this.BuildDeviceCombobox();
+    this.AddEventListeners();
+    this.UpdateCurrentDeviceText();
+    this.UpdateActiveEffectTile();
+}
+
+function GetActiveEffect(device){
+        
+    $.ajax({
+        url: "/GetActiveEffect",
+        type: "GET", //send it through get method
+        data: {"device": device},
+        success: function(response) {
+            ParseActiveEffect(response);
+        },
+        error: function(xhr) {
+          //Do Something to handle error
+        }
+      });
+}
+
+function ParseActiveEffect(respond){
+    this.activeEffect = respond["effect"];   
+    this.UpdateActiveEffectTile();
+}
+
+function SetActiveEffect(newActiveEffect){
+
+    var lastEffect = this.activeEffect;
+    this.activeEffect = newActiveEffect;
+
+    removeActiveStyle(lastEffect);
     
-    $("#" + activeEffect).addClass("active-dashboard-item");
+    if(this.currentDevice == "all_devices"){
+        var data = {};
+        data["effect"] = this.activeEffect;
+    
+        $.ajax({
+            url: "/SetActiveEffectForAll",
+            type: "POST", //send it through get method
+            data: JSON.stringify(data, null, '\t'),
+            contentType: 'application/json;charset=UTF-8',
+            success: function(response) {
+                console.log("Set the effect sucessfull. Response: " + response.toString());
+            },
+            error: function(xhr) {
+              //Do Something to handle error
+              console.log("Set the effect got an error. Error: " + xhr.responseText);
+            }
+          });
+
+    }else{
+        var data = {};
+        data["device"] = this.currentDevice;
+        data["effect"] = this.activeEffect;
+    
+        $.ajax({
+            url: "/SetActiveEffect",
+            type: "POST", //send it through get method
+            data: JSON.stringify(data, null, '\t'),
+            contentType: 'application/json;charset=UTF-8',
+            success: function(response) {
+                console.log("Set the effect sucessfull. Response: " + response.toString());
+            },
+            error: function(xhr) {
+              //Do Something to handle error
+              console.log("Set the effect got an error. Error: " + xhr.responseText);
+            }
+          });
+    }
+    
+    setActiveStyle(this.activeEffect);
 }
 
-function removeActiveStyle(){
-    $("#" + activeEffect).removeClass("active-dashboard-item");
+
+/* Device Handling */
+
+function BuildDeviceCombobox(){
+    var devices = this.devices
+
+    $( ".dropdown-menu").append("<a class=\"dropdown-item device_item\" id=\"all_devices\">All Devices</a>")
+    
+    Object.keys(devices).forEach(device_key => {
+        $( ".dropdown-menu").append( "<a class=\"dropdown-item device_item\" id=\"" + device_key +"\">" + devices[device_key] + "</a>" );
+    });
+    
+}
+
+function AddEventListeners(){
+    var elements = document.getElementsByClassName("device_item");
+
+    for (var i = 0; i < elements.length; i++) {
+        elements[i].addEventListener('click', function(e){
+            SwitchDevice(e);
+        });
+    }
+}
+
+function UpdateCurrentDeviceText(){
+    var text = "";
+    
+    if(this.currentDevice == "all_devices"){
+        text = "Current device: All Devices"
+    }
+    else
+    {
+        text = "Current device: " + this.devices[this.currentDevice]
+    }
+    
+    $("#selected_device_txt").text(text);
+    if(this.activeEffect != ""){
+        this.removeActiveStyle(this.activeEffect);
+    }
+}
+
+function UpdateActiveEffectTile(){
+
+    if(this.activeEffect != ""){
+        this.setActiveStyle(this.activeEffect);
+    }
+}
+
+function SwitchDevice(e){
+    var newDeviceId = e.target.id;
+
+    this.currentDevice = newDeviceId;
+
+    if(newDeviceId == "all_devices"){
+        this.removeActiveStyle(this.activeEffect);
+        this.UpdateActiveEffectTile();
+        this.UpdateCurrentDeviceText();
+        return;
+    }
+
+    this.GetActiveEffect(newDeviceId);
+
+    this.UpdateCurrentDeviceText();
+}
+
+
+
+
+/* Effect Handling */
+
+
+function setActiveStyle(currentEffect){
+    
+    $("#" + currentEffect).addClass("active-dashboard-item");
+}
+
+function removeActiveStyle(currentEffect){
+    $("#" + currentEffect).removeClass("active-dashboard-item");
 }
 
 // locate your element and add the Click Event Listener
@@ -85,7 +212,7 @@ function switchEffect(e, listName){
         }
      
     // Click on some of the span elements inside the li element.
-    }else if(e.target && e.target.nodeName == "SPAN"){
+    }else if((e.target && e.target.nodeName == "SPAN")||(e.target && e.target.nodeName == "I")){
         if(e.target.parentElement && e.target.parentElement.nodeName == "LI"){
             if(e.target.parentElement.parentElement && e.target.parentElement.parentElement.id == listName){
                 newActiveEffect = e.target.parentElement.id;
@@ -95,6 +222,7 @@ function switchEffect(e, listName){
 
     if(newActiveEffect.length > 0){
         console.log(newActiveEffect + " was clicked");
-        setActiveEffect(newActiveEffect);
+        SetActiveEffect(newActiveEffect);
     }
 }
+

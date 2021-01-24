@@ -1,4 +1,4 @@
-.glyphicon.dasboard-glyph{
+.dasboard-glyph{
     margin-top: 10px;
     margin-bottom: 20px;
     font-size: 35px;
@@ -23,4 +23,46 @@ li.active-dashboard-item {
 
 .center{
     margin: 25px 0px;
+}
+
+.nav_height{
+    height: 50px;
+}
+
+.dropdown_position{
+    margin: 20px 0px;
+}
+
+.dropdown_color{
+    background-color: #73879C;
+    border: #73879C;
+}
+
+.dropdown_color:hover{
+    background-color: #1ABB9C;
+    border: #73879C;
+}
+
+.dropdown_color:active{
+    background-color: #1ABB9C;
+    border: #73879C;
+}
+
+.btn-secondary.dropdown_color:not(:disabled):not(.disabled).active, .btn-secondary.dropdown_color:not(:disabled):not(.disabled):active, .show>.btn-secondary.dropdown-toggle.dropdown_color {
+    background-color: #73879C;
+    border: #73879C;
+}
+
+.current_selected_txt{
+    vertical-align: middle;
+}
+
+.logoimage{
+    max-width: 100px;
+    max-height: 50px;
+}
+
+.note{
+    max-width: 50px;
+    max-height: 50px;
 }
