@@ -26,8 +26,10 @@ Feature List
 
 ## Installation
 Please see the Installation Guide inside the Wiki: [Installation Guide](https://github.com/TobKra96/music_led_strip_control/wiki/Installation-Guide)  
-Additional see the Tutorial Video I made for the Installation: 
+Also, check out the tutorial video I created for the installation:  
+[![Tutorial_Github](https://user-images.githubusercontent.com/7833146/106381265-d219c000-63b7-11eb-927d-43b96453d2d2.jpg)](https://youtu.be/ShpOVoOpqrQ)  
 
+Setup scheme:  
 ![Scheme_02](https://user-images.githubusercontent.com/7833146/104821835-ee0d5580-583e-11eb-8ed7-fbfc4f15a1a1.png)
 
 ## Used Libraries
