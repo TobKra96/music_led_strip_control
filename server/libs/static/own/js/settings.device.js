@@ -7,6 +7,9 @@ var output_types = {};
 var devicesLoading = true;
 var outputTypesLoading = true;
 
+var reloadingCounter = 0;
+var reloadingMax = 0;
+
 // Init and load all settings
 $( document ).ready(function() {
   settingsIdentifier = $("#settingsIdentifier").val();
@@ -222,10 +225,18 @@ function SetDeviceSetting(device, settings){
           contentType: 'application/json;charset=UTF-8',
           success: function(response) {
               console.log("Set the device settings sucessfull. Response: " + response.toString());
+              reloadingCounter++;
+              if(reloadingCounter >= reloadingMax){
+                location.reload();
+              }
           },
           error: function(xhr) {
             //Do Something to handle error
             console.log("Set the device settings got an error. Error: " + xhr.responseText);
+            reloadingCounter++;
+              if(reloadingCounter >= reloadingMax){
+                location.reload();
+              }
           }
         });
  }
@@ -244,16 +255,29 @@ function SetDeviceSetting(device, settings){
       contentType: 'application/json;charset=UTF-8',
       success: function(response) {
           console.log("Set the device settings sucessfull. Response: " + response.toString());
+          reloadingCounter++;
+              if(reloadingCounter >= reloadingMax){
+                location.reload();
+              }
+
       },
       error: function(xhr) {
         //Do Something to handle error
         console.log("Set the device settings got an error. Error: " + xhr.responseText);
+        reloadingCounter++;
+              if(reloadingCounter >= reloadingMax){
+                location.reload();
+              }
       }
     });
 }
 
 function SetLocalSettings(){
   var all_device_setting_keys = GetDeviceSettingKeys();
+
+  reloadingCounter = 0;
+  reloadingMax = 1; //Device Settings
+  reloadingMax += Object.keys(output_types).length; // All output types.
 
   settings_device = {};
   Object.keys(all_device_setting_keys).forEach(setting_id => {
@@ -306,10 +330,8 @@ function SetLocalSettings(){
     });
 
     SetOutputTypeDeviceSetting(currentDevice, output_type_key, settings_output_type)
+
   });
-
-  location.reload();
-
 }
 
 function CreateNewDevice(){
