@@ -1,8 +1,10 @@
 import numpy as np
 
-class MathService:
-      def interpolate(self, y, new_length):
-        """Intelligently resizes the array by linearly interpolating the values
+
+class MathService():
+    def interpolate(self, y, new_length):
+        """
+        Intelligently resizes the array by linearly interpolating the values.
 
         Parameters
         ----------
@@ -41,8 +43,7 @@ def memoize(function):
             return rv
     return wrapper
 
+
 @memoize
 def _normalized_linspace(size):
     return np.linspace(0, 1, size)
-
-    
