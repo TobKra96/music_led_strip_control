@@ -15,7 +15,7 @@
             255,
             0
         ],
-        "Light blue": [
+        "Cyan": [
             0,
             247,
             161
@@ -197,7 +197,7 @@
                 "lowmid_color": "Pink",
                 "mid_color": "Yellow",
                 "uppermid_color": "Green",
-                "presence_color": "Light blue",
+                "presence_color": "Cyan",
                 "brilliance_color": "Blue",
                 "subbass_speed": 4,
                 "bass_speed": 4,
