@@ -3,8 +3,8 @@ from multiprocessing import Process, Queue, Manager
 from libs.effect_service import EffectService
 from libs.output_service import OutputService
 
-class Device:
 
+class Device:
     def __init__(self, config, device_config, color_service_global):
         self.__config = config
         self.__device_config = device_config
@@ -14,25 +14,27 @@ class Device:
         self.create_processes()
 
     def start_device(self):
-        print("Start device: " + self.__device_config["DEVICE_NAME"])
+        print("Starting device: " + self.__device_config["DEVICE_NAME"])
         self.__output_process.start()
         self.__effect_process.start()
 
     def stop_device(self):
-        print("Stop device: " + self.__device_config["DEVICE_NAME"])
+        print("Stopping device: " + self.__device_config["DEVICE_NAME"])
         self.__effect_process.terminate()
         self.__output_process.terminate()
 
     def create_processes(self):
         self.__output_service = OutputService()
         self.__output_process = Process(
-            target=self.__output_service.start, 
-            args=(self,))
+            target=self.__output_service.start,
+            args=(self,)
+        )
 
         self.__effect_service = EffectService()
         self.__effect_process = Process(
-            target=self.__effect_service.start, 
-            args=(self,))
+            target=self.__effect_service.start,
+            args=(self,)
+        )
 
     def create_queues(self):
         self.__device_notification_queue_in = Queue(2)
@@ -42,7 +44,7 @@ class Device:
         self.__output_queue = Queue(2)
 
     def refresh_config(self, config, device_config):
-        print("Refresh config of device: " + self.__device_config["DEVICE_NAME"])
+        print("Refreshing config of device: " + self.__device_config["DEVICE_NAME"])
 
         self.stop_device()
 
@@ -54,17 +56,18 @@ class Device:
 
         self.__output_service = OutputService()
         self.__output_process = Process(
-            target=self.__output_service.start, 
-            args=(self,))
+            target=self.__output_service.start,
+            args=(self,)
+        )
 
         self.__effect_service = EffectService()
         self.__effect_process = Process(
-            target=self.__effect_service.start, 
-            args=(self,))
+            target=self.__effect_service.start,
+            args=(self,)
+        )
 
         self.start_device()
 
-        
     def get_config(self):
         return self.__config
 
@@ -103,4 +106,3 @@ class Device:
     output_queue = property(get_output_queue)
 
     color_service_global = property(get_color_service_global)
-
