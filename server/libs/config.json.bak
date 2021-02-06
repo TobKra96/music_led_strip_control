@@ -295,7 +295,7 @@
         "MIN_VOLUME_THRESHOLD": 0,
         "N_FFT_BINS": 24,
         "N_ROLLING_HISTORY": 4,
-        "WEBSERVER_PORT": 80
+        "WEBSERVER_PORT": 8080
     },
     "gradients": {
         "Dancefloor": [
