@@ -48,9 +48,18 @@
 
 
 ## Installation
+
+### Automated installation
+Run the following command in your terminal:
+```bash
+curl -sSL https://raw.githubusercontent.com/TobKra96/music_led_strip_control/master/setup.sh | sh
+```
+After the installation completes, please check the [Installation Guide](https://github.com/TobKra96/music_led_strip_control/wiki/Installation-Guide#iv-configure-music-led-strip-control) to configure the initial settings.
+
+### Manual installation
 Please see the Installation Guide inside the Wiki: [Installation Guide](https://github.com/TobKra96/music_led_strip_control/wiki/Installation-Guide).
 
-Also, check out the tutorial video I created for the installation:
+Also, check out the tutorial video I created for the manual installation:
 
 <p align="center">
   <a style="text-decoration:none" href="https://youtu.be/ShpOVoOpqrQ">
