@@ -1,6 +1,7 @@
-from libs.effects.effect import Effect # pylint: disable=E0611, E0401
+from libs.effects.effect import Effect  # pylint: disable=E0611, E0401
 
 import numpy as np
+
 
 class EffectPendulum(Effect):
 
@@ -9,15 +10,14 @@ class EffectPendulum(Effect):
         # Call the constructor of the base class.
         super(EffectPendulum, self).__init__(device)
 
-        # Pendulum Variables
+        # Pendulum Variables.
         self.current_direction = True
         self.current_position = 0
-        self.current_color = [0,0,0]
+        self.current_color = [0, 0, 0]
         self.current_color_index = 0
 
-
     def run(self):
-        # Get the config of the current effect
+        # Get the config of the current effect.
         effect_config = self._device.device_config["effects"]["effect_pendulum"]
         led_count = self._device.device_config["LED_Count"]
 
@@ -29,16 +29,16 @@ class EffectPendulum(Effect):
                 self.current_color_index = self.current_color_index + 1
                 if self.current_color_index > count_colors_in_gradient - 1:
                     self.current_color_index = 0
-                
+
                 self.current_color = gradient[self.current_color_index]
 
             else:
                 self.current_color = self._color_service.colour(effect_config["color"])
 
-        # Build an empty array
+        # Build an empty array.
         output_array = np.zeros((3, self._device.device_config["LED_Count"]))
 
-        # Calculate how many steps the array will roll
+        # Calculate how many steps the array will roll.
         steps = self.get_roll_steps(effect_config["speed"])
 
         if self.current_direction:
@@ -46,7 +46,7 @@ class EffectPendulum(Effect):
             # |-----------------------------------------------------------|
             #               ----> Direction
 
-            # Fix the direction swap
+            # Fix the direction swap.
             if self.current_position == 0:
                 self.current_position = effect_config["pendulum_length"]
 
@@ -55,7 +55,7 @@ class EffectPendulum(Effect):
             if self.current_position > led_count - 1:
                 self.current_position = led_count - 1
                 self.current_direction = False
-            
+
             start_position = self.current_position
             end_position = start_position - effect_config["pendulum_length"]
             if end_position < 0:
@@ -79,7 +79,7 @@ class EffectPendulum(Effect):
             if self.current_position < 0:
                 self.current_position = 0
                 self.current_direction = True
-            
+
             start_position = self.current_position
             end_position = start_position + effect_config["pendulum_length"]
             if end_position > led_count - 1:
@@ -89,6 +89,5 @@ class EffectPendulum(Effect):
             output_array[1, start_position:end_position] = self.current_color[1]
             output_array[2, start_position:end_position] = self.current_color[2]
 
-
-        # Add the output array to the queue
+        # Add the output array to the queue.
         self.queue_output_array_blocking(output_array)

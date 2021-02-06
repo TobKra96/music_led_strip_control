@@ -1,13 +1,14 @@
-from libs.effects.effect import Effect # pylint: disable=E0611, E0401
+from libs.effects.effect import Effect  # pylint: disable=E0611, E0401
 
 import numpy as np
 
+
 class EffectSyncFade(Effect):
     def run(self):
-        # Get the config of the current effect
+        # Get the config of the current effect.
         effect_config = self._device.device_config["effects"]["effect_sync_fade"]
 
-        # Prepare the needed config inside local variables to enhance the looking of the long array functions.
+        # Prepare the required config inside local variables to enhance the looking of the long array functions.
         current_gradient = effect_config["gradient"]
         current_speed = effect_config["speed"]
         current_reverse = effect_config["reverse"]
@@ -22,14 +23,13 @@ class EffectSyncFade(Effect):
         current_color_b = current_color[2]
 
         # Fill the whole strip with the color.
-        output_array = np.array([
-            [current_color_r for i in range(led_count)],
-            [current_color_g for i in range(led_count)],
-            [current_color_b for i in range(led_count)]
-        ])
+        output_array = np.array(
+            [
+                [current_color_r for i in range(led_count)],
+                [current_color_g for i in range(led_count)],
+                [current_color_b for i in range(led_count)]
+            ]
+        )
 
-               
-
-        # Add the output array to the queue
+        # Add the output array to the queue.
         self.queue_output_array_blocking(output_array)
-        
