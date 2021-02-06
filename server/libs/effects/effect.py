@@ -1,7 +1,7 @@
-from libs.color_service import ColorService # pylint: disable=E0611, E0401
-from libs.config_service import ConfigService # pylint: disable=E0611, E0401
-from libs.math_service import MathService # pylint: disable=E0611, E0401
-from libs.dsp import DSP # pylint: disable=E0611, E0401
+from libs.color_service import ColorService  # pylint: disable=E0611, E0401
+from libs.config_service import ConfigService  # pylint: disable=E0611, E0401
+from libs.math_service import MathService  # pylint: disable=E0611, E0401
+from libs.dsp import DSP  # pylint: disable=E0611, E0401
 
 import numpy as np
 from time import sleep
@@ -10,11 +10,12 @@ import cProfile
 import random
 from collections import deque
 
+
 class Effect:
 
     def __init__(self, device):
         self._device = device
-        
+
         # Initial config load.
         self._config = self._device.config
         self._config_colours = self._config["colours"]
@@ -24,7 +25,7 @@ class Effect:
         self._output_queue = self._device.output_queue
         self._audio_queue = self._device.audio_queue
 
-        # Initials color service and build gradients
+        # Initialize color service and build gradients.
         self._color_service = ColorService(self._config, self._device_config)
         self._color_service.build_gradients()
         self._color_service.build_fadegradients()
@@ -32,13 +33,13 @@ class Effect:
         self._color_service.build_slidearrays()
         self._color_service.build_bubblearrays()
 
-         # Init math service 
+        # Init math service.
         self._math_service = MathService()
 
-        # Init dsp
+        # Init dsp.
         self._dsp = DSP(self._config, self._device_config)
 
-        #Init some variables for the effects
+        # Init some variables for the effects.
         self.led_count = self._device_config["LED_Count"]
         self.n_fft_bins = self._config["general_settings"]["N_FFT_BINS"]
 
@@ -52,40 +53,49 @@ class Effect:
 
         self.speed_counter = 0
 
-        self.current_freq_detects = {"beat":False,
-                                     "low":False,
-                                     "mid":False,
-                                     "high":False}
-        self.prev_freq_detects = {"beat":0,
-                                  "low":0,
-                                  "mid":0,
-                                  "high":0}
-        self.detection_ranges = {"beat":(0,int(self._config["general_settings"]["N_FFT_BINS"]*0.13)),
-                                 "low":(int(self._config["general_settings"]["N_FFT_BINS"]*0.13),
-                                        int(self._config["general_settings"]["N_FFT_BINS"]*0.4)),
-                                 "mid":(int(self._config["general_settings"]["N_FFT_BINS"]*0.4),
-                                        int(self._config["general_settings"]["N_FFT_BINS"]*0.7)),
-                                 "high":(int(self._config["general_settings"]["N_FFT_BINS"]*0.8),
-                                         int(self._config["general_settings"]["N_FFT_BINS"]))}
-        self.min_detect_amplitude = {"beat":0.7,
-                                     "low":0.5,
-                                     "mid":0.3,
-                                     "high":0.3}
-        self.min_percent_diff = {"beat":70,
-                                 "low":100,
-                                 "mid":50,
-                                 "high":30}
+        self.current_freq_detects = {
+            "beat": False,
+            "low": False,
+            "mid": False,
+            "high": False
+        }
+        self.prev_freq_detects = {
+            "beat": 0,
+            "low": 0,
+            "mid": 0,
+            "high": 0
+        }
+        self.detection_ranges = {
+            "beat": (0, int(self._config["general_settings"]["N_FFT_BINS"] * 0.13)),
+            "low": (int(self._config["general_settings"]["N_FFT_BINS"] * 0.13),
+                    int(self._config["general_settings"]["N_FFT_BINS"] * 0.4)),
+            "mid": (int(self._config["general_settings"]["N_FFT_BINS"] * 0.4),
+                    int(self._config["general_settings"]["N_FFT_BINS"] * 0.7)),
+            "high": (int(self._config["general_settings"]["N_FFT_BINS"] * 0.8),
+                     int(self._config["general_settings"]["N_FFT_BINS"]))
+        }
+        self.min_detect_amplitude = {
+            "beat": 0.7,
+            "low": 0.5,
+            "mid": 0.3,
+            "high": 0.3
+        }
+        self.min_percent_diff = {
+            "beat": 70,
+            "low": 100,
+            "mid": 50,
+            "high": 30
+        }
 
-        # Setup for "Power" (don't change these)
+        # Setup for "Power" (don't change these).
         self.power_indexes = []
         self.power_brightness = 0
 
-        # Setup for "Wave" (don't change these)
+        # Setup for "Wave" (don't change this).
         self.wave_wipe_count = 0
 
     def run(self):
         raise NotImplementedError
-
 
     def update_freq_channels(self, y):
         for i in range(len(y)):
@@ -99,21 +109,20 @@ class Effect:
         n_fft_bins = self._config["general_settings"]["N_FFT_BINS"]
         channel_avgs = []
         differences = []
-        
+
         for i in range(n_fft_bins):
-            channel_avgs.append(sum(self.freq_channels[i])/len(self.freq_channels[i]))
-            differences.append(((self.freq_channels[i][0]-channel_avgs[i])*100)//channel_avgs[i])
+            channel_avgs.append(sum(self.freq_channels[i]) / len(self.freq_channels[i]))
+            differences.append(((self.freq_channels[i][0] - channel_avgs[i]) * 100) // channel_avgs[i])
         for i in ["beat", "low", "mid", "high"]:
-            if any(differences[j] >= self.min_percent_diff[i]\
-                   and self.freq_channels[j][0] >= self.min_detect_amplitude[i]\
-                            for j in range(*self.detection_ranges[i]))\
-                        and (time.time() - self.prev_freq_detects[i] > 0.2)\
-                        and len(self.freq_channels[0]) == self.freq_channel_history:
+            if (any(differences[j] >= self.min_percent_diff[i]
+                    and self.freq_channels[j][0] >= self.min_detect_amplitude[i]
+                    for j in range(*self.detection_ranges[i]))
+                and (time.time() - self.prev_freq_detects[i] > 0.2)
+                    and len(self.freq_channels[0]) == self.freq_channel_history):
                 self.prev_freq_detects[i] = time.time()
                 self.current_freq_detects[i] = True
             else:
                 self.current_freq_detects[i] = False
-
 
     def get_roll_steps(self, current_speed):
         """
@@ -128,12 +137,12 @@ class Effect:
         if self.speed_counter > max_counter:
             self.speed_counter = 0
 
-            if (max_counter/current_speed) < 1:
+            if (max_counter / current_speed) < 1:
 
-                steps = int(1 / (max_counter/current_speed))
+                steps = int(1 / (max_counter / current_speed))
             else:
                 steps = 1
-        
+
         else:
             steps = 0
 
@@ -148,13 +157,13 @@ class Effect:
 
     def get_mel(self, audio_data):
 
-        # Audio Data is empty
+        # Audio Data is empty.
         if(audio_data is None):
             return None
 
         audio_mel = audio_data["mel"]
 
-        # mel is empty
+        # mel is empty.
         if(audio_mel is None):
             return None
 
@@ -162,13 +171,13 @@ class Effect:
 
     def get_vol(self, audio_data):
 
-        # Audio Data is empty
+        # Audio Data is empty.
         if(audio_data is None):
             return None
 
         audio_vol = audio_data["vol"]
 
-        # vol is empty
+        # vol is empty.
         if(audio_vol is None):
             return None
 
