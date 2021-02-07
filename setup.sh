@@ -87,6 +87,8 @@ sudo pip3 install --no-input flask             # The webserver component.
 sudo pip3 install --no-input pyaudio           # Offer the audio input stream, which will be processed.
 sudo pip3 install --no-input scipy==1.3.0      # Offers a Gaussian filter.
 
+prompt -s "\nPackages updated and installed."
+
 
 # Install MLSC:
 prompt -i "\n[2/3] Installing $PROJ_NAME..."
@@ -96,11 +98,13 @@ fi
 cd $INST_DIR
 
 if [ -d $PROJ_DIR ]; then
-    confirm '${PROJ_NAME} is already installed. Do you want to reinstall it'
-    if [[ $? -eq 0 ]]; then
-	    sudo mv $PROJ_DIR "${PROJ_DIR}_bak" # Backup previous MLSC installation.
+    confirm "${PROJ_NAME} is already installed. Do you want to reinstall it"
+    if [ $? -eq 0 ]; then
+	    sudo mv $PROJ_DIR "${PROJ_DIR}_bak"
+        prompt -s "\nBackup of ${PROJ_NAME} created."
         sudo git clone https://github.com/TobKra96/music_led_strip_control.git
-        sudo cp music_led_strip_control_bak/server/libs/config.json music_led_strip_control/server/libs/config.json  # Restore config after reinstalling.
+        sudo cp music_led_strip_control_bak/server/libs/config.json music_led_strip_control/server/libs/config.json
+        prompt -s "\nConfig restored after reinstalling ${PROJ_NAME}."
     fi
 else
     sudo git clone https://github.com/TobKra96/music_led_strip_control.git
