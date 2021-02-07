@@ -1,4 +1,4 @@
-#!/usr/bin/sh
+#!/bin/bash
 
 # Setup script for MLSC
 # https://github.com/TobKra96/music_led_strip_control
@@ -25,27 +25,27 @@ b_CWAR="\033[1;33m"     # Bold warning color
 
 
 # Print message with flag type to change message color.
-prompt() {
+function prompt {
     arg1=$1
     all=$@
     shift
     case $arg1 in
         "-s"|"--success")
-        echo "${b_CGSC}${@}${CDEF}";;  # Print success message
+        echo -e "${b_CGSC}${@}${CDEF}";;  # Print success message
         "-e"|"--error")
-        echo "${b_CRER}${@}${CDEF}";;  # Print error message
+        echo -e "${b_CRER}${@}${CDEF}";;  # Print error message
         "-w"|"--warning")
-        echo "${b_CWAR}${@}${CDEF}";;  # Print warning message
+        echo -e "${b_CWAR}${@}${CDEF}";;  # Print warning message
         "-i"|"--info")
-        echo "${b_CCIN}${@}${CDEF}";;  # Print info message
+        echo -e "${b_CCIN}${@}${CDEF}";;  # Print info message
         *)
-        echo "$all";;                  # Print generic message
+        echo -e "$all";;                  # Print generic message
     esac
 }
 
 
 # Confirm action before proceeding.
-confirm() {
+function confirm {
     while true; do
         read -p "$(prompt -w "$*? [y/N] ")" yn
         case $yn in
@@ -92,14 +92,14 @@ prompt -s "\nPackages updated and installed."
 
 # Install MLSC:
 prompt -i "\n[2/3] Installing $PROJ_NAME..."
-if [ ! -d $INST_DIR ]; then
+if [[ ! -d $INST_DIR ]]; then
 	sudo mkdir $INST_DIR
 fi
 cd $INST_DIR
 
-if [ -d $PROJ_DIR ]; then
+if [[ -d $PROJ_DIR ]]; then
     confirm "${PROJ_NAME} is already installed. Do you want to reinstall it"
-    if [ $? -eq 0 ]; then
+    if [[ $? -eq 0 ]]; then
 	    sudo mv $PROJ_DIR "${PROJ_DIR}_bak"
         prompt -s "\nBackup of ${PROJ_NAME} created."
         sudo git clone https://github.com/TobKra96/music_led_strip_control.git
@@ -113,7 +113,7 @@ fi
 
 # Setup microphone:
 prompt -i "\n[3/3] Configuring microphone settings..."
-if [ ! -f $ASOUND_DIR ]; then
+if [[ ! -f $ASOUND_DIR ]]; then
     sudo touch $ASOUND_DIR
     prompt -s "\n$ASOUND_DIR created."
 else
@@ -123,7 +123,7 @@ fi
 sudo echo -e "pcm.!default {\n    type hw\n    card 1\n}\nctl.!default {\n    type hw\n    card 1\n}" > $ASOUND_DIR
 prompt -s "\nNew configuration for $ASOUND_DIR saved."
 
-if [ ! -f $ALSA_DIR ]; then
+if [[ ! -f $ALSA_DIR ]]; then
     sudo touch $ALSA_DIR
     prompt -s "\n$ALSA_DIR created."
 else
