@@ -54,7 +54,7 @@
                         {% include "nav/top_navigation.html" %}
                     </div>
                 {% endblock top_navigation %}
-                                
+
                 <div class="right_col" role="main">
 
                     <div class="page-title">
@@ -70,20 +70,20 @@
                                 Select Device
                             </button>
                             <div id="deviceDropDownMenuID" class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                
+
                             </div>
                         </div>
 
                         <div class="current_selected_txt" id="selected_device_txt" style="font-weight: bold;">Current Selected: All Devices</div>
                     </div>
-                    
+
 
                     <div class="clearfix"></div>
 
                     {% block content %}
                     <!-- {{ content }} -->
-                    {% endblock content %}           
-                </div>     
+                    {% endblock content %}
+                </div>
             </div>
         </div>
 
@@ -122,15 +122,15 @@
         <script src="{{ url_for('static', filename='vendors/devbridge-autocomplete/dist/jquery.autocomplete.min.js') }}"></script>
         <!-- starrr -->
         <script src="{{ url_for('static', filename='vendors/starrr/dist/starrr.js') }}"></script>
-        
+
         <!-- Custom Theme Scripts -->
         <script src="{{ url_for('static', filename='vendors/gentelella/js/custom.js') }}"></script>
-        
+
         {% endblock javascripts %}
 
         {% block custom_javascripts %}
             <!-- some custom javascripts -->
-        {% endblock custom_javascripts %}          
+        {% endblock custom_javascripts %}
     {% endblock body %}
 </body>
 
