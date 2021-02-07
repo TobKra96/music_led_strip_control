@@ -111,15 +111,20 @@ fi
 prompt -i "\n[3/3] Configuring microphone settings..."
 if [ ! -f $ASOUND_DIR ]; then
     sudo touch $ASOUND_DIR
+    prompt -s "\n$ASOUND_DIR created."
 else
     sudo mv $ASOUND_DIR "$ASOUND_DIR.bak"
+    prompt -s "\nBackup of existing $ASOUND_DIR created."
 fi
 sudo echo -e 'pcm.!default {\n    type hw\n    card 1\n}\nctl.!default {\n    type hw\n    card 1\n}' > $ASOUND_DIR
+prompt -s "\nNew configuration for $ASOUND_DIR saved."
 
 if [ ! -f $ALSA_DIR ]; then
     sudo touch $ALSA_DIR
+    prompt -s "\n$ALSA_DIR created."
 else
     sudo cp $ALSA_DIR "$ALSA_DIR.bak"
+    prompt -s "\nBackup of existing $ALSA_DIR created."
 fi
 sudo sed -i '/defaults.ctl.card 0/c\defaults.ctl.card 1' $ALSA_DIR
 sudo sed -i '/defaults.pcm.card 0/c\defaults.pcm.card 1' $ALSA_DIR
@@ -141,6 +146,8 @@ sudo sed -e '/pcm.dmix cards.pcm.dmix/ s/^#*/#/' -i $ALSA_DIR
 sudo sed -e '/pcm.dsnoop cards.pcm.dsnoop/ s/^#*/#/' -i $ALSA_DIR
 sudo sed -e '/pcm.modem cards.pcm.modem/ s/^#*/#/' -i $ALSA_DIR
 sudo sed -e '/pcm.phoneline cards.pcm.phoneline/ s/^#*/#/' -i $ALSA_DIR
+
+prompt -s "\nNew configuration for $ALSA_DIR saved."
 
 
 echo
