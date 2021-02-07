@@ -47,7 +47,7 @@ function prompt {
 # Confirm action before proceeding.
 function confirm {
     while true; do
-        read -p "$(prompt -w "$*? [y/N] ")" yn
+        read -p "$(prompt -w "$*? [y/N] ")" yn </dev/tty
         case $yn in
             [Yy]*) prompt -s "Proceeding..."; return 0;;
             [Nn]*) prompt -i "Skipped."; return 1;;
