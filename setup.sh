@@ -11,6 +11,39 @@ ASOUND_DIR="/etc/asound.conf" # Asound config location
 ALSA_DIR="/usr/share/alsa/alsa.conf" # Alsa config location
 
 
+# Colors
+CDEF="\033[0m"          # Default color
+CCIN="\033[0;36m"       # Info color
+CGSC="\033[0;32m"       # Success color
+CRER="\033[0;31m"       # Error color
+CWAR="\033[0;33m"       # Warning color
+b_CDEF="\033[1;37m"     # Bold default color
+b_CCIN="\033[1;36m"     # Bold info color
+b_CGSC="\033[1;32m"     # Bold success color
+b_CRER="\033[1;31m"     # Bold error color
+b_CWAR="\033[1;33m"     # Bold warning color
+
+
+# Print message with flag type to change message color.
+prompt() {
+    arg1=$1
+    all=$@
+    shift
+    case $arg1 in
+        "-s"|"--success")
+        echo -e "${b_CGSC}${@}${CDEF}";;  # Print success message
+        "-e"|"--error")
+        echo -e "${b_CRER}${@}${CDEF}";;  # Print error message
+        "-w"|"--warning")
+        echo -e "${b_CWAR}${@}${CDEF}";;  # Print warning message
+        "-i"|"--info")
+        echo -e "${b_CCIN}${@}${CDEF}";;  # Print info message
+        *)
+        echo -e "$all";;                  # Print generic message
+    esac
+}
+
+
 # Confirm action before proceeding.
 confirm() {
     while true; do
@@ -25,9 +58,14 @@ confirm() {
 }
 
 
-echo "Installing $PROJ_NAME..."
+echo
+prompt -s "\t          ***************************"
+prompt -s "\t          *  Installing $PROJ_NAME  *"
+prompt -s "\t          ***************************"
+echo
 
 # Update packages:
+prompt -i "\nUpdating and installing required packages..."
 sudo apt-get update
 sudo apt-get -y upgrade
 
@@ -51,6 +89,7 @@ sudo pip3 install --no-input scipy==1.3.0      # Offers a Gaussian filter.
 
 
 # Install MLSC:
+prompt -i "\nInstalling $PROJ_NAME..."
 if [ ! -d $INST_DIR ]; then
 	sudo mkdir $INST_DIR
 fi
@@ -62,12 +101,14 @@ if [ -d $PROJ_DIR ]; then
 	    sudo mv $PROJ_DIR "${PROJ_DIR}_bak" # Backup previous MLSC installation.
         sudo git clone https://github.com/TobKra96/music_led_strip_control.git
         sudo cp music_led_strip_control_bak/server/libs/config.json music_led_strip_control/server/libs/config.json  # Restore config after reinstalling.
+    fi
 else
     sudo git clone https://github.com/TobKra96/music_led_strip_control.git
 fi
 
 
 # Setup microphone:
+prompt -i "\nConfiguring microphone settings..."
 if [ ! -f $ASOUND_DIR ]; then
     sudo touch $ASOUND_DIR
 else
@@ -102,4 +143,10 @@ sudo sed -e '/pcm.modem cards.pcm.modem/ s/^#*/#/' -i $ALSA_DIR
 sudo sed -e '/pcm.phoneline cards.pcm.phoneline/ s/^#*/#/' -i $ALSA_DIR
 
 
-echo -e "\n${PROJ_NAME} installation is done. Please reboot your system (sudo reboot)."
+echo
+prompt -s "\t          ********************************************"
+prompt -s "\t          *       ${PROJ_NAME} installation completed!       *"
+prompt -s "\t          * Please reboot your system (sudo reboot). *"
+prompt -s "\t          ********************************************"
+
+exit 0
