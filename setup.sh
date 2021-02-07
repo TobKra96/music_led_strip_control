@@ -31,15 +31,15 @@ prompt() {
     shift
     case $arg1 in
         "-s"|"--success")
-        echo -e "${b_CGSC}${@}${CDEF}";;  # Print success message
+        echo "${b_CGSC}${@}${CDEF}";;  # Print success message
         "-e"|"--error")
-        echo -e "${b_CRER}${@}${CDEF}";;  # Print error message
+        echo "${b_CRER}${@}${CDEF}";;  # Print error message
         "-w"|"--warning")
-        echo -e "${b_CWAR}${@}${CDEF}";;  # Print warning message
+        echo "${b_CWAR}${@}${CDEF}";;  # Print warning message
         "-i"|"--info")
-        echo -e "${b_CCIN}${@}${CDEF}";;  # Print info message
+        echo "${b_CCIN}${@}${CDEF}";;  # Print info message
         *)
-        echo -e "$all";;                  # Print generic message
+        echo "$all";;                  # Print generic message
     esac
 }
 
@@ -59,13 +59,13 @@ confirm() {
 
 
 echo
-prompt -s "\t          ***************************"
+prompt -s "\t          *********************"
 prompt -s "\t          *  Installing $PROJ_NAME  *"
-prompt -s "\t          ***************************"
+prompt -s "\t          *********************"
 echo
 
 # Update packages:
-prompt -i "\nUpdating and installing required packages..."
+prompt -i "\n[1/3] Updating and installing required packages..."
 sudo apt-get update
 sudo apt-get -y upgrade
 
@@ -89,7 +89,7 @@ sudo pip3 install --no-input scipy==1.3.0      # Offers a Gaussian filter.
 
 
 # Install MLSC:
-prompt -i "\nInstalling $PROJ_NAME..."
+prompt -i "\n[2/3] Installing $PROJ_NAME..."
 if [ ! -d $INST_DIR ]; then
 	sudo mkdir $INST_DIR
 fi
@@ -108,7 +108,7 @@ fi
 
 
 # Setup microphone:
-prompt -i "\nConfiguring microphone settings..."
+prompt -i "\n[3/3] Configuring microphone settings..."
 if [ ! -f $ASOUND_DIR ]; then
     sudo touch $ASOUND_DIR
 else
