@@ -66,26 +66,26 @@ echo
 
 # Update packages:
 prompt -i "\n[1/3] Updating and installing required packages..."
-# sudo apt-get update
-# sudo apt-get -y upgrade
+sudo apt-get update
+sudo apt-get -y upgrade
 
-# # Install Git:
-# sudo apt-get -y install git
+# Install Git:
+sudo apt-get -y install git
 
-# # Install Audio Driver:
-# sudo apt-get -y install libatlas-base-dev portaudio19-dev
+# Install Audio Driver:
+sudo apt-get -y install libatlas-base-dev portaudio19-dev
 
-# # Install Python and required packages for it:
-# sudo apt-get -y install python3 python3-pip python3-scipy  # Fallback scipy module if the Pip module fails to install.
+# Install Python and required packages for it:
+sudo apt-get -y install python3 python3-pip python3-scipy  # Fallback scipy module if the Pip module fails to install.
 
 
-# # Install required Python modules:
-# sudo pip3 install --no-input --upgrade pip     # Upgrade Pip to the latest version.
-# sudo pip3 install --no-input -I numpy==1.17.0  # Offers a lot of mathematical functions and matrix manipulation. This version is required because 1.16 has a memory leak when using queues.
-# sudo pip3 install --no-input rpi_ws281x        # Raspberry Pi PWM library for WS281X LEDs.
-# sudo pip3 install --no-input flask             # The webserver component.
-# sudo pip3 install --no-input pyaudio           # Offer the audio input stream, which will be processed.
-# sudo pip3 install --no-input scipy==1.3.0      # Offers a Gaussian filter.
+# Install required Python modules:
+sudo pip3 install --no-input --upgrade pip     # Upgrade Pip to the latest version.
+sudo pip3 install --no-input -I numpy==1.17.0  # Offers a lot of mathematical functions and matrix manipulation. This version is required because 1.16 has a memory leak when using queues.
+sudo pip3 install --no-input rpi_ws281x        # Raspberry Pi PWM library for WS281X LEDs.
+sudo pip3 install --no-input flask             # The webserver component.
+sudo pip3 install --no-input pyaudio           # Offer the audio input stream, which will be processed.
+sudo pip3 install --no-input scipy==1.3.0      # Offers a Gaussian filter.
 
 prompt -s "\nPackages updated and installed."
 
