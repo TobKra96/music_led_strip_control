@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/sh
 
 # Setup script for MLSC
 # https://github.com/TobKra96/music_led_strip_control
