@@ -5,11 +5,27 @@
 
 
 INST_DIR="/share" # Installation location
+PROJ_DIR="music_led_strip_control" # Project location
+PROJ_NAME="MLSC" # Project abbreviation
 ASOUND_DIR="/etc/asound.conf" # Asound config location
 ALSA_DIR="/usr/share/alsa/alsa.conf" # Alsa config location
 
 
-echo "Installing MLSC..."
+# Confirm action before proceeding.
+confirm() {
+    while true; do
+        read -p "$(prompt -w "$*? [y/N] ")" yn
+        case $yn in
+            [Yy]*) prompt -s "Proceeding..."; return 0;;
+            [Nn]*) prompt -i "Skipped."; return 1;;
+            [Qq]*) prompt -e "Setup exited."; exit 0;;
+            '') prompt -i "Skipped."; return 1;;
+        esac
+    done
+}
+
+
+echo "Installing $PROJ_NAME..."
 
 # Update packages:
 sudo apt-get update
@@ -26,12 +42,12 @@ sudo apt-get -y install python3 python3-pip python3-scipy  # Fallback scipy modu
 
 
 # Install required Python modules:
-sudo pip3 install --upgrade pip --yes     # Upgrade Pip to the latest version.
-sudo pip3 install -I numpy==1.17.0 --yes  # Offers a lot of mathematical functions and matrix manipulation. This version is required because 1.16 has a memory leak when using queues.
-sudo pip3 install rpi_ws281x --yes        # Raspberry Pi PWM library for WS281X LEDs.
-sudo pip3 install flask --yes             # The webserver component.
-sudo pip3 install pyaudio --yes           # Offer the audio input stream, which will be processed.
-sudo pip3 install scipy==1.3.0 --yes      # Offers a Gaussian filter.
+sudo pip3 install --no-input --upgrade pip     # Upgrade Pip to the latest version.
+sudo pip3 install --no-input -I numpy==1.17.0  # Offers a lot of mathematical functions and matrix manipulation. This version is required because 1.16 has a memory leak when using queues.
+sudo pip3 install --no-input rpi_ws281x        # Raspberry Pi PWM library for WS281X LEDs.
+sudo pip3 install --no-input flask             # The webserver component.
+sudo pip3 install --no-input pyaudio           # Offer the audio input stream, which will be processed.
+sudo pip3 install --no-input scipy==1.3.0      # Offers a Gaussian filter.
 
 
 # Install MLSC:
@@ -39,7 +55,16 @@ if [ ! -d $INST_DIR ]; then
 	sudo mkdir $INST_DIR
 fi
 cd $INST_DIR
-sudo git clone https://github.com/TobKra96/music_led_strip_control.git
+
+if [ -d $PROJ_DIR ]; then
+    confirm '${PROJ_NAME} is already installed. Do you want to reinstall it'
+    if [[ $? -eq 0 ]]; then
+	    sudo mv $PROJ_DIR "${PROJ_DIR}_bak" # Backup previous MLSC installation.
+        sudo git clone https://github.com/TobKra96/music_led_strip_control.git
+        sudo cp music_led_strip_control_bak/server/libs/config.json music_led_strip_control/server/libs/config.json  # Restore config after reinstalling.
+else
+    sudo git clone https://github.com/TobKra96/music_led_strip_control.git
+fi
 
 
 # Setup microphone:
@@ -77,4 +102,4 @@ sudo sed -e '/pcm.modem cards.pcm.modem/ s/^#*/#/' -i $ALSA_DIR
 sudo sed -e '/pcm.phoneline cards.pcm.phoneline/ s/^#*/#/' -i $ALSA_DIR
 
 
-echo "MLSC installation is done. Please reboot your system (sudo reboot)."
+echo -e "\n${PROJ_NAME} installation is done. Please reboot your system (sudo reboot)."
