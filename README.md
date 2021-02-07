@@ -52,7 +52,7 @@
 ### Automated installation
 Run the following command in your terminal:
 ```bash
-curl -sSL https://raw.githubusercontent.com/TobKra96/music_led_strip_control/master/setup.sh | sudo sh
+curl -sSL https://raw.githubusercontent.com/TobKra96/music_led_strip_control/master/setup.sh | sudo bash
 ```
 After the installation completes, please check the [Installation Guide](https://github.com/TobKra96/music_led_strip_control/wiki/Installation-Guide#iv-configure-music-led-strip-control) to configure the initial settings.
 
