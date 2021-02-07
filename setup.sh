@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # Setup script for MLSC
 # https://github.com/TobKra96/music_led_strip_control
@@ -120,7 +120,7 @@ else
     sudo mv $ASOUND_DIR "$ASOUND_DIR.bak"
     prompt -s "\nBackup of existing $ASOUND_DIR created."
 fi
-sudo echo -e 'pcm.!default {\n    type hw\n    card 1\n}\nctl.!default {\n    type hw\n    card 1\n}' > $ASOUND_DIR
+sudo echo -e "pcm.!default {\n    type hw\n    card 1\n}\nctl.!default {\n    type hw\n    card 1\n}" > $ASOUND_DIR
 prompt -s "\nNew configuration for $ASOUND_DIR saved."
 
 if [ ! -f $ALSA_DIR ]; then
