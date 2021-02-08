@@ -72,7 +72,7 @@ Also, check out the tutorial video I created for the manual installation:
 </p>
 <p align="center">
   <a style="text-decoration:none" href="">
-    <img src="https://user-images.githubusercontent.com/7833146/104821835-ee0d5580-583e-11eb-8ed7-fbfc4f15a1a1.png" alt="Scheme_02" />
+    <img src="https://user-images.githubusercontent.com/24798198/107171661-a2744480-69c3-11eb-8753-d05d14b478c1.png" alt="Schematic" />
   </a>
 </p>
 
