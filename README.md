@@ -67,9 +67,9 @@ Also, check out the tutorial video I created for the manual installation:
   </a>
 </p>
 
-<p align="center">
-    Setup scheme
-</p>
+<h2 align="center">
+    Setup schematic
+</h2>
 <p align="center">
   <a style="text-decoration:none" href="https://github.com/TobKra96/music_led_strip_control/wiki/Installation-Guide">
     <img src="https://user-images.githubusercontent.com/24798198/107310140-209c1e00-6a8c-11eb-8bbb-0e99f63e667c.png" alt="Schematic" />
@@ -79,9 +79,16 @@ Also, check out the tutorial video I created for the manual installation:
 
 ## Used Libraries
  - [Audio Reactive LED Strip by Scott Lawson](https://github.com/scottlawsonbc/audio-reactive-led-strip)
+
 Thank you for the digital signal processing and some effects. You are the best.
+
 - [rpi_ws281x by Jeremy Garff](https://github.com/jgarff/rpi_ws281x)
-Awesome library for the led ouput signal. Easy to use.
+
+Awesome library for the LED output signal. Easy to use.
+
 - [gentelella by Colorlib](https://github.com/ColorlibHQ/gentelella)
+
 Fancy looking bootstrap theme.
-Scripts included: Bootstrap, Font Awesome, jQuery-Autocomplete, FullCalendar, Charts.js, Bootstrap Colorpicker, Cropper, dataTables, Date Range Picker for Bootstrap, Dropzone, easyPieChart, ECharts, bootstrap-wysiwyg, Flot, Javascript plotting library for jQuery, gauge.js, iCheck, jquery.inputmask plugin, Ion.RangeSlider, jQuery, jVectorMap, moment.js, Morris.js - pretty time-series line graphs, PNotify - Awesome JavaScript notifications, NProgress, Pace, Parsley, bootstrap-progressbar, select2, Sidebar Transitions - simple off-canvas navigations, Skycons - canvas based wather icons, jQuery Sparklines plugin, switchery - Turns HTML checkbox inputs into beautiful iOS style switches, jQuery Tags Input Plugin, Autosize - resizes text area to fit text, validator - HTML from validator using jQuery, jQuery Smart Wizard
+Scripts included:
+
+Bootstrap, Font Awesome, jQuery-Autocomplete, FullCalendar, Charts.js, Bootstrap Colorpicker, Cropper, dataTables, Date Range Picker for Bootstrap, Dropzone, easyPieChart, ECharts, bootstrap-wysiwyg, Flot, Javascript plotting library for jQuery, gauge.js, iCheck, jquery.inputmask plugin, Ion.RangeSlider, jQuery, jVectorMap, moment.js, Morris.js - pretty time-series line graphs, PNotify - Awesome JavaScript notifications, NProgress, Pace, Parsley, bootstrap-progressbar, select2, Sidebar Transitions - simple off-canvas navigations, Skycons - canvas based weather icons, jQuery Sparklines plugin, switchery - Turns HTML checkbox inputs into beautiful iOS style switches, jQuery Tags Input Plugin, Autosize - resizes text area to fit text, validator - HTML form validator using jQuery, jQuery Smart Wizard.
