@@ -71,7 +71,7 @@ Also, check out the tutorial video I created for the manual installation:
     Setup scheme
 </p>
 <p align="center">
-  <a style="text-decoration:none" href="">
+  <a style="text-decoration:none" href="https://github.com/TobKra96/music_led_strip_control/wiki/Installation-Guide">
     <img src="https://user-images.githubusercontent.com/24798198/107310140-209c1e00-6a8c-11eb-8bbb-0e99f63e667c.png" alt="Schematic" />
   </a>
 </p>
