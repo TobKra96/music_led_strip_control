@@ -3,14 +3,14 @@
 </h1>
 
 <p align="center">
-    <img src="https://user-images.githubusercontent.com/7833146/105612807-9c287a80-5dbe-11eb-8c25-2212d975a605.png" alt="Logo" />
+    <img src="https://user-images.githubusercontent.com/24798198/107574531-1d6d7300-6bef-11eb-8d7f-83c42a5784d2.png" alt="Logo" />
 </p>
 
 <p align="center">
   <a style="text-decoration:none" href="https://www.python.org/">
     <img src="https://img.shields.io/badge/Made%20with-Python-1f425f.svg" alt="made-with-python" />
   </a>
-  <a style="text-decoration:none" href="https://discord.gg/jXd5Zxsu/">
+  <a style="text-decoration:none" href="https://discord.gg/bMmWYGcz/">
     <img src="https://img.shields.io/discord/774182494277992478" alt="Discord" />
   </a>
   <a style="text-decoration:none" href="https://github.com/TobKra96/music_led_strip_control/blob/master/LICENSE">
