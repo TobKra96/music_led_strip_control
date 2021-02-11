@@ -1,4 +1,6 @@
 from enum import Enum
+
+
 class EffectsEnum(Enum):
     effect_off = 1
     effect_single = 2

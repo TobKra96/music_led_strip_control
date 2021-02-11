@@ -4,4 +4,4 @@ class Output:
         self._device_config = device.device_config
 
     def show(self, output_array):
-        raise NotImplementedError("Please Implement this method")
+        raise NotImplementedError("Please implement this method.")

@@ -1,13 +1,14 @@
-from libs.effects.effect import Effect # pylint: disable=E0611, E0401
+from libs.effects.effect import Effect  # pylint: disable=E0611, E0401
 
 import numpy as np
 
+
 class EffectFade(Effect):
     def run(self):
-        # Get the config of the current effect
+        # Get the config of the current effect.
         effect_config = self._device.device_config["effects"]["effect_fade"]
 
-        # Prepare the needed config inside local variables to enhance the looking of the long array functions.
+        # Prepare the required config inside local variables to enhance the looking of the long array functions.
         current_gradient = effect_config["gradient"]
         current_speed = effect_config["speed"]
         current_reverse = effect_config["reverse"]
@@ -35,16 +36,15 @@ class EffectFade(Effect):
             [current_color_b for i in range(led_count)]
         ])
 
-        # Calculate how many steps the array will roll
+        # Calculate how many steps the array will roll.
         steps = self.get_roll_steps(current_speed)
 
         # We got the current output array. Now we prepare the next step. We "roll" the array with the specified speed.
         full_gradient_ref[current_gradient] = np.roll(
             full_gradient_ref[current_gradient],
             steps * current_reverse_translated,
-            axis = 1
+            axis=1
         )
 
-        # Add the output array to the queue
+        # Add the output array to the queue.
         self.queue_output_array_blocking(output_array)
-        
