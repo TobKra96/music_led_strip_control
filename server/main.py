@@ -1,9 +1,8 @@
-#   Main File
-#   ----------------
-# 
-#   The Programm will start here.
-#   This file will only initialize and start the processes.
+# Main File
+# ----------------
 #
+# The program will start here.
+# This file will only initialize and start the processes.
 
 from libs.device_manager import DeviceManager
 from libs.config_service import ConfigService
@@ -17,25 +16,25 @@ import numpy as np
 from multiprocessing import Process, Queue, Manager, Lock
 from time import sleep
 
+
 class Main():
     """
-    This is the main class. It control everything.
-    Its the first starting point of the programm.
+    This is the main class. It controls everything.
+    It's the first starting point of the program.
     """
-
     def start(self):
         """
-        This function will start all neccesary components.
+        This function will start all necessary components.
         Let's go :-D
         """
-        print("Init the programm...")
+        print("Init the program...")
 
-        # We need a lock to prevent too fast save and load actions of the config
+        # We need a lock to prevent too fast saving and loading actions of the config
         self._config_lock = Lock()
 
         # Create the instance of the config
         self._config_instance = ConfigService.instance(self._config_lock)
-        self._config = self._config_instance.config        
+        self._config = self._config_instance.config
 
         # Prepare the queue for the output
         self._output_queue = Queue(2)
@@ -55,79 +54,76 @@ class Main():
         # Start the DeviceManager Service
         self._device_manager = DeviceManager()
         self._device_manager_process = Process(
-            target=self._device_manager.start, 
+            target=self._device_manager.start,
             args=(
-                self._config_lock, 
-                self._notification_queue_device_manager_in, 
+                self._config_lock,
+                self._notification_queue_device_manager_in,
                 self._notification_queue_device_manager_out,
                 self._effects_queue,
                 self._audio_queue,
-                ))
+            ))
         self._device_manager_process.start()
 
         # Start Notification Service
         self._notification_service = NotificationService()
         self._notification_service_process = Process(
-            target=self._notification_service.start, 
+            target=self._notification_service.start,
             args=(
-                self._config_lock, 
-                self._notification_queue_device_manager_in, 
-                self._notification_queue_device_manager_out, 
-                self._notification_queue_audio_in, 
-                self._notification_queue_audio_out, 
-                self._notification_queue_webserver_in, 
-                self._notification_queue_webserver_out, 
-                ))
+                self._config_lock,
+                self._notification_queue_device_manager_in,
+                self._notification_queue_device_manager_out,
+                self._notification_queue_audio_in,
+                self._notification_queue_audio_out,
+                self._notification_queue_webserver_in,
+                self._notification_queue_webserver_out,
+            ))
         self._notification_service_process.start()
 
-        #Start Webserver
+        # Start Webserver
         self._webserver = Webserver()
         self._webserver_process = Process(
-            target=self._webserver.start, 
+            target=self._webserver.start,
             args=(
-                self._config_lock, 
-                self._notification_queue_webserver_in, 
+                self._config_lock,
+                self._notification_queue_webserver_in,
                 self._notification_queue_webserver_out,
                 self._effects_queue
-                ))
+            ))
         self._webserver_process.start()
-        
-        #Start audio process
+
+        # Start audio process
         self._audio = AudioProcessService()
         self._audio_process = Process(
-            target=self._audio.start, 
+            target=self._audio.start,
             args=(
-                self._config_lock, 
-                self._notification_queue_audio_in, 
+                self._config_lock,
+                self._notification_queue_audio_in,
                 self._notification_queue_audio_out,
                 self._audio_queue
-                ))
+            ))
         self._audio_process.start()
 
         print("Init finished")
 
         try:
-
-            print("Programm started...")
+            print("Program started...")
 
             self._cancel_token = False
 
             # Do nothing with this thread. Just wait for the exit.
             while not self._cancel_token:
                 sleep(10)
-            
-
 
         except KeyboardInterrupt:
 
-            print("Stop the programm...")
-            
+            print("Stopping the program...")
+
             self._notification_service_process.terminate()
             self._webserver_process.terminate()
 
-            print("Programm stopped")
+            print("Program stopped")
+
 
 if __name__ == "__main__":
-
     main = Main()
     main.start()

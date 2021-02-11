@@ -1,6 +1,6 @@
-
-*.pyc
+__pycache__/
+*.py[cod]
+*$py.class
 
 server/libs/config_.json
-
-.vscode/launch.json
+.vscode/

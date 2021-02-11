@@ -1,68 +1,70 @@
-.dasboard-glyph{
+.dasboard-glyph {
     margin-top: 10px;
     margin-bottom: 20px;
     font-size: 35px;
 }
 
-.nav-sm span.fa.dasboard-glyph{
+.nav-sm span.fa.dasboard-glyph {
     display: inline-block;
 }
 
-#dashboard-header-1{
+#dashboard-header-1 {
     margin-top: 20px;
 }
 
 li.active-dashboard-item {
-        color: #fff;
-        background-color: #1ABB9C;
+    color: #fff;
+    background-color: #1ABB9C;
 }
 
-.form-space{
+.form-space {
     margin-bottom: 10px;
 }
 
-.center{
+.center {
     margin: 25px 0px;
 }
 
-.nav_height{
+.nav_height {
     height: 50px;
 }
 
-.dropdown_position{
+.dropdown_position {
     margin: 20px 0px;
 }
 
-.dropdown_color{
+.dropdown_color {
     background-color: #73879C;
     border: #73879C;
 }
 
-.dropdown_color:hover{
+.dropdown_color:hover {
     background-color: #1ABB9C;
     border: #73879C;
 }
 
-.dropdown_color:active{
+.dropdown_color:active {
     background-color: #1ABB9C;
     border: #73879C;
 }
 
-.btn-secondary.dropdown_color:not(:disabled):not(.disabled).active, .btn-secondary.dropdown_color:not(:disabled):not(.disabled):active, .show>.btn-secondary.dropdown-toggle.dropdown_color {
+.btn-secondary.dropdown_color:not(:disabled):not(.disabled).active,
+.btn-secondary.dropdown_color:not(:disabled):not(.disabled):active,
+.show>.btn-secondary.dropdown-toggle.dropdown_color {
     background-color: #73879C;
     border: #73879C;
 }
 
-.current_selected_txt{
+.current_selected_txt {
     vertical-align: middle;
 }
 
-.logoimage{
+.logoimage {
     max-width: 100px;
     max-height: 50px;
 }
 
-.note{
+.note {
     max-width: 50px;
     max-height: 50px;
 }
