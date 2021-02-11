@@ -59,12 +59,13 @@ li.active-dashboard-item {
     vertical-align: middle;
 }
 
-.logoimage {
-    max-width: 100px;
+.logo {
+    max-width: 50px;
     max-height: 50px;
 }
 
-.note {
-    max-width: 50px;
+.logotext {
+    margin: 10px;
+    max-width: 120px;
     max-height: 50px;
 }
