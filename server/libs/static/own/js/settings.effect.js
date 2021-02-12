@@ -337,11 +337,14 @@ document.getElementById("save_btn").addEventListener("click",function(e) {
 
 
 $(function() {
-  $('#colorpickerDiv').colorpicker({
-      color: '#000000',
-      format: 'rgb'
-  });
+  if($('#colorpickerDiv').length) {
+    $('#colorpickerDiv').colorpicker({
+        color: '#000000',
+        format: 'rgb'
+    });
+  }
 });
+
 
 
 function componentToHex(c) {
