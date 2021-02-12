@@ -22,21 +22,21 @@ $( document ).ready(function() {
 
   settingsIdentifier = $("#settingsIdentifier").val();
   effectIdentifier = $("#effectIdentifier").val();
-  
+
   // Only allow all_devices for sync fade effect.
   if(effectIdentifier == "effect_sync_fade"){
     currentDevice = "all_devices"
     BuildDeviceCombobox();
     UpdateCurrentDeviceText();
-    
+
     AddEventListeners();
-  
+
     devicesLoading = false;
   }
   else{
     GetDevices();
   }
-  
+
   GetColors();
   GetGradients();
 });
@@ -67,7 +67,7 @@ function ParseDevices(devices){
 
   BuildDeviceCombobox();
   UpdateCurrentDeviceText();
-  
+
   AddEventListeners();
 
   devicesLoading = false;
@@ -143,9 +143,9 @@ function GetEffectSetting(device, effect, setting_key){
     url: "/GetEffectSetting",
     type: "GET", //send it through get method
     data: {
-      "device": device, 
-      "effect": effect, 
-      "setting_key": setting_key, 
+      "device": device,
+      "effect": effect,
+      "setting_key": setting_key,
   },
     success: function(response) {
         ParseGetEffectSetting(response);
@@ -179,7 +179,7 @@ function GetLocalSettings(){
       GetEffectSetting(currentDevice, effectIdentifier, all_setting_keys[setting_id])
     })
   }
-  
+
 
 }
 
@@ -194,7 +194,7 @@ function SetLocalInput(setting_key, setting_value){
   }else{
     $("#" + setting_key).val(setting_value);
   }
-  
+
   $("#" + setting_key).trigger('change');
 }
 
@@ -210,12 +210,12 @@ function GetAllSettingKeys(){
 
 
 function SetEffectSetting(device, effect, settings){
-  
+
   if(this.currentDevice == "all_devices"){
       var data = {};
       data["effect"] = effect;
       data["settings"] = settings;
-  
+
       $.ajax({
           url: "/SetEffectSettingForAll",
           type: "POST", //send it through get method
@@ -235,7 +235,7 @@ function SetEffectSetting(device, effect, settings){
       data["device"] = this.currentDevice;
       data["effect"] = effect;
       data["settings"] = settings;
-  
+
       $.ajax({
           url: "/SetEffectSetting",
           type: "POST", //send it through get method
@@ -250,7 +250,7 @@ function SetEffectSetting(device, effect, settings){
           }
         });
   }
-  
+
 }
 
 function SetLocalSettings(){
@@ -261,7 +261,7 @@ function SetLocalSettings(){
   Object.keys(all_setting_keys).forEach(setting_id => {
     var setting_key = all_setting_keys[setting_id];
     var setting_value = "";
-    
+
     if($("#" + setting_key).length){
       if($("#" + setting_key).attr('type') == 'checkbox'){
         setting_value = $("#" + setting_key).is(':checked')
@@ -278,7 +278,7 @@ function SetLocalSettings(){
     }
 
     settings[setting_key] = setting_value;
-        
+
   })
 
   SetEffectSetting(currentDevice, effectIdentifier, settings)
@@ -297,7 +297,7 @@ function BuildDeviceCombobox(){
   Object.keys(devices).forEach(device_key => {
       $('#deviceDropDownMenuID').append( "<a class=\"dropdown-item device_item\" id=\"" + device_key +"\">" + devices[device_key] + "</a>" );
   });
-  
+
 }
 
 function AddEventListeners(){
@@ -312,7 +312,7 @@ function AddEventListeners(){
 
 function UpdateCurrentDeviceText(){
   var text = "";
-  
+
   if(this.currentDevice == "all_devices"){
       text = "Current device: All Devices"
   }
@@ -320,9 +320,9 @@ function UpdateCurrentDeviceText(){
   {
       text = "Current device: " + this.devices[this.currentDevice]
   }
-  
+
   $("#selected_device_txt").text(text);
-  
+
 }
 
 function SwitchDevice(e){

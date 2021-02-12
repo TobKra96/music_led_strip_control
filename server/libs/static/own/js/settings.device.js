@@ -13,13 +13,13 @@ var reloadingMax = 0;
 // Init and load all settings
 $( document ).ready(function() {
   settingsIdentifier = $("#settingsIdentifier").val();
- 
+
   GetDevices();
   GetOutputTypes();
 });
 
 //Check if all initial ajax requests are finished.
-function CheckIfFinishedInitialLoading (){ 
+function CheckIfFinishedInitialLoading (){
   if(!devicesLoading && !outputTypesLoading){
     GetLocalSettings();
   }
@@ -47,7 +47,7 @@ function ParseDevices(devices){
 
   BuildDeviceCombobox();
   UpdateCurrentDeviceText();
-  
+
   AddEventListeners();
 
   devicesLoading = false;
@@ -91,8 +91,8 @@ function GetDeviceSetting(device, setting_key){
     url: "/GetDeviceSetting",
     type: "GET", //send it through get method
     data: {
-      "device": device, 
-      "setting_key": setting_key, 
+      "device": device,
+      "setting_key": setting_key,
   },
     success: function(response) {
         ParseGetDeviceSetting(response);
@@ -117,8 +117,8 @@ function GetOutputTypeDeviceSetting(device, output_type_key, setting_key){
     type: "GET", //send it through get method
     data: {
       "device": device,
-      "output_type_key": output_type_key, 
-      "setting_key": setting_key, 
+      "output_type_key": output_type_key,
+      "setting_key": setting_key,
   },
     success: function(response) {
         ParseGetOutputTypeDeviceSetting(response);
@@ -163,9 +163,9 @@ function GetLocalSettings(){
       Object.keys(all_output_type_setting_keys).forEach(setting_id => {
         GetOutputTypeDeviceSetting(currentDevice, output_type_key, all_output_type_setting_keys[setting_id])
       })
-      
+
     });
-  
+
 }
 
 function SetLocalDeviceInput(setting_key, setting_value){
@@ -173,11 +173,11 @@ function SetLocalDeviceInput(setting_key, setting_value){
     if(setting_value){
       $("#" + setting_key).click();
     }
-    
+
   }else{
     $("#" + setting_key).val(setting_value);
   }
-  
+
   $("#" + setting_key).trigger('change');
 }
 
@@ -186,11 +186,11 @@ function SetLocalOutputTypeDeviceInput(output_type_key, setting_key, setting_val
     if(setting_value){
       $("#" + setting_key + "." + output_type_key).click();
     }
-    
+
   }else{
     $("#" + setting_key + "." + output_type_key).val(setting_value);
   }
-  
+
   $("#" + setting_key + "." + output_type_key).trigger('change');
 }
 
@@ -213,11 +213,11 @@ function GetOutputTypeSettingKeys(output_type){
 
 
 function SetDeviceSetting(device, settings){
- 
+
       var data = {};
       data["device"] = device;
       data["settings"] = settings;
-  
+
       $.ajax({
           url: "/SetDeviceSetting",
           type: "POST", //send it through get method
@@ -242,12 +242,12 @@ function SetDeviceSetting(device, settings){
  }
 
  function SetOutputTypeDeviceSetting(device, output_type_key, settings){
- 
+
   var data = {};
   data["device"] = device;
   data["output_type_key"] = output_type_key;
   data["settings"] = settings;
-  
+
   $.ajax({
       url: "/SetOutputTypeDeviceSetting",
       type: "POST", //send it through get method
@@ -283,7 +283,7 @@ function SetLocalSettings(){
   Object.keys(all_device_setting_keys).forEach(setting_id => {
     var setting_key = all_device_setting_keys[setting_id];
     var setting_value = "";
-    
+
     var elementIdentifier = "#" + setting_key + ".device_setting_input";
     if($(elementIdentifier).length){
       if($(elementIdentifier).attr('type') == 'checkbox'){
@@ -297,11 +297,11 @@ function SetLocalSettings(){
     }
 
     settings_device[setting_key] = setting_value;
-    
+
   })
 
   SetDeviceSetting(currentDevice, settings_device)
-  
+
 
   Object.keys(output_types).forEach(output_type_key => {
     var all_output_type_setting_keys = GetOutputTypeSettingKeys(output_type_key);
@@ -323,10 +323,10 @@ function SetLocalSettings(){
           setting_value = $(elementIdentifier).val();
         }
       }
-      
+
       settings_output_type[setting_key] = setting_value;
 
-      
+
     });
 
     SetOutputTypeDeviceSetting(currentDevice, output_type_key, settings_output_type)
@@ -335,9 +335,9 @@ function SetLocalSettings(){
 }
 
 function CreateNewDevice(){
- 
+
   var data = {};
-  
+
   $.ajax({
       url: "/CreateNewDevice",
       type: "POST", //send it through get method
@@ -355,7 +355,7 @@ function CreateNewDevice(){
 }
 
 function DeleteDevice(device){
- 
+
   var data = {};
   data["device"] = device;
 
@@ -384,7 +384,7 @@ function BuildDeviceCombobox(){
   Object.keys(devices).forEach(device_key => {
       $( ".dropdown-menu").append( "<a class=\"dropdown-item device_item\" id=\"" + device_key +"\">" + devices[device_key] + "</a>" );
   });
-  
+
 }
 
 function AddEventListeners(){
@@ -401,7 +401,7 @@ function UpdateCurrentDeviceText(){
   var text = "";
   text = "Current device: " + this.devices[this.currentDevice]
   $("#selected_device_txt").text(text);
-  
+
 }
 
 function SwitchDevice(e){
@@ -424,9 +424,9 @@ document.getElementById("create2_btn").addEventListener("click",function(e) {
 
 document.getElementById("delete_btn").addEventListener("click",function(e) {
   if (confirm('Are you sure you want to delete the device?')) {
-    DeleteDevice(currentDevice);  
+    DeleteDevice(currentDevice);
   }
-  
+
 });
 
 

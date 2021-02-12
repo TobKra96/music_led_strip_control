@@ -31,7 +31,7 @@ function ParseDevices(devices){
 }
 
 function GetActiveEffect(device){
-        
+
     $.ajax({
         url: "/GetActiveEffect",
         type: "GET", //send it through get method
@@ -46,7 +46,7 @@ function GetActiveEffect(device){
 }
 
 function ParseActiveEffect(respond){
-    this.activeEffect = respond["effect"];   
+    this.activeEffect = respond["effect"];
     this.UpdateActiveEffectTile();
 }
 
@@ -56,11 +56,11 @@ function SetActiveEffect(newActiveEffect){
     this.activeEffect = newActiveEffect;
 
     removeActiveStyle(lastEffect);
-    
+
     if(this.currentDevice == "all_devices"){
         var data = {};
         data["effect"] = this.activeEffect;
-    
+
         $.ajax({
             url: "/SetActiveEffectForAll",
             type: "POST", //send it through get method
@@ -79,7 +79,7 @@ function SetActiveEffect(newActiveEffect){
         var data = {};
         data["device"] = this.currentDevice;
         data["effect"] = this.activeEffect;
-    
+
         $.ajax({
             url: "/SetActiveEffect",
             type: "POST", //send it through get method
@@ -94,7 +94,7 @@ function SetActiveEffect(newActiveEffect){
             }
           });
     }
-    
+
     setActiveStyle(this.activeEffect);
 }
 
@@ -105,11 +105,11 @@ function BuildDeviceCombobox(){
     var devices = this.devices
 
     $( ".dropdown-menu").append("<a class=\"dropdown-item device_item\" id=\"all_devices\">All Devices</a>")
-    
+
     Object.keys(devices).forEach(device_key => {
         $( ".dropdown-menu").append( "<a class=\"dropdown-item device_item\" id=\"" + device_key +"\">" + devices[device_key] + "</a>" );
     });
-    
+
 }
 
 function AddEventListeners(){
@@ -124,7 +124,7 @@ function AddEventListeners(){
 
 function UpdateCurrentDeviceText(){
     var text = "";
-    
+
     if(this.currentDevice == "all_devices"){
         text = "Current device: All Devices"
     }
@@ -132,7 +132,7 @@ function UpdateCurrentDeviceText(){
     {
         text = "Current device: " + this.devices[this.currentDevice]
     }
-    
+
     $("#selected_device_txt").text(text);
     if(this.activeEffect != ""){
         this.removeActiveStyle(this.activeEffect);
@@ -170,7 +170,7 @@ function SwitchDevice(e){
 
 
 function setActiveStyle(currentEffect){
-    
+
     $("#" + currentEffect).addClass("active-dashboard-item");
 }
 
@@ -182,7 +182,7 @@ function removeActiveStyle(currentEffect){
 document.getElementById("dashboard-list-special").addEventListener("click",function(e) {
     // e.target is our targetted element.
     // try doing console.log(e.target.nodeName), it will result LI
-    
+
     switchEffect(e, "dashboard-list-special");
 });
 
@@ -190,7 +190,7 @@ document.getElementById("dashboard-list-special").addEventListener("click",funct
 document.getElementById("dashboard-list-none-music").addEventListener("click",function(e) {
     // e.target is our targetted element.
     // try doing console.log(e.target.nodeName), it will result LI
-    
+
     switchEffect(e, "dashboard-list-none-music");
 });
 
@@ -198,7 +198,7 @@ document.getElementById("dashboard-list-none-music").addEventListener("click",fu
 document.getElementById("dashboard-list-music").addEventListener("click",function(e) {
     // e.target is our targetted element.
     // try doing console.log(e.target.nodeName), it will result LI
-    
+
     switchEffect(e, "dashboard-list-music");
 });
 
@@ -210,7 +210,7 @@ function switchEffect(e, listName){
         if(e.target.parentElement && e.target.parentElement.id == listName){
             newActiveEffect = e.target.id;
         }
-     
+
     // Click on some of the span elements inside the li element.
     }else if((e.target && e.target.nodeName == "SPAN")||(e.target && e.target.nodeName == "I")){
         if(e.target.parentElement && e.target.parentElement.nodeName == "LI"){

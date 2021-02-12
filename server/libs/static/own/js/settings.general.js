@@ -11,7 +11,7 @@ var devicesLoading = true;
 $( document ).ready(function() {
   $("#device_dropdown").hide();
   settingsIdentifier = $("#settingsIdentifier").val();
-    
+
   GetLocalSettings();
 });
 
@@ -21,7 +21,7 @@ function GetGeneralSetting(setting_key){
     url: "/GetGeneralSetting",
     type: "GET", //send it through get method
     data: {
-      "setting_key": setting_key, 
+      "setting_key": setting_key,
   },
     success: function(response) {
         ParseGetGeneralSetting(response);
@@ -42,7 +42,7 @@ function ParseGetGeneralSetting(response){
 
 function GetLocalSettings(){
   var all_setting_keys = GetAllSettingKeys();
-  
+
   Object.keys(all_setting_keys).forEach(setting_id => {
     GetGeneralSetting(all_setting_keys[setting_id])
   })
@@ -54,11 +54,11 @@ function SetLocalInput(setting_key, setting_value){
     if(setting_value){
       $("#" + setting_key).click();
     }
-    
+
   }else{
     $("#" + setting_key).val(setting_value);
   }
-  
+
   $("#" + setting_key).trigger('change');
 }
 
@@ -90,7 +90,7 @@ function SetGeneralSetting(settings){
         console.log("Set the general setting. Got an error. Error: " + xhr.responseText);
       }
     });
-  
+
 }
 
 function SetLocalSettings(){
@@ -101,7 +101,7 @@ function SetLocalSettings(){
   Object.keys(all_setting_keys).forEach(setting_id => {
     var setting_key = all_setting_keys[setting_id];
     var setting_value = "";
-    
+
     if($("#" + setting_key).length){
       if($("#" + setting_key).attr('type') == 'checkbox'){
         setting_value = $("#" + setting_key).is(':checked')
@@ -114,7 +114,7 @@ function SetLocalSettings(){
     }
 
     settings[setting_key] = setting_value;
-    
+
   })
 
   SetGeneralSetting(settings)
@@ -122,7 +122,7 @@ function SetLocalSettings(){
 }
 
 function ResetSettings(){
- 
+
   var data = {};
 
   $.ajax({
@@ -147,7 +147,7 @@ document.getElementById("save_btn").addEventListener("click",function(e) {
 
 document.getElementById("reset_btn").addEventListener("click",function(e) {
   if (confirm('Are you sure you want to reset the config? This will need a restart.')) {
-    ResetSettings(currentDevice);  
+    ResetSettings(currentDevice);
   }
-  
+
 });
