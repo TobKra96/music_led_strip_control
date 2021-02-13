@@ -83,7 +83,7 @@ function SetGeneralSetting(settings){
       data: JSON.stringify(data, null, '\t'),
       contentType: 'application/json;charset=UTF-8',
       success: function(response) {
-          console.log("Set the general sucessfull. Response: " + response.toString());
+          console.log("Set the general successfully. Response: " + response.toString());
       },
       error: function(xhr) {
         //Do Something to handle error
@@ -131,7 +131,7 @@ function ResetSettings(){
       data: JSON.stringify(data, null, '\t'),
       contentType: 'application/json;charset=UTF-8',
       success: function(response) {
-          console.log("Reset settings sucessfull. Response: " + response.toString());
+          console.log("Reset settings successfully. Response: " + response.toString());
           location.reload();
       },
       error: function(xhr) {

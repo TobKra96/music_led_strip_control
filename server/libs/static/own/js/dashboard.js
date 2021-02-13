@@ -67,7 +67,7 @@ function SetActiveEffect(newActiveEffect){
             data: JSON.stringify(data, null, '\t'),
             contentType: 'application/json;charset=UTF-8',
             success: function(response) {
-                console.log("Set the effect sucessfull. Response: " + response.toString());
+                console.log("Set the effect successfully. Response: " + response.toString());
             },
             error: function(xhr) {
               //Do Something to handle error
@@ -86,7 +86,7 @@ function SetActiveEffect(newActiveEffect){
             data: JSON.stringify(data, null, '\t'),
             contentType: 'application/json;charset=UTF-8',
             success: function(response) {
-                console.log("Set the effect sucessfull. Response: " + response.toString());
+                console.log("Set the effect successfully. Response: " + response.toString());
             },
             error: function(xhr) {
               //Do Something to handle error
