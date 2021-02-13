@@ -177,6 +177,11 @@ class Webserver():
         # Render the effect_rods page.
         return render_template('effects/effect_rods.html')
 
+    @server.route('/effects/effect_segment_color', methods=['GET', 'POST'])
+    def effect_segment_color():  # pylint: disable=E0211
+        # Render the effect_segment_color page.
+        return render_template('effects/effect_segment_color.html')
+
     @server.route('/effects/effect_beat_slide', methods=['GET', 'POST'])
     def effect_beat_slide():  # pylint: disable=E0211
         # Render the effect_beat_slide page.
