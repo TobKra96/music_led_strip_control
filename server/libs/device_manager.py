@@ -23,7 +23,7 @@ class DeviceManager():
         self._audio_queue = audio_queue
 
         # Init FPS Limiter.
-        self._fps_limiter = FPSLimiter(200)
+        self._fps_limiter = FPSLimiter(120)
 
         self._skip_routine = False
         self._devices = {}
