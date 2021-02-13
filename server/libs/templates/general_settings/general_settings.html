@@ -71,15 +71,14 @@
             <h2 id="dashboard-header-2">Import/Export Configuration</h2>
 
             <div class="item form-group">
-              <a href="/export_config"><button type="button" id="export_btn" class="btn btn-primary">Export Configuration</button></a>
+              <a href="/export_config"><button type="button" id="export_btn" class="btn btn-primary">Export Configuration <span class="fa fa-download"></span></button></a>
             </div>
 
             <iframe name="dummyframe" id="dummyframe" style="display: none;"></iframe>
 
             <form method="POST" action="/import_config" target="dummyframe" enctype="multipart/form-data">
-              <input  type="submit" id="import_btn" class="btn btn-primary" value="Import Configuration">
+              <a href="/import_config"><button type="submit" id="import_btn" class="btn btn-primary">Import Configuration <span class="fa fa-upload"></span></button></a>
               <input type="file" name="imported_config" accept=".json">
-
             </form>
             Restart the Raspberry Pi/Program after importing the configuration file.
             Some settings can't be applied on the running system.
