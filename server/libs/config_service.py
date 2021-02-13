@@ -3,17 +3,23 @@
 #   Load and save the config after every change.
 #
 
+from shutil import copyfile
+from pathlib import Path
 import json
 import os
 
 
 class ConfigService():
     def __init__(self, config_lock):
-        path = os.path.dirname(__file__) + "/config.json"
-        if os.path.exists(path):
-            self._path = path
-        else:
-            raise Exception("Could not find the config file.", path)
+        config_file = "/config.json"
+        config_path = "/share/.mlsc"
+        src = os.path.dirname(__file__) + config_file  # Default config.json from the repository.
+        if not os.path.exists(src):
+            raise Exception(f'Could not find the config file: "{src}"')  # Raise exception, if no config.json found in repository.
+        if not os.path.exists(config_path + config_file):
+            Path(config_path).mkdir(exist_ok=True)  # Create config directory, ignore if already exists.
+            copyfile(src, config_path + config_file)  # Copy config.json from repository to config directory.
+        self._path = config_path + config_file
 
         self.config_lock = config_lock
 
@@ -54,7 +60,7 @@ class ConfigService():
 
         path = os.path.dirname(__file__) + "/config.json.bak"
         if not os.path.exists(path):
-            raise Exception("Could not find the backup config file.", path)
+            raise Exception(f'Could not find the backup config file: "{path}"')
 
         # Read the Backup Config.
         with open(path, "r") as read_file:
