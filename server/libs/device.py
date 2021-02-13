@@ -14,12 +14,12 @@ class Device:
         self.create_processes()
 
     def start_device(self):
-        print("Starting device: " + self.__device_config["DEVICE_NAME"])
+        print(f'Starting device: {self.__device_config["DEVICE_NAME"]}')
         self.__output_process.start()
         self.__effect_process.start()
 
     def stop_device(self):
-        print("Stopping device: " + self.__device_config["DEVICE_NAME"])
+        print(f'Stopping device: {self.__device_config["DEVICE_NAME"]}')
         self.__effect_process.terminate()
         self.__output_process.terminate()
 
@@ -44,7 +44,7 @@ class Device:
         self.__output_queue = Queue(2)
 
     def refresh_config(self, config, device_config):
-        print("Refreshing config of device: " + self.__device_config["DEVICE_NAME"])
+        print(f'Refreshing config of device: {self.__device_config["DEVICE_NAME"]}')
 
         self.stop_device()
 

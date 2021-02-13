@@ -19,7 +19,7 @@ class DeviceManager():
         self._notification_queue_in = notification_queue_in
         self._notification_queue_out = notification_queue_out
         self._effect_queue = effect_queue
-        print("Effect queue id DeviceManager: " + str(id(self._effect_queue)))
+        print(f"Effect queue id DeviceManager: {id(self._effect_queue)}")
         self._audio_queue = audio_queue
 
         # Init FPS Limiter.
@@ -40,21 +40,21 @@ class DeviceManager():
         # Check the effect queue.
         if not self._effect_queue.empty():
             current_effect_item = self._effect_queue.get()
-            print("Device Manager received new effect: " + str(current_effect_item.effect_enum) + current_effect_item.device_id)
+            print(f"Device Manager received new effect: {current_effect_item.effect_enum} {current_effect_item.device_id}")
             current_device = self._devices[current_effect_item.device_id]
             current_device.effect_queue.put(current_effect_item)
 
         if not self._notification_queue_in.empty():
             current_notification_item = self._notification_queue_in.get()
-            print("Device Manager received new notification: " + str(current_notification_item.notification_enum) + " - " + str(current_notification_item.device_id))
+            print(f"Device Manager received new notification: {current_notification_item.notification_enum} - {current_notification_item.device_id}")
 
             if current_notification_item.notification_enum is NotificationEnum.config_refresh:
 
                 devices_count_before_reload = len(self._config["device_configs"].keys())
-                print("Device count before: " + str(devices_count_before_reload))
+                print(f"Device count before: {devices_count_before_reload}")
                 self.reload_config()
                 devices_count_after_reload = len(self._config["device_configs"].keys())
-                print("Device count after: " + str(devices_count_after_reload))
+                print(f"Device count after: {devices_count_after_reload}")
 
                 if(devices_count_before_reload != devices_count_after_reload):
                     self.reinit_devices()
@@ -86,7 +86,7 @@ class DeviceManager():
             self.ten_seconds_counter = time.time()
             self.time_dif = self.end_time - self.start_time
             self.fps = 1 / self.time_dif
-            print("Device Manager | FPS: " + str(self.fps))
+            print(f"Device Manager | FPS: {self.fps}")
 
         self.start_time = time.time()
 
@@ -105,7 +105,6 @@ class DeviceManager():
                     pre_audio_data = value.audio_queue.get(False)
                     del pre_audio_data
                 except Exception as e:
-                    # print("Empty audio queue of devices.")
                     pass
 
             audio_copy = copy.deepcopy(audio_data)
@@ -120,7 +119,7 @@ class DeviceManager():
 
         for key in self._config["device_configs"].keys():
             device_id = key
-            print("Init device with device id:" + device_id)
+            print(f"Init device with device id: {device_id}")
             self._devices[device_id] = Device(self._config, self._config["device_configs"][device_id], self._color_service_global)
         print("Leaving init_devices()")
 
@@ -135,7 +134,7 @@ class DeviceManager():
 
     def start_devices(self):
         for key, value in self._devices.items():
-            print("Starting device:" + key)
+            print(f"Starting device: {key}")
             value.start_device()
 
     def reload_config(self):
@@ -145,11 +144,11 @@ class DeviceManager():
         print("Leaving reload_config()")
 
     def restart_device(self, device_id):
-        print("Restarting " + device_id)
+        print(f"Restarting {device_id}")
         self._devices[device_id].refresh_config(self._config, self._config["device_configs"][device_id])
-        print("Restarted " + device_id)
+        print(f"Restarted {device_id}")
 
     def stop_device(self, device_id):
-        print("Stop " + device_id)
+        print(f"Stopping {device_id}")
         self._devices[device_id].stop_device()
-        print("Stopped " + device_id)
+        print(f"Stopped {device_id}")

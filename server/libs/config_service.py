@@ -34,13 +34,11 @@ class ConfigService():
 
         self.config_lock.release()
 
-        # print("Settings loaded: " + str(self.config))
-        print("Settings loaded")
+        print("Settings loaded from config.")
 
     def save_config(self, config=None):
         """Save the config file. Use the current self.config"""
-        # print("Save settings: " + str(self.config))
-        print("Save settings")
+        print("Saving settings...")
 
         self.config_lock.acquire()
 
@@ -54,7 +52,7 @@ class ConfigService():
 
     def reset_config(self):
         """Reset the config."""
-        print("Reset config")
+        print("Resetting config...")
 
         self.config_lock.acquire()
 
@@ -79,7 +77,7 @@ class ConfigService():
         This method will create the config if it's null.
         """
         if imported_instance is not None:
-            print("Import config instance")
+            print("Importing config instance...")
             ConfigService.current_instance = imported_instance
 
         if not hasattr(ConfigService, 'current_instance'):

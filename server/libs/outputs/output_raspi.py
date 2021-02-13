@@ -23,8 +23,8 @@ class OutputRaspi(Output):
 
         self._led_brightness_translated = int(255 * (self._led_brightness / 100))
 
-        print("LED Brightness: " + str(self._led_brightness))
-        print("LED Brightness Translated: " + str(self._led_brightness_translated))
+        print(f"LED Brightness: {self._led_brightness}")
+        print(f"LED Brightness converted: {self._led_brightness_translated}")
 
         self._leds = ws.new_ws2811_t()
 
@@ -42,7 +42,7 @@ class OutputRaspi(Output):
         resp = ws.ws2811_init(self._leds)
         if resp != ws.WS2811_SUCCESS:
             message = ws.ws2811_get_return_t_str(resp)
-            raise RuntimeError('ws2811_init failed with code {0} ({1})'.format(resp, message))
+            raise RuntimeError(f'ws2811_init failed with code {resp} ({message})')
 
     def show(self, output_array):
         import _rpi_ws281x as ws  # pylint: disable=import-error
@@ -65,4 +65,4 @@ class OutputRaspi(Output):
 
         if resp != ws.WS2811_SUCCESS:
             message = ws.ws2811_get_return_t_str(resp)
-            raise RuntimeError('ws2811_render failed with code {0} ({1})'.format(resp, message))
+            raise RuntimeError(f'ws2811_render failed with code {resp} ({message})')

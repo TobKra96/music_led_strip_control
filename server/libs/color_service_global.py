@@ -28,7 +28,6 @@ class ColorServiceGlobal():
         self.last_fade_change_time = int(round(time.time() * 1000))
 
     def build_gradients(self):
-        # print("Enter build_gradients() in ColorServiceGlobal")
         led_count = 1000
 
         self.full_gradients = {}
@@ -46,7 +45,6 @@ class ColorServiceGlobal():
                 (not_mirrored_gradient[:, ::-1], not_mirrored_gradient),
                 axis=1
             )
-        # print("Leave build_gradients() in ColorServiceGlobal")
 
     def _easing_gradient_generator(self, colors, length):
         """
@@ -106,7 +104,7 @@ class ColorServiceGlobal():
         if colour in self._config["colours"]:
             return self._config["colours"][colour]
         else:
-            print("Color {} has not been defined.".format(colour))
+            print(f"Color '{colour}' has not been defined.")
             return (0, 0, 0)
 
     def get_global_fade_color(self, fade_speed, fade_gradient, fade_reverse):

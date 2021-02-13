@@ -53,7 +53,7 @@ class Webserver():
 
     @server.route('/export_config')
     def export_config():  # pylint: disable=E0211
-        print("Send file " + Webserver.instance.export_config_path)
+        print(f"Send file: {Webserver.instance.export_config_path}")
         return send_file(Webserver.instance.export_config_path, as_attachment=True, cache_timeout=-1)
 
     @server.route('/import_config', methods=['POST'])
@@ -66,7 +66,7 @@ class Webserver():
         content = imported_config.read()
         if content:
             try:
-                print("File Received: " + json.dumps(json.loads(content), indent=4))
+                print(f"File Received: {json.dumps(json.loads(content), indent=4)}")
                 if Webserver.instance.webserver_executer.ImportConfig(json.loads(content, encoding='utf-8')):
                     return "File imported.", 200
                 else:

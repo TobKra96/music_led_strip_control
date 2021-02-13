@@ -47,7 +47,7 @@ class EffectService():
         """
 
         self._device = device
-        print("Starting Effect Service component from device: " + self._device.device_config["DEVICE_NAME"])
+        print(f'Starting Effect Service component from device: {self._device.device_config["DEVICE_NAME"]}')
 
         self.ten_seconds_counter = time.time()
         self.start_time = time.time()
@@ -95,7 +95,7 @@ class EffectService():
         # A token to cancel the while loop.
         self._cancel_token = False
         self._skip_effect = False
-        print("Effects component started. Device: " + self._device.device_config["DEVICE_NAME"])
+        print(f'Effects component started. Device: {self._device.device_config["DEVICE_NAME"]}')
 
         while not self._cancel_token:
             # try:
@@ -103,7 +103,7 @@ class EffectService():
             # except Exception as e:
             #     print("Error in Effect Service. Routine Restarted. Exception: " + str(e))
 
-        print("Effects component stopped. Device: " + self._device.device_config["DEVICE_NAME"])
+        print(f'Effects component stopped. Device: {self._device.device_config["DEVICE_NAME"]}')
 
     def effect_routine(self):
         # Limit the fps to decrease laggs caused by 100 percent CPU.
@@ -112,7 +112,7 @@ class EffectService():
         # Check the nofitication queue.
         if not self._device.device_notification_queue_in.empty():
             self._current_notification_in = self._device.device_notification_queue_in.get()
-            print("Effects Service has a new nofitication in. Notification: " + str(self._current_notification_in) + " Device: " + self._device.device_config["DEVICE_NAME"])
+            print(f'Effects Service has a new nofitication in. Notification: {self._current_notification_in} | Device: {self._device.device_config["DEVICE_NAME"]}')
 
         if hasattr(self, "_current_notification_in"):
             if self._current_notification_in is NotificationEnum.config_refresh:
@@ -135,7 +135,7 @@ class EffectService():
         if not self._device.effect_queue.empty():
             new_effect_item = self._device.effect_queue.get()
             self._current_effect = new_effect_item.effect_enum
-            print("New effect found:" + str(new_effect_item.effect_enum))
+            print(f"New effect found: {new_effect_item.effect_enum}")
 
         # Something is wrong here, no effect set. So skip until we get new information.
         if self._current_effect is None:
@@ -146,14 +146,14 @@ class EffectService():
             if self._current_effect in self._available_effects.keys():
                 self._initialized_effects[self._current_effect] = self._available_effects[self._current_effect](self._device)
             else:
-                print("Could not find effect: " + self._current_effect)
+                print(f"Could not find effect: {self._current_effect}")
 
         self.end_time = time.time()
         if time.time() - self.ten_seconds_counter > 10:
             self.ten_seconds_counter = time.time()
             self.time_dif = self.end_time - self.start_time
             self.fps = 1 / self.time_dif
-            print("Effect Service | FPS: " + str(self.fps) + " | Device: " + self._device.device_config["DEVICE_NAME"])
+            print(f'Effect Service | FPS: {self.fps} | Device: {self._device.device_config["DEVICE_NAME"]}')
 
         self.start_time = time.time()
 

@@ -59,28 +59,28 @@ class AudioProcessService:
 
                 if device_info["maxInputChannels"] >= 1:
                     self._devices.append(device_info)
-                    print(str(device_info["index"]) + " - " + str(device_info["name"]) + " - " + str(device_info["defaultSampleRate"]))
+                    print(f'{device_info["index"]} - {device_info["name"]} - {device_info["defaultSampleRate"]}')
 
                     if device_info["index"] == selected_device_list_index:
                         foundMicIndex = True
             except Exception as e:
                 print("Could not get device infos.")
-                print("Unexpected error in AudioProcessService: " + str(e))
+                print(f"Unexpected error in AudioProcessService: {e}")
 
         # Could not find a mic with the selected mic id, so I will use the first device I found.
         if not foundMicIndex:
             print("********************************************************")
             print("*                      Error                           *")
             print("********************************************************")
-            print("Could not find the mic with the id: " + str(selected_device_list_index))
-            print("Use the first mic as fallback.")
+            print(f"Could not find the mic with the id: {selected_device_list_index}")
+            print("Using the first mic as fallback.")
             print("Please change the id of the mic inside the config.")
             selected_device_list_index = self._devices[0]["index"]
 
         for device in self._devices:
             if device["index"] == selected_device_list_index:
-                print("Selected ID: " + str(selected_device_list_index))
-                print("Use " + str(device["index"]) + " - " + str(device["name"]) + " - " + str(device["defaultSampleRate"]))
+                print(f"Selected ID: {selected_device_list_index}")
+                print(f'Using {device["index"]} - {device["name"]} - {device["defaultSampleRate"]}')
                 self._device_id = device["index"]
                 self._device_name = device["name"]
                 self._device_rate = self._config["general_settings"]["DEFAULT_SAMPLE_RATE"]
@@ -113,13 +113,13 @@ class AudioProcessService:
                 self.ten_seconds_counter_1 = time.time()
                 time_dif = self.end_time_1 - self.start_time_1
                 fps = 1 / time_dif
-                print("Audio Service Callback | FPS: " + str(fps))
+                print(f"Audio Service Callback | FPS: {fps}")
 
             self.start_time_1 = time.time()
 
             return (self.audio, pyaudio.paContinue)
 
-        print("Start open Audio stream")
+        print("Starting Open Audio Stream...")
         self.stream = self._py_audio.open(
             format=pyaudio.paInt16,
             channels=1,
@@ -180,7 +180,7 @@ class AudioProcessService:
                 self.ten_seconds_counter_2 = time.time()
                 time_dif = self.end_time_2 - self.start_time_2
                 fps = 1 / time_dif
-                print("Audio Service Routine | FPS: " + str(fps))
+                print(f"Audio Service Routine | FPS: {fps}")
 
             self.start_time_2 = time.time()
 

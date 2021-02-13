@@ -27,7 +27,7 @@ class Main():
         This function will start all necessary components.
         Let's go :-D
         """
-        print("Init the program...")
+        print("Initializing MLSC...")
 
         # We need a lock to prevent too fast saving and loading actions of the config
         self._config_lock = Lock()
@@ -103,10 +103,10 @@ class Main():
             ))
         self._audio_process.start()
 
-        print("Init finished")
+        print("Initialization finished.")
 
         try:
-            print("Program started...")
+            print("MLSC started...")
 
             self._cancel_token = False
 
@@ -116,12 +116,12 @@ class Main():
 
         except KeyboardInterrupt:
 
-            print("Stopping the program...")
+            print("Stopping MLSC...")
 
             self._notification_service_process.terminate()
             self._webserver_process.terminate()
 
-            print("Program stopped")
+            print("MLSC stopped")
 
 
 if __name__ == "__main__":

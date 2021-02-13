@@ -103,7 +103,7 @@ class ColorService():
         if colour in self._config["colours"]:
             return self._config["colours"][colour]
         else:
-            print("Color {} has not been defined.".format(colour))
+            print(f"Color '{colour}' has not been defined.")
             return (0, 0, 0)
 
     def build_slidearrays(self):

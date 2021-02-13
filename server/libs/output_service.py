@@ -21,7 +21,7 @@ class OutputService():
     def start(self, device):
         self._device = device
 
-        print("Starting Output service... Device: " + self._device.device_config["DEVICE_NAME"])
+        print(f'Starting Output service... Device: {self._device.device_config["DEVICE_NAME"]}')
 
         # Initial config load.
         self._config = self._device.config
@@ -47,10 +47,10 @@ class OutputService():
         }
 
         current_output_enum = OutputsEnum[self._device.device_config["OUTPUT_TYPE"]]
-        print("Found output: " + str(current_output_enum))
+        print(f"Found output: {current_output_enum}")
         self._current_output = self._available_outputs[current_output_enum](self._device)
 
-        print("Output component started. Device: " + self._device.device_config["DEVICE_NAME"])
+        print(f'Output component started. Device: {self._device.device_config["DEVICE_NAME"]}')
 
         while not self._cancel_token:
             self.output_routine()
@@ -94,7 +94,7 @@ class OutputService():
             self.ten_seconds_counter = time.time()
             self.time_dif = self.end_time - self.start_time
             self.fps = 1 / self.time_dif
-            print("Output Service | FPS: " + str(self.fps) + " | Device: " + self._device.device_config["DEVICE_NAME"])
+            print(f'Output Service | FPS: {self.fps} | Device: {self._device.device_config["DEVICE_NAME"]}')
 
         self.start_time = time.time()
 
@@ -108,7 +108,7 @@ class OutputService():
         # Refresh the config,
         self._config = self._device.config
 
-        # Notifiy the master component, that I'm finished.
+        # Notify the master component, that I'm finished.
         self._device_notification_queue_out.put(NotificationEnum.config_refresh_finished)
 
         print("Output refreshed.")

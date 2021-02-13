@@ -142,7 +142,7 @@ class WebserverExecuter():
             print("Could not import Config. Config is None.")
             return False
 
-        print("Type of imported config: " + str(type(imported_config)))
+        print(f"Type of imported config: {type(imported_config)}")
         if type(imported_config) is dict:
             self._config = imported_config
             self.SaveConfig()
@@ -163,15 +163,15 @@ class WebserverExecuter():
     def PutIntoEffectQueue(self, device, effect):
         print("Preparing new EnumItem...")
         effect_item = EffectItem(EffectsEnum[effect], device)
-        print("EnumItem prepared: " + str(effect_item.effect_enum) + " " + effect_item.device_id)
+        print(f"EnumItem prepared: {effect_item.effect_enum} {effect_item.device_id}")
         self.effects_queue.put(effect_item)
         print("EnumItem put into queue.")
-        print("Effect queue id Webserver " + str(id(self.effects_queue)))
+        print(f"Effect queue id Webserver {id(self.effects_queue)}")
 
     def PutIntoNotificationQueue(self, notificication, device):
         print("Preparing new Notification...")
         notification_item = NotificationItem(notificication, device)
-        print("Notification Item prepared: " + str(notification_item.notification_enum) + " " + notification_item.device_id)
+        print(f"Notification Item prepared: {notification_item.notification_enum} {notification_item.device_id}")
         self.notification_queue_out.put(notification_item)
         print("Notification Item put into queue.")
 
@@ -189,13 +189,13 @@ class WebserverExecuter():
 
         for currentkey in keys:
             if not (currentkey in dictionary):
-                print("Error in ValidateDataIn: Could not find the key: " + currentkey)
+                print(f"Error in ValidateDataIn: Could not find the key: {currentkey}")
                 print("Dict:")
                 print(dictionary)
                 return False
 
             if dictionary[currentkey] is None:
-                print("Error in ValidateDataIn: dictionary entry is None. Key: " + currentkey)
+                print(f"Error in ValidateDataIn: dictionary entry is None. Key: {currentkey}")
                 print("Dict:")
                 print(dictionary)
                 return False
