@@ -41,8 +41,8 @@
   <a style="text-decoration:none" href="https://youtu.be/jAL1DfeYQI8">
     <img src="https://user-images.githubusercontent.com/7833146/105635961-1bbd5480-5e66-11eb-8608-51aaa9505257.jpg" alt="Version1_Github" />
   </a>
-  <a style="text-decoration:none" href="https://github.com/TobKra96/music_led_strip_control/blob/master/media/LEDStripTutorial_WiringDiagram.png">
-    <img src="https://user-images.githubusercontent.com/24798198/107167989-ae0f3d80-69ba-11eb-8d5c-aceaec15d054.png" alt="Mockup" />
+  <a style="text-decoration:none" href="media/web_interface_mockup.png">
+    <img src="https://user-images.githubusercontent.com/24798198/107848366-20d14c00-6df3-11eb-842c-6d19831d2429.png" alt="Mockup" />
   </a>
 </p>
 
