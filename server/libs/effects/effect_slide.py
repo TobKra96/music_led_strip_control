@@ -10,7 +10,7 @@ class EffectSlide(Effect):
         led_count = self._device.device_config["LED_Count"]
         led_mid = self._device.device_config["LED_Mid"]
 
-        # Translate the true and false to a number, for the fuction use.
+        # Translate the true and false to a number, for the function use.
         current_reverse_translated = 0
         if effect_config["reverse"]:
             current_reverse_translated = -1
