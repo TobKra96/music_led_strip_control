@@ -27,3 +27,4 @@ class EffectsEnum(Enum):
     effect_advanced_scroll = 23
     effect_direction_changer = 24
     effect_beat_twinkle = 25
+    effect_segment_color = 26
