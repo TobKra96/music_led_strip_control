@@ -64,11 +64,17 @@ class Webserver():
             return "Could not import file.", 404
         imported_config = request.files['imported_config']
         content = imported_config.read()
-        print("File Received: " + str(content))
-        if Webserver.instance.webserver_executer.ImportConfig(json.loads(content, encoding='utf-8')):
-            return "File imported.", 200
+        if content:
+            try:
+                print("File Received: " + json.dumps(json.loads(content), indent=4))
+                if Webserver.instance.webserver_executer.ImportConfig(json.loads(content, encoding='utf-8')):
+                    return "File imported.", 200
+                else:
+                    return "Could not import file.", 400
+            except json.decoder.JSONDecodeError:
+                return "File is not valid JSON.", 400
         else:
-            return "Could not import file.", 400
+            return "No config file selected.", 400
 
     #####################################################################
     #   Device Settings                                                 #
