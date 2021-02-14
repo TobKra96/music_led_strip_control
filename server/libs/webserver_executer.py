@@ -77,6 +77,12 @@ class WebserverExecuter():
             gradients[gradientID] = gradientID
         return gradients
 
+    def GetLEDStrips(self):
+        led_strips = dict()
+        for led_strip_ID in self._config["led_strips"]:
+            led_strips[led_strip_ID] = self._config["led_strips"][led_strip_ID]
+        return led_strips
+
     def GetGeneralSetting(self, setting_key):
         return self._config["general_settings"][setting_key]
 

@@ -64,7 +64,8 @@
                 "LED_Dma": 10,
                 "LED_Freq_Hz": 800000,
                 "LED_Invert": false,
-                "LED_Pin": 18
+                "LED_Pin": 18,
+                "LED_Strip": "WS2811_STRIP_RGB"
             },
             "output_mqtt": {
                 "MQTT_Broker": "localhost",
@@ -544,5 +545,23 @@
                 0
             ]
         ]
+    },
+
+    "led_strips":{
+        "SK6812_STRIP_RGBW": "SK6812_STRIP_RGBW",
+        "SK6812_STRIP_RBGW": "SK6812_STRIP_RBGW",
+        "SK6812_STRIP_GRBW": "SK6812_STRIP_GRBW",
+        "SK6812_STRIP_GBRW": "SK6812_STRIP_GBRW",
+        "SK6812_STRIP_BRGW": "SK6812_STRIP_BRGW",
+        "SK6812_STRIP_BGRW": "SK6812_STRIP_BGRW",
+        "SK6812_SHIFT_WMASK": "SK6812_SHIFT_WMASK",
+        "WS2811_STRIP_RGB": "WS281x_RGB",
+        "WS2811_STRIP_RBG": "WS281x_RBG",
+        "WS2811_STRIP_GRB": "WS281x_GRB",
+        "WS2811_STRIP_GBR": "WS281x_GBR",
+        "WS2811_STRIP_BRG": "WS281x_BRG",
+        "WS2811_STRIP_BGR": "WS281x_BGR"
     }
+
+
 }
