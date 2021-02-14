@@ -36,6 +36,9 @@ class Main():
         self._config_instance = ConfigService.instance(self._config_lock)
         self._config = self._config_instance.config
 
+        # Check config compatibility
+        self._config_instance.check_compatibility()
+
         # Prepare the queue for the output
         self._output_queue = Queue(2)
         self._effects_queue = Queue(100)
