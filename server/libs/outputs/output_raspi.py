@@ -38,7 +38,10 @@ class OutputRaspi(Output):
             "WS2811_STRIP_GRB": ws.WS2811_STRIP_GRB,
             "WS2811_STRIP_GBR": ws.WS2811_STRIP_GBR,
             "WS2811_STRIP_BRG": ws.WS2811_STRIP_BRG,
-            "WS2811_STRIP_BGR": ws.WS2811_STRIP_BGR
+            "WS2811_STRIP_BGR": ws.WS2811_STRIP_BGR,
+            "WS2812_STRIP": ws.WS2812_STRIP,
+            "SK6812_STRIP": ws.SK6812_STRIP,
+            "SK6812W_STRIP": ws.SK6812W_STRIP
         }
 
 
@@ -81,9 +84,9 @@ class OutputRaspi(Output):
         # Typecast the array to int.
         output_array = output_array.clip(0, 255).astype(int)
 
-        # Sort the colors as GRB type.
-        g = np.left_shift(output_array[1][:].astype(int), 16)  # pylint: disable=assignment-from-no-return
-        r = np.left_shift(output_array[0][:].astype(int), 8)  # pylint: disable=assignment-from-no-return
+        # Sort the colors as RGB type.
+        r = np.left_shift(output_array[0][:].astype(int), 16)  # pylint: disable=assignment-from-no-return
+        g = np.left_shift(output_array[1][:].astype(int), 8)  # pylint: disable=assignment-from-no-return
         b = output_array[2][:].astype(int)
         rgb = np.bitwise_or(np.bitwise_or(r, g), b).astype(int)
 
