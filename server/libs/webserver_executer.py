@@ -152,6 +152,7 @@ class WebserverExecuter():
         if type(imported_config) is dict:
             self._config = imported_config
             self.SaveConfig()
+            self._config_instance.check_compatibility()
             self.RefreshDevice("all_devices")
             return True
         else:

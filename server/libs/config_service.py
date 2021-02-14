@@ -56,18 +56,61 @@ class ConfigService():
 
         self.config_lock.acquire()
 
+        backup_config = self.load_backup()
+        if backup_config is not None:
+            self.config = backup_config
+
+        self.config_lock.release()
+
+        # Save the config again.
+        self.save_config()
+
+    def load_backup(self):
+        backup_config = None
+
         path = os.path.dirname(__file__) + "/config.json.bak"
         if not os.path.exists(path):
             raise Exception(f'Could not find the backup config file: "{path}"')
 
         # Read the Backup Config.
         with open(path, "r") as read_file:
-            self.config = json.load(read_file)
+            backup_config = json.load(read_file)
 
-        self.config_lock.release()
+        return backup_config
+        
 
-        # Save the config again.
+    def check_compatibility(self):
+        loaded_config = self.config
+        template_config = self.load_backup()
+
+        # Loop through the root
+        for key, value in template_config.items():
+            if key == "device_configs":
+                continue
+
+            if key not in loaded_config:
+                loaded_config[key] = template_config[key]
+                continue
+
+            self.check_leaf(loaded_config[key], template_config[key])
+          
+        self.check_devices(loaded_config["device_configs"], template_config["default_device"])
+
         self.save_config()
+        
+    
+    def check_leaf(self, loaded_config_leaf, template_config_leaf):
+        if type(template_config_leaf) is dict:
+            for key, value in template_config_leaf.items():
+                if key not in loaded_config_leaf:
+                    loaded_config_leaf[key] = template_config_leaf[key]
+                    continue
+
+                self.check_leaf(loaded_config_leaf[key], template_config_leaf[key])
+
+    def check_devices(self, loaded_config_devices, template_config_device):
+        for key, value in loaded_config_devices.items():
+            self.check_leaf(loaded_config_devices[key], template_config_device)
 
     @staticmethod
     def instance(config_lock, imported_instance=None):
