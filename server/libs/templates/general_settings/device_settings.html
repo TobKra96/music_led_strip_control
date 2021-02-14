@@ -18,28 +18,28 @@
 
               <div class="item form-group">
                 <label class="control-label col-md-3 col-sm-3 col-xs-12" for="DEVICE_NAME">Device Name</label>
-                <input id="DEVICE_NAME" type="text" name="text" required="required" class="col-md-6 col-sm-6 col-xs-12 device_setting_input" data-kwimpalastatus="alive" data-kwimpalaid="1554401854198-5">
+                <input id="DEVICE_NAME" type="text" name="text" required="required" class="form-control col-md-9 col-sm-9 col-xs-12 device_setting_input" data-kwimpalastatus="alive" data-kwimpalaid="1554401854198-5">
               </div>
 
               <div class="item form-group">
                 <label class="control-label col-md-3 col-sm-3 col-xs-12" for="FPS">Max FPS</label>
-                <input id="FPS" type="number" name="number" required="required" data-validate-minmax="1,100" class="col-md-6 col-sm-6 col-xs-12 device_setting_input" data-kwimpalastatus="alive" data-kwimpalaid="1554401854198-5">
+                <input id="FPS" type="number" name="number" required="required" data-validate-minmax="1,100" class="form-control col-md-9 col-sm-9 col-xs-12 device_setting_input" data-kwimpalastatus="alive" data-kwimpalaid="1554401854198-5">
               </div>
 
               <div class="item form-group">
                 <label class="control-label col-md-3 col-sm-3 col-xs-12" for="LED_Count">Numbers of LEDs</label>
-                <input id="LED_Count" type="number" name="number" required="required" data-validate-minmax="1,1500" class="col-md-6 col-sm-6 col-xs-12 device_setting_input" data-kwimpalastatus="alive" data-kwimpalaid="1554401854198-5">
+                <input id="LED_Count" type="number" name="number" required="required" data-validate-minmax="1,1500" class="form-control col-md-9 col-sm-9 col-xs-12 device_setting_input" data-kwimpalastatus="alive" data-kwimpalaid="1554401854198-5">
               </div>
 
               <div class="item form-group">
                 <label class="control-label col-md-3 col-sm-3 col-xs-12" for="LED_Mid">LED Mid</label>
-                <input id="LED_Mid" type="number" name="number" required="required" data-validate-minmax="1,2000" class="col-md-6 col-sm-6 col-xs-12 device_setting_input" data-kwimpalastatus="alive" data-kwimpalaid="1554401854198-5">
+                <input id="LED_Mid" type="number" name="number" required="required" data-validate-minmax="1,2000" class="form-control col-md-9 col-sm-9 col-xs-12 device_setting_input" data-kwimpalastatus="alive" data-kwimpalaid="1554401854198-5">
               </div>
 
               <div class="item form-group">
                 <label class="control-label col-md-3 col-sm-3 col-xs-12">Used Output Type</label>
 
-                <select id="OUTPUT_TYPE" class="form-control col-md-6 col-sm-6 col-xs-12 output_type device_setting_input">
+                <select id="OUTPUT_TYPE" class="form-control col-md-9 col-sm-9 col-xs-12 output_type device_setting_input">
                 </select>
 
               </div>
@@ -49,12 +49,18 @@
 
               <div class="item form-group">
                 <label class="center control-label col-md-3 col-sm-3 col-xs-12" for="LED_Brightness">LED Brightness</label>
-                <input id="LED_Brightness" class="knob col-md-6 col-sm-6 col-xs-12 output_raspi"  type="number" data-angleoffset="-125" data-anglearc="250" data-width="100" data-height="120" data-cursor=true data-fgColor="#f0ad4e" value="29">
+                <input id="LED_Brightness" class="knob col-md-9 col-sm-9 col-xs-12 output_raspi"  type="number" data-angleoffset="-125" data-anglearc="250" data-width="100" data-height="120" data-cursor=true data-fgColor="#f0ad4e" value="29">
               </div>
 
               <div class="item form-group">
                 <label class="control-label col-md-3 col-sm-3 col-xs-12" for="LED_Count">LED Pin (GPIO Pin)</label>
-                <input id="LED_Pin" type="number" name="number" required="required" data-validate-minmax="1,100" class="col-md-6 col-sm-6 col-xs-12 output_raspi" data-kwimpalastatus="alive" data-kwimpalaid="1554401854198-5">
+                <input id="LED_Pin" type="number" name="number" required="required" data-validate-minmax="1,100" class="form-control col-md-9 col-sm-9 col-xs-12 output_raspi" data-kwimpalastatus="alive" data-kwimpalaid="1554401854198-5">
+              </div>
+
+              <div class="item form-group">
+                <label class="control-label col-md-3 col-sm-3 col-xs-12">LED Strip</label>
+                <select id="LED_Strip" class="form-control col-md-9 col-sm-9 col-xs-12 led_strips output_raspi">
+                </select>
               </div>
 
               <div class="ln_solid"></div>
@@ -62,12 +68,12 @@
 
               <div class="item form-group">
                 <label class="control-label col-md-3 col-sm-3 col-xs-12" for="UDP_Client_IP">UDP CLient IP Address</label>
-                <input id="UDP_Client_IP" type="text" name="text" required="required" class="col-md-6 col-sm-6 col-xs-12 output_udp" data-kwimpalastatus="alive" data-kwimpalaid="1554401854198-5">
+                <input id="UDP_Client_IP" type="text" name="text" required="required" class="form-control col-md-9 col-sm-9 col-xs-12 output_udp" data-kwimpalastatus="alive" data-kwimpalaid="1554401854198-5">
               </div>
 
               <div class="item form-group">
                 <label class="control-label col-md-3 col-sm-3 col-xs-12" for="UDP_Client_Port">UDP Client Port</label>
-                <input id="UDP_Client_Port" type="number" name="number" required="required" data-validate-minmax="1,100000" class="col-md-6 col-sm-6 col-xs-12 output_udp" data-kwimpalastatus="alive" data-kwimpalaid="1554401854198-5">
+                <input id="UDP_Client_Port" type="number" name="number" required="required" data-validate-minmax="1,100000" class="form-control col-md-9 col-sm-9 col-xs-12 output_udp" data-kwimpalastatus="alive" data-kwimpalaid="1554401854198-5">
               </div>
 
 

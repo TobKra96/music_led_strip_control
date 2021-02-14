@@ -378,6 +378,28 @@ class Webserver():
             else:
                 return jsonify(data_out)
 
+    # /GetLEDStrips
+    #
+    # return
+    # {
+    # "<LEDStripID1>" = <LEDStripName1>
+    # "<LEDStripID2>" = <LEDStripName2>
+    # "<LEDStripID3>" = <LEDStripName3>
+    # ...
+    # }
+    @server.route('/GetLEDStrips', methods=['GET'])
+    def GetLEDStrips():  # pylint: disable=E0211
+        if request.method == 'GET':
+            data_out = dict()
+
+            led_strips = Webserver.instance.webserver_executer.GetLEDStrips()
+            data_out = led_strips
+
+            if data_out is None:
+                return "Could not find led_strips.", 403
+            else:
+                return jsonify(data_out)
+
     # /SetEffectSetting
     # {
     # "device" = <deviceID>

@@ -20,6 +20,36 @@ class OutputRaspi(Output):
         self._led_brightness = int(self._device_config["output"][output_id]["LED_Brightness"])  # Set to '0' for darkest and 100 for brightest.
         self._led_invert = int(self._device_config["output"][output_id]["LED_Invert"])          # Set to 'True' to invert the signal (when using NPN transistor level shift).
         self._led_channel = int(self._device_config["output"][output_id]["LED_Channel"])        # set to '1' for GPIOs 13, 19, 41, 45 or 53.
+        self._led_strip = self._device_config["output"][output_id]["LED_Strip"]
+
+        # Set Fallback Strip
+        self._led_strip_translated = ws.WS2811_STRIP_RGB
+
+        self._led_strip_mapper = {
+            "SK6812_STRIP_RGBW": ws.SK6812_STRIP_RGBW,
+            "SK6812_STRIP_RBGW": ws.SK6812_STRIP_RBGW,
+            "SK6812_STRIP_GRBW": ws.SK6812_STRIP_GRBW,
+            "SK6812_STRIP_GBRW": ws.SK6812_STRIP_GBRW,
+            "SK6812_STRIP_BRGW": ws.SK6812_STRIP_BRGW,
+            "SK6812_STRIP_BGRW": ws.SK6812_STRIP_BGRW,
+            "SK6812_SHIFT_WMASK": ws.SK6812_SHIFT_WMASK,
+            "WS2811_STRIP_RGB": ws.WS2811_STRIP_RGB,
+            "WS2811_STRIP_RBG": ws.WS2811_STRIP_RBG,
+            "WS2811_STRIP_GRB": ws.WS2811_STRIP_GRB,
+            "WS2811_STRIP_GBR": ws.WS2811_STRIP_GBR,
+            "WS2811_STRIP_BRG": ws.WS2811_STRIP_BRG,
+            "WS2811_STRIP_BGR": ws.WS2811_STRIP_BGR
+        }
+
+
+        try:
+            led_strip = self._led_strip_mapper[self._led_strip]
+            if led_strip is not None:
+                self._led_strip_translated = led_strip
+                print(f"Found Led Strip {self._led_strip}")
+        except Exception as e:
+            print(f"Could not find LED Strip Type. Exception: {str(e)}")
+            pass
 
         self._led_brightness_translated = int(255 * (self._led_brightness / 100))
 
@@ -30,6 +60,7 @@ class OutputRaspi(Output):
 
         self.channel = ws.ws2811_channel_get(self._leds, 0)
 
+        ws.ws2811_channel_t_strip_type_set(self.channel, self._led_strip_translated)
         ws.ws2811_channel_t_count_set(self.channel, self._led_count)
         ws.ws2811_channel_t_gpionum_set(self.channel, self._led_pin)
         ws.ws2811_channel_t_invert_set(self.channel, self._led_invert)

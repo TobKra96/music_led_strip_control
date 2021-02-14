@@ -6,6 +6,7 @@ var output_types = {};
 
 var devicesLoading = true;
 var outputTypesLoading = true;
+var ledStripsLoading = true;
 
 var reloadingCounter = 0;
 var reloadingMax = 0;
@@ -16,14 +17,17 @@ $( document ).ready(function() {
 
   GetDevices();
   GetOutputTypes();
+  GetLEDStrips();
 });
 
 //Check if all initial ajax requests are finished.
 function CheckIfFinishedInitialLoading (){
-  if(!devicesLoading && !outputTypesLoading){
+  if(!devicesLoading && !outputTypesLoading && !ledStripsLoading){
     GetLocalSettings();
   }
 }
+
+// Get Devices    -----------------------------------------------------------
 
 function GetDevices(){
   $.ajax({
@@ -53,6 +57,9 @@ function ParseDevices(devices){
   devicesLoading = false;
   CheckIfFinishedInitialLoading();
 }
+
+
+// Get Output Type    -----------------------------------------------------------
 
 function GetOutputTypes(){
   $.ajax({
@@ -86,6 +93,8 @@ function ParseGetOutputTypes(response){
   CheckIfFinishedInitialLoading();
 }
 
+// Get Device Settings   -----------------------------------------------------------
+
 function GetDeviceSetting(device, setting_key){
   $.ajax({
     url: "/GetDeviceSetting",
@@ -110,6 +119,8 @@ function ParseGetDeviceSetting(response){
 
   SetLocalDeviceInput(setting_key, setting_value)
 }
+
+// Get Output Type Device Settings   -----------------------------------------------------------
 
 function GetOutputTypeDeviceSetting(device, output_type_key, setting_key){
   $.ajax({
@@ -137,6 +148,108 @@ function ParseGetOutputTypeDeviceSetting(response){
 
   SetLocalOutputTypeDeviceInput(output_type_key, setting_key, setting_value)
 }
+
+// Get LED Strips   -----------------------------------------------------------
+
+function GetLEDStrips(){
+  $.ajax({
+    url: "/GetLEDStrips",
+    type: "GET", //send it through get method
+    data: {     },
+    success: function(response) {
+        ParseGetLEDStrips(response);
+    },
+    error: function(xhr) {
+      //Do Something to handle error
+    }
+  });
+}
+
+function ParseGetLEDStrips(response){
+  var context = this;
+  this.led_strips = response;
+
+  $('.led_strips').each(function(){
+    var led_strips = context.led_strips;
+    for(var currentKey in led_strips){
+      var newOption = new Option(led_strips[currentKey], currentKey);
+      $(newOption).html(led_strips[currentKey]);
+      $(this).append(newOption);
+    }
+  });
+
+  ledStripsLoading = false;
+  CheckIfFinishedInitialLoading();
+}
+
+
+
+// Set Device Setting   -----------------------------------------------------------
+
+function SetDeviceSetting(device, settings){
+
+  var data = {};
+  data["device"] = device;
+  data["settings"] = settings;
+
+  $.ajax({
+      url: "/SetDeviceSetting",
+      type: "POST", //send it through get method
+      data: JSON.stringify(data, null, '\t'),
+      contentType: 'application/json;charset=UTF-8',
+      success: function(response) {
+          console.log("Set the device settings successfully. Response: " + response.toString());
+          reloadingCounter++;
+          if(reloadingCounter >= reloadingMax){
+            location.reload();
+          }
+      },
+      error: function(xhr) {
+        //Do Something to handle error
+        console.log("Set the device settings got an error. Error: " + xhr.responseText);
+        reloadingCounter++;
+          if(reloadingCounter >= reloadingMax){
+            location.reload();
+          }
+      }
+    });
+}
+
+// Set Output Type Device Setting   -----------------------------------------------------------
+
+function SetOutputTypeDeviceSetting(device, output_type_key, settings){
+
+var data = {};
+data["device"] = device;
+data["output_type_key"] = output_type_key;
+data["settings"] = settings;
+
+$.ajax({
+  url: "/SetOutputTypeDeviceSetting",
+  type: "POST", //send it through get method
+  data: JSON.stringify(data, null, '\t'),
+  contentType: 'application/json;charset=UTF-8',
+  success: function(response) {
+      console.log("Set the device settings successfully. Response: " + response.toString());
+      reloadingCounter++;
+          if(reloadingCounter >= reloadingMax){
+            location.reload();
+          }
+
+  },
+  error: function(xhr) {
+    //Do Something to handle error
+    console.log("Set the device settings got an error. Error: " + xhr.responseText);
+    reloadingCounter++;
+          if(reloadingCounter >= reloadingMax){
+            location.reload();
+          }
+  }
+});
+}
+
+
+// Load Functions   -----------------------------------------------------------
 
 function GetLocalSettings(){
 
@@ -212,65 +325,8 @@ function GetOutputTypeSettingKeys(output_type){
 }
 
 
-function SetDeviceSetting(device, settings){
 
-      var data = {};
-      data["device"] = device;
-      data["settings"] = settings;
-
-      $.ajax({
-          url: "/SetDeviceSetting",
-          type: "POST", //send it through get method
-          data: JSON.stringify(data, null, '\t'),
-          contentType: 'application/json;charset=UTF-8',
-          success: function(response) {
-              console.log("Set the device settings successfully. Response: " + response.toString());
-              reloadingCounter++;
-              if(reloadingCounter >= reloadingMax){
-                location.reload();
-              }
-          },
-          error: function(xhr) {
-            //Do Something to handle error
-            console.log("Set the device settings got an error. Error: " + xhr.responseText);
-            reloadingCounter++;
-              if(reloadingCounter >= reloadingMax){
-                location.reload();
-              }
-          }
-        });
- }
-
- function SetOutputTypeDeviceSetting(device, output_type_key, settings){
-
-  var data = {};
-  data["device"] = device;
-  data["output_type_key"] = output_type_key;
-  data["settings"] = settings;
-
-  $.ajax({
-      url: "/SetOutputTypeDeviceSetting",
-      type: "POST", //send it through get method
-      data: JSON.stringify(data, null, '\t'),
-      contentType: 'application/json;charset=UTF-8',
-      success: function(response) {
-          console.log("Set the device settings successfully. Response: " + response.toString());
-          reloadingCounter++;
-              if(reloadingCounter >= reloadingMax){
-                location.reload();
-              }
-
-      },
-      error: function(xhr) {
-        //Do Something to handle error
-        console.log("Set the device settings got an error. Error: " + xhr.responseText);
-        reloadingCounter++;
-              if(reloadingCounter >= reloadingMax){
-                location.reload();
-              }
-      }
-    });
-}
+// Save Functions   -----------------------------------------------------------
 
 function SetLocalSettings(){
   var all_device_setting_keys = GetDeviceSettingKeys();
@@ -333,6 +389,9 @@ function SetLocalSettings(){
 
   });
 }
+
+
+// General Functions   -----------------------------------------------------------
 
 function CreateNewDevice(){
 
