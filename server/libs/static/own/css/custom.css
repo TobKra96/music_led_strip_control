@@ -71,5 +71,6 @@ li.active-dashboard-item {
 }
 
 .left_col {
-    overflow: scroll;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
