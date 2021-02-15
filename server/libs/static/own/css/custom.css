@@ -69,3 +69,7 @@ li.active-dashboard-item {
     max-width: 120px;
     max-height: 50px;
 }
+
+.left_col {
+    overflow: scroll;
+}
