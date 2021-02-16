@@ -10,7 +10,7 @@
   <a style="text-decoration:none" href="https://www.python.org/">
     <img src="https://img.shields.io/badge/Made%20with-Python-1f425f.svg" alt="made-with-python" />
   </a>
-  <a style="text-decoration:none" href="https://discord.gg/bMmWYGcz/">
+  <a style="text-decoration:none" href="https://discord.gg/qfmDu9jnce">
     <img src="https://img.shields.io/discord/774182494277992478" alt="Discord" />
   </a>
   <a style="text-decoration:none" href="https://github.com/TobKra96/music_led_strip_control/blob/master/LICENSE">
