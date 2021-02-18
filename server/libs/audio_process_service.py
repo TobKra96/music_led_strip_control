@@ -91,6 +91,7 @@ class AudioProcessService:
                     self._device_name = device["name"]
                     self._device_rate = self._config["general_settings"]["DEFAULT_SAMPLE_RATE"]
                     self._frames_per_buffer = self._config["general_settings"]["FRAMES_PER_BUFFER"]
+                    self.n_fft_bins = self._config["general_settings"]["N_FFT_BINS"]
 
             self.start_time_1 = time.time()
             self.ten_seconds_counter_1 = time.time()
@@ -176,7 +177,7 @@ class AudioProcessService:
             # Check if value is higher than min value.
             if audio_datas["vol"] < self._config["general_settings"]["MIN_VOLUME_THRESHOLD"]:
                 # Fill the array with zeros, to fade out the effect.
-                audio_datas["mel"] = np.zeros(1)
+                audio_datas["mel"] = np.zeros(self.n_fft_bins)
 
             if self._audio_queue.full():
                 try:
@@ -202,4 +203,4 @@ class AudioProcessService:
             pass
         except Exception as e:
             print("Could not run AudioService routine.")
-            print(f"Unexpected error in routine: {e}") 
+            print(f"Unexpected error in routine: {e}")
