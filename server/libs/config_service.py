@@ -3,7 +3,7 @@
 #   Load and save the config after every change.
 #
 
-from shutil import copyfile
+from shutil import copyfile, copy
 from pathlib import Path
 import json
 import os
@@ -11,15 +11,33 @@ import os
 
 class ConfigService():
     def __init__(self, config_lock):
-        config_file = "/config.json"
-        config_path = "/share/.mlsc"
-        src = os.path.dirname(__file__) + config_file  # Default config.json from the repository.
-        if not os.path.exists(src):
-            raise Exception(f'Could not find the config file: "{src}"')  # Raise exception, if no config.json found in repository.
-        if not os.path.exists(config_path + config_file):
-            Path(config_path).mkdir(exist_ok=True)  # Create config directory, ignore if already exists.
-            copyfile(src, config_path + config_file)  # Copy config.json from repository to config directory.
-        self._path = config_path + config_file
+        config_file = "config.json"
+        config_backup_file = "config_backup.json"
+        config_template_file = "config_template.json"
+
+        rel_config_path = "../../.mlsc/"
+        # Convert relative path to abs path.
+        config_folder = os.path.abspath(rel_config_path) + "/"
+        lib_folder = os.path.dirname(__file__) + "/"
+
+        self._config_path = config_folder + config_file
+        self._backup_path = config_folder + config_backup_file
+        self._template_path = lib_folder + config_template_file
+
+        print("Config Files")
+        print(f"Config: {self._config_path}")
+        print(f"Backup: {self._backup_path}")
+        print(f"Template: {self._template_path}")
+
+        if not os.path.exists(self._config_path):
+            if not os.path.exists(self._backup_path):
+                # Use the template as config
+                Path(config_folder).mkdir(exist_ok=True)  # Create config directory, ignore if already exists.
+                copyfile(self._template_path, self._config_path)  # Copy config.json from repository to config directory.
+            else:
+                # Use the backup as template
+                Path(config_folder).mkdir(exist_ok=True)  # Create config directory, ignore if already exists.
+                copyfile(self._backup_path, self._config_path)  # Copy config.json from repository to config directory.
 
         self.config_lock = config_lock
 
@@ -29,7 +47,7 @@ class ConfigService():
         """Load the configuration file inside the self.config variable."""
         self.config_lock.acquire()
 
-        with open(self._path, "r") as read_file:
+        with open(self._config_path, "r") as read_file:
             self.config = json.load(read_file)
 
         self.config_lock.release()
@@ -42,13 +60,18 @@ class ConfigService():
 
         self.config_lock.acquire()
 
+        self.save_backup()
+
         if config is not None:
             self.config = config
 
-        with open(self._path, "w") as write_file:
+        with open(self._config_path, "w") as write_file:
             json.dump(self.config, write_file, indent=4, sort_keys=True)
 
         self.config_lock.release()
+
+    def save_backup(self):
+        copy(self._config_path, self._backup_path)
 
     def reset_config(self):
         """Reset the config."""
@@ -56,32 +79,31 @@ class ConfigService():
 
         self.config_lock.acquire()
 
-        backup_config = self.load_backup()
-        if backup_config is not None:
-            self.config = backup_config
+        config_template = self.load_template()
+        if config_template is not None:
+            self.config = config_template
 
         self.config_lock.release()
 
         # Save the config again.
         self.save_config()
 
-    def load_backup(self):
-        backup_config = None
-
-        path = os.path.dirname(__file__) + "/config.json.bak"
-        if not os.path.exists(path):
-            raise Exception(f'Could not find the backup config file: "{path}"')
+    def load_template(self):
+        config_template = None
+        
+        if not os.path.exists(self._template_path):
+            raise Exception(f'Could not find the template config file: "{self._template_path}"')
 
         # Read the Backup Config.
-        with open(path, "r") as read_file:
-            backup_config = json.load(read_file)
+        with open(self._template_path, "r") as read_file:
+            config_template = json.load(read_file)
 
-        return backup_config
+        return config_template
         
 
     def check_compatibility(self):
         loaded_config = self.config
-        template_config = self.load_backup()
+        template_config = self.load_template()
 
         # Loop through the root
         for key, value in template_config.items():
@@ -111,6 +133,9 @@ class ConfigService():
     def check_devices(self, loaded_config_devices, template_config_device):
         for key, value in loaded_config_devices.items():
             self.check_leaf(loaded_config_devices[key], template_config_device)
+
+    def get_config_path(self):
+        return self._config_path
 
     @staticmethod
     def instance(config_lock, imported_instance=None):
