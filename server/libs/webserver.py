@@ -23,7 +23,8 @@ class Webserver():
         self.webserver_executer = WebserverExecuter(config_lock, notification_queue_in, notification_queue_out, effects_queue)
         Webserver.instance = self
 
-        self.export_config_path = join(dirname(realpath(__file__)), 'config.json')
+        config_instance = ConfigService.instance(self._config_lock)
+        self.export_config_path = config_instance.get_config_path()
 
         server.config["TEMPLATES_AUTO_RELOAD"] = True
         webserver_port = self.webserver_executer.GetWebserverPort()
