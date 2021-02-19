@@ -34,12 +34,12 @@ IPAddress subnet(x, x, x, x);
 void setup() {
     Serial.begin(115200);
     Serial.println("Serial Begin");
-    
+
     ledstrip.Begin();//Begin output
     ledstrip.Show();//Clear the strip for use
     welcomeLight();
 
-    
+
     // Connect to wifi and print the IP address over serial
     wl_status_t state;
     bool isOn = false;
@@ -60,7 +60,7 @@ void setup() {
         delay(500);
         timeoutCounter = 0;
       }
-      
+
       state = WiFi.status();
 
       if(state == WL_CONNECTED){
@@ -102,12 +102,12 @@ void setup() {
       /*
       if (state == WL_NO_SHIELD) {  // WiFi.begin wasn't called yet
         wifiConnect();
-      
+
       } else if (state == WL_CONNECT_FAILED) {  // WiFi.begin has failed (AUTH_FAIL)
         wifiDisconnect();
       }
       */
-      
+
       delay(500);
       Serial.print(".");
       showConnection(isOn, reconnected, stateLED);
@@ -139,7 +139,7 @@ void loop() {
             RgbColor pixel((uint8_t)packetBuffer[i], (uint8_t)packetBuffer[i+1], (uint8_t)packetBuffer[i+2]);
             ledstrip.SetPixelColor(n, pixel);
             n++;
-        } 
+        }
         ledstrip.Show();
         #if PRINT_FPS
             fpsCounter++;
@@ -150,8 +150,8 @@ void loop() {
         if (millis() - secondTimer >= 1000U) {
             secondTimer = millis();
             Serial.printf("FPS: %d\n", fpsCounter);
-            fpsCounter = 0; 
-        }   
+            fpsCounter = 0;
+        }
     #endif
 }
 
@@ -162,17 +162,17 @@ void welcomeLight(){
   uint8_t b = 0;
 
   for(uint8_t i = 0; i < 255; i++) {
-    
+
     for(int n = 0; n < NUM_LEDS; n++) {
             RgbColor pixel(r, g, b);
             ledstrip.SetPixelColor(n, pixel);
-        }   
+        }
     ledstrip.Show();
-      
+
     r++;
     g++;
     b++;
- 
+
     delay(20);
   }
   Serial.println("Leave welcomeLigth()");
@@ -186,21 +186,21 @@ void showConnection(bool ledIsOn, bool reconnected, int stateLed){
   if(ledIsOn)
   {
     RgbColor pixelOne(255, 0, 0);
-    ledstrip.SetPixelColor(0, pixelOne);  
+    ledstrip.SetPixelColor(0, pixelOne);
   }
   else{
     RgbColor pixelOne(0, 0, 0);
-    ledstrip.SetPixelColor(0, pixelOne);  
+    ledstrip.SetPixelColor(0, pixelOne);
   }
 
   if(reconnected)
   {
     RgbColor pixelTwo(0, 0, 255);
-    ledstrip.SetPixelColor(1, pixelTwo);  
+    ledstrip.SetPixelColor(1, pixelTwo);
   }
   else{
     RgbColor pixelTwo(0, 0, 0);
-    ledstrip.SetPixelColor(1, pixelTwo);  
+    ledstrip.SetPixelColor(1, pixelTwo);
   }
 
   if(stateLed == -1){
@@ -219,12 +219,12 @@ void showConnection(bool ledIsOn, bool reconnected, int stateLed){
      RgbColor pixel(0, 255, 0);
      ledstrip.SetPixelColor(stateLedWithOffset, pixel);
   }
-  
+
   for(int n = 12; n < NUM_LEDS; n++) {
            RgbColor pixel(r, g, b);
            ledstrip.SetPixelColor(n, pixel);
            }
-  ledstrip.Show(); 
+  ledstrip.Show();
 }
 
 void wifiConnect(){
