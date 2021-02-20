@@ -5,12 +5,10 @@
 
 from logging.handlers import RotatingFileHandler
 from shutil import copyfile, copy
-from sys import version_info
 from pathlib import Path
 import coloredlogs
 import logging
 import json
-import sys
 import os
 
 
@@ -19,10 +17,6 @@ class ConfigService():
         self.setup_logging()
 
         self.logger = logging.getLogger(__name__)
-
-        if version_info < (3, 6):
-            self.logger.error("Error: MLSC requires Python 3.6 or greater.")
-            sys.exit()
 
         config_file = "config.json"
         config_backup_file = "config_backup.json"

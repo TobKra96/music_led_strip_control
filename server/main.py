@@ -4,6 +4,12 @@
 # The program will start here.
 # This file will only initialize and start the processes.
 
+from sys import version_info
+import sys
+
+if version_info < (3, 6):
+    sys.exit("Error: MLSC requires Python 3.6 or greater.")
+
 from libs.audio_process_service import AudioProcessService
 from libs.notification_service import NotificationService
 from libs.device_manager import DeviceManager
