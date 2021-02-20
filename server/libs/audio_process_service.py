@@ -5,7 +5,7 @@ from libs.fps_limiter import FPSLimiter  # pylint: disable=E0611, E0401
 from libs.dsp import DSP  # pylint: disable=E0611, E0401
 
 from multiprocessing import Queue
-from queue import Empty, Full
+from queue import Empty
 
 from time import time
 import numpy as np

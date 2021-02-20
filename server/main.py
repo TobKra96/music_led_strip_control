@@ -11,7 +11,6 @@ from libs.config_service import ConfigService
 from libs.webserver import Webserver
 
 from multiprocessing import Process, Queue, Lock
-import multiprocessing
 from time import sleep
 import logging
 
@@ -124,22 +123,16 @@ class Main():
             self.logger.info("MLSC stopped")
 
 
-
-
 if __name__ == "__main__":
 
-    
-    #logging.basicConfig(handlers=[
-    #                RotatingFileHandler(logging_path + logging_file, mode='a', maxBytes=5 * 1024 * 1024, backupCount=5, encoding='utf-8'),
-    #                logging.StreamHandler()
-    #                ],
-    #                format='%(asctime)s - %(levelname)-8s - %(name)-15s - %(message)s',
-    #                datefmt='%Y.%m.%d %H:%M:%S',
-    #                level=logging.DEBUG
-    #                )
-
-    
-    
+    # logging.basicConfig(handlers=[
+    #     RotatingFileHandler(logging_path + logging_file, mode='a', maxBytes=5 * 1024 * 1024, backupCount=5, encoding='utf-8'),
+    #     logging.StreamHandler()
+    # ],
+    #     format='%(asctime)s - %(levelname)-8s - %(name)-15s - %(message)s',
+    #     datefmt='%Y.%m.%d %H:%M:%S',
+    #     level=logging.DEBUG
+    # )
 
     main = Main()
     main.start()

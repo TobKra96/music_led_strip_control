@@ -1,13 +1,11 @@
 from flask import Flask, render_template, request, jsonify, send_file
 from time import sleep
+import logging
 import copy
 import json
-import logging
 
 from libs.webserver_executer import WebserverExecuter  # pylint: disable=E0611, E0401
 from libs.config_service import ConfigService  # pylint: disable=E0611, E0401
-
-
 
 
 server = Flask(__name__)

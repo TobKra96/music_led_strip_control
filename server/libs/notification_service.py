@@ -4,6 +4,7 @@ import logging
 from libs.notification_enum import NotificationEnum  # pylint: disable=E0611, E0401
 from libs.notification_item import NotificationItem  # pylint: disable=E0611, E0401
 
+
 class NotificationService():
     def start(self, config_lock, notification_queue_device_manager_in,
               notification_queue_device_manager_out, notification_queue_audio_in,
@@ -27,18 +28,21 @@ class NotificationService():
             # 1. Check Webserver
             # 2. Check Output
             # 3. Check Effects
-            sleep(0.5)
+            try:
+                sleep(0.5)
 
-            if not self._notification_queue_webserver_out.empty():
-                self.logger.debug("NotificationService: New Notification detected.")
-                self._current_notification_item = self._notification_queue_webserver_out.get()
+                if not self._notification_queue_webserver_out.empty():
+                    self.logger.debug("NotificationService: New Notification detected.")
+                    self._current_notification_item = self._notification_queue_webserver_out.get()
 
-                self.logger.debug("Item get")
-                if self._current_notification_item.notification_enum is NotificationEnum.config_refresh:
+                    self.logger.debug("Item get")
+                    if self._current_notification_item.notification_enum is NotificationEnum.config_refresh:
 
-                    self.logger.debug("Reloading config...")
-                    self.config_refresh(self._current_notification_item)
-                    self.logger.debug("Config reloaded.")
+                        self.logger.debug("Reloading config...")
+                        self.config_refresh(self._current_notification_item)
+                        self.logger.debug("Config reloaded.")
+            except KeyboardInterrupt:
+                break
 
     def stop(self):
         self._cancel_token = True
@@ -90,4 +94,3 @@ class NotificationService():
         # 4. Continue the processes.
         self._notification_queue_device_manager_in.put(NotificationItem(NotificationEnum.process_continue, device_id))
         self._notification_queue_audio_in.put(NotificationItem(NotificationEnum.process_continue, device_id))
-

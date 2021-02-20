@@ -4,6 +4,7 @@ import logging
 from libs.effect_service import EffectService
 from libs.output_service import OutputService
 
+
 class Device:
     def __init__(self, config, device_config, color_service_global):
         self.logger = logging.getLogger(__name__)

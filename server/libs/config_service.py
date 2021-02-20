@@ -3,13 +3,14 @@
 #   Load and save the config after every change.
 #
 
+from logging.handlers import RotatingFileHandler
 from shutil import copyfile, copy
 from pathlib import Path
+import coloredlogs
+import logging
 import json
 import os
-import logging
-import coloredlogs
-from logging.handlers import RotatingFileHandler
+
 
 class ConfigService():
     def __init__(self, config_lock):
@@ -148,13 +149,13 @@ class ConfigService():
 
         if not os.path.exists(logging_path):
             Path(logging_path).mkdir(exist_ok=True)
-        
+
         root_logger = logging.getLogger()
         root_logger.setLevel(default_level)
-        
+
         format_string_file = "%(asctime)s - %(levelname)-8s - %(name)-30s - %(message)s"
         file_formatter = logging.Formatter(format_string_file)
-      
+
         rotating_file_handler = RotatingFileHandler(logging_path + logging_file, mode='a', maxBytes=5 * 1024 * 1024, backupCount=5, encoding='utf-8')
         rotating_file_handler.setLevel(default_level)
         rotating_file_handler.setFormatter(file_formatter)
@@ -163,7 +164,6 @@ class ConfigService():
 
         format_string_console = "%(levelname)-8s - %(name)-30s - %(message)s"
         coloredlogs.install(fmt=format_string_console)
-
 
     @staticmethod
     def instance(config_lock, imported_instance=None):
