@@ -11,8 +11,7 @@ from queue import Empty, Full
 import numpy as np
 import pyaudio
 import sys
-import time
-from time import sleep
+from time import time
 
 
 class AudioProcessService:
@@ -96,10 +95,10 @@ class AudioProcessService:
                     self._frames_per_buffer = self._config["general_settings"]["FRAMES_PER_BUFFER"]
                     self.n_fft_bins = self._config["general_settings"]["N_FFT_BINS"]
 
-            self.start_time_1 = time.time()
-            self.ten_seconds_counter_1 = time.time()
-            self.start_time_2 = time.time()
-            self.ten_seconds_counter_2 = time.time()
+            self.start_time_1 = time()
+            self.ten_seconds_counter_1 = time()
+            self.start_time_2 = time()
+            self.ten_seconds_counter_2 = time()
 
             self._dsp = DSP(self._config)
 
@@ -117,16 +116,16 @@ class AudioProcessService:
                     self.audio_buffer_queue.put(in_data)
                 except Exception as e:
                     pass
-    #
-                self.end_time_1 = time.time()
 
-                if time.time() - self.ten_seconds_counter_1 > 10:
-                    self.ten_seconds_counter_1 = time.time()
+                self.end_time_1 = time()
+
+                if time() - self.ten_seconds_counter_1 > 10:
+                    self.ten_seconds_counter_1 = time()
                     time_dif = self.end_time_1 - self.start_time_1
                     fps = 1 / time_dif
                     print(f"Audio Service Callback | FPS: {fps:.2f}")
 
-                self.start_time_1 = time.time()
+                self.start_time_1 = time()
 
                 return (self.audio, pyaudio.paContinue)
 
@@ -191,15 +190,15 @@ class AudioProcessService:
 
             self._audio_queue.put(audio_datas, False)
 
-            self.end_time_2 = time.time()
+            self.end_time_2 = time()
 
-            if time.time() - self.ten_seconds_counter_2 > 10:
-                self.ten_seconds_counter_2 = time.time()
+            if time() - self.ten_seconds_counter_2 > 10:
+                self.ten_seconds_counter_2 = time()
                 time_dif = self.end_time_2 - self.start_time_2
                 fps = 1 / time_dif
                 print(f"Audio Service Routine | FPS: {fps:.2f}")
 
-            self.start_time_2 = time.time()
+            self.start_time_2 = time()
 
         except IOError:
             print("IOError while reading the Microphone Stream.")

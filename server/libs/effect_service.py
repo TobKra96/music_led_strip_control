@@ -30,8 +30,7 @@ from libs.effects.effect_segment_color import EffectSegmentColor  # pylint: disa
 
 import numpy as np
 import gc as gc
-from time import sleep
-import time
+from time import time
 import cProfile
 import random
 from collections import deque
@@ -50,8 +49,8 @@ class EffectService():
         self._device = device
         print(f'Starting Effect Service component from device: {self._device.device_config["DEVICE_NAME"]}')
 
-        self.ten_seconds_counter = time.time()
-        self.start_time = time.time()
+        self.ten_seconds_counter = time()
+        self.start_time = time()
 
         self._fps_limiter = FPSLimiter(self._device.device_config["FPS"])
 
@@ -150,14 +149,14 @@ class EffectService():
             else:
                 print(f"Could not find effect: {self._current_effect}")
 
-        self.end_time = time.time()
-        if time.time() - self.ten_seconds_counter > 10:
-            self.ten_seconds_counter = time.time()
+        self.end_time = time()
+        if time() - self.ten_seconds_counter > 10:
+            self.ten_seconds_counter = time()
             self.time_dif = self.end_time - self.start_time
             self.fps = 1 / self.time_dif
             print(f'Effect Service | FPS: {self.fps:.2f} | Device: {self._device.device_config["DEVICE_NAME"]}')
 
-        self.start_time = time.time()
+        self.start_time = time()
 
         self._initialized_effects[self._current_effect].run()
 

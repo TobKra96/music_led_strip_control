@@ -1,7 +1,7 @@
 from libs.color_service import ColorService  # pylint: disable=E0611, E0401
 
 import numpy as np
-import time
+from time import time
 
 
 class ColorServiceGlobal():
@@ -25,7 +25,7 @@ class ColorServiceGlobal():
         self.current_fade_color[0] = 0
         self.current_fade_color[1] = 0
         self.current_fade_color[2] = 0
-        self.last_fade_change_time = int(round(time.time() * 1000))
+        self.last_fade_change_time = int(round(time() * 1000))
 
     def build_gradients(self):
         led_count = 1000
@@ -108,7 +108,7 @@ class ColorServiceGlobal():
             return (0, 0, 0)
 
     def get_global_fade_color(self, fade_speed, fade_gradient, fade_reverse):
-        current_time = int(round(time.time() * 1000))
+        current_time = int(round(time() * 1000))
         time_diff = current_time - self.last_fade_change_time
 
         rolling_steps = int((fade_speed * time_diff) / 500)
@@ -125,7 +125,7 @@ class ColorServiceGlobal():
                 axis=1
             )
 
-            self.last_fade_change_time = int(round(time.time() * 1000))
+            self.last_fade_change_time = int(round(time() * 1000))
 
         self.current_fade_color[0] = self.full_gradients[fade_gradient][0][0]
         self.current_fade_color[1] = self.full_gradients[fade_gradient][1][0]

@@ -4,8 +4,7 @@ from libs.math_service import MathService  # pylint: disable=E0611, E0401
 from libs.dsp import DSP  # pylint: disable=E0611, E0401
 
 import numpy as np
-from time import sleep
-import time
+from time import time
 import cProfile
 import random
 from collections import deque
@@ -117,9 +116,9 @@ class Effect:
             if (any(differences[j] >= self.min_percent_diff[i]
                     and self.freq_channels[j][0] >= self.min_detect_amplitude[i]
                     for j in range(*self.detection_ranges[i]))
-                and (time.time() - self.prev_freq_detects[i] > 0.2)
+                and (time() - self.prev_freq_detects[i] > 0.2)
                     and len(self.freq_channels[0]) == self.freq_channel_history):
-                self.prev_freq_detects[i] = time.time()
+                self.prev_freq_detects[i] = time()
                 self.current_freq_detects[i] = True
             else:
                 self.current_freq_detects[i] = False
