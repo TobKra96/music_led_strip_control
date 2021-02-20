@@ -39,9 +39,11 @@ class EffectEnergy(Effect):
         self.output[2, :b] = 255
         self.output[2, b:] = 0
         # Apply blur to smooth the edges.
-        self.output[0, :] = gaussian_filter1d(self.output[0, :], sigma=effect_config["blur"])
-        self.output[1, :] = gaussian_filter1d(self.output[1, :], sigma=effect_config["blur"])
-        self.output[2, :] = gaussian_filter1d(self.output[2, :], sigma=effect_config["blur"])
+        blur_amount = effect_config["blur"]
+        if blur_amount > 0:
+            self.output[0, :] = gaussian_filter1d(self.output[0, :], sigma=blur_amount)
+            self.output[1, :] = gaussian_filter1d(self.output[1, :], sigma=blur_amount)
+            self.output[2, :] = gaussian_filter1d(self.output[2, :], sigma=blur_amount)
 
         if effect_config["mirror"]:
             # Calculate the real mid.

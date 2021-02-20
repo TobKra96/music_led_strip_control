@@ -53,9 +53,12 @@ class EffectWavelength(Effect):
             steps * (-1 if effect_config["reverse_roll"] else 1),
             axis=1
         )
-        output[0] = gaussian_filter1d(output[0], sigma=effect_config["blur"])
-        output[1] = gaussian_filter1d(output[1], sigma=effect_config["blur"])
-        output[2] = gaussian_filter1d(output[2], sigma=effect_config["blur"])
+        blur_amount = effect_config["blur"]
+        if blur_amount > 0:
+            output[0] = gaussian_filter1d(output[0], sigma=blur_amount)
+            output[1] = gaussian_filter1d(output[1], sigma=blur_amount)
+            output[2] = gaussian_filter1d(output[2], sigma=blur_amount)
+
         if effect_config["flip_lr"]:
             output = np.fliplr(output)
 

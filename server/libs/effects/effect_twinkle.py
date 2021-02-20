@@ -86,7 +86,9 @@ class EffectTwinkle(Effect):
         for current_star_to_remove in remove_stars_descending:
             self.descending_stars.remove(current_star_to_remove)
 
-        self.output = gaussian_filter1d(self.output, sigma=effect_config["blur"])
+        blur_amount = effect_config["blur"]
+        if blur_amount > 0:
+            self.output = gaussian_filter1d(self.output, sigma=blur_amount)
 
         # Add the output array to the queue.
         self.queue_output_array_blocking(self.output)

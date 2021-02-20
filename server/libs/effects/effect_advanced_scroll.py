@@ -135,7 +135,9 @@ class EffectAdvancedScroll(Effect):
         self.output[2] = self.output_scroll_subbass[2] + self.output_scroll_bass[2] + self.output_scroll_lowmid[2] + self.output_scroll_mid[2] + self.output_scroll_uppermid[2] + self.output_scroll_presence[2] + self.output_scroll_brilliance[2]
 
         self.output = (self.output * effect_config["decay"]).astype(int)
-        self.output = gaussian_filter1d(self.output, sigma=effect_config["blur"])
+        blur_amount = effect_config["blur"]
+        if blur_amount > 0:
+            self.output = gaussian_filter1d(self.output, sigma=blur_amount)
 
         if effect_config["mirror"]:
             # Calculate the real mid.
