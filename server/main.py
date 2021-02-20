@@ -33,8 +33,8 @@ class Main():
         self._config_instance = ConfigService.instance(self._config_lock)
         self._config = self._config_instance.config
 
-        logger = logging.getLogger(__name__)
-        logger.info("Initializing MLSC...")
+        self.logger = logging.getLogger(__name__)
+        self.logger.info("Initializing MLSC...")
 
         # Check config compatibility
         self._config_instance.check_compatibility()
@@ -106,10 +106,10 @@ class Main():
             ))
         self._audio_process.start()
 
-        logger.info("Initialization finished.")
+        self.logger.info("Initialization finished.")
 
         try:
-            logger.info("MLSC started...")
+            self.logger.info("MLSC started...")
 
             self._cancel_token = False
 
@@ -118,10 +118,10 @@ class Main():
                 sleep(10)
 
         except KeyboardInterrupt:
-            logger.info("\nStopping MLSC...")
+            self.logger.info("\nStopping MLSC...")
             self._notification_service_process.terminate()
             self._webserver_process.terminate()
-            logger.info("MLSC stopped")
+            self.logger.info("MLSC stopped")
 
 
 
