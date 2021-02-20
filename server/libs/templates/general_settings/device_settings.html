@@ -53,8 +53,30 @@
               </div>
 
               <div class="item form-group">
-                <label class="control-label col-md-3 col-sm-3 col-xs-12" for="LED_Count">LED Pin (GPIO Pin)</label>
+                <label class="control-label col-md-3 col-sm-3 col-xs-12" for="LED_Pin">LED Pin (GPIO Pin)</label>
                 <input id="LED_Pin" type="number" name="number" required="required" data-validate-minmax="1,100" class="form-control col-md-9 col-sm-9 col-xs-12 output_raspi" data-kwimpalastatus="alive" data-kwimpalaid="1554401854198-5">
+              </div>
+
+              <div class="item form-group">
+                <label class="control-label col-md-3 col-sm-3 col-xs-12" for="LED_Channel">LED Signal Frequenzy in Hz</label>
+                <input id="LED_Freq_Hz" type="number" name="number" required="required" data-validate-minmax="0,9999999" class="form-control col-md-9 col-sm-9 col-xs-12 output_raspi" data-kwimpalastatus="alive" data-kwimpalaid="1554401854198-5">
+              </div>
+
+              <div class="item form-group">
+                <label class="control-label col-md-3 col-sm-3 col-xs-12" for="LED_Channel">LED Channel</label>
+                <input id="LED_Channel" type="number" name="number" required="required" data-validate-minmax="0,100" class="form-control col-md-9 col-sm-9 col-xs-12 output_raspi" data-kwimpalastatus="alive" data-kwimpalaid="1554401854198-5">
+              </div>
+
+              <div class="item form-group">
+                <label class="control-label col-md-3 col-sm-3 col-xs-12" for="LED_Dma">LED DMA</label>
+                <input id="LED_Dma" type="number" name="number" required="required" data-validate-minmax="0,100" class="form-control col-md-9 col-sm-9 col-xs-12 output_raspi" data-kwimpalastatus="alive" data-kwimpalaid="1554401854198-5">
+              </div>
+
+              <div class="item form-group form-space">
+                <label class="control-label col-md-3 col-sm-3 col-xs-12">LED_Invert</label>
+                <div class="col-md-9 col-sm-9 col-xs-12">
+                  <input id="LED_Invert" type="checkbox" class="js-switch output_raspi" data-switchery="true" >
+                </div>
               </div>
 
               <div class="item form-group">
