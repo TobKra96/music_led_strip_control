@@ -85,6 +85,12 @@ class WebserverExecuter():
             led_strips[led_strip_ID] = self._config["led_strips"][led_strip_ID]
         return led_strips
 
+    def GetLoggingLevels(self):
+        logging_levels = dict()
+        for logging_level_ID in self._config["logging_levels"]:
+            logging_levels[logging_level_ID] = self._config["logging_levels"][logging_level_ID]
+        return logging_levels
+
     def GetGeneralSetting(self, setting_key):
         return self._config["general_settings"][setting_key]
 

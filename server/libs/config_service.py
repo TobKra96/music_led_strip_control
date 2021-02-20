@@ -10,11 +10,15 @@ import coloredlogs
 import logging
 import json
 import os
-
+import sys
 
 class ConfigService():
     def __init__(self, config_lock):
+        self.config = None
+
+        # Start with the default logging settings, because the config was not loaded.
         self.setup_logging()
+        
 
         self.logger = logging.getLogger(__name__)
 
@@ -50,6 +54,10 @@ class ConfigService():
 
         self.load_config()
 
+        # Now the config was loaded, so we can reinit the logging with the set logging levels.
+        self.setup_logging()
+
+
     def load_config(self):
         """Load the configuration file inside the self.config variable."""
         self.config_lock.acquire()
@@ -75,6 +83,8 @@ class ConfigService():
         with open(self._config_path, "w") as write_file:
             json.dump(self.config, write_file, indent=4, sort_keys=True)
 
+        # Maybe the logging updated
+        self.setup_logging()
         self.config_lock.release()
 
     def save_backup(self):
@@ -143,27 +153,52 @@ class ConfigService():
         return self._config_path
 
     def setup_logging(self):
-        default_level = logging.INFO
         logging_path = "../../.mlsc/"
         logging_file = "mlsc.log"
+
+        format_string_file = "%(asctime)s - %(levelname)-8s - %(name)-30s - %(message)s"
+        format_string_console = "%(levelname)-8s - %(name)-30s - %(message)s"
+
+        logging_level_root = logging.NOTSET
+        logging_level_console = logging.INFO
+        logging_level_file = logging.INFO
+        logging_file_enabled = False
+        
+        logging_level_map ={
+            "NOTSET": logging.NOTSET,
+            "DEBUG": logging.DEBUG,
+            "INFO": logging.INFO,
+            "WARNING": logging.WARNING,
+            "ERROR": logging.ERROR,
+            "CRITICAL": logging.CRITICAL
+        }
+
+        if self.config is not None:
+            logging_level_console = logging_level_map[self.config["general_settings"]["LOG_LEVEL_CONSOLE"]]
+            logging_level_file = logging_level_map[self.config["general_settings"]["LOG_LEVEL_FILE"]]
+            logging_file_enabled = self.config["general_settings"]["LOG_FILE_ENABLED"]
 
         if not os.path.exists(logging_path):
             Path(logging_path).mkdir(exist_ok=True)
 
         root_logger = logging.getLogger()
-        root_logger.setLevel(default_level)
 
-        format_string_file = "%(asctime)s - %(levelname)-8s - %(name)-30s - %(message)s"
-        file_formatter = logging.Formatter(format_string_file)
+        # Reset Handlers
+        root_logger.handlers = []
+        root_logger.setLevel(logging_level_root)
 
-        rotating_file_handler = RotatingFileHandler(logging_path + logging_file, mode='a', maxBytes=5 * 1024 * 1024, backupCount=5, encoding='utf-8')
-        rotating_file_handler.setLevel(default_level)
-        rotating_file_handler.setFormatter(file_formatter)
+        if logging_file_enabled:
+            file_formatter = logging.Formatter(format_string_file)
+            rotating_file_handler = RotatingFileHandler(logging_path + logging_file, mode='a', maxBytes=5 * 1024 * 1024, backupCount=5, encoding='utf-8')
+            rotating_file_handler.setLevel(logging_level_file)
+            rotating_file_handler.setFormatter(file_formatter)
+            root_logger.addHandler(rotating_file_handler)
 
-        root_logger.addHandler(rotating_file_handler)
-
-        format_string_console = "%(levelname)-8s - %(name)-30s - %(message)s"
-        coloredlogs.install(fmt=format_string_console)
+        console_formatter = coloredlogs.ColoredFormatter(fmt=format_string_console)
+        stream_handler = logging.StreamHandler(stream=sys.stderr)
+        stream_handler.setFormatter(console_formatter)
+        stream_handler.setLevel(logging_level_console)
+        root_logger.addHandler(stream_handler)
 
     @staticmethod
     def instance(config_lock, imported_instance=None):

@@ -328,7 +328,10 @@
         "MIN_VOLUME_THRESHOLD": 0,
         "N_FFT_BINS": 24,
         "N_ROLLING_HISTORY": 4,
-        "WEBSERVER_PORT": 8080
+        "WEBSERVER_PORT": 8080,
+        "LOG_FILE_ENABLED": false,
+        "LOG_LEVEL_CONSOLE": "INFO",
+        "LOG_LEVEL_FILE": "INFO"
     },
     "gradients": {
         "Dancefloor": [
@@ -563,5 +566,14 @@
         "WS2811_STRIP_RBG": "WS281x_RBG",
         "WS2811_STRIP_RGB": "WS281x_RGB",
         "WS2812_STRIP": "WS281x_default"
+    },
+
+    "logging_levels":{
+        "NOTSET": "Not Set",
+        "DEBUG": "Debug",
+        "INFO": "Info",
+        "WARNING": "Warning",
+        "ERROR": "Error",
+        "CRITICAL": "Critical"
     }
 }

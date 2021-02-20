@@ -402,6 +402,28 @@ class Webserver():
             else:
                 return jsonify(data_out)
 
+     # /GetLoggingLevels
+    #
+    # return
+    # {
+    # "<GetLoggingLevelID1>" = <LoggingLevelName1>
+    # "<GetLoggingLevelID2>" = <LoggingLevelName2>
+    # "<GetLoggingLevelID3>" = <LoggingLevelName3>
+    # ...
+    # }
+    @server.route('/GetLoggingLevels', methods=['GET'])
+    def GetLoggingLevels():  # pylint: disable=E0211
+        if request.method == 'GET':
+            data_out = dict()
+
+            logging_levels = Webserver.instance.webserver_executer.GetLoggingLevels()
+            data_out = logging_levels
+
+            if data_out is None:
+                return "Could not find logging_levels.", 403
+            else:
+                return jsonify(data_out)
+
     # /SetEffectSetting
     # {
     # "device" = <deviceID>
