@@ -116,7 +116,7 @@
             },
             "effect_bubble": {
                 "blur": 5,
-                "bubble_lenght": 5,
+                "bubble_length": 5,
                 "bubble_repeat": 2,
                 "gradient": "Spectral",
                 "mirror": false,

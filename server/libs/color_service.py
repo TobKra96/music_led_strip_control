@@ -148,7 +148,7 @@ class ColorService():
 
                     #             Find the right spot in the array for the repetition.                     Find the right spot in the repetition for the color.
                     start_index = int((current_bubble_repeat * gradient_color_count * steps_between_bubbles) + (current_color * steps_between_bubbles))
-                    end_index = int(start_index + effect_config["bubble_lenght"])
+                    end_index = int(start_index + effect_config["bubble_length"])
 
                     # If the start reaches the end of the string something is wrong.
                     if start_index > led_count - 1:
