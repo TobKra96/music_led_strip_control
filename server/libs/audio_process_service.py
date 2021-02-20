@@ -25,7 +25,7 @@ class AudioProcessService:
         self.audio_buffer_queue = Queue(2)
         self.stream = None
 
-        self.init_audio_service()
+        self.init_audio_service(show_output = True)
 
         while True:
             try:
@@ -34,7 +34,7 @@ class AudioProcessService:
             except KeyboardInterrupt:
                 break
 
-    def init_audio_service(self):
+    def init_audio_service(self, show_output = False):
         try:
             # Initial config load.
             ConfigService.instance(self._config_lock).load_config()
@@ -52,7 +52,8 @@ class AudioProcessService:
             self._default_device_id = self._py_audio.get_default_input_device_info()['index']
             self._devices = []
 
-            self.logger.info("Found the following audio sources:")
+            self.log_output(show_output,logging.INFO, "Found the following audio sources:")
+
 
             # Select the audio device you want to use.
             selected_device_list_index = self._config["general_settings"]["DEVICE_ID"]
@@ -67,28 +68,28 @@ class AudioProcessService:
 
                     if device_info["maxInputChannels"] >= 1:
                         self._devices.append(device_info)
-                        self.logger.info(f'{device_info["index"]} - {device_info["name"]} - {device_info["defaultSampleRate"]}')
+                        self.log_output(show_output, logging.INFO ,f'{device_info["index"]} - {device_info["name"]} - {device_info["defaultSampleRate"]}')
 
                         if device_info["index"] == selected_device_list_index:
                             foundMicIndex = True
                 except Exception as e:
-                    self.logger.error("Could not get device infos.")
+                    self.log_output(show_output, logging.ERROR ,"Could not get device infos.")
                     self.logger.exception(f"Unexpected error in AudioProcessService: {e}")
 
             # Could not find a mic with the selected mic id, so I will use the first device I found.
             if not foundMicIndex:
-                self.logger.error("********************************************************")
-                self.logger.error("*                      Error                           *")
-                self.logger.error("********************************************************")
-                self.logger.error(f"Could not find the mic with the id: {selected_device_list_index}")
-                self.logger.error("Using the first mic as fallback.")
-                self.logger.error("Please change the id of the mic inside the config.")
+                self.log_output(show_output, logging.ERROR ,"********************************************************")
+                self.log_output(show_output, logging.ERROR ,"*                      Error                           *")
+                self.log_output(show_output, logging.ERROR ,"********************************************************")
+                self.log_output(show_output, logging.ERROR ,f"Could not find the mic with the id: {selected_device_list_index}")
+                self.log_output(show_output, logging.ERROR ,"Using the first mic as fallback.")
+                self.log_output(show_output, logging.ERROR ,"Please change the id of the mic inside the config.")
                 selected_device_list_index = self._devices[0]["index"]
 
             for device in self._devices:
                 if device["index"] == selected_device_list_index:
-                    self.logger.info(f"Selected ID: {selected_device_list_index}")
-                    self.logger.info(f'Using {device["index"]} - {device["name"]} - {device["defaultSampleRate"]}')
+                    self.log_output(show_output, logging.INFO ,f"Selected ID: {selected_device_list_index}")
+                    self.log_output(show_output, logging.INFO ,f'Using {device["index"]} - {device["name"]} - {device["defaultSampleRate"]}')
                     self._device_id = device["index"]
                     self._device_name = device["name"]
                     self._device_rate = self._config["general_settings"]["DEFAULT_SAMPLE_RATE"]
@@ -129,7 +130,7 @@ class AudioProcessService:
 
                 return (self.audio, pyaudio.paContinue)
 
-            self.logger.debug("Starting Open Audio Stream...")
+            self.log_output(show_output, logging.DEBUG ,"Starting Open Audio Stream...")
             self.stream = self._py_audio.open(
                 format=pyaudio.paInt16,
                 channels=1,
@@ -142,6 +143,19 @@ class AudioProcessService:
         except Exception as e:
             self.logger.error("Could not init AudioService.")
             self.logger.exception(f"Unexpected error in init_audio_service: {e}")
+
+    def log_output(self, show_output, log_level, message):
+        if show_output:
+            if log_level == logging.INFO:
+                self.logger.info(message)
+            elif log_level == logging.DEBUG:
+                self.logger.debug(message)
+            elif log_level == logging.ERROR:
+                self.logger.error(message)
+            else:
+                self.logger.debug(message)
+        else:
+            self.logger.debug(message)
 
     def audio_service_routine(self):
         try:
