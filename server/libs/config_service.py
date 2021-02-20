@@ -152,22 +152,16 @@ class ConfigService():
         root_logger = logging.getLogger()
         root_logger.setLevel(default_level)
         
-        format_string_console = "%(levelname)-8s - %(name)-30s - %(message)s"
-        console_formatter = logging.Formatter(format_string_console)
         format_string_file = "%(asctime)s - %(levelname)-8s - %(name)-30s - %(message)s"
         file_formatter = logging.Formatter(format_string_file)
-
-        console_handler = logging.StreamHandler()
-        console_handler.setLevel(logging.DEBUG)
-        console_handler.setFormatter(console_formatter)
-
+      
         rotating_file_handler = RotatingFileHandler(logging_path + logging_file, mode='a', maxBytes=5 * 1024 * 1024, backupCount=5, encoding='utf-8')
         rotating_file_handler.setLevel(default_level)
         rotating_file_handler.setFormatter(file_formatter)
 
-        root_logger.addHandler(console_handler)
         root_logger.addHandler(rotating_file_handler)
 
+        format_string_console = "%(levelname)-8s - %(name)-30s - %(message)s"
         coloredlogs.install(fmt=format_string_console)
 
 
