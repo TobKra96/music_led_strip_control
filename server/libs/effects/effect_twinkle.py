@@ -27,7 +27,7 @@ class EffectTwinkle(Effect):
         # Reset output array.
         self.output = np.zeros((3, self._device.device_config["LED_Count"]))
         # Randomly add the stars, depending on speed settings.
-        if random.randrange(0, 100, 1) <= effect_config["star_appears_speed"]:
+        if random.randrange(0, 100, 1) <= effect_config["star_ascending_speed"]:
             # Add a star only if the list is not full.
             if len(self.rising_stars) < effect_config["stars_count"]:
                 gradient = self._config["gradients"][effect_config["gradient"]]

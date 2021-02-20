@@ -256,7 +256,7 @@
             "effect_twinkle": {
                 "blur": 1,
                 "gradient": "Spectral",
-                "star_appears_speed": 25,
+                "star_ascending_speed": 5,
                 "star_descending_speed": 5,
                 "star_rising_speed": 5,
                 "stars_count": 10,
