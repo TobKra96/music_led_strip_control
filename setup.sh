@@ -107,7 +107,7 @@ if [[ -d $PROJ_DIR ]]; then
 	    sudo mv -T $PROJ_DIR "${PROJ_DIR}_bak"
         prompt -s "\nNew backup of ${PROJ_NAME} created."
         sudo git clone https://github.com/TobKra96/music_led_strip_control.git
-        prompt -s "\nConfig is stored in /share/.mlsc"
+        prompt -s "\nConfig is stored in .mlsc, in the same directory as the MLSC installation."
     fi
 else
     sudo git clone https://github.com/TobKra96/music_led_strip_control.git

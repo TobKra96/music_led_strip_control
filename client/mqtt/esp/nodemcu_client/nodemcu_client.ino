@@ -21,7 +21,7 @@ char* mqttServer = "x.x.x.x";
 int mqttPort = 1883;
 char* mqttUser = "xxx";
 char* mqttPassword = "xxx";
- 
+
 WiFiClient espClient;
 PubSubClient client(espClient);
 
@@ -32,29 +32,29 @@ PubSubClient client(espClient);
 
 void callback(char* topic, byte* payload, unsigned int length) {
   int n = 0;
-  for(int i = 0; i < length; i+=3) 
+  for(int i = 0; i < length; i+=3)
   {
     if(n < NUM_LEDS){
     RgbColor pixel((uint8_t)payload[i], (uint8_t)payload[i+1], (uint8_t)payload[i+2]);
     ledstrip.SetPixelColor(n, pixel);
     n++;
     }
-  } 
+  }
   ledstrip.Show();
   #if PRINT_FPS
     fpsCounter++;
     Serial.print("/");//Monitors connection(shows jumps/jitters in packets)
   #endif
 
- 
+
 }
- 
+
 void setup() {
- 
+
   Serial.begin(115200);
   Serial.println("Ledstrip begin");
   ledstrip.Begin();
-  
+
   Serial.println("Wifi begin");
   WiFi.begin(ssid, password);
 
@@ -64,30 +64,30 @@ void setup() {
     Serial.println("Connecting to WiFi..");
   }
   Serial.println("Connected to the WiFi network");
- 
+
   client.setServer(mqttServer, mqttPort);
   client.setCallback(callback);
- 
+
   while (!client.connected()) {
     Serial.println("Connecting to MQTT...");
- 
+
     if (client.connect("ESP32Client")) {
- 
-      Serial.println("connected");  
- 
+
+      Serial.println("connected");
+
     } else {
- 
+
       Serial.print("failed with state ");
       Serial.print(client.state());
       delay(2000);
- 
+
     }
   }
- 
+
   client.subscribe("led/device_a");
- 
+
 }
- 
+
 void loop() {
   client.loop();
 
@@ -96,6 +96,6 @@ void loop() {
       secondTimer = millis();
       Serial.printf("FPS: %d\n", fpsCounter);
       fpsCounter = 0;
-    }   
+    }
   #endif
 }

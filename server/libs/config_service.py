@@ -31,11 +31,11 @@ class ConfigService():
 
         if not os.path.exists(self._config_path):
             if not os.path.exists(self._backup_path):
-                # Use the template as config
+                # Use the template as config.
                 Path(config_folder).mkdir(exist_ok=True)  # Create config directory, ignore if already exists.
                 copyfile(self._template_path, self._config_path)  # Copy config.json from repository to config directory.
             else:
-                # Use the backup as template
+                # Use the backup as template.
                 Path(config_folder).mkdir(exist_ok=True)  # Create config directory, ignore if already exists.
                 copyfile(self._backup_path, self._config_path)  # Copy config.json from repository to config directory.
 
@@ -90,7 +90,7 @@ class ConfigService():
 
     def load_template(self):
         config_template = None
-        
+
         if not os.path.exists(self._template_path):
             raise Exception(f'Could not find the template config file: "{self._template_path}"')
 
@@ -99,13 +99,12 @@ class ConfigService():
             config_template = json.load(read_file)
 
         return config_template
-        
 
     def check_compatibility(self):
         loaded_config = self.config
         template_config = self.load_template()
 
-        # Loop through the root
+        # Loop through the root.
         for key, value in template_config.items():
             if key == "device_configs":
                 continue
@@ -115,12 +114,11 @@ class ConfigService():
                 continue
 
             self.check_leaf(loaded_config[key], template_config[key])
-          
+
         self.check_devices(loaded_config["device_configs"], template_config["default_device"])
 
         self.save_config()
-        
-    
+
     def check_leaf(self, loaded_config_leaf, template_config_leaf):
         if type(template_config_leaf) is dict:
             for key, value in template_config_leaf.items():

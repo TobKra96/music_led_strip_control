@@ -1,40 +1,33 @@
-from libs.config_service import ConfigService  # pylint: disable=E0611, E0401
-from libs.effects_enum import EffectsEnum  # pylint: disable=E0611, E0401
-from libs.notification_enum import NotificationEnum  # pylint: disable=E0611, E0401
-from libs.fps_limiter import FPSLimiter  # pylint: disable=E0611, E0401
-from libs.effects.effect_bars import EffectBars  # pylint: disable=E0611, E0401
-from libs.effects.effect_beat import EffectBeat  # pylint: disable=E0611, E0401
-from libs.effects.effect_bubble import EffectBubble  # pylint: disable=E0611, E0401
-from libs.effects.effect_energy import EffectEnergy  # pylint: disable=E0611, E0401
-from libs.effects.effect_fade import EffectFade  # pylint: disable=E0611, E0401
-from libs.effects.effect_sync_fade import EffectSyncFade  # pylint: disable=E0611, E0401
-from libs.effects.effect_gradient import EffectGradient  # pylint: disable=E0611, E0401
-from libs.effects.effect_off import EffectOff  # pylint: disable=E0611, E0401
-from libs.effects.effect_pendulum import EffectPendulum  # pylint: disable=E0611, E0401
-from libs.effects.effect_power import EffectPower  # pylint: disable=E0611, E0401
-from libs.effects.effect_rods import EffectRods  # pylint: disable=E0611, E0401
+from libs.effects.effect_spectrum_analyzer import EffectSpectrumAnalyzer  # pylint: disable=E0611, E0401
+from libs.effects.effect_direction_changer import EffectDirectionChanger  # pylint: disable=E0611, E0401
 from libs.effects.effect_advanced_scroll import EffectAdvancedScroll  # pylint: disable=E0611, E0401
-from libs.effects.effect_scroll import EffectScroll  # pylint: disable=E0611, E0401
-from libs.effects.effect_single import EffectSingle  # pylint: disable=E0611, E0401
-from libs.effects.effect_slide import EffectSlide  # pylint: disable=E0611, E0401
-from libs.effects.effect_twinkle import EffectTwinkle  # pylint: disable=E0611, E0401
-from libs.effects.effect_wave import EffectWave  # pylint: disable=E0611, E0401
+from libs.effects.effect_segment_color import EffectSegmentColor  # pylint: disable=E0611, E0401
+from libs.effects.effect_beat_twinkle import EffectBeatTwinkle  # pylint: disable=E0611, E0401
 from libs.effects.effect_wavelength import EffectWavelength  # pylint: disable=E0611, E0401
 from libs.effects.effect_beat_slide import EffectBeatSlide  # pylint: disable=E0611, E0401
-from libs.effects.effect_spectrum_analyzer import EffectSpectrumAnalyzer  # pylint: disable=E0611, E0401
+from libs.effects.effect_sync_fade import EffectSyncFade  # pylint: disable=E0611, E0401
+from libs.effects.effect_gradient import EffectGradient  # pylint: disable=E0611, E0401
+from libs.effects.effect_pendulum import EffectPendulum  # pylint: disable=E0611, E0401
 from libs.effects.effect_vu_meter import EffectVuMeter  # pylint: disable=E0611, E0401
+from libs.effects.effect_twinkle import EffectTwinkle  # pylint: disable=E0611, E0401
+from libs.notification_enum import NotificationEnum  # pylint: disable=E0611, E0401
+from libs.effects.effect_bubble import EffectBubble  # pylint: disable=E0611, E0401
+from libs.effects.effect_energy import EffectEnergy  # pylint: disable=E0611, E0401
+from libs.effects.effect_scroll import EffectScroll  # pylint: disable=E0611, E0401
+from libs.effects.effect_single import EffectSingle  # pylint: disable=E0611, E0401
 from libs.effects.effect_wiggle import EffectWiggle  # pylint: disable=E0611, E0401
-from libs.effects.effect_direction_changer import EffectDirectionChanger  # pylint: disable=E0611, E0401
-from libs.effects.effect_beat_twinkle import EffectBeatTwinkle  # pylint: disable=E0611, E0401
-from libs.effects.effect_segment_color import EffectSegmentColor  # pylint: disable=E0611, E0401
+from libs.effects.effect_power import EffectPower  # pylint: disable=E0611, E0401
+from libs.effects.effect_slide import EffectSlide  # pylint: disable=E0611, E0401
+from libs.effects.effect_bars import EffectBars  # pylint: disable=E0611, E0401
+from libs.effects.effect_beat import EffectBeat  # pylint: disable=E0611, E0401
+from libs.effects.effect_fade import EffectFade  # pylint: disable=E0611, E0401
+from libs.effects.effect_rods import EffectRods  # pylint: disable=E0611, E0401
+from libs.effects.effect_wave import EffectWave  # pylint: disable=E0611, E0401
+from libs.effects.effect_off import EffectOff  # pylint: disable=E0611, E0401
+from libs.effects_enum import EffectsEnum  # pylint: disable=E0611, E0401
+from libs.fps_limiter import FPSLimiter  # pylint: disable=E0611, E0401
 
-import numpy as np
-import gc as gc
-from time import sleep
-import time
-import cProfile
-import random
-from collections import deque
+from time import time
 
 # Output array should look like:
 # output = {[r1,r2,r3,r4,r5],[g1,g2,g3,g4,g5],[]}
@@ -50,8 +43,8 @@ class EffectService():
         self._device = device
         print(f'Starting Effect Service component from device: {self._device.device_config["DEVICE_NAME"]}')
 
-        self.ten_seconds_counter = time.time()
-        self.start_time = time.time()
+        self.ten_seconds_counter = time()
+        self.start_time = time()
 
         self._fps_limiter = FPSLimiter(self._device.device_config["FPS"])
 
@@ -100,21 +93,21 @@ class EffectService():
         print(f'Effects component started. Device: {self._device.device_config["DEVICE_NAME"]}')
 
         while not self._cancel_token:
-            # try:
-            self.effect_routine()
-            # except Exception as e:
-            #     print("Error in Effect Service. Routine Restarted. Exception: " + str(e))
+            try:
+                self.effect_routine()
+            except KeyboardInterrupt:
+                break
 
         print(f'Effects component stopped. Device: {self._device.device_config["DEVICE_NAME"]}')
 
     def effect_routine(self):
-        # Limit the fps to decrease laggs caused by 100 percent CPU.
+        # Limit the fps to decrease lags caused by 100 percent CPU.
         self._fps_limiter.fps_limiter()
 
-        # Check the nofitication queue.
+        # Check the notification queue.
         if not self._device.device_notification_queue_in.empty():
             self._current_notification_in = self._device.device_notification_queue_in.get()
-            print(f'Effects Service has a new nofitication in. Notification: {self._current_notification_in} | Device: {self._device.device_config["DEVICE_NAME"]}')
+            print(f'Effects Service has a new notification in. Notification: {self._current_notification_in} | Device: {self._device.device_config["DEVICE_NAME"]}')
 
         if hasattr(self, "_current_notification_in"):
             if self._current_notification_in is NotificationEnum.config_refresh:
@@ -150,14 +143,14 @@ class EffectService():
             else:
                 print(f"Could not find effect: {self._current_effect}")
 
-        self.end_time = time.time()
-        if time.time() - self.ten_seconds_counter > 10:
-            self.ten_seconds_counter = time.time()
+        self.end_time = time()
+        if time() - self.ten_seconds_counter > 10:
+            self.ten_seconds_counter = time()
             self.time_dif = self.end_time - self.start_time
             self.fps = 1 / self.time_dif
-            print(f'Effect Service | FPS: {self.fps} | Device: {self._device.device_config["DEVICE_NAME"]}')
+            print(f'Effect Service | FPS: {self.fps:.2f} | Device: {self._device.device_config["DEVICE_NAME"]}')
 
-        self.start_time = time.time()
+        self.start_time = time()
 
         self._initialized_effects[self._current_effect].run()
 

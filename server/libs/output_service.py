@@ -1,20 +1,11 @@
-from libs.config_service import ConfigService  # pylint: disable=E0611, E0401
 from libs.notification_enum import NotificationEnum  # pylint: disable=E0611, E0401
-from libs.fps_limiter import FPSLimiter  # pylint: disable=E0611, E0401
 from libs.outputs.output_raspi import OutputRaspi  # pylint: disable=E0611, E0401
-# from libs.outputs.output_mqtt import OutputMptt  # pylint: disable=E0611, E0401
-from libs.outputs.output_udp import OutputUDP  # pylint: disable=E0611, E0401
 from libs.outputs.output_dummy import OutputDummy  # pylint: disable=E0611, E0401
+from libs.outputs.output_udp import OutputUDP  # pylint: disable=E0611, E0401
 from libs.output_enum import OutputsEnum  # pylint: disable=E0611, E0401
+from libs.fps_limiter import FPSLimiter  # pylint: disable=E0611, E0401
 
-import numpy as np
-from numpy import asarray
-from ctypes import c_uint8
-import time
-from time import sleep
-import cProfile
-import pprint
-import array
+from time import time
 
 
 class OutputService():
@@ -30,9 +21,9 @@ class OutputService():
         self._device_notification_queue_in = self._device.device_notification_queue_in
         self._device_notification_queue_out = self._device.device_notification_queue_out
 
-        self.ten_seconds_counter = time.time()
-        self.sec_ten_seconds_counter = time.time()
-        self.start_time = time.time()
+        self.ten_seconds_counter = time()
+        self.sec_ten_seconds_counter = time()
+        self.start_time = time()
 
         # Init FPS Limiter.
         self._fps_limiter = FPSLimiter(self._device.device_config["FPS"])
@@ -53,13 +44,16 @@ class OutputService():
         print(f'Output component started. Device: {self._device.device_config["DEVICE_NAME"]}')
 
         while not self._cancel_token:
-            self.output_routine()
+            try:
+                self.output_routine()
+            except KeyboardInterrupt:
+                break
 
     def output_routine(self):
         # Limit the fps to decrease lags caused by 100 percent CPU.
         self._fps_limiter.fps_limiter()
 
-        # Check the nofitication queue.
+        # Check the notification queue.
         if not self._device_notification_queue_in.empty():
             self._current_notification_in = self._device_notification_queue_in.get()
 
@@ -88,15 +82,15 @@ class OutputService():
             current_output_array = self._output_queue.get()
             self._current_output.show(current_output_array)
 
-        self.end_time = time.time()
+        self.end_time = time()
 
-        if time.time() - self.ten_seconds_counter > 10:
-            self.ten_seconds_counter = time.time()
+        if time() - self.ten_seconds_counter > 10:
+            self.ten_seconds_counter = time()
             self.time_dif = self.end_time - self.start_time
             self.fps = 1 / self.time_dif
-            print(f'Output Service | FPS: {self.fps} | Device: {self._device.device_config["DEVICE_NAME"]}')
+            print(f'Output Service | FPS: {self.fps:.2f} | Device: {self._device.device_config["DEVICE_NAME"]}')
 
-        self.start_time = time.time()
+        self.start_time = time()
 
     def stop(self):
         self._cancel_token = True

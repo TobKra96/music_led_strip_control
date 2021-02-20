@@ -4,16 +4,13 @@
 # The program will start here.
 # This file will only initialize and start the processes.
 
+from libs.audio_process_service import AudioProcessService
+from libs.notification_service import NotificationService
 from libs.device_manager import DeviceManager
 from libs.config_service import ConfigService
-from libs.effects_enum import EffectsEnum
-from libs.notification_enum import NotificationEnum
-from libs.notification_service import NotificationService
 from libs.webserver import Webserver
-from libs.audio_process_service import AudioProcessService
 
-import numpy as np
-from multiprocessing import Process, Queue, Manager, Lock
+from multiprocessing import Process, Queue, Lock
 from time import sleep
 
 
@@ -118,12 +115,9 @@ class Main():
                 sleep(10)
 
         except KeyboardInterrupt:
-
-            print("Stopping MLSC...")
-
+            print("\nStopping MLSC...")
             self._notification_service_process.terminate()
             self._webserver_process.terminate()
-
             print("MLSC stopped")
 
 

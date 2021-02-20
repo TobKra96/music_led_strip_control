@@ -1,18 +1,15 @@
-from libs.color_service import ColorService  # pylint: disable=E0611, E0401
-from libs.config_service import ConfigService  # pylint: disable=E0611, E0401
-from libs.dsp import DSP  # pylint: disable=E0611, E0401
-from libs.fps_limiter import FPSLimiter  # pylint: disable=E0611, E0401
 from libs.notification_item import NotificationItem  # pylint: disable=E0611, E0401
 from libs.notification_enum import NotificationEnum  # pylint: disable=E0611, E0401
+from libs.config_service import ConfigService  # pylint: disable=E0611, E0401
+from libs.fps_limiter import FPSLimiter  # pylint: disable=E0611, E0401
+from libs.dsp import DSP  # pylint: disable=E0611, E0401
 
 from multiprocessing import Queue
 from queue import Empty, Full
 
+from time import time
 import numpy as np
 import pyaudio
-import sys
-import time
-from time import sleep
 
 
 class AudioProcessService:
@@ -29,8 +26,11 @@ class AudioProcessService:
         self.init_audio_service()
 
         while True:
-            self.audio_service_routine()
-            self._fps_limiter.fps_limiter()
+            try:
+                self.audio_service_routine()
+                self._fps_limiter.fps_limiter()
+            except KeyboardInterrupt:
+                break
 
     def init_audio_service(self):
         try:
@@ -93,10 +93,10 @@ class AudioProcessService:
                     self._frames_per_buffer = self._config["general_settings"]["FRAMES_PER_BUFFER"]
                     self.n_fft_bins = self._config["general_settings"]["N_FFT_BINS"]
 
-            self.start_time_1 = time.time()
-            self.ten_seconds_counter_1 = time.time()
-            self.start_time_2 = time.time()
-            self.ten_seconds_counter_2 = time.time()
+            self.start_time_1 = time()
+            self.ten_seconds_counter_1 = time()
+            self.start_time_2 = time()
+            self.ten_seconds_counter_2 = time()
 
             self._dsp = DSP(self._config)
 
@@ -114,16 +114,16 @@ class AudioProcessService:
                     self.audio_buffer_queue.put(in_data)
                 except Exception as e:
                     pass
-    #
-                self.end_time_1 = time.time()
 
-                if time.time() - self.ten_seconds_counter_1 > 10:
-                    self.ten_seconds_counter_1 = time.time()
+                self.end_time_1 = time()
+
+                if time() - self.ten_seconds_counter_1 > 10:
+                    self.ten_seconds_counter_1 = time()
                     time_dif = self.end_time_1 - self.start_time_1
                     fps = 1 / time_dif
-                    print(f"Audio Service Callback | FPS: {fps}")
+                    print(f"Audio Service Callback | FPS: {fps:.2f}")
 
-                self.start_time_1 = time.time()
+                self.start_time_1 = time()
 
                 return (self.audio, pyaudio.paContinue)
 
@@ -188,15 +188,15 @@ class AudioProcessService:
 
             self._audio_queue.put(audio_datas, False)
 
-            self.end_time_2 = time.time()
+            self.end_time_2 = time()
 
-            if time.time() - self.ten_seconds_counter_2 > 10:
-                self.ten_seconds_counter_2 = time.time()
+            if time() - self.ten_seconds_counter_2 > 10:
+                self.ten_seconds_counter_2 = time()
                 time_dif = self.end_time_2 - self.start_time_2
                 fps = 1 / time_dif
-                print(f"Audio Service Routine | FPS: {fps}")
+                print(f"Audio Service Routine | FPS: {fps:.2f}")
 
-            self.start_time_2 = time.time()
+            self.start_time_2 = time()
 
         except IOError:
             print("IOError while reading the Microphone Stream.")

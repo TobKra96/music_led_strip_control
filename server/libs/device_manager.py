@@ -1,14 +1,12 @@
-from libs.device import Device  # pylint: disable=E0611, E0401
-from libs.config_service import ConfigService  # pylint: disable=E0611, E0401
 from libs.color_service_global import ColorServiceGlobal  # pylint: disable=E0611, E0401
-from libs.effect_item import EffectItem  # pylint: disable=E0611, E0401
 from libs.notification_item import NotificationItem  # pylint: disable=E0611, E0401
 from libs.notification_enum import NotificationEnum  # pylint: disable=E0611, E0401
+from libs.config_service import ConfigService  # pylint: disable=E0611, E0401
 from libs.fps_limiter import FPSLimiter  # pylint: disable=E0611, E0401
-import copy
+from libs.device import Device  # pylint: disable=E0611, E0401
 
-import time
-from time import sleep
+from time import time
+import copy
 
 
 class DeviceManager():
@@ -30,11 +28,14 @@ class DeviceManager():
         self.init_devices()
         self.start_devices()
 
-        self.start_time = time.time()
-        self.ten_seconds_counter = time.time()
+        self.start_time = time()
+        self.ten_seconds_counter = time()
 
         while True:
-            self.routine()
+            try:
+                self.routine()
+            except KeyboardInterrupt:
+                break
 
     def routine(self):
         # Check the effect queue.
@@ -80,15 +81,15 @@ class DeviceManager():
         audio_data = self.get_audio_data()
         self.refresh_audio_queues(audio_data)
 
-        self.end_time = time.time()
+        self.end_time = time()
 
-        if time.time() - self.ten_seconds_counter > 10:
-            self.ten_seconds_counter = time.time()
+        if time() - self.ten_seconds_counter > 10:
+            self.ten_seconds_counter = time()
             self.time_dif = self.end_time - self.start_time
             self.fps = 1 / self.time_dif
-            print(f"Device Manager | FPS: {self.fps}")
+            print(f"Device Manager | FPS: {self.fps:.2f}")
 
-        self.start_time = time.time()
+        self.start_time = time()
 
     def get_audio_data(self):
         audio_data = None

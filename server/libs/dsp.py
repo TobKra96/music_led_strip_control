@@ -1,9 +1,8 @@
-import numpy as np
-from numpy import abs, append, arange, insert, linspace, log10, round, zeros
-
-from math import log
 from scipy.ndimage.filters import gaussian_filter1d
-from libs.config_service import ConfigService  # pylint: disable=E0611, E0401
+
+from numpy import abs, arange, linspace, zeros
+from math import log
+import numpy as np
 
 
 class DSP():
@@ -193,7 +192,6 @@ class Melbank():
         mel : scalar or ndarray
             Mel-frequency value or ndarray in Mel
         """
-        # return 2595.0 * log10(1 + (freq / 700.0))
         return 3340.0 * log(1 + (freq / 250.0), 9)
 
     def mel_to_hertz(self, mel):

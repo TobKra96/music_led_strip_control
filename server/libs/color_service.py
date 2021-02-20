@@ -1,5 +1,5 @@
-import numpy as np
 from scipy.ndimage.filters import gaussian_filter1d
+import numpy as np
 
 
 class ColorService():
@@ -148,7 +148,7 @@ class ColorService():
 
                     #             Find the right spot in the array for the repetition.                     Find the right spot in the repetition for the color.
                     start_index = int((current_bubble_repeat * gradient_color_count * steps_between_bubbles) + (current_color * steps_between_bubbles))
-                    end_index = int(start_index + effect_config["bubble_lenght"])
+                    end_index = int(start_index + effect_config["bubble_length"])
 
                     # If the start reaches the end of the string something is wrong.
                     if start_index > led_count - 1:
@@ -169,7 +169,9 @@ class ColorService():
             tmp_gradient_array = np.concatenate((tmp_gradient_array, tmp_gradient_array), axis=1)
             tmp_gradient_array = np.concatenate((tmp_gradient_array, tmp_gradient_array), axis=1)
 
-            tmp_gradient_array = gaussian_filter1d(tmp_gradient_array, sigma=effect_config["blur"])
+            blur_amount = effect_config["blur"]
+            if blur_amount > 0:
+                tmp_gradient_array = gaussian_filter1d(tmp_gradient_array, sigma=blur_amount)
 
             start_index = led_count - 1
             end_index = start_index + led_count
