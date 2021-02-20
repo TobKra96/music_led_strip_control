@@ -12,8 +12,8 @@
         ],
         "Cyan": [
             0,
-            247,
-            161
+            255,
+            255
         ],
         "Green": [
             0,
@@ -28,12 +28,12 @@
         "Pink": [
             255,
             0,
-            178
+            75
         ],
         "Purple": [
             255,
             0,
-            200
+            255
         ],
         "Red": [
             255,
@@ -546,8 +546,7 @@
             ]
         ]
     },
-
-    "led_strips":{
+    "led_strips": {
         "SK6812_STRIP_RGBW": "SK6812_STRIP_RGBW",
         "SK6812_STRIP_RBGW": "SK6812_STRIP_RBGW",
         "SK6812_STRIP_GRBW": "SK6812_STRIP_GRBW",
@@ -565,6 +564,4 @@
         "SK6812_STRIP": "SK6812_default",
         "SK6812W_STRIP": "SK6812W_default"
     }
-
-
 }
