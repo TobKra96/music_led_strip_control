@@ -59,7 +59,7 @@ class OutputService():
         # Limit the fps to decrease lags caused by 100 percent CPU.
         self._fps_limiter.fps_limiter()
 
-        # Check the nofitication queue.
+        # Check the notification queue.
         if not self._device_notification_queue_in.empty():
             self._current_notification_in = self._device_notification_queue_in.get()
 

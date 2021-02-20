@@ -108,13 +108,13 @@ class EffectService():
         print(f'Effects component stopped. Device: {self._device.device_config["DEVICE_NAME"]}')
 
     def effect_routine(self):
-        # Limit the fps to decrease laggs caused by 100 percent CPU.
+        # Limit the fps to decrease lags caused by 100 percent CPU.
         self._fps_limiter.fps_limiter()
 
-        # Check the nofitication queue.
+        # Check the notification queue.
         if not self._device.device_notification_queue_in.empty():
             self._current_notification_in = self._device.device_notification_queue_in.get()
-            print(f'Effects Service has a new nofitication in. Notification: {self._current_notification_in} | Device: {self._device.device_config["DEVICE_NAME"]}')
+            print(f'Effects Service has a new notification in. Notification: {self._current_notification_in} | Device: {self._device.device_config["DEVICE_NAME"]}')
 
         if hasattr(self, "_current_notification_in"):
             if self._current_notification_in is NotificationEnum.config_refresh:
