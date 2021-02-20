@@ -52,7 +52,10 @@ class OutputService():
         print(f'Output component started. Device: {self._device.device_config["DEVICE_NAME"]}')
 
         while not self._cancel_token:
-            self.output_routine()
+            try:
+                self.output_routine()
+            except KeyboardInterrupt:
+                break
 
     def output_routine(self):
         # Limit the fps to decrease lags caused by 100 percent CPU.
