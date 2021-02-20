@@ -1,7 +1,7 @@
 from libs.effects.effect import Effect  # pylint: disable=E0611, E0401
 
-import numpy as np
 from scipy.ndimage.filters import gaussian_filter1d
+import numpy as np
 
 
 class EffectAdvancedScroll(Effect):

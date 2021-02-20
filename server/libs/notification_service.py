@@ -1,5 +1,6 @@
 from libs.notification_enum import NotificationEnum  # pylint: disable=E0611, E0401
 from libs.notification_item import NotificationItem  # pylint: disable=E0611, E0401
+
 from time import sleep
 
 

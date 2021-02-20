@@ -1,7 +1,5 @@
-from libs.color_service import ColorService  # pylint: disable=E0611, E0401
-
-import numpy as np
 from time import time
+import numpy as np
 
 
 class ColorServiceGlobal():

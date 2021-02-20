@@ -44,7 +44,6 @@ class OutputRaspi(Output):
             "SK6812W_STRIP": ws.SK6812W_STRIP
         }
 
-
         try:
             led_strip = self._led_strip_mapper[self._led_strip]
             if led_strip is not None:

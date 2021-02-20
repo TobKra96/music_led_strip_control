@@ -1,5 +1,4 @@
 from libs.outputs.output import Output  # pylint: disable=E0611, E0401
-from time import sleep
 import numpy as np
 import socket
 

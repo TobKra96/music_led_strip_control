@@ -1,39 +1,33 @@
-from libs.config_service import ConfigService  # pylint: disable=E0611, E0401
-from libs.effects_enum import EffectsEnum  # pylint: disable=E0611, E0401
-from libs.notification_enum import NotificationEnum  # pylint: disable=E0611, E0401
-from libs.fps_limiter import FPSLimiter  # pylint: disable=E0611, E0401
-from libs.effects.effect_bars import EffectBars  # pylint: disable=E0611, E0401
-from libs.effects.effect_beat import EffectBeat  # pylint: disable=E0611, E0401
-from libs.effects.effect_bubble import EffectBubble  # pylint: disable=E0611, E0401
-from libs.effects.effect_energy import EffectEnergy  # pylint: disable=E0611, E0401
-from libs.effects.effect_fade import EffectFade  # pylint: disable=E0611, E0401
-from libs.effects.effect_sync_fade import EffectSyncFade  # pylint: disable=E0611, E0401
-from libs.effects.effect_gradient import EffectGradient  # pylint: disable=E0611, E0401
-from libs.effects.effect_off import EffectOff  # pylint: disable=E0611, E0401
-from libs.effects.effect_pendulum import EffectPendulum  # pylint: disable=E0611, E0401
-from libs.effects.effect_power import EffectPower  # pylint: disable=E0611, E0401
-from libs.effects.effect_rods import EffectRods  # pylint: disable=E0611, E0401
+from libs.effects.effect_spectrum_analyzer import EffectSpectrumAnalyzer  # pylint: disable=E0611, E0401
+from libs.effects.effect_direction_changer import EffectDirectionChanger  # pylint: disable=E0611, E0401
 from libs.effects.effect_advanced_scroll import EffectAdvancedScroll  # pylint: disable=E0611, E0401
-from libs.effects.effect_scroll import EffectScroll  # pylint: disable=E0611, E0401
-from libs.effects.effect_single import EffectSingle  # pylint: disable=E0611, E0401
-from libs.effects.effect_slide import EffectSlide  # pylint: disable=E0611, E0401
-from libs.effects.effect_twinkle import EffectTwinkle  # pylint: disable=E0611, E0401
-from libs.effects.effect_wave import EffectWave  # pylint: disable=E0611, E0401
+from libs.effects.effect_segment_color import EffectSegmentColor  # pylint: disable=E0611, E0401
+from libs.effects.effect_beat_twinkle import EffectBeatTwinkle  # pylint: disable=E0611, E0401
 from libs.effects.effect_wavelength import EffectWavelength  # pylint: disable=E0611, E0401
 from libs.effects.effect_beat_slide import EffectBeatSlide  # pylint: disable=E0611, E0401
-from libs.effects.effect_spectrum_analyzer import EffectSpectrumAnalyzer  # pylint: disable=E0611, E0401
+from libs.effects.effect_sync_fade import EffectSyncFade  # pylint: disable=E0611, E0401
+from libs.effects.effect_gradient import EffectGradient  # pylint: disable=E0611, E0401
+from libs.effects.effect_pendulum import EffectPendulum  # pylint: disable=E0611, E0401
 from libs.effects.effect_vu_meter import EffectVuMeter  # pylint: disable=E0611, E0401
+from libs.effects.effect_twinkle import EffectTwinkle  # pylint: disable=E0611, E0401
+from libs.notification_enum import NotificationEnum  # pylint: disable=E0611, E0401
+from libs.effects.effect_bubble import EffectBubble  # pylint: disable=E0611, E0401
+from libs.effects.effect_energy import EffectEnergy  # pylint: disable=E0611, E0401
+from libs.effects.effect_scroll import EffectScroll  # pylint: disable=E0611, E0401
+from libs.effects.effect_single import EffectSingle  # pylint: disable=E0611, E0401
 from libs.effects.effect_wiggle import EffectWiggle  # pylint: disable=E0611, E0401
-from libs.effects.effect_direction_changer import EffectDirectionChanger  # pylint: disable=E0611, E0401
-from libs.effects.effect_beat_twinkle import EffectBeatTwinkle  # pylint: disable=E0611, E0401
-from libs.effects.effect_segment_color import EffectSegmentColor  # pylint: disable=E0611, E0401
+from libs.effects.effect_power import EffectPower  # pylint: disable=E0611, E0401
+from libs.effects.effect_slide import EffectSlide  # pylint: disable=E0611, E0401
+from libs.effects.effect_bars import EffectBars  # pylint: disable=E0611, E0401
+from libs.effects.effect_beat import EffectBeat  # pylint: disable=E0611, E0401
+from libs.effects.effect_fade import EffectFade  # pylint: disable=E0611, E0401
+from libs.effects.effect_rods import EffectRods  # pylint: disable=E0611, E0401
+from libs.effects.effect_wave import EffectWave  # pylint: disable=E0611, E0401
+from libs.effects.effect_off import EffectOff  # pylint: disable=E0611, E0401
+from libs.effects_enum import EffectsEnum  # pylint: disable=E0611, E0401
+from libs.fps_limiter import FPSLimiter  # pylint: disable=E0611, E0401
 
-import numpy as np
-import gc as gc
 from time import time
-import cProfile
-import random
-from collections import deque
 
 # Output array should look like:
 # output = {[r1,r2,r3,r4,r5],[g1,g2,g3,g4,g5],[]}

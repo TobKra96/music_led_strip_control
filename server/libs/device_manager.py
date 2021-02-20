@@ -1,13 +1,12 @@
-from libs.device import Device  # pylint: disable=E0611, E0401
-from libs.config_service import ConfigService  # pylint: disable=E0611, E0401
 from libs.color_service_global import ColorServiceGlobal  # pylint: disable=E0611, E0401
-from libs.effect_item import EffectItem  # pylint: disable=E0611, E0401
 from libs.notification_item import NotificationItem  # pylint: disable=E0611, E0401
 from libs.notification_enum import NotificationEnum  # pylint: disable=E0611, E0401
+from libs.config_service import ConfigService  # pylint: disable=E0611, E0401
 from libs.fps_limiter import FPSLimiter  # pylint: disable=E0611, E0401
-import copy
+from libs.device import Device  # pylint: disable=E0611, E0401
 
 from time import time
+import copy
 
 
 class DeviceManager():

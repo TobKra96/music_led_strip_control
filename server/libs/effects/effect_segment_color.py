@@ -18,12 +18,12 @@ class EffectSegmentColor(Effect):
 
         for x in range(1, max):
             segment_number = str(x).zfill(2)
-            
+
             colorkey = f"segment_{segment_number}_color"
             startkey = f"segment_{segment_number}_start"
             endkey = f"segment_{segment_number}_end"
 
-            if (colorkey not in effect_config) or (startkey not in effect_config) or (endkey not in effect_config) :
+            if (colorkey not in effect_config) or (startkey not in effect_config) or (endkey not in effect_config):
                 continue
 
             start = effect_config[startkey]
@@ -40,7 +40,7 @@ class EffectSegmentColor(Effect):
 
             if end <= 0:
                 end = 1
-            
+
             if end > led_count:
                 end = led_count
 

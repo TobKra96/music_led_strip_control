@@ -1,13 +1,10 @@
 from libs.color_service import ColorService  # pylint: disable=E0611, E0401
-from libs.config_service import ConfigService  # pylint: disable=E0611, E0401
 from libs.math_service import MathService  # pylint: disable=E0611, E0401
 from libs.dsp import DSP  # pylint: disable=E0611, E0401
 
-import numpy as np
-from time import time
-import cProfile
-import random
 from collections import deque
+from time import time
+import numpy as np
 
 
 class Effect:

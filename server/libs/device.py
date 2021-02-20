@@ -1,7 +1,7 @@
-from multiprocessing import Process, Queue, Manager
-
 from libs.effect_service import EffectService
 from libs.output_service import OutputService
+
+from multiprocessing import Process, Queue
 
 
 class Device:

@@ -1,19 +1,11 @@
-from libs.config_service import ConfigService  # pylint: disable=E0611, E0401
 from libs.notification_enum import NotificationEnum  # pylint: disable=E0611, E0401
-from libs.fps_limiter import FPSLimiter  # pylint: disable=E0611, E0401
 from libs.outputs.output_raspi import OutputRaspi  # pylint: disable=E0611, E0401
-# from libs.outputs.output_mqtt import OutputMptt  # pylint: disable=E0611, E0401
-from libs.outputs.output_udp import OutputUDP  # pylint: disable=E0611, E0401
 from libs.outputs.output_dummy import OutputDummy  # pylint: disable=E0611, E0401
+from libs.outputs.output_udp import OutputUDP  # pylint: disable=E0611, E0401
 from libs.output_enum import OutputsEnum  # pylint: disable=E0611, E0401
+from libs.fps_limiter import FPSLimiter  # pylint: disable=E0611, E0401
 
-import numpy as np
-from numpy import asarray
-from ctypes import c_uint8
 from time import time
-import cProfile
-import pprint
-import array
 
 
 class OutputService():

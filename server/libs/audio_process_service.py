@@ -1,17 +1,15 @@
-from libs.color_service import ColorService  # pylint: disable=E0611, E0401
-from libs.config_service import ConfigService  # pylint: disable=E0611, E0401
-from libs.dsp import DSP  # pylint: disable=E0611, E0401
-from libs.fps_limiter import FPSLimiter  # pylint: disable=E0611, E0401
 from libs.notification_item import NotificationItem  # pylint: disable=E0611, E0401
 from libs.notification_enum import NotificationEnum  # pylint: disable=E0611, E0401
+from libs.config_service import ConfigService  # pylint: disable=E0611, E0401
+from libs.fps_limiter import FPSLimiter  # pylint: disable=E0611, E0401
+from libs.dsp import DSP  # pylint: disable=E0611, E0401
 
 from multiprocessing import Queue
 from queue import Empty, Full
 
+from time import time
 import numpy as np
 import pyaudio
-import sys
-from time import time
 
 
 class AudioProcessService:
