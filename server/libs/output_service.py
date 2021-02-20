@@ -94,7 +94,7 @@ class OutputService():
             self.ten_seconds_counter = time.time()
             self.time_dif = self.end_time - self.start_time
             self.fps = 1 / self.time_dif
-            print(f'Output Service | FPS: {self.fps} | Device: {self._device.device_config["DEVICE_NAME"]}')
+            print(f'Output Service | FPS: {self.fps:.2f} | Device: {self._device.device_config["DEVICE_NAME"]}')
 
         self.start_time = time.time()
 

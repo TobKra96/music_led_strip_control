@@ -121,7 +121,7 @@ class AudioProcessService:
                     self.ten_seconds_counter_1 = time.time()
                     time_dif = self.end_time_1 - self.start_time_1
                     fps = 1 / time_dif
-                    print(f"Audio Service Callback | FPS: {fps}")
+                    print(f"Audio Service Callback | FPS: {fps:.2f}")
 
                 self.start_time_1 = time.time()
 
@@ -194,7 +194,7 @@ class AudioProcessService:
                 self.ten_seconds_counter_2 = time.time()
                 time_dif = self.end_time_2 - self.start_time_2
                 fps = 1 / time_dif
-                print(f"Audio Service Routine | FPS: {fps}")
+                print(f"Audio Service Routine | FPS: {fps:.2f}")
 
             self.start_time_2 = time.time()
 

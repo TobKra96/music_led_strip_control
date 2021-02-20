@@ -86,7 +86,7 @@ class DeviceManager():
             self.ten_seconds_counter = time.time()
             self.time_dif = self.end_time - self.start_time
             self.fps = 1 / self.time_dif
-            print(f"Device Manager | FPS: {self.fps}")
+            print(f"Device Manager | FPS: {self.fps:.2f}")
 
         self.start_time = time.time()
 
