@@ -76,18 +76,11 @@ class EffectRods(Effect):
         local_output_array = self.output
 
         if effect_config["mirror"]:
-            # Calculate the real mid.
-            real_mid = led_count / 2
-            # Add some tolerance for the real mid.
-            if (real_mid >= led_mid - 2) and (real_mid <= led_mid + 2):
-                # Use the option with shrinking the array.
-                local_output_array = np.concatenate((self.output[:, ::-2], self.output[:, ::2]), axis=1)
-            else:
-                # Mirror the whole array. After this the array has a two times bigger size than led_count.
-                big_mirrored_array = np.concatenate((self.output[:, ::-1], self.output[:, ::1]), axis=1)
-                start_of_array = led_count - led_mid
-                end_of_array = start_of_array + led_count
-                local_output_array = big_mirrored_array[:, start_of_array:end_of_array]
+            # Mirror the whole array. After this the array has a two times bigger size than led_count.
+            big_mirrored_array = np.concatenate((self.output[:, ::-1], self.output[:, ::1]), axis=1)
+            start_of_array = led_count - led_mid
+            end_of_array = start_of_array + led_count
+            local_output_array = big_mirrored_array[:, start_of_array:end_of_array]
 
         # Add the output array to the queue.
         self.queue_output_array_blocking(local_output_array)
