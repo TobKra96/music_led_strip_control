@@ -152,7 +152,6 @@ class EffectService():
             self.fps = 1 / self.time_dif
             self.logger.info(f'FPS: {self.fps:.2f} | Device: {self._device.device_config["DEVICE_NAME"]}')
 
-
         self.start_time = time()
 
         self._initialized_effects[self._current_effect].run()

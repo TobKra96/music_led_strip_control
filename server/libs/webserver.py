@@ -1,13 +1,12 @@
 from flask import Flask, render_template, request, jsonify, send_file
+from waitress import serve
 from time import sleep
+import logging
 import copy
 import json
-import logging
 
 from libs.webserver_executer import WebserverExecuter  # pylint: disable=E0611, E0401
 from libs.config_service import ConfigService  # pylint: disable=E0611, E0401
-
-
 
 
 server = Flask(__name__)
@@ -30,7 +29,7 @@ class Webserver():
 
         server.config["TEMPLATES_AUTO_RELOAD"] = True
         webserver_port = self.webserver_executer.GetWebserverPort()
-        server.run(host='0.0.0.0', port=webserver_port)
+        serve(server, host='0.0.0.0', port=webserver_port)
 
         while True:
             sleep(10)
