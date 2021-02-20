@@ -28,6 +28,7 @@ from libs.effects_enum import EffectsEnum  # pylint: disable=E0611, E0401
 from libs.fps_limiter import FPSLimiter  # pylint: disable=E0611, E0401
 
 from time import time
+import logging
 
 # Output array should look like:
 # output = {[r1,r2,r3,r4,r5],[g1,g2,g3,g4,g5],[]}
@@ -39,9 +40,10 @@ class EffectService():
         Start the effect service process.
         You can change the effect by adding a new effect enum inside the enum_queue.
         """
+        self.logger = logging.getLogger(__name__)
 
         self._device = device
-        print(f'Starting Effect Service component from device: {self._device.device_config["DEVICE_NAME"]}')
+        self.logger.info(f'Starting Effect Service component from device: {self._device.device_config["DEVICE_NAME"]}')
 
         self.ten_seconds_counter = time()
         self.start_time = time()
@@ -84,13 +86,13 @@ class EffectService():
             last_effect_string = self._device.device_config["effects"]["last_effect"]
             self._current_effect = EffectsEnum[last_effect_string]
         except Exception:
-            print("Could not parse last effect. Set effect to off.")
+            self.logger.exception("Could not parse last effect. Set effect to off.")
             self._current_effect = EffectsEnum.effect_off
 
         # A token to cancel the while loop.
         self._cancel_token = False
         self._skip_effect = False
-        print(f'Effects component started. Device: {self._device.device_config["DEVICE_NAME"]}')
+        self.logger.info(f'Effects component started. Device: {self._device.device_config["DEVICE_NAME"]}')
 
         while not self._cancel_token:
             try:
@@ -98,7 +100,7 @@ class EffectService():
             except KeyboardInterrupt:
                 break
 
-        print(f'Effects component stopped. Device: {self._device.device_config["DEVICE_NAME"]}')
+        self.logger.info(f'Effects component stopped. Device: {self._device.device_config["DEVICE_NAME"]}')
 
     def effect_routine(self):
         # Limit the fps to decrease lags caused by 100 percent CPU.
@@ -107,7 +109,7 @@ class EffectService():
         # Check the notification queue.
         if not self._device.device_notification_queue_in.empty():
             self._current_notification_in = self._device.device_notification_queue_in.get()
-            print(f'Effects Service has a new notification in. Notification: {self._current_notification_in} | Device: {self._device.device_config["DEVICE_NAME"]}')
+            self.logger.debug(f'Effects Service has a new notification in. Notification: {self._current_notification_in} | Device: {self._device.device_config["DEVICE_NAME"]}')
 
         if hasattr(self, "_current_notification_in"):
             if self._current_notification_in is NotificationEnum.config_refresh:
@@ -130,40 +132,41 @@ class EffectService():
         if not self._device.effect_queue.empty():
             new_effect_item = self._device.effect_queue.get()
             self._current_effect = new_effect_item.effect_enum
-            print(f"New effect found: {new_effect_item.effect_enum}")
+            self.logger.debug(f"New effect found: {new_effect_item.effect_enum}")
 
         # Something is wrong here, no effect set. So skip until we get new information.
         if self._current_effect is None:
-            print("Effect Service | Could not find effect.")
+            self.logger.error("Effect Service | Could not find effect.")
             return
 
         if(not(self._current_effect in self._initialized_effects.keys())):
             if self._current_effect in self._available_effects.keys():
                 self._initialized_effects[self._current_effect] = self._available_effects[self._current_effect](self._device)
             else:
-                print(f"Could not find effect: {self._current_effect}")
+                self.logger.error(f"Could not find effect: {self._current_effect}")
 
         self.end_time = time()
         if time() - self.ten_seconds_counter > 10:
             self.ten_seconds_counter = time()
             self.time_dif = self.end_time - self.start_time
             self.fps = 1 / self.time_dif
-            print(f'Effect Service | FPS: {self.fps:.2f} | Device: {self._device.device_config["DEVICE_NAME"]}')
+            self.logger.info(f'FPS: {self.fps:.2f} | Device: {self._device.device_config["DEVICE_NAME"]}')
+
 
         self.start_time = time()
 
         self._initialized_effects[self._current_effect].run()
 
     def stop(self):
-        print("Stopping effect component...")
+        self.logger.info("Stopping effect component...")
         self.cancel_token = True
 
     def refresh(self):
-        print("Refreshing effects...")
+        self.logger.debug("Refreshing effects...")
         self._initialized_effects = {}
 
         self._fps_limiter = FPSLimiter(self._device.device_config["FPS"])
 
         # Notify the master component, that I'm finished.
         self._device.device_notification_queue_out.put(NotificationEnum.config_refresh_finished)
-        print("Effects refreshed.")
+        self.logger.debug("Effects refreshed.")

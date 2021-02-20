@@ -1,3 +1,6 @@
+import logging
+from time import time
+
 from libs.notification_enum import NotificationEnum  # pylint: disable=E0611, E0401
 from libs.outputs.output_raspi import OutputRaspi  # pylint: disable=E0611, E0401
 from libs.outputs.output_dummy import OutputDummy  # pylint: disable=E0611, E0401
@@ -5,14 +8,14 @@ from libs.outputs.output_udp import OutputUDP  # pylint: disable=E0611, E0401
 from libs.output_enum import OutputsEnum  # pylint: disable=E0611, E0401
 from libs.fps_limiter import FPSLimiter  # pylint: disable=E0611, E0401
 
-from time import time
-
 
 class OutputService():
     def start(self, device):
+        self.logger = logging.getLogger(__name__)
+
         self._device = device
 
-        print(f'Starting Output service... Device: {self._device.device_config["DEVICE_NAME"]}')
+        self.logger.info(f'Starting Output service... Device: {self._device.device_config["DEVICE_NAME"]}')
 
         # Initial config load.
         self._config = self._device.config
@@ -38,10 +41,10 @@ class OutputService():
         }
 
         current_output_enum = OutputsEnum[self._device.device_config["OUTPUT_TYPE"]]
-        print(f"Found output: {current_output_enum}")
+        self.logger.debug(f"Found output: {current_output_enum}")
         self._current_output = self._available_outputs[current_output_enum](self._device)
 
-        print(f'Output component started. Device: {self._device.device_config["DEVICE_NAME"]}')
+        self.logger.debug(f'Output component started. Device: {self._device.device_config["DEVICE_NAME"]}')
 
         while not self._cancel_token:
             try:
@@ -88,7 +91,7 @@ class OutputService():
             self.ten_seconds_counter = time()
             self.time_dif = self.end_time - self.start_time
             self.fps = 1 / self.time_dif
-            print(f'Output Service | FPS: {self.fps:.2f} | Device: {self._device.device_config["DEVICE_NAME"]}')
+            self.logger.info(f'FPS: {self.fps:.2f} | Device: {self._device.device_config["DEVICE_NAME"]}')
 
         self.start_time = time()
 
@@ -97,7 +100,7 @@ class OutputService():
         self._current_output.clear()
 
     def refresh(self):
-        print("Refreshing output...")
+        self.logger.debug("Refreshing output...")
 
         # Refresh the config,
         self._config = self._device.config
@@ -105,4 +108,4 @@ class OutputService():
         # Notify the master component, that I'm finished.
         self._device_notification_queue_out.put(NotificationEnum.config_refresh_finished)
 
-        print("Output refreshed.")
+        self.logger.debug("Output refreshed.")

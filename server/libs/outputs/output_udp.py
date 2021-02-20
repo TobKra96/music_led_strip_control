@@ -1,12 +1,14 @@
 from libs.outputs.output import Output  # pylint: disable=E0611, E0401
 import numpy as np
 import socket
+import logging
 
 
 class OutputUDP(Output):
     def __init__(self, device):
         # Call the constructor of the base class.
         super(OutputUDP, self).__init__(device)
+        self.logger = logging.getLogger(__name__)
 
         output_id = "output_udp"
 
