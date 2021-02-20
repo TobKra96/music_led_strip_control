@@ -11,7 +11,9 @@ from libs.config_service import ConfigService
 from libs.webserver import Webserver
 
 from multiprocessing import Process, Queue, Lock
+import multiprocessing
 from time import sleep
+import logging
 
 
 class Main():
@@ -24,14 +26,15 @@ class Main():
         This function will start all necessary components.
         Let's go :-D
         """
-        print("Initializing MLSC...")
-
         # We need a lock to prevent too fast saving and loading actions of the config
         self._config_lock = Lock()
 
         # Create the instance of the config
         self._config_instance = ConfigService.instance(self._config_lock)
         self._config = self._config_instance.config
+
+        logger = logging.getLogger(__name__)
+        logger.info("Initializing MLSC...")
 
         # Check config compatibility
         self._config_instance.check_compatibility()
@@ -103,10 +106,10 @@ class Main():
             ))
         self._audio_process.start()
 
-        print("Initialization finished.")
+        logger.info("Initialization finished.")
 
         try:
-            print("MLSC started...")
+            logger.info("MLSC started...")
 
             self._cancel_token = False
 
@@ -115,12 +118,28 @@ class Main():
                 sleep(10)
 
         except KeyboardInterrupt:
-            print("\nStopping MLSC...")
+            logger.info("\nStopping MLSC...")
             self._notification_service_process.terminate()
             self._webserver_process.terminate()
-            print("MLSC stopped")
+            logger.info("MLSC stopped")
+
+
 
 
 if __name__ == "__main__":
+
+    
+    #logging.basicConfig(handlers=[
+    #                RotatingFileHandler(logging_path + logging_file, mode='a', maxBytes=5 * 1024 * 1024, backupCount=5, encoding='utf-8'),
+    #                logging.StreamHandler()
+    #                ],
+    #                format='%(asctime)s - %(levelname)-8s - %(name)-15s - %(message)s',
+    #                datefmt='%Y.%m.%d %H:%M:%S',
+    #                level=logging.DEBUG
+    #                )
+
+    
+    
+
     main = Main()
     main.start()

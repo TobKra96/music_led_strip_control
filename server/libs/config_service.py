@@ -7,10 +7,16 @@ from shutil import copyfile, copy
 from pathlib import Path
 import json
 import os
-
+import logging
+import coloredlogs
+from logging.handlers import RotatingFileHandler
 
 class ConfigService():
     def __init__(self, config_lock):
+        self.setup_logging()
+
+        self.logger = logging.getLogger(__name__)
+
         config_file = "config.json"
         config_backup_file = "config_backup.json"
         config_template_file = "config_template.json"
@@ -24,10 +30,10 @@ class ConfigService():
         self._backup_path = config_folder + config_backup_file
         self._template_path = lib_folder + config_template_file
 
-        print("Config Files")
-        print(f"Config: {self._config_path}")
-        print(f"Backup: {self._backup_path}")
-        print(f"Template: {self._template_path}")
+        self.logger.debug("Config Files")
+        self.logger.debug(f"Config: {self._config_path}")
+        self.logger.debug(f"Backup: {self._backup_path}")
+        self.logger.debug(f"Template: {self._template_path}")
 
         if not os.path.exists(self._config_path):
             if not os.path.exists(self._backup_path):
@@ -52,11 +58,11 @@ class ConfigService():
 
         self.config_lock.release()
 
-        print("Settings loaded from config.")
+        self.logger.debug("Settings loaded from config.")
 
     def save_config(self, config=None):
         """Save the config file. Use the current self.config"""
-        print("Saving settings...")
+        self.logger.debug("Saving settings...")
 
         self.config_lock.acquire()
 
@@ -75,7 +81,7 @@ class ConfigService():
 
     def reset_config(self):
         """Reset the config."""
-        print("Resetting config...")
+        self.logger.debug("Resetting config...")
 
         self.config_lock.acquire()
 
@@ -135,6 +141,36 @@ class ConfigService():
     def get_config_path(self):
         return self._config_path
 
+    def setup_logging(self):
+        default_level = logging.INFO
+        logging_path = "../../.mlsc/"
+        logging_file = "mlsc.log"
+
+        if not os.path.exists(logging_path):
+            Path(logging_path).mkdir(exist_ok=True)
+        
+        root_logger = logging.getLogger()
+        root_logger.setLevel(default_level)
+        
+        format_string_console = "%(levelname)-8s - %(name)-30s - %(message)s"
+        console_formatter = logging.Formatter(format_string_console)
+        format_string_file = "%(asctime)s - %(levelname)-8s - %(name)-30s - %(message)s"
+        file_formatter = logging.Formatter(format_string_file)
+
+        console_handler = logging.StreamHandler()
+        console_handler.setLevel(logging.DEBUG)
+        console_handler.setFormatter(console_formatter)
+
+        rotating_file_handler = RotatingFileHandler(logging_path + logging_file, mode='a', maxBytes=5 * 1024 * 1024, backupCount=5, encoding='utf-8')
+        rotating_file_handler.setLevel(default_level)
+        rotating_file_handler.setFormatter(file_formatter)
+
+        root_logger.addHandler(console_handler)
+        root_logger.addHandler(rotating_file_handler)
+
+        coloredlogs.install(fmt=format_string_console)
+
+
     @staticmethod
     def instance(config_lock, imported_instance=None):
         """
@@ -143,7 +179,6 @@ class ConfigService():
         This method will create the config if it's null.
         """
         if imported_instance is not None:
-            print("Importing config instance...")
             ConfigService.current_instance = imported_instance
 
         if not hasattr(ConfigService, 'current_instance'):

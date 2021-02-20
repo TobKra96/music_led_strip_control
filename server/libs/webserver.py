@@ -1,11 +1,13 @@
-
-from libs.webserver_executer import WebserverExecuter  # pylint: disable=E0611, E0401
-from libs.config_service import ConfigService  # pylint: disable=E0611, E0401
-
 from flask import Flask, render_template, request, jsonify, send_file
 from time import sleep
 import copy
 import json
+import logging
+
+from libs.webserver_executer import WebserverExecuter  # pylint: disable=E0611, E0401
+from libs.config_service import ConfigService  # pylint: disable=E0611, E0401
+
+
 
 
 server = Flask(__name__)
@@ -13,6 +15,8 @@ server = Flask(__name__)
 
 class Webserver():
     def start(self, config_lock, notification_queue_in, notification_queue_out, effects_queue):
+        self.logger = logging.getLogger(__name__)
+
         self._config_lock = config_lock
         self.notification_queue_in = notification_queue_in
         self.notification_queue_out = notification_queue_out
@@ -52,20 +56,20 @@ class Webserver():
 
     @server.route('/export_config')
     def export_config():  # pylint: disable=E0211
-        print(f"Send file: {Webserver.instance.export_config_path}")
+        Webserver.instance.logger.debug(f"Send file: {Webserver.instance.export_config_path}")
         return send_file(Webserver.instance.export_config_path, as_attachment=True, cache_timeout=-1)
 
     @server.route('/import_config', methods=['POST'])
     def import_config():  # pylint: disable=E0211
-        print("Import Config Request received.")
+        Webserver.instance.logger.debug("Import Config Request received.")
         if 'imported_config' not in request.files:
-            print("Could not find the file key.")
+            Webserver.instance.logger.error("Could not find the file key.")
             return "Could not import file.", 404
         imported_config = request.files['imported_config']
         content = imported_config.read()
         if content:
             try:
-                print(f"File Received: {json.dumps(json.loads(content), indent=4)}")
+                Webserver.instance.logger.debug(f"File Received: {json.dumps(json.loads(content), indent=4)}")
                 if Webserver.instance.webserver_executer.ImportConfig(json.loads(content, encoding='utf-8')):
                     return "File imported.", 200
                 else:
