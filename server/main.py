@@ -118,12 +118,9 @@ class Main():
                 sleep(10)
 
         except KeyboardInterrupt:
-
-            print("Stopping MLSC...")
-
+            print("\nStopping MLSC...")
             self._notification_service_process.terminate()
             self._webserver_process.terminate()
-
             print("MLSC stopped")
 
 

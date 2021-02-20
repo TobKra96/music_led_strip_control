@@ -34,7 +34,10 @@ class DeviceManager():
         self.ten_seconds_counter = time.time()
 
         while True:
-            self.routine()
+            try:
+                self.routine()
+            except KeyboardInterrupt:
+                break
 
     def routine(self):
         # Check the effect queue.

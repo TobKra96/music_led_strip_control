@@ -100,10 +100,10 @@ class EffectService():
         print(f'Effects component started. Device: {self._device.device_config["DEVICE_NAME"]}')
 
         while not self._cancel_token:
-            # try:
-            self.effect_routine()
-            # except Exception as e:
-            #     print("Error in Effect Service. Routine Restarted. Exception: " + str(e))
+            try:
+                self.effect_routine()
+            except KeyboardInterrupt:
+                break
 
         print(f'Effects component stopped. Device: {self._device.device_config["DEVICE_NAME"]}')
 

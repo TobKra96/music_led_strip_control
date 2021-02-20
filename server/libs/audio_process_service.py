@@ -29,8 +29,11 @@ class AudioProcessService:
         self.init_audio_service()
 
         while True:
-            self.audio_service_routine()
-            self._fps_limiter.fps_limiter()
+            try:
+                self.audio_service_routine()
+                self._fps_limiter.fps_limiter()
+            except KeyboardInterrupt:
+                break
 
     def init_audio_service(self):
         try:
