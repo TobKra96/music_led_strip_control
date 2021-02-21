@@ -174,9 +174,13 @@ class ConfigService():
         }
 
         if self.config is not None:
-            logging_level_console = logging_level_map[self.config["general_settings"]["LOG_LEVEL_CONSOLE"]]
-            logging_level_file = logging_level_map[self.config["general_settings"]["LOG_LEVEL_FILE"]]
-            logging_file_enabled = self.config["general_settings"]["LOG_FILE_ENABLED"]
+            try:
+                logging_level_console = logging_level_map[self.config["general_settings"]["LOG_LEVEL_CONSOLE"]]
+                logging_level_file = logging_level_map[self.config["general_settings"]["LOG_LEVEL_FILE"]]
+                logging_file_enabled = self.config["general_settings"]["LOG_FILE_ENABLED"]
+            except Exception as e:
+                print(f"Could not load logging settings. Exception {e}")
+                pass
 
         if not os.path.exists(logging_path):
             Path(logging_path).mkdir(exist_ok=True)
