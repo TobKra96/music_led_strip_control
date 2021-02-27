@@ -19,4 +19,8 @@ class OutputUDP(Output):
         # Typecast the array to int.
         output_array = output_array.clip(0, 255).astype(np.uint8)
         byte_array = output_array.tobytes('F')
-        self._sock.sendto(byte_array, (self._udp_client_ip, self._udp_client_port))
+        try:
+            self._sock.sendto(byte_array, (self._udp_client_ip, self._udp_client_port))
+        except Exception as ex:
+            self._sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
