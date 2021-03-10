@@ -89,125 +89,13 @@ class Webserver():
     #####################################################################
     #   Effects                                                         #
     #####################################################################
-    @server.route('/effects/effect_single', methods=['GET', 'POST'])
-    def effect_single():  # pylint: disable=E0211
-        # Render the effect_single page.
-        return render_template('effects/effect_single.html')
+    @server.route('/effects/<template>', methods=['GET', 'POST'])
+    def route_effects(template):  # pylint: disable=E0211
+        if not template.endswith('.html'):
+            template += '.html'
 
-    @server.route('/effects/effect_gradient', methods=['GET', 'POST'])
-    def effect_gradient():  # pylint: disable=E0211
-        # Render the effect_gradient page.
-        return render_template('effects/effect_gradient.html')
-
-    @server.route('/effects/effect_fade', methods=['GET', 'POST'])
-    def effect_fade():  # pylint: disable=E0211
-        # Render the effect_fade page.
-        return render_template('effects/effect_fade.html')
-
-    @server.route('/effects/effect_sync_fade', methods=['GET', 'POST'])
-    def effect_sync_fade():  # pylint: disable=E0211
-        # Render the effect_fade page.
-        return render_template('effects/effect_sync_fade.html')
-
-    @server.route('/effects/effect_scroll', methods=['GET', 'POST'])
-    def effect_scroll():  # pylint: disable=E0211
-        # Render the effect_scroll page.
-        return render_template('effects/effect_scroll.html')
-
-    @server.route('/effects/effect_energy', methods=['GET', 'POST'])
-    def effect_energy():  # pylint: disable=E0211
-        # Render the effect_energy page.
-        return render_template('effects/effect_energy.html')
-
-    @server.route('/effects/effect_advanced_scroll', methods=['GET', 'POST'])
-    def effect_advanced_scroll():  # pylint: disable=E0211
-        # Render the effect_advanced_scroll page.
-        return render_template('effects/effect_advanced_scroll.html')
-
-    @server.route('/effects/effect_wavelength', methods=['GET', 'POST'])
-    def effect_wavelength():  # pylint: disable=E0211
-        # Render the effect_wavelength page.
-        return render_template('effects/effect_wavelength.html')
-
-    @server.route('/effects/effect_bars', methods=['GET', 'POST'])
-    def effect_bars():  # pylint: disable=E0211
-        # Render the effect_bars page.
-        return render_template('effects/effect_bars.html')
-
-    @server.route('/effects/effect_power', methods=['GET', 'POST'])
-    def effect_power():  # pylint: disable=E0211
-        # Render the effect_power page.
-        return render_template('effects/effect_power.html')
-
-    @server.route('/effects/effect_beat', methods=['GET', 'POST'])
-    def effect_beat():  # pylint: disable=E0211
-        # Render the effect_beat page.
-        return render_template('effects/effect_beat.html')
-
-    @server.route('/effects/effect_beat_twinkle', methods=['GET', 'POST'])
-    def effect_beat_twinkle():  # pylint: disable=E0211
-        # Render the effect_beat_twinkle page.
-        return render_template('effects/effect_beat_twinkle.html')
-
-    @server.route('/effects/effect_wave', methods=['GET', 'POST'])
-    def effect_wave():  # pylint: disable=E0211
-        # Render the effect_wave page.
-        return render_template('effects/effect_wave.html')
-
-    @server.route('/effects/effect_slide', methods=['GET', 'POST'])
-    def effect_slide():  # pylint: disable=E0211
-        # Render the effect_slide page.
-        return render_template('effects/effect_slide.html')
-
-    @server.route('/effects/effect_bubble', methods=['GET', 'POST'])
-    def effect_bubble():  # pylint: disable=E0211
-        # Render the effect_bubble page.
-        return render_template('effects/effect_bubble.html')
-
-    @server.route('/effects/effect_twinkle', methods=['GET', 'POST'])
-    def effect_twinkle():  # pylint: disable=E0211
-        # Render the effect_twinkle page.
-        return render_template('effects/effect_twinkle.html')
-
-    @server.route('/effects/effect_pendulum', methods=['GET', 'POST'])
-    def effect_pendulum():  # pylint: disable=E0211
-        # Render the effect_pendulum page.
-        return render_template('effects/effect_pendulum.html')
-
-    @server.route('/effects/effect_rods', methods=['GET', 'POST'])
-    def effect_rods():  # pylint: disable=E0211
-        # Render the effect_rods page.
-        return render_template('effects/effect_rods.html')
-
-    @server.route('/effects/effect_segment_color', methods=['GET', 'POST'])
-    def effect_segment_color():  # pylint: disable=E0211
-        # Render the effect_segment_color page.
-        return render_template('effects/effect_segment_color.html')
-
-    @server.route('/effects/effect_beat_slide', methods=['GET', 'POST'])
-    def effect_beat_slide():  # pylint: disable=E0211
-        # Render the effect_beat_slide page.
-        return render_template('effects/effect_beat_slide.html')
-
-    @server.route('/effects/effect_wiggle', methods=['GET', 'POST'])
-    def effect_wiggle():  # pylint: disable=E0211
-        # Render the effect_wiggle page.
-        return render_template('effects/effect_wiggle.html')
-
-    @server.route('/effects/effect_vu_meter', methods=['GET', 'POST'])
-    def effect_vu_meter():  # pylint: disable=E0211
-        # Render the effect_vu_meter page.
-        return render_template('effects/effect_vu_meter.html')
-
-    @server.route('/effects/effect_spectrum_analyzer', methods=['GET', 'POST'])
-    def effect_spectrum_analyzer():  # pylint: disable=E0211
-        # Render the effect_spectrum_analyzer page.
-        return render_template('effects/effect_spectrum_analyzer.html')
-
-    @server.route('/effects/effect_direction_changer', methods=['GET', 'POST'])
-    def effect_direction_changer():  # pylint: disable=E0211
-        # Render the effect_direction_changer page.
-        return render_template('effects/effect_direction_changer.html')
+        # Serve the file (if exists) from templates/effects/FILE.html
+        return render_template("/effects/" + template)
 
     #####################################################################
     #   Ajax Endpoints                                                  #
@@ -402,7 +290,7 @@ class Webserver():
             else:
                 return jsonify(data_out)
 
-     # /GetLoggingLevels
+    # /GetLoggingLevels
     #
     # return
     # {
