@@ -46,12 +46,13 @@ class Webserver():
         return render_template('dashboard.html')
 
     #####################################################################
-    #   General Settings                                                #
+    #   Settings                                                        #
     #####################################################################
-    @server.route('/general_settings', methods=['GET', 'POST'])
-    def general_settings():  # pylint: disable=E0211
-        # Render the general_settings page.
-        return render_template('/general_settings/general_settings.html')
+    @server.route('/settings/<template>', methods=['GET', 'POST'])
+    def settings(template):  # pylint: disable=E0211
+        if not template.endswith('.html'):
+            template += '.html'
+        return render_template("/settings/" + template)
 
     @server.route('/export_config')
     def export_config():  # pylint: disable=E0211
@@ -77,14 +78,6 @@ class Webserver():
                 return "File is not valid JSON.", 400
         else:
             return "No config file selected.", 400
-
-    #####################################################################
-    #   Device Settings                                                 #
-    #####################################################################
-    @server.route('/device_settings', methods=['GET', 'POST'])
-    def device_settings():  # pylint: disable=E0211
-        # Render the device_settings page.
-        return render_template('/general_settings/device_settings.html')
 
     #####################################################################
     #   Effects                                                         #
