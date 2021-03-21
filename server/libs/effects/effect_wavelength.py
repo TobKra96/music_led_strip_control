@@ -16,32 +16,31 @@ class EffectWavelength(Effect):
         if y is None:
             return
 
+        # Interpolate y to get a array, which is as half long as the led strip
         y = np.copy(self._math_service.interpolate(y, led_count // 2))
         self._dsp.common_mode.update(y)
-        diff = y - self.prev_spectrum
-        self.prev_spectrum = np.copy(y)
+
         # Color channel mappings.
         r = self._dsp.r_filt.update(y - self._dsp.common_mode.value)
-        g = np.abs(diff)
-        b = self._dsp.b_filt.update(np.copy(y))
+
+        # Expand the array to the twice sice and mirror the values
+        # [0,1,2,3]
+        # --> [0,1,2,3,3,2,1,0]
         r = np.array([j for i in zip(r, r) for j in i])
-        output = np.array(
+
+        # If the r array is smaller than the led_count, the r array will b filled with the lats value.
+        r_len_before_resize = len(r)
+        missing_values = led_count - r_len_before_resize
+        r = np.pad(r, (0,missing_values), 'edge')
+               
+        start_gradient_index = (led_count if effect_config["reverse_grad"] else 0)
+        end_gradient_index = (None if effect_config["reverse_grad"] else led_count)
+
+        self.output = np.array(
             [
-                self._color_service.full_gradients[effect_config["color_mode"]][0]
-                [
-                    (led_count if effect_config["reverse_grad"] else 0):
-                    (None if effect_config["reverse_grad"] else led_count):
-                ] * r,
-                self._color_service.full_gradients[effect_config["color_mode"]][1]
-                [
-                    (led_count if effect_config["reverse_grad"] else 0):
-                    (None if effect_config["reverse_grad"] else led_count):
-                ] * r,
-                self._color_service.full_gradients[effect_config["color_mode"]][2]
-                [
-                    (led_count if effect_config["reverse_grad"] else 0):
-                    (None if effect_config["reverse_grad"] else led_count):
-                ] * r
+                self._color_service.full_gradients[effect_config["color_mode"]][0][start_gradient_index:end_gradient_index:] * r,
+                self._color_service.full_gradients[effect_config["color_mode"]][1][start_gradient_index:end_gradient_index:] * r,
+                self._color_service.full_gradients[effect_config["color_mode"]][2][start_gradient_index:end_gradient_index:] * r
             ]
         )
 
@@ -55,12 +54,12 @@ class EffectWavelength(Effect):
         )
         blur_amount = effect_config["blur"]
         if blur_amount > 0:
-            output[0] = gaussian_filter1d(output[0], sigma=blur_amount)
-            output[1] = gaussian_filter1d(output[1], sigma=blur_amount)
-            output[2] = gaussian_filter1d(output[2], sigma=blur_amount)
+            self.output[0] = gaussian_filter1d(self.output[0], sigma=blur_amount)
+            self.output[1] = gaussian_filter1d(self.output[1], sigma=blur_amount)
+            self.output[2] = gaussian_filter1d(self.output[2], sigma=blur_amount)
 
         if effect_config["flip_lr"]:
-            output = np.fliplr(output)
+            self.output = np.fliplr(self.output)
 
         if effect_config["mirror"]:
             # Calculate the real mid.
@@ -68,12 +67,12 @@ class EffectWavelength(Effect):
             # Add some tolerance for the real mid.
             if (real_mid >= led_mid - 2) and (real_mid <= led_mid + 2):
                 # Use the option with shrinking the array.
-                output = np.concatenate((output[:, ::-2], output[:, ::2]), axis=1)
+                self.output = np.concatenate((self.output[:, ::-2], self.output[:, ::2]), axis=1)
             else:
                 # Mirror the whole array. After this the array has a two times bigger size than led_count.
-                big_mirrored_array = np.concatenate((output[:, ::-1], output[:, ::1]), axis=1)
+                big_mirrored_array = np.concatenate((self.output[:, ::-1], self.output[:, ::1]), axis=1)
                 start_of_array = led_count - led_mid
                 end_of_array = start_of_array + led_count
-                output = big_mirrored_array[:, start_of_array:end_of_array]
+                self.output = big_mirrored_array[:, start_of_array:end_of_array]
 
-        self.queue_output_array_noneblocking(output)
+        self.queue_output_array_noneblocking(self.output)
