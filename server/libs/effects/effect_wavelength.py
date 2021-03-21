@@ -16,23 +16,23 @@ class EffectWavelength(Effect):
         if y is None:
             return
 
-        # Interpolate y to get a array, which is as half long as the led strip
+        # Interpolate y to get an array, which is half as long as the LED strip.
         y = np.copy(self._math_service.interpolate(y, led_count // 2))
         self._dsp.common_mode.update(y)
 
         # Color channel mappings.
         r = self._dsp.r_filt.update(y - self._dsp.common_mode.value)
 
-        # Expand the array to the twice sice and mirror the values
+        # Expand the array twice the size and mirror the values.
         # [0,1,2,3]
         # --> [0,1,2,3,3,2,1,0]
         r = np.array([j for i in zip(r, r) for j in i])
 
-        # If the r array is smaller than the led_count, the r array will b filled with the lats value.
+        # If the r array is smaller than the led_count, the r array will be filled with the last value.
         r_len_before_resize = len(r)
         missing_values = led_count - r_len_before_resize
-        r = np.pad(r, (0,missing_values), 'edge')
-               
+        r = np.pad(r, (0, missing_values), 'edge')
+
         start_gradient_index = (led_count if effect_config["reverse_grad"] else 0)
         end_gradient_index = (None if effect_config["reverse_grad"] else led_count)
 
