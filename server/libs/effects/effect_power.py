@@ -28,6 +28,9 @@ class EffectPower(Effect):
         # Color channel mappings.
         r = self._dsp.r_filt.update(y - self._dsp.common_mode.value)
         r = np.array([j for i in zip(r, r) for j in i])
+        r_len_before_resize = len(r)
+        missing_values = led_count - r_len_before_resize
+        r = np.pad(r, (0,missing_values), 'edge')
         output = np.array([self._color_service.full_gradients[effect_config["color_mode"]][0, :led_count] * r,
                            self._color_service.full_gradients[effect_config["color_mode"]][1, :led_count] * r,
                            self._color_service.full_gradients[effect_config["color_mode"]][2, :led_count] * r])

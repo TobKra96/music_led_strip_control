@@ -25,6 +25,9 @@ class EffectWavelength(Effect):
         g = np.abs(diff)
         b = self._dsp.b_filt.update(np.copy(y))
         r = np.array([j for i in zip(r, r) for j in i])
+        r_len_before_resize = len(r)
+        missing_values = led_count - r_len_before_resize
+        r = np.pad(r, (0,missing_values), 'edge')
         output = np.array(
             [
                 self._color_service.full_gradients[effect_config["color_mode"]][0]
