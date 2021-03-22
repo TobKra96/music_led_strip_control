@@ -323,15 +323,15 @@
         "DEFAULT_SAMPLE_RATE": 48000,
         "DEVICE_ID": 0,
         "FRAMES_PER_BUFFER": 512,
-        "MAX_FREQUENCY": 16000,
-        "MIN_FREQUENCY": 50,
-        "MIN_VOLUME_THRESHOLD": 0,
-        "N_FFT_BINS": 24,
-        "N_ROLLING_HISTORY": 4,
-        "WEBSERVER_PORT": 8080,
         "LOG_FILE_ENABLED": false,
         "LOG_LEVEL_CONSOLE": "INFO",
-        "LOG_LEVEL_FILE": "INFO"
+        "LOG_LEVEL_FILE": "INFO",
+        "MAX_FREQUENCY": 16000,
+        "MIN_FREQUENCY": 50,
+        "MIN_VOLUME_THRESHOLD": 0.001,
+        "N_FFT_BINS": 24,
+        "N_ROLLING_HISTORY": 4,
+        "WEBSERVER_PORT": 8080
     },
     "gradients": {
         "Dancefloor": [
@@ -567,7 +567,6 @@
         "WS2811_STRIP_RGB": "WS281x_RGB",
         "WS2812_STRIP": "WS281x_default"
     },
-
     "logging_levels":{
         "NOTSET": "Not Set",
         "DEBUG": "Debug",

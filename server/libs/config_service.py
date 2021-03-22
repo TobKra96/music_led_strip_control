@@ -9,8 +9,9 @@ from pathlib import Path
 import coloredlogs
 import logging
 import json
-import os
 import sys
+import os
+
 
 class ConfigService():
     def __init__(self, config_lock):
@@ -18,7 +19,6 @@ class ConfigService():
 
         # Start with the default logging settings, because the config was not loaded.
         self.setup_logging()
-        
 
         self.logger = logging.getLogger(__name__)
 
@@ -56,7 +56,6 @@ class ConfigService():
 
         # Now the config was loaded, so we can reinit the logging with the set logging levels.
         self.setup_logging()
-
 
     def load_config(self):
         """Load the configuration file inside the self.config variable."""
@@ -163,8 +162,8 @@ class ConfigService():
         logging_level_console = logging.INFO
         logging_level_file = logging.INFO
         logging_file_enabled = False
-        
-        logging_level_map ={
+
+        logging_level_map = {
             "NOTSET": logging.NOTSET,
             "DEBUG": logging.DEBUG,
             "INFO": logging.INFO,
