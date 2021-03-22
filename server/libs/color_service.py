@@ -1,9 +1,12 @@
-import numpy as np
 from scipy.ndimage.filters import gaussian_filter1d
+import numpy as np
+import logging
 
 
 class ColorService():
     def __init__(self, config, device_config):
+        self.logger = logging.getLogger(__name__)
+
         self._config = config
         self._device_config = device_config
         self.full_gradients = {}
@@ -103,7 +106,7 @@ class ColorService():
         if colour in self._config["colours"]:
             return self._config["colours"][colour]
         else:
-            print(f"Color '{colour}' has not been defined.")
+            self.logger.error(f"Color '{colour}' has not been defined.")
             return (0, 0, 0)
 
     def build_slidearrays(self):
@@ -148,7 +151,7 @@ class ColorService():
 
                     #             Find the right spot in the array for the repetition.                     Find the right spot in the repetition for the color.
                     start_index = int((current_bubble_repeat * gradient_color_count * steps_between_bubbles) + (current_color * steps_between_bubbles))
-                    end_index = int(start_index + effect_config["bubble_lenght"])
+                    end_index = int(start_index + effect_config["bubble_length"])
 
                     # If the start reaches the end of the string something is wrong.
                     if start_index > led_count - 1:
@@ -169,7 +172,9 @@ class ColorService():
             tmp_gradient_array = np.concatenate((tmp_gradient_array, tmp_gradient_array), axis=1)
             tmp_gradient_array = np.concatenate((tmp_gradient_array, tmp_gradient_array), axis=1)
 
-            tmp_gradient_array = gaussian_filter1d(tmp_gradient_array, sigma=effect_config["blur"])
+            blur_amount = effect_config["blur"]
+            if blur_amount > 0:
+                tmp_gradient_array = gaussian_filter1d(tmp_gradient_array, sigma=blur_amount)
 
             start_index = led_count - 1
             end_index = start_index + led_count

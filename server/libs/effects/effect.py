@@ -1,14 +1,10 @@
 from libs.color_service import ColorService  # pylint: disable=E0611, E0401
-from libs.config_service import ConfigService  # pylint: disable=E0611, E0401
 from libs.math_service import MathService  # pylint: disable=E0611, E0401
 from libs.dsp import DSP  # pylint: disable=E0611, E0401
 
-import numpy as np
-from time import sleep
-import time
-import cProfile
-import random
 from collections import deque
+from time import time
+import numpy as np
 
 
 class Effect:
@@ -112,14 +108,17 @@ class Effect:
 
         for i in range(n_fft_bins):
             channel_avgs.append(sum(self.freq_channels[i]) / len(self.freq_channels[i]))
-            differences.append(((self.freq_channels[i][0] - channel_avgs[i]) * 100) // channel_avgs[i])
+            if channel_avgs[i] != 0:
+                differences.append(((self.freq_channels[i][0] - channel_avgs[i]) * 100) // channel_avgs[i])
+            else:
+                differences.append(0)
         for i in ["beat", "low", "mid", "high"]:
             if (any(differences[j] >= self.min_percent_diff[i]
                     and self.freq_channels[j][0] >= self.min_detect_amplitude[i]
                     for j in range(*self.detection_ranges[i]))
-                and (time.time() - self.prev_freq_detects[i] > 0.2)
+                and (time() - self.prev_freq_detects[i] > 0.2)
                     and len(self.freq_channels[0]) == self.freq_channel_history):
-                self.prev_freq_detects[i] = time.time()
+                self.prev_freq_detects[i] = time()
                 self.current_freq_detects[i] = True
             else:
                 self.current_freq_detects[i] = False

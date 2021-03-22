@@ -1,13 +1,14 @@
 from libs.outputs.output import Output  # pylint: disable=E0611, E0401
-from time import sleep
 import numpy as np
 import socket
+import logging
 
 
 class OutputUDP(Output):
     def __init__(self, device):
         # Call the constructor of the base class.
         super(OutputUDP, self).__init__(device)
+        self.logger = logging.getLogger(__name__)
 
         output_id = "output_udp"
 
@@ -22,5 +23,7 @@ class OutputUDP(Output):
         try:
             self._sock.sendto(byte_array, (self._udp_client_ip, self._udp_client_port))
         except Exception as ex:
+            self.logger.exception(f"Could not send to client", ex)
+            self.logger.debug(f"Reinit output of {self._udp_client_ip}")
             self._sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 

@@ -1,8 +1,8 @@
 from libs.effects.effect import Effect  # pylint: disable=E0611, E0401
 
+from scipy.ndimage.filters import gaussian_filter1d
 import numpy as np
 import random
-from scipy.ndimage.filters import gaussian_filter1d
 
 
 class EffectTwinkle(Effect):
@@ -27,7 +27,7 @@ class EffectTwinkle(Effect):
         # Reset output array.
         self.output = np.zeros((3, self._device.device_config["LED_Count"]))
         # Randomly add the stars, depending on speed settings.
-        if random.randrange(0, 100, 1) <= effect_config["star_appears_speed"]:
+        if random.randrange(0, 100, 1) <= effect_config["star_ascending_speed"]:
             # Add a star only if the list is not full.
             if len(self.rising_stars) < effect_config["stars_count"]:
                 gradient = self._config["gradients"][effect_config["gradient"]]
@@ -86,7 +86,9 @@ class EffectTwinkle(Effect):
         for current_star_to_remove in remove_stars_descending:
             self.descending_stars.remove(current_star_to_remove)
 
-        self.output = gaussian_filter1d(self.output, sigma=effect_config["blur"])
+        blur_amount = effect_config["blur"]
+        if blur_amount > 0:
+            self.output = gaussian_filter1d(self.output, sigma=blur_amount)
 
         # Add the output array to the queue.
         self.queue_output_array_blocking(self.output)

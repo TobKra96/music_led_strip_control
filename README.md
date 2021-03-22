@@ -7,47 +7,47 @@
 </p>
 
 <p align="center">
-  <a style="text-decoration:none" href="https://www.python.org/">
-    <img src="https://img.shields.io/badge/Made%20with-Python-1f425f.svg" alt="made-with-python" />
+  <a style="text-decoration:none" href="https://www.python.org/downloads/release/python-3613/">
+    <img src="https://img.shields.io/badge/python-3.6+-blue.svg?color=3498DB&style=flat-square" alt="Python Version" />
   </a>
-  <a style="text-decoration:none" href="https://discord.gg/qfmDu9jnce">
-    <img src="https://img.shields.io/discord/774182494277992478" alt="Discord" />
+  <a style="text-decoration:none" href="https://discord.gg/bMmWYGcz/">
+    <img src="https://img.shields.io/discord/774182494277992478?color=3498DB&style=flat-square&label=discord" alt="Discord" />
   </a>
   <a style="text-decoration:none" href="https://github.com/TobKra96/music_led_strip_control/blob/master/LICENSE">
-    <img src="https://img.shields.io/github/license/TobKra96/music_led_strip_control" alt="GitHub" />
+    <img src="https://img.shields.io/github/license/TobKra96/music_led_strip_control?color=3498DB&style=flat-square" alt="GitHub" />
   </a>
 </p>
 
 
-## Feature List
+<details open="open">
+  <summary>Table of Contents</summary>
+  <ol>
+    <li><a href="#features">Features</a></li>
+    <li>
+      <a href="#installing">Installing</a>
+      <ul>
+        <li><a href="#automated-installation">Automated installation</a></li>
+        <li><a href="#manual-installation">Manual installation</a></li>
+      </ul>
+    </li>
+    <li><a href="#demo">Demo</a></li>
+    <li><a href="#acknowledgements">Acknowledgements</a></li>
+    <li><a href="#license">License</a></li>
+  </ol>
+</details>
+
+
+## Features
 
 - Audio visualization in real time.
 - Fancy Web interface.
-- 23 effects with many configuration options.
+- 24 effects with many configuration options.
 - Customizable colors and color schemes.
 - Multicore optimized for large LED strips (900+ LEDs).
 - Standalone and client compatible for audio processing.
 
 
-## Demo
-
-<p align="center">
-  <a style="text-decoration:none" href="https://youtu.be/DankmP4riOo">
-    <img src="https://user-images.githubusercontent.com/7833146/105639512-0e5d9580-5e79-11eb-93f2-2c13456863cd.jpg" alt="Version2_Github" />
-  </a>
-  <a style="text-decoration:none" href="https://youtu.be/eUSX9l89th0">
-    <img src="https://user-images.githubusercontent.com/7833146/105635856-9639a480-5e65-11eb-8126-9e947638e0f2.jpg" alt="Roomtour_Github" />
-  </a>
-  <a style="text-decoration:none" href="https://youtu.be/jAL1DfeYQI8">
-    <img src="https://user-images.githubusercontent.com/7833146/105635961-1bbd5480-5e66-11eb-8608-51aaa9505257.jpg" alt="Version1_Github" />
-  </a>
-  <a style="text-decoration:none" href="media/web_interface_mockup.png">
-    <img src="https://user-images.githubusercontent.com/24798198/107848581-dbae1980-6df4-11eb-9801-59aacf7af905.png" alt="Mockup" />
-  </a>
-</p>
-
-
-## Installation
+## Installing
 
 ### Automated installation
 Run the following command in your terminal:
@@ -63,7 +63,7 @@ Also, check out the tutorial video I created for the manual installation:
 
 <p align="center">
   <a style="text-decoration:none" href="https://youtu.be/ShpOVoOpqrQ">
-    <img src="https://user-images.githubusercontent.com/7833146/106381265-d219c000-63b7-11eb-927d-43b96453d2d2.jpg" alt="Tutorial_Github" />
+    <img src="https://user-images.githubusercontent.com/24798198/108500735-87051580-72b0-11eb-8841-65f79421277a.png" alt="Tutorial_Github" />
   </a>
 </p>
 
@@ -77,18 +77,43 @@ Also, check out the tutorial video I created for the manual installation:
 </p>
 
 
-## Used Libraries
- - [Audio Reactive LED Strip by Scott Lawson](https://github.com/scottlawsonbc/audio-reactive-led-strip)
+## Demo
+
+<p align="center">
+  <a style="text-decoration:none" href="https://youtu.be/DankmP4riOo">
+    <img src="https://user-images.githubusercontent.com/24798198/108499122-24127f00-72ae-11eb-8668-7c720f527c46.png" alt="Version2_Github" />
+  </a>
+  <a style="text-decoration:none" href="https://youtu.be/eUSX9l89th0">
+    <img src="https://user-images.githubusercontent.com/24798198/108499722-0abe0280-72af-11eb-9dc1-f37e3df0b0e7.png" alt="Roomtour_Github" />
+  </a>
+  <a style="text-decoration:none" href="https://youtu.be/jAL1DfeYQI8">
+    <img src="https://user-images.githubusercontent.com/24798198/108499975-68eae580-72af-11eb-9115-594b11f503cf.png" alt="Version1_Github" />
+  </a>
+  <a style="text-decoration:none" href="media/web_interface_mockup.png">
+    <img src="https://user-images.githubusercontent.com/24798198/107848581-dbae1980-6df4-11eb-9801-59aacf7af905.png" alt="Mockup" />
+  </a>
+</p>
+
+
+## Acknowledgements
+
+* [Audio Reactive LED Strip by Scott Lawson](https://github.com/scottlawsonbc/audio-reactive-led-strip)
 
 Thank you for the digital signal processing and some effects. You are the best.
 
-- [rpi_ws281x by Jeremy Garff](https://github.com/jgarff/rpi_ws281x)
+* [rpi_ws281x by Jeremy Garff](https://github.com/jgarff/rpi_ws281x)
 
 Awesome library for the LED output signal. Easy to use.
 
-- [gentelella by Colorlib](https://github.com/ColorlibHQ/gentelella)
+* [gentelella by Colorlib](https://github.com/ColorlibHQ/gentelella)
 
-Fancy looking bootstrap theme.
+Bootstrap admin dashboard.
+
 Scripts included:
 
-Bootstrap, Font Awesome, jQuery-Autocomplete, FullCalendar, Charts.js, Bootstrap Colorpicker, Cropper, dataTables, Date Range Picker for Bootstrap, Dropzone, easyPieChart, ECharts, bootstrap-wysiwyg, Flot, Javascript plotting library for jQuery, gauge.js, iCheck, jquery.inputmask plugin, Ion.RangeSlider, jQuery, jVectorMap, moment.js, Morris.js - pretty time-series line graphs, PNotify - Awesome JavaScript notifications, NProgress, Pace, Parsley, bootstrap-progressbar, select2, Sidebar Transitions - simple off-canvas navigations, Skycons - canvas based weather icons, jQuery Sparklines plugin, switchery - Turns HTML checkbox inputs into beautiful iOS style switches, jQuery Tags Input Plugin, Autosize - resizes text area to fit text, validator - HTML form validator using jQuery, jQuery Smart Wizard.
+Bootstrap, Font Awesome, jQuery-Autocomplete, Bootstrap Colorpicker, bootstrap-wysiwyg, jQuery, switchery - Turns HTML checkbox inputs into beautiful iOS style switches, jQuery Tags Input Plugin, Autosize - resizes text area to fit text, validator - HTML form validator using jQuery.
+
+
+## License
+
+Distributed under the MIT License. See [`LICENSE`](https://github.com/TobKra96/music_led_strip_control/blob/master/LICENSE) for more information.

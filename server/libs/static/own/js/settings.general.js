@@ -6,14 +6,55 @@ var colors = {};
 var gradients = {};
 
 var devicesLoading = true;
+var loggingLevelsLoading = true;
 
 // Init and load all settings
 $( document ).ready(function() {
   $("#device_dropdown").hide();
   settingsIdentifier = $("#settingsIdentifier").val();
 
-  GetLocalSettings();
+  GetLoggingLevels();
 });
+
+//Check if all initial ajax requests are finished.
+function CheckIfFinishedInitialLoading (){
+  if(!loggingLevelsLoading){
+    GetLocalSettings();
+  }
+}
+
+// Get LED Strips   -----------------------------------------------------------
+
+function GetLoggingLevels(){
+  $.ajax({
+    url: "/GetLoggingLevels",
+    type: "GET", //send it through get method
+    data: {     },
+    success: function(response) {
+        ParseGetLoggingLevels(response);
+    },
+    error: function(xhr) {
+      //Do Something to handle error
+    }
+  });
+}
+
+function ParseGetLoggingLevels(response){
+  var context = this;
+  this.logging_levels = response;
+
+  $('.logging_levels').each(function(){
+    var logging_levels = context.logging_levels;
+    for(var currentKey in logging_levels){
+      var newOption = new Option(logging_levels[currentKey], currentKey);
+      $(newOption).html(logging_levels[currentKey]);
+      $(this).append(newOption);
+    }
+  });
+
+  loggingLevelsLoading = false;
+  CheckIfFinishedInitialLoading();
+}
 
 
 function GetGeneralSetting(setting_key){
