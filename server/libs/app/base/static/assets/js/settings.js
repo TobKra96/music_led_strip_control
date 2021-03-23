@@ -28,7 +28,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (outputType) {
         function toggleOutput() {
-            if (outputType.value == 'raspberrypi') {
+            if (outputType.value == 'output_raspi') {
                 $('#raspberrypi').removeClass('d-none');
                 $('#udp').addClass('d-none');
             } else {
@@ -37,7 +37,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         };
         toggleOutput();
-        outputType.addEventListener("change", toggleOutput);
+        $("#OUTPUT_TYPE").change(toggleOutput).change();
     }
 
 });
