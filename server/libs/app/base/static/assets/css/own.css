@@ -1,0 +1,74 @@
+@font-face {
+    font-family: "Quicksand";
+    src:url("../fonts/quicksand/fonts/Quicksand_Bold.otf");
+    font-weight: normal;
+    font-style: normal;
+}
+
+/* Set text highlight color */
+::selection {
+    background: #3F4D67;
+    color: #ffffff;
+}
+::-moz-selection {
+    background: #3F4D67;
+    color: #ffffff;
+}
+
+/* Resize svg logo */
+.logo {
+    width: 200px;
+}
+
+/* Overwrite sidebar logo style */
+.pcoded-navbar.navbar-collapsed .header-logo img {
+    -webkit-transform: none;
+    transform: none;
+    opacity: 1;
+}
+.b-brand .b-title {
+    font-family: "Quicksand";
+    margin-left: 15px;
+    letter-spacing: 10px;
+    color: #3498DB;
+    font-weight: normal;
+    font-size: 26px;
+}
+
+/* Apply color to effect buttons on hover */
+.dashboard_effect {
+    user-select: none;
+    transition: 0.2s;
+}
+.dashboard_effect:hover, .dashboard_effect_active {
+    background-color: #3F4D67;
+    color: white;
+}
+
+/* Prevent text overflow if filename of imported config too long */
+.custom-file-label {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Remove text highlight from checkboxes */
+.custom-checkbox {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+/* Change tooltip color */
+.tooltip-inner {
+    background-color: #3F4D67 !important;
+    color: #ffffff;
+  }
+
+.tooltip .arrow::before {
+    color: #3F4D67 !important;
+}

@@ -1,0 +1,98 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Edit Effect Direction Changer {% endblock %}
+
+<!-- Specific CSS goes HERE -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+    <div class="pcoded-content">
+        <div class="pcoded-inner-content">
+            <!-- [ breadcrumb ] start -->
+            <div class="page-header">
+                <div class="page-block">
+                    <div class="row align-items-center">
+                        <div class="col-md-12">
+                            <div class="page-header-title">
+                                <h5 class="m-b-10">Direction Changer</h5>
+                            </div>
+                            <ul class="breadcrumb">
+                                <li class="breadcrumb-item"><a href="/"><i class="feather icon-home"></i></a></li>
+                                <li class="breadcrumb-item"><a href="javascript:">Edit Effects</a></li>
+                                <li class="breadcrumb-item"><a href="javascript:">Direction Changer</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- [ breadcrumb ] end -->
+            <div class="main-body">
+                <div class="page-wrapper">
+                    <!-- [ Main Content ] start -->
+
+                    {% include 'includes/devices.html' %}
+
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5>Direction Changer Effect Settings</h5>
+                                </div>
+                                <div class="card-block">
+                                    <p>Edit the Direction Changer effect.</p>
+                                    <form id="settingsForm" action method="post" novalidate>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label>Single Color</label>
+                                                    <select id="color" class="form-control colours setting_input"></select>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>Speed <span id="speedNum" class="mb-0 badge badge-secondary"></span></label>
+                                                    <input id="speed" type="range" class="custom-range setting_input" min="0" max="20" step="1" required>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>Bar Length <span id="barLengthNum" class="mb-0 badge badge-secondary"></span></label>
+                                                    <input id="bar_length" type="range" class="custom-range setting_input" min="0" max="20" step="1" required>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>Amount of Bars in the Same Direction <span id="barsInSameDirectionNum" class="mb-0 badge badge-secondary"></span></label>
+                                                    <input id="bars_in_same_direction" type="range" class="custom-range setting_input" min="0" max="20" step="1" required>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label>Gradient</label>
+                                                    <select id="gradient" class="form-control gradients setting_input"></select>
+                                                </div>
+                                                <div class="custom-control custom-checkbox my-2">
+                                                    <input type="checkbox" class="custom-control-input" id="colorfulCheck">
+                                                    <label id="colorful_mode" class="custom-control-label" for="colorfulCheck">Use Gradient</label>
+                                                </div>
+                                                <div class="custom-control custom-checkbox my-2">
+                                                    <input type="checkbox" class="custom-control-input" id="randomColorCheck">
+                                                    <label id="random_color" class="custom-control-label" for="randomColorCheck">Randomly Select Gradient Color</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="mt-4 d-flex flex-md-row flex-column justify-content-md-end">
+                                            <button type="button" id="save_btn" class="btn btn-success m-0">Save</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- [ Main Content ] end -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+<script src="/static/assets/js/effects.js"></script>
+{% endblock javascripts %}

@@ -1,0 +1,270 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Dashboard {% endblock %}
+
+<!-- Specific CSS goes HERE -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+    <div class="pcoded-content">
+        <div class="pcoded-inner-content">
+            <!-- [ breadcrumb ] start -->
+
+            <!-- [ breadcrumb ] end -->
+            <div class="main-body">
+                <div class="page-wrapper">
+                    <!-- [ Main Content ] start -->
+
+                    <div class="h3 text-secondary">Dashboard</div>
+
+                    {% include 'includes/devices.html' %}
+
+                    <div class="h3 text-secondary">Special Effects</div>
+                    <div class="row h1 text-secondary">
+                        <!-- Effect Off -->
+                        <div class="col-sm-6 col-md-4 col-lg-3 col-xl-2 mb-4">
+                            <div id="effect_off" class="card m-auto h-100 dashboard_effect">
+                                <div class="card-block text-center">
+                                    <i class="fa fa-power-off" aria-hidden="true"></i>
+                                    <p class="mt-4 mb-0">Off</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="h3 text-secondary">Non-Music Effects</div>
+                    <div class="row h1 text-secondary">
+                        <!-- Effect Single -->
+                        <div class="col-sm-6 col-md-4 col-lg-3 col-xl-2 mb-4">
+                            <div id="effect_single" class="card m-auto h-100 dashboard_effect">
+                                <div class="card-block text-center">
+                                    <i class="fa fa-tint" aria-hidden="true"></i>
+                                    <p class="mt-4 mb-0">Single</p>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Effect Gradient -->
+                        <div class="col-sm-6 col-md-4 col-lg-3 col-xl-2 mb-4">
+                            <div id="effect_gradient" class="card m-auto h-100 dashboard_effect">
+                                <div class="card-block text-center">
+                                    <i class="fa fa-rainbow" aria-hidden="true"></i>
+                                    <p class="mt-4 mb-0">Gradient</p>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Effect Fade -->
+                        <div class="col-sm-6 col-md-4 col-lg-3 col-xl-2 mb-4">
+                            <div id="effect_fade" class="card m-auto h-100 dashboard_effect">
+                                <div class="card-block text-center">
+                                    <i class="fa fa-braille" aria-hidden="true"></i>
+                                    <p class="mt-4 mb-0">Fade</p>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Effect Sync Fade -->
+                        <div class="col-sm-6 col-md-4 col-lg-3 col-xl-2 mb-4">
+                            <div id="effect_sync_fade" class="card m-auto h-100 dashboard_effect">
+                                <div class="card-block text-center">
+                                    <i class="fa fa-sync-alt" aria-hidden="true"></i>
+                                    <p class="mt-4 mb-0">Sync Fade</p>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Effect Slide -->
+                        <div class="col-sm-6 col-md-4 col-lg-3 col-xl-2 mb-4">
+                            <div id="effect_slide" class="card m-auto h-100 dashboard_effect">
+                                <div class="card-block text-center">
+                                    <i class="fa fa-sliders-h" aria-hidden="true"></i>
+                                    <p class="mt-4 mb-0">Slide</p>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Effect Bubble -->
+                        <div class="col-sm-6 col-md-4 col-lg-3 col-xl-2 mb-4">
+                            <div id="effect_bubble" class="card m-auto h-100 dashboard_effect">
+                                <div class="card-block text-center">
+                                    <i class="far fa-circle" aria-hidden="true"></i>
+                                    <p class="mt-4 mb-0">Bubble</p>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Effect Twinkle -->
+                        <div class="col-sm-6 col-md-4 col-lg-3 col-xl-2 mb-4">
+                            <div id="effect_twinkle" class="card m-auto h-100 dashboard_effect">
+                                <div class="card-block text-center">
+                                    <i class="fa fa-star" aria-hidden="true"></i>
+                                    <p class="mt-4 mb-0">Twinkle</p>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Effect Pendulum -->
+                        <div class="col-sm-6 col-md-4 col-lg-3 col-xl-2 mb-4">
+                            <div id="effect_pendulum" class="card m-auto h-100 dashboard_effect">
+                                <div class="card-block text-center">
+                                    <i class="fa fa-arrows-alt-h" aria-hidden="true"></i>
+                                    <p class="mt-4 mb-0">Pendulum</p>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Effect Rods -->
+                        <div class="col-sm-6 col-md-4 col-lg-3 col-xl-2 mb-4">
+                            <div id="effect_rods" class="card m-auto h-100 dashboard_effect">
+                                <div class="card-block text-center">
+                                    <i class="fa fa-grip-horizontal" aria-hidden="true"></i>
+                                    <p class="mt-4 mb-0">Rods</p>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Effect Segment Color -->
+                        <div class="col-sm-6 col-md-4 col-lg-3 col-xl-2 mb-4">
+                            <div id="effect_segment_color" class="card m-auto h-100 dashboard_effect">
+                                <div class="card-block text-center">
+                                    <i class="fa fa-ruler-combined" aria-hidden="true"></i>
+                                    <p class="mt-4 mb-0">Segment Color</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="h3 text-secondary">Music Effects</div>
+                    <div class="row h1 text-secondary">
+                        <!-- Effect Scroll -->
+                        <div class="col-sm-6 col-md-4 col-lg-3 col-xl-2 mb-4">
+                            <div id="effect_scroll" class="card m-auto h-100 dashboard_effect">
+                                <div class="card-block text-center">
+                                    <i class="fa fa-angle-right" aria-hidden="true"></i>
+                                    <p class="mt-4 mb-0">Scroll</p>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Effect Advanced Scroll -->
+                        <div class="col-sm-6 col-md-4 col-lg-3 col-xl-2 mb-4">
+                            <div id="effect_advanced_scroll" class="card m-auto h-100 dashboard_effect">
+                                <div class="card-block text-center">
+                                    <i class="fa fa-angle-double-right" aria-hidden="true"></i>
+                                    <p class="mt-4 mb-0">Advanced Scroll</p>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Effect Energy -->
+                        <div class="col-sm-6 col-md-4 col-lg-3 col-xl-2 mb-4">
+                            <div id="effect_energy" class="card m-auto h-100 dashboard_effect">
+                                <div class="card-block text-center">
+                                    <i class="fa fa-bolt" aria-hidden="true"></i>
+                                    <p class="mt-4 mb-0">Energy</p>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Effect Wavelength -->
+                        <div class="col-sm-6 col-md-4 col-lg-3 col-xl-2 mb-4">
+                            <div id="effect_wavelength" class="card m-auto h-100 dashboard_effect">
+                                <div class="card-block text-center">
+                                    <i class="fa fa-chart-area" aria-hidden="true"></i>
+                                    <p class="mt-4 mb-0">Wavelength</p>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Effect Bars -->
+                        <div class="col-sm-6 col-md-4 col-lg-3 col-xl-2 mb-4">
+                            <div id="effect_bars" class="card m-auto h-100 dashboard_effect">
+                                <div class="card-block text-center">
+                                    <i class="fa fa-stream" aria-hidden="true"></i>
+                                    <p class="mt-4 mb-0">Bars</p>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Effect Power -->
+                        <div class="col-sm-6 col-md-4 col-lg-3 col-xl-2 mb-4">
+                            <div id="effect_power" class="card m-auto h-100 dashboard_effect">
+                                <div class="card-block text-center">
+                                    <i class="fa fa-fighter-jet" aria-hidden="true"></i>
+                                    <p class="mt-4 mb-0">Power</p>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Effect Beat -->
+                        <div class="col-sm-6 col-md-4 col-lg-3 col-xl-2 mb-4">
+                            <div id="effect_beat" class="card m-auto h-100 dashboard_effect">
+                                <div class="card-block text-center">
+                                    <i class="fa fa-headphones" aria-hidden="true"></i>
+                                    <p class="mt-4 mb-0">Beat</p>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Effect Beat Twinkle -->
+                        <div class="col-sm-6 col-md-4 col-lg-3 col-xl-2 mb-4">
+                            <div id="effect_beat_twinkle" class="card m-auto h-100 dashboard_effect">
+                                <div class="card-block text-center">
+                                    <i class="fa fa-star-half-alt" aria-hidden="true"></i>
+                                    <p class="mt-4 mb-0">Beat Twinkle</p>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Effect Beat Slide -->
+                        <div class="col-sm-6 col-md-4 col-lg-3 col-xl-2 mb-4">
+                            <div id="effect_beat_slide" class="card m-auto h-100 dashboard_effect">
+                                <div class="card-block text-center">
+                                    <i class="fa fa-heartbeat" aria-hidden="true"></i>
+                                    <p class="mt-4 mb-0">Beat Slide</p>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Effect Wave -->
+                        <div class="col-sm-6 col-md-4 col-lg-3 col-xl-2 mb-4">
+                            <div id="effect_wave" class="card m-auto h-100 dashboard_effect">
+                                <div class="card-block text-center">
+                                    <i class="fa fa-rss" aria-hidden="true"></i>
+                                    <p class="mt-4 mb-0">Wave</p>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Effect Wiggle -->
+                        <div class="col-sm-6 col-md-4 col-lg-3 col-xl-2 mb-4">
+                            <div id="effect_wiggle" class="card m-auto h-100 dashboard_effect">
+                                <div class="card-block text-center">
+                                    <i class="fa fa-wave-square" aria-hidden="true"></i>
+                                    <p class="mt-4 mb-0">Wiggle</p>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Effect VU Meter -->
+                        <div class="col-sm-6 col-md-4 col-lg-3 col-xl-2 mb-4">
+                            <div id="effect_vu_meter" class="card m-auto h-100 dashboard_effect">
+                                <div class="card-block text-center">
+                                    <i class="fa fa-volume-up" aria-hidden="true"></i>
+                                    <p class="mt-4 mb-0">VU Meter</p>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Effect Spectrum Analyzer -->
+                        <div class="col-sm-6 col-md-4 col-lg-3 col-xl-2 mb-4">
+                            <div id="effect_spectrum_analyzer" class="card m-auto h-100 dashboard_effect">
+                                <div class="card-block text-center">
+                                    <i class="fa fa-chart-bar" aria-hidden="true"></i>
+                                    <p class="mt-4 mb-0">Spectrum Analyzer</p>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Effect Direction Changer -->
+                        <div class="col-sm-6 col-md-4 col-lg-3 col-xl-2 mb-4">
+                            <div id="effect_direction_changer" class="card m-auto h-100 dashboard_effect">
+                                <div class="card-block text-center">
+                                    <i class="fa fa-map-signs" aria-hidden="true"></i>
+                                    <p class="mt-4 mb-0">Direction Changer</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- [ Main Content ] end -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+<script src="/static/assets/js/dashboard.js"></script>
+{% endblock javascripts %}

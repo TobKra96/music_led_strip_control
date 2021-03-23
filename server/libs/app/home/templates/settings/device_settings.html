@@ -1,0 +1,165 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Device Settings {% endblock %}
+
+<!-- Specific CSS goes HERE -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+    <div class="pcoded-content">
+        <div class="pcoded-inner-content">
+            <!-- [ breadcrumb ] start -->
+            <div class="page-header">
+                <div class="page-block">
+                    <div class="row align-items-center">
+                        <div class="col-md-12">
+                            <div class="page-header-title">
+                                <h5 class="m-b-10">Device Settings</h5>
+                            </div>
+                            <ul class="breadcrumb">
+                                <li class="breadcrumb-item"><a href="/"><i class="feather icon-home"></i></a></li>
+                                <li class="breadcrumb-item"><a href="javascript:">Settings</a></li>
+                                <li class="breadcrumb-item"><a href="javascript:">Device Settings</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- [ breadcrumb ] end -->
+            <div class="main-body">
+                <div class="page-wrapper">
+                    <!-- [ Main Content ] start -->
+
+                    {% include 'includes/devices.html' %}
+
+                    <form id="settingsForm" action method="post" novalidate>
+                        <div class="row mt-4">
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5>Configuration</h5>
+                                    </div>
+                                    <div class="card-block">
+                                        <div class="row">
+                                            <div class="col-lg-6">
+                                                <div class="form-group">
+                                                    <label>Device Name</label>
+                                                    <input id="DEVICE_NAME" class="form-control device_setting_input" type="number" name="number" required>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>Maximum FPS</label>
+                                                    <input id="FPS" class="form-control device_setting_input" type="number" name="number" required>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-6">
+                                                <div class="form-group">
+                                                    <label>Number of LEDs</label>
+                                                    <input id="LED_Count" class="form-control device_setting_input" type="number" name="number" required>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>LED Strip Middle</label>
+                                                    <input id="LED_Mid" class="form-control device_setting_input" type="number" name="number" required>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-12">
+                                                <div class="form-group">
+                                                    <label>Selected Output Type</label>
+                                                    <select id="OUTPUT_TYPE" class="form-control output_type device_setting_input">
+                                                        <option value="raspberrypi">Output Raspberry Pi</option>
+                                                        <option value="udp">Output Network via UDP</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div id="raspberrypi" class="card">
+                                    <div class="card-header">
+                                        <h5>Output Raspberry Pi</h5>
+                                    </div>
+                                    <div class="card-block">
+                                        <div class="row">
+                                            <div class="col-lg-6">
+                                                <div class="form-group">
+                                                    <label>LED GPIO Pin</label>
+                                                    <input id="LED_Pin" class="form-control output_raspi" type="number" name="number" required>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>LED Signal Frequency in Hz</label>
+                                                    <input id="LED_Freq_Hz" class="form-control output_raspi" type="number" name="number" required>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-6">
+                                                <div class="form-group">
+                                                    <label>LED Channel</label>
+                                                    <input id="LED_Channel" class="form-control output_raspi" type="number" name="number" required>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>LED DMA</label>
+                                                    <input id="LED_Dma" class="form-control output_raspi" type="number" name="number" required>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-12">
+                                                <div class="form-group">
+                                                    <label>LED Strip Type</label>
+                                                    <select id="LED_Strip" class="form-control led_strips output_raspi"></select>
+                                                </div>
+                                                <div class="custom-control custom-checkbox my-2">
+                                                    <input type="checkbox" class="custom-control-input output_raspi" id="LED_Invert">
+                                                    <label class="custom-control-label" for="LED_Invert">Invert LED</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-12 mt-2">
+                                                <div class="form-group">
+                                                    <label>LED Brightness <span id="ledBrightnessNum" class="mb-0 badge badge-secondary"></span></label>
+                                                    <input id="LED_Brightness" type="range" class="custom-range mt-3 output_raspi" min="0" max="100" step="1" required>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="udp" class="card">
+                                    <div class="card-header">
+                                        <h5>Output Network via UDP</h5>
+                                    </div>
+                                    <div class="card-block">
+                                        <div class="form-group">
+                                            <label>UDP Client IP Address</label>
+                                            <input id="UDP_Client_IP" class="form-control output_udp" type="text" name="text" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>UDP Client Port</label>
+                                            <input id="UDP_Client_Port" class="form-control output_udp" type="number" name="number" required>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12 m-0">
+                                <div class="card">
+                                    <div class="card-block">
+                                        <div class="d-flex flex-md-row flex-column justify-content-md-end">
+                                            <button type="button" id="save_btn" class="btn btn-success m-0">Save</button>
+                                            <button type="button" id="create1_btn" class="btn btn-primary m-0 my-3 my-md-0 mx-md-3">Create Device</button>
+                                            <button type="button" id="delete_btn" class="btn btn-danger m-0">Delete Device</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+
+                    <!-- [ Main Content ] end -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+<script src="/static/assets/js/settings.js"></script>
+{% endblock javascripts %}

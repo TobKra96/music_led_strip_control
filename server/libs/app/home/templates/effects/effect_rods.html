@@ -1,0 +1,102 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Edit Effect Rods {% endblock %}
+
+<!-- Specific CSS goes HERE -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+    <div class="pcoded-content">
+        <div class="pcoded-inner-content">
+            <!-- [ breadcrumb ] start -->
+            <div class="page-header">
+                <div class="page-block">
+                    <div class="row align-items-center">
+                        <div class="col-md-12">
+                            <div class="page-header-title">
+                                <h5 class="m-b-10">Rods</h5>
+                            </div>
+                            <ul class="breadcrumb">
+                                <li class="breadcrumb-item"><a href="/"><i class="feather icon-home"></i></a></li>
+                                <li class="breadcrumb-item"><a href="javascript:">Edit Effects</a></li>
+                                <li class="breadcrumb-item"><a href="javascript:">Rods</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- [ breadcrumb ] end -->
+            <div class="main-body">
+                <div class="page-wrapper">
+                    <!-- [ Main Content ] start -->
+
+                    {% include 'includes/devices.html' %}
+
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5>Rods Effect Settings</h5>
+                                </div>
+                                <div class="card-block">
+                                    <p>Edit the Rods effect.</p>
+                                    <form id="settingsForm" action method="post" novalidate>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label>Single Color</label>
+                                                    <select id="gradient" class="form-control gradients setting_input"></select>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>Speed <span id="speedNum" class="mb-0 badge badge-secondary"></span></label>
+                                                    <input id="speed" type="range" class="custom-range setting_input" min="0" max="10" step="0.1" required>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>Rod Length <span id="rodsLengthNum" class="mb-0 badge badge-secondary"></span></label>
+                                                    <input id="rods_length" type="range" class="custom-range setting_input" min="0" max="200" step="1" required>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>Rod Distance <span id="rodsDistanceNum" class="mb-0 badge badge-secondary"></span></label>
+                                                    <input id="rods_distance" type="range" class="custom-range setting_input" min="0" max="200" step="1" required>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label>Gradient</label>
+                                                    <select id="gradient" class="form-control gradients setting_input"></select>
+                                                </div>
+                                                <div class="custom-control custom-checkbox my-2">
+                                                    <input type="checkbox" class="custom-control-input setting_input" id="changeColor">
+                                                    <label id="change_color" class="custom-control-label" for="changeColor">Change color</label>
+                                                </div>
+                                                <div class="custom-control custom-checkbox my-2">
+                                                    <input type="checkbox" class="custom-control-input" id="mirrorCheck">
+                                                    <label id="mirror" class="custom-control-label" for="mirrorCheck">Mirror</label>
+                                                </div>
+                                                <div class="custom-control custom-checkbox my-2">
+                                                    <input type="checkbox" class="custom-control-input" id="reverseCheck">
+                                                    <label id="reverse" class="custom-control-label" for="reverseCheck">Reverse</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="mt-4 d-flex flex-md-row flex-column justify-content-md-end">
+                                            <button type="button" id="save_btn" class="btn btn-success m-0">Save</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- [ Main Content ] end -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+<script src="/static/assets/js/effects.js"></script>
+{% endblock javascripts %}
