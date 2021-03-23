@@ -53,6 +53,11 @@
     white-space: nowrap;
 }
 
+/* Align "Browse" button text */
+.custom-file-label::after {
+    padding-top: .5rem!important;
+}
+
 /* Remove text highlight from checkboxes */
 .custom-checkbox {
     -webkit-touch-callout: none;
