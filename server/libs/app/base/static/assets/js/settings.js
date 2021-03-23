@@ -10,6 +10,10 @@ document.addEventListener("DOMContentLoaded", () => {
         ledBrightnessSlider.oninput = function() {
             ledBrightnessNumOutput.innerHTML = this.value;
         }
+        $(ledBrightnessSlider).change(function() {
+            ledBrightnessNumOutput.innerHTML = this.value;
+        }).change();
+
     }
 
     // Insert filename of imported config
@@ -36,8 +40,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 $('#raspberrypi').addClass('d-none');
             }
         };
-        toggleOutput();
-        $("#OUTPUT_TYPE").change(toggleOutput).change();
+        $(outputType).change(toggleOutput).change();
     }
 
 });
