@@ -45,7 +45,7 @@
                                             <div class="col-lg-6">
                                                 <div class="form-group">
                                                     <label>Device Name</label>
-                                                    <input id="DEVICE_NAME" class="form-control device_setting_input" type="number" name="number" required>
+                                                    <input id="DEVICE_NAME" class="form-control device_setting_input" type="text" name="number" required>
                                                 </div>
                                                 <div class="form-group">
                                                     <label>Maximum FPS</label>
@@ -65,10 +65,7 @@
                                             <div class="col-lg-12">
                                                 <div class="form-group">
                                                     <label>Selected Output Type</label>
-                                                    <select id="OUTPUT_TYPE" class="form-control output_type device_setting_input">
-                                                        <option value="raspberrypi">Output Raspberry Pi</option>
-                                                        <option value="udp">Output Network via UDP</option>
-                                                    </select>
+                                                    <select id="OUTPUT_TYPE" class="form-control output_type device_setting_input"></select>
                                                 </div>
                                             </div>
                                         </div>
@@ -162,4 +159,5 @@
 <!-- Specific Page JS goes HERE  -->
 {% block javascripts %}
 <script src="/static/assets/js/settings.js"></script>
+<script src="/static/assets/js/settings.device.js"></script>
 {% endblock javascripts %}
