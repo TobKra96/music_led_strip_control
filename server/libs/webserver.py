@@ -162,7 +162,7 @@ class Webserver():
                     return "File imported.", 200
                 else:
                     return "Could not import file.", 400
-            except json.decoder.JSONDecodeError:
+            except (json.decoder.JSONDecodeError, UnicodeDecodeError):
                 return "File is not valid JSON.", 400
         else:
             return "No config file selected.", 400
