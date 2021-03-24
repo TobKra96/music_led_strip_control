@@ -34,7 +34,7 @@
                     {% include 'includes/devices.html' %}
 
                     <input type="hidden" id="settingsIdentifier" value="device_settings">
-                    <div id="deviceFound">
+                    <div id="deviceFound" class="d-none">
                         <form id="settingsForm" action method="post" novalidate>
                             <div class="row mt-4">
                                 <div class="col-md-6">
@@ -150,7 +150,7 @@
                             </div>
                         </form>
                     </div>
-                    <div id="noDeviceFound">
+                    <div id="noDeviceFound" class="d-none">
                         <div class="class="col-md-12 m-0">
                             <div class="card">
                                 <div class="card-block">

@@ -254,11 +254,11 @@ $.ajax({
 function GetLocalSettings(){
 
   if(Object.keys(devices).length > 0){
-    $("#deviceFound").show();
-    $("#noDeviceFound").hide();
+    $("#deviceFound").removeClass('d-none');
+    $("#noDeviceFound").addClass('d-none');
   }else{
-    $("#deviceFound").hide();
-    $("#noDeviceFound").show();
+    $("#deviceFound").addClass('d-none');
+    $("#noDeviceFound").removeClass('d-none');
 
     return;
   }
