@@ -1,47 +1,8 @@
-document.addEventListener("DOMContentLoaded", () => {
+$(document).ready(function() {
 
     // Set effect slider values
-    function setSliderValue(sliderId, outputId) {
-        let slider = document.getElementById(sliderId)
-        let output = document.getElementById(outputId)
-
-        if (slider && output) {
-            output.innerHTML = slider.value;
-
-            slider.oninput = function() {
-                output.innerHTML = this.value;
-            }
-        }
-    }
-
-    const sliderIdList = [
-        'speed', 'bubble_length', 'bubble_repeat', 'blur', 'star_ascending_speed',
-        'star_rising_speed', 'star_descending_speed', 'stars_count', 'stars_length',
-        'pendulum_length', 'rods_length', 'rods_distance', 'decay', 'high_speed',
-        'mid_speed', 'low_speed', 'lows_multiplier', 'mids_multiplier', 'high_multiplier',
-        'subbass_speed', 'bass_speed', 'lowmid_speed', 'mid_speed', 'uppermid_speed',
-        'presence_speed', 'brilliance_speed', 'subbass_multiplier', 'bass_multiplier',
-        'lowmid_multiplier', 'mid_multiplier', 'uppermid_multiplier', 'presence_multiplier',
-        'brilliance_multiplier', 'r_multiplier', 'g_multiplier', 'b_multiplier', 'scale',
-        'roll_speed', 'resolution', 's_count', 'star_length', 'wipe_len', 'wipe_speed',
-        'slider_length', 'bar_speed', 'bar_length', 'spectrum_count', 'bars_in_same_direction'
-    ]
-
-    const outputIdList = [
-        'speedNum', 'bubbleLengthNum', 'bubbleRepeatNum', 'blurNum', 'starAscendingSpeedNum',
-        'starRisingSpeedNum', 'starDescendingSpeedNum', 'starsCountNum', 'starsLengthNum',
-        'pendulumLengthNum', 'rodsLengthNum', 'rodsDistanceNum', 'decayNum', 'highSpeedNum',
-        'midSpeedNum', 'lowSpeedNum', 'lowsMultiplierNum', 'midsMultiplierNum', 'highMultiplierNum',
-        'subbassSpeedNum', 'bassSpeedNum', 'lowmidSpeedNum', 'midSpeedNum', 'uppermidSpeedNum',
-        'presenceSpeedNum', 'brillianceSpeedNum', 'subbassMultiplierNum', 'bassMultiplierNum',
-        'lowmidMultiplierNum', 'midMultiplierNum', 'uppermidMultiplierNum', 'presenceMultiplierNum',
-        'brillianceMultiplierNum', 'rMultiplierNum', 'gMultiplierNum', 'bMultiplierNum', 'scaleNum',
-        'rollSpeedNum', 'resolutionNum', 'sCountNum', 'starLengthNum', 'wipeLenNum', 'wipeSpeedNum',
-        'sliderLengthNum', 'barSpeedNum', 'barLengthNum', 'spectrumCountNum', 'barsInSameDirectionNum'
-    ]
-
-    sliderIdList.forEach((sliderId, index) => {
-        setSliderValue(sliderId, outputIdList[index])
+    $('input[type=range]').on('input', function() {
+        $("span[for='" + $(this).attr('id') + "']").text(this.value)
     });
 
     // Parse color selection

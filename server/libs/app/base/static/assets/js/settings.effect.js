@@ -162,6 +162,9 @@ function ParseGetEffectSetting(response){
   localSettings[setting_key] = setting_value;
 
   SetLocalInput(setting_key, setting_value)
+
+ // Set initial slider values
+  $("span[for='" + setting_key + "']").text(setting_value)
 }
 
 function GetLocalSettings(){
