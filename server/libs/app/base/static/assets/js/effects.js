@@ -24,7 +24,7 @@ document.addEventListener("DOMContentLoaded", () => {
         'lowmid_multiplier', 'mid_multiplier', 'uppermid_multiplier', 'presence_multiplier',
         'brilliance_multiplier', 'r_multiplier', 'g_multiplier', 'b_multiplier', 'scale',
         'roll_speed', 'resolution', 's_count', 'star_length', 'wipe_len', 'wipe_speed',
-        'slider_length', 'bar_length', 'spectrum_count', 'bars_in_same_direction'
+        'slider_length', 'bar_speed', 'bar_length', 'spectrum_count', 'bars_in_same_direction'
     ]
 
     const outputIdList = [
@@ -37,7 +37,7 @@ document.addEventListener("DOMContentLoaded", () => {
         'lowmidMultiplierNum', 'midMultiplierNum', 'uppermidMultiplierNum', 'presenceMultiplierNum',
         'brillianceMultiplierNum', 'rMultiplierNum', 'gMultiplierNum', 'bMultiplierNum', 'scaleNum',
         'rollSpeedNum', 'resolutionNum', 'sCountNum', 'starLengthNum', 'wipeLenNum', 'wipeSpeedNum',
-        'sliderLengthNum', 'barLengthNum', 'spectrumCountNum', 'barsInSameDirectionNum'
+        'sliderLengthNum', 'barSpeedNum', 'barLengthNum', 'spectrumCountNum', 'barsInSameDirectionNum'
     ]
 
     sliderIdList.forEach((sliderId, index) => {
