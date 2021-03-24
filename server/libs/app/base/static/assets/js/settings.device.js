@@ -198,7 +198,7 @@ function SetDeviceSetting(device, settings){
       data: JSON.stringify(data, null, '\t'),
       contentType: 'application/json;charset=UTF-8',
       success: function(response) {
-          console.log("Set the device settings successfully. Response: " + response.toString());
+          console.log("Set the device settings successfully. Response:\n\n" + JSON.stringify(response, null, '\t'));
           reloadingCounter++;
           if(reloadingCounter >= reloadingMax){
             location.reload();
@@ -230,7 +230,7 @@ $.ajax({
   data: JSON.stringify(data, null, '\t'),
   contentType: 'application/json;charset=UTF-8',
   success: function(response) {
-      console.log("Set the device settings successfully. Response: " + response.toString());
+      console.log("Set the device settings successfully. Response:\n\n" + JSON.stringify(response, null, '\t'));
       reloadingCounter++;
           if(reloadingCounter >= reloadingMax){
             location.reload();
@@ -403,7 +403,7 @@ function CreateNewDevice(){
       data: JSON.stringify(data, null, '\t'),
       contentType: 'application/json;charset=UTF-8',
       success: function(response) {
-          console.log("Create new device successfully. Response: " + response.toString());
+          console.log("Create new device successfully. Response:\n\n" + JSON.stringify(response, null, '\t'));
           location.reload();
       },
       error: function(xhr) {
@@ -424,7 +424,7 @@ function DeleteDevice(device){
       data: JSON.stringify(data, null, '\t'),
       contentType: 'application/json;charset=UTF-8',
       success: function(response) {
-          console.log("Delete device successfully. Response: " + response.toString());
+          console.log("Delete device successfully. Response:\n\n" + JSON.stringify(response, null, '\t'));
           location.reload();
       },
       error: function(xhr) {
