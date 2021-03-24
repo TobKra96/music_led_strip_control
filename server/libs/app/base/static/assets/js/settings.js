@@ -1,20 +1,9 @@
 document.addEventListener("DOMContentLoaded", () => {
 
     // Set LED strip brightness
-    let ledBrightnessSlider = document.getElementById("LED_Brightness");
-    let ledBrightnessNumOutput = document.getElementById("ledBrightnessNum");
-
-    if (ledBrightnessSlider && ledBrightnessNumOutput) {
-        ledBrightnessNumOutput.innerHTML = ledBrightnessSlider.value;
-
-        ledBrightnessSlider.oninput = function() {
-            ledBrightnessNumOutput.innerHTML = this.value;
-        }
-        $(ledBrightnessSlider).change(function() {
-            ledBrightnessNumOutput.innerHTML = this.value;
-        }).change();
-
-    }
+    $('input[type=range]').on('input', function() {
+        $("span[for='" + $(this).attr('id') + "']").text(this.value)
+    });
 
     // Insert filename of imported config
     let fileInput = document.querySelector('.custom-file-input');

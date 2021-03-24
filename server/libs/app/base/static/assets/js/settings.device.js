@@ -147,6 +147,9 @@ function ParseGetOutputTypeDeviceSetting(response){
   localSettings[setting_key] = setting_value;
 
   SetLocalOutputTypeDeviceInput(output_type_key, setting_key, setting_value)
+
+  // Set initial brightness slider value
+  $("span[for='" + setting_key + "']").text(setting_value)
 }
 
 // Get LED Strips   -----------------------------------------------------------
