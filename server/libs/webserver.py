@@ -145,7 +145,7 @@ class Webserver():
     @server.route('/export_config')
     def export_config():  # pylint: disable=E0211
         Webserver.instance.logger.debug(f"Send file: {Webserver.instance.export_config_path}")
-        return send_file(Webserver.instance.export_config_path, as_attachment=True, cache_timeout=-1)
+        return send_file(Webserver.instance.export_config_path, as_attachment=True, cache_timeout=-1, mimetype="text/html")
 
     @server.route('/import_config', methods=['POST'])
     def import_config():  # pylint: disable=E0211
