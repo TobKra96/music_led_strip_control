@@ -1,15 +1,119 @@
-from flask import Flask, render_template, request, jsonify, send_file
+from libs.webserver_executer import WebserverExecuter  # pylint: disable=E0611, E0401
+from libs.config_service import ConfigService  # pylint: disable=E0611, E0401
+
+from flask import render_template, request, jsonify, send_file, redirect, url_for, session, flash
+from flask_login import LoginManager, UserMixin, current_user, login_user, logout_user
+from environs import Env, EnvError, EnvValidationError
+from urllib.parse import urlparse, urljoin
+from libs.app import create_app
 from waitress import serve
 from time import sleep
 import logging
 import copy
 import json
-
-from libs.webserver_executer import WebserverExecuter  # pylint: disable=E0611, E0401
-from libs.config_service import ConfigService  # pylint: disable=E0611, E0401
+import re
 
 
-server = Flask(__name__)
+# Load login variables from .env file.
+env = Env()
+env.read_env()
+try:
+    DEFAULT_PIN = env("DEFAULT_PIN")
+    USE_PIN_LOCK = env.bool("USE_PIN_LOCK")
+except (EnvError, EnvValidationError) as env_error:
+    DEFAULT_PIN = ''
+    USE_PIN_LOCK = False
+
+
+def validate_pin(pin):
+    return bool(re.fullmatch(r"\d{4,8}", pin))
+
+
+if not validate_pin(DEFAULT_PIN) and USE_PIN_LOCK:
+    raise ValueError("PIN must be from 4 to 8 digits.")
+
+
+# Flask DEBUG switch.
+DEBUG = False
+
+
+server = create_app()
+
+login_manager = LoginManager()
+server.secret_key = 'secretkey'
+if not USE_PIN_LOCK:
+    server.config['LOGIN_DISABLED'] = True
+login_manager.init_app(server)
+
+
+def is_safe_url(target):
+    ref_url = urlparse(request.host_url)
+    test_url = urlparse(urljoin(request.host_url, target))
+    return test_url.scheme in ('http', 'https') and ref_url.netloc == test_url.netloc
+
+
+class User(UserMixin):
+    id = 1001
+
+
+@login_manager.user_loader
+def user_loader(user_id):
+    if not USE_PIN_LOCK:
+        return
+    user = User()
+    user.id = user_id
+    return user
+
+
+@login_manager.unauthorized_handler
+def unauthorized():
+    session['next'] = request.path
+    return redirect(url_for('login', next=session['next']))
+
+
+@server.before_first_request
+def first():
+    if USE_PIN_LOCK:
+        logout_user()
+
+
+@server.route('/login', methods=['GET', 'POST'])
+def login():
+    if not USE_PIN_LOCK:
+        return redirect("/")
+    if request.method == 'POST':
+        pin = request.form.get('pin')
+        if 'next' in request.args:
+            session['next'] = request.args['next']
+        else:
+            session['next'] = None
+        if not pin:
+            flash('PIN is required')
+            return redirect(url_for('login', next=session['next']))
+        if not pin.isdigit():
+            flash('PIN must only contain digits')
+            return redirect(url_for('login', next=session['next']))
+        if not validate_pin(pin):
+            flash('PIN must be at least 4 digits long')
+            return redirect(url_for('login', next=session['next']))
+        if pin != DEFAULT_PIN:
+            flash('Invalid PIN')
+            return redirect(url_for('login', next=session['next']))
+        elif pin == DEFAULT_PIN:
+            user = User()
+            login_user(user)
+            if session['next'] is not None:
+                if is_safe_url(session['next']):
+                    return redirect(session['next'])
+            return redirect("/")
+    return render_template('login.html')
+
+
+@server.route('/logout')
+def logout():
+    if current_user.is_authenticated:
+        logout_user()
+    return redirect(url_for('login'))
 
 
 class Webserver():
@@ -29,35 +133,19 @@ class Webserver():
 
         server.config["TEMPLATES_AUTO_RELOAD"] = True
         webserver_port = self.webserver_executer.GetWebserverPort()
-        serve(server, host='0.0.0.0', port=webserver_port)
+
+        if DEBUG:
+            server.run(host='0.0.0.0', port=webserver_port, load_dotenv=False, debug=True)
+        else:
+            serve(server, host='0.0.0.0', port=webserver_port, threads=8)
 
         while True:
             sleep(10)
 
-    #####################################################################
-    #   Dashboard                                                       #
-    #####################################################################
-
-    @server.route('/', methods=['GET'])
-    @server.route('/index', methods=['GET'])
-    @server.route('/dashboard', methods=['GET'])
-    def index():  # pylint: disable=E0211
-        # First handle with normal GET and render the template.
-        return render_template('dashboard.html')
-
-    #####################################################################
-    #   Settings                                                        #
-    #####################################################################
-    @server.route('/settings/<template>', methods=['GET', 'POST'])
-    def settings(template):  # pylint: disable=E0211
-        if not template.endswith('.html'):
-            template += '.html'
-        return render_template("/settings/" + template)
-
     @server.route('/export_config')
     def export_config():  # pylint: disable=E0211
         Webserver.instance.logger.debug(f"Send file: {Webserver.instance.export_config_path}")
-        return send_file(Webserver.instance.export_config_path, as_attachment=True, cache_timeout=-1)
+        return send_file(Webserver.instance.export_config_path, as_attachment=True, cache_timeout=-1, mimetype="text/html")
 
     @server.route('/import_config', methods=['POST'])
     def import_config():  # pylint: disable=E0211
@@ -74,21 +162,10 @@ class Webserver():
                     return "File imported.", 200
                 else:
                     return "Could not import file.", 400
-            except json.decoder.JSONDecodeError:
+            except (json.decoder.JSONDecodeError, UnicodeDecodeError):
                 return "File is not valid JSON.", 400
         else:
             return "No config file selected.", 400
-
-    #####################################################################
-    #   Effects                                                         #
-    #####################################################################
-    @server.route('/effects/<template>', methods=['GET', 'POST'])
-    def route_effects(template):  # pylint: disable=E0211
-        if not template.endswith('.html'):
-            template += '.html'
-
-        # Serve the file (if exists) from templates/effects/FILE.html
-        return render_template("/effects/" + template)
 
     #####################################################################
     #   Ajax Endpoints                                                  #

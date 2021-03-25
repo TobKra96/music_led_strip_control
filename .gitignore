@@ -1,6 +1,33 @@
+# byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
 *$py.class
+
+# tests and coverage
+*.pytest_cache
+.coverage
+
+# database & logs
+*.db
+*.sqlite3
+*.log
+.env
+
+# venv
+env
+venv
+
+# other
+.DS_Store
+
+# sphinx docs
+_build
+_static
+_templates
+
+# javascript
+package-lock.json
+.vscode/symbols.json
 
 server/libs/config_.json
 .vscode/

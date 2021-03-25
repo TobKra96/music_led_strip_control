@@ -1,0 +1,93 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Edit Effect Wave {% endblock %}
+
+<!-- Specific CSS goes HERE -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+    <div class="pcoded-content">
+        <div class="pcoded-inner-content">
+            <!-- [ breadcrumb ] start -->
+            <div class="page-header">
+                <div class="page-block">
+                    <div class="row align-items-center">
+                        <div class="col-md-12">
+                            <div class="page-header-title">
+                                <h5 class="m-b-10">Wave</h5>
+                            </div>
+                            <ul class="breadcrumb">
+                                <li class="breadcrumb-item"><a href="/"><i class="feather icon-home"></i></a></li>
+                                <li class="breadcrumb-item"><a href="javascript:">Edit Effects</a></li>
+                                <li class="breadcrumb-item"><a href="javascript:">Wave</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- [ breadcrumb ] end -->
+            <div class="main-body">
+                <div class="page-wrapper">
+                    <!-- [ Main Content ] start -->
+
+                    {% include 'includes/devices.html' %}
+
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5>Wave Effect Settings</h5>
+                                </div>
+                                <div class="card-block">
+                                    <p>Edit the Wave effect.</p>
+                                    <input type="hidden" id="settingsIdentifier" value="effect">
+                                    <input type="hidden" id="effectIdentifier" value="effect_wave">
+                                    <form id="settingsForm" action method="post" novalidate>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label>Wave Color</label>
+                                                    <select id="color_wave" class="form-control colours setting_input"></select>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>Wipe Length <span for="wipe_len" class="mb-0 badge badge-secondary"></span></label>
+                                                    <input id="wipe_len" type="range" class="custom-range setting_input" min="0" max="200" step="1" required>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>Wipe Speed <span for="wipe_speed" class="mb-0 badge badge-secondary"></span></label>
+                                                    <input id="wipe_speed" type="range" class="custom-range setting_input" min="0" max="25" step="0.1" required>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label>Flash Color</label>
+                                                    <select id="color_flash" class="form-control colours setting_input"></select>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>Decay <span for="decay" class="mb-0 badge badge-secondary"></span></label>
+                                                    <input id="decay" type="range" class="custom-range setting_input" min="0" max="5" step="0.1" required>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="mt-4 d-flex flex-md-row flex-column justify-content-md-end">
+                                            <button type="button" id="save_btn" class="btn btn-success m-0">Save</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- [ Main Content ] end -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+<script src="/static/assets/js/effects.js"></script>
+<script src="/static/assets/js/settings.effect.js"></script>
+{% endblock javascripts %}

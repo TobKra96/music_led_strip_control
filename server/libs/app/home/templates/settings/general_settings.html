@@ -1,0 +1,239 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} General Settings {% endblock %}
+
+<!-- Specific CSS goes HERE -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+    <div class="pcoded-content">
+        <div class="pcoded-inner-content">
+            <!-- [ breadcrumb ] start -->
+            <div class="page-header">
+                <div class="page-block">
+                    <div class="row align-items-center">
+                        <div class="col-md-12">
+                            <div class="page-header-title">
+                                <h5 class="m-b-10">General Settings</h5>
+                            </div>
+                            <ul class="breadcrumb">
+                                <li class="breadcrumb-item"><a href="/"><i class="feather icon-home"></i></a></li>
+                                <li class="breadcrumb-item"><a href="javascript:">Settings</a></li>
+                                <li class="breadcrumb-item"><a href="javascript:">General Settings</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- [ breadcrumb ] end -->
+            <div class="main-body">
+                <div class="page-wrapper">
+                    <!-- [ Main Content ] start -->
+
+                    <div class="row mt-4">
+                        <div class="col-md-12 col-lg-8">
+                            <form id="settingsForm" action method="post" novalidate>
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5>Configuration</h5>
+                                    </div>
+                                    <div class="card-block">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <h5>Web Server</h5>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label class="row m-0 mb-2 p-0">
+                                                        Web Server Port
+                                                        <div class="pl-1" data-toggle="tooltip" data-placement="top" data-html="true" title="Web Server Port">
+                                                            <i class="feather icon-help-circle"></i>
+                                                        </div>
+                                                    </label>
+                                                    <input id="WEBSERVER_PORT" class="form-control setting_input" type="number" name="number" required="required">
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-12">
+                                                <hr>
+                                                <h5>Audio</h5>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                        <label class="row m-0 mb-2 p-0">
+                                                            Audio Source ID
+                                                            <div class="pl-1" data-toggle="tooltip" data-placement="top" data-html="true" title="Audio Source ID">
+                                                                <i class="feather icon-help-circle"></i>
+                                                            </div>
+                                                        </label>
+                                                    <input id="DEVICE_ID" class="form-control setting_input" type="number" name="number" required="required">
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="row m-0 mb-2 p-0">
+                                                        Default Sample Rate
+                                                        <div class="pl-1" data-toggle="tooltip" data-placement="top" data-html="true" title="Default Sample Rate">
+                                                            <i class="feather icon-help-circle"></i>
+                                                        </div>
+                                                    </label>
+                                                    <input id="DEFAULT_SAMPLE_RATE" class="form-control setting_input" type="number" name="number" required="required">
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="row m-0 mb-2 p-0">
+                                                        Minimum Frequency
+                                                        <div class="pl-1" data-toggle="tooltip" data-placement="top" data-html="true" title="Minimum Frequency">
+                                                            <i class="feather icon-help-circle"></i>
+                                                        </div>
+                                                    </label>
+                                                    <input id="MIN_FREQUENCY" class="form-control setting_input" type="number" name="number" required="required">
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="row m-0 mb-2 p-0">
+                                                        Maximum Frequency
+                                                        <div class="pl-1" data-toggle="tooltip" data-placement="top" data-html="true" title="Maximum Frequency">
+                                                            <i class="feather icon-help-circle"></i>
+                                                        </div>
+                                                    </label>
+                                                    <input id="MAX_FREQUENCY" class="form-control setting_input" type="number" name="number" required="required">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label class="row m-0 mb-2 p-0">
+                                                        Minimum Volume Threshold
+                                                        <div class="pl-1" data-toggle="tooltip" data-placement="top" data-html="true" title="Minimum Volume Threshold">
+                                                            <i class="feather icon-help-circle"></i>
+                                                        </div>
+                                                    </label>
+                                                    <input id="MIN_VOLUME_THRESHOLD" class="form-control setting_input" type="number" name="number" required="required">
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="row m-0 mb-2 p-0">
+                                                        Rolling History
+                                                        <div class="pl-1" data-toggle="tooltip" data-placement="top" data-html="true" title="Rolling History">
+                                                            <i class="feather icon-help-circle"></i>
+                                                        </div>
+                                                    </label>
+                                                    <input id="N_ROLLING_HISTORY" class="form-control setting_input" type="number" name="number" required="required">
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="row m-0 mb-2 p-0">
+                                                        Frames Per Buffer
+                                                        <div class="pl-1" data-toggle="tooltip" data-placement="top" data-html="true" title="Frames Per Buffer">
+                                                            <i class="feather icon-help-circle"></i>
+                                                        </div>
+                                                    </label>
+                                                    <input id="FRAMES_PER_BUFFER" class="form-control setting_input" type="number" name="number" required="required">
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="row m-0 mb-2 p-0">
+                                                        FFT BINS
+                                                        <div class="pl-1" data-toggle="tooltip" data-placement="top" data-html="true" title="FFT BINS">
+                                                            <i class="feather icon-help-circle"></i>
+                                                        </div>
+                                                    </label>
+                                                    <input id="N_FFT_BINS" class="form-control setting_input" type="number" name="number" required="required">
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-12">
+                                                <hr>
+                                                <h5>Logging</h5>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label class="row m-0 mb-2 p-0">
+                                                        Console Logging Level
+                                                        <div class="pl-1" data-toggle="tooltip" data-placement="top" data-html="true" title="Console Logging Level">
+                                                            <i class="feather icon-help-circle"></i>
+                                                        </div>
+                                                    </label>
+                                                    <select id="LOG_LEVEL_CONSOLE" class="form-control logging_levels setting_input">
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label class="row m-0 mb-2 p-0">
+                                                        File Logging Level
+                                                        <div class="pl-1" data-toggle="tooltip" data-placement="top" data-html="true" title="File Logging Level">
+                                                            <i class="feather icon-help-circle"></i>
+                                                        </div>
+                                                    </label>
+                                                    <select id="LOG_LEVEL_FILE" class="form-control logging_levels setting_input">
+                                                    </select>
+                                                </div>
+                                                <div class="custom-control custom-checkbox my-2">
+                                                    <input type="checkbox" class="custom-control-input setting_input" id="LOG_FILE_ENABLED">
+                                                    <label class="custom-control-label" for="LOG_FILE_ENABLED">Enable File Logging</label>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="mt-4 d-flex flex-md-row flex-column justify-content-md-end">
+                                            <button type="button" id="save_btn" class="btn btn-success m-0 mb-3 mb-md-0">Save</button>
+                                            <button type="button" id="reset_btn" class="btn btn-danger m-0 ml-md-3">Reset</button>
+                                        </div>
+                                        <div class="mt-4 text-center text-md-right">
+                                            <p class="mb-0">Changes will require a restart.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+
+                        <div class="col-md-12 col-lg-4">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5>Export Configuration</h5>
+                                </div>
+                                <div class="card-block">
+                                    <div class="text-center">
+                                        <a href="/export_config">
+                                            <button type="button" id="export_btn" class="btn btn-primary btn-block m-0">Export <span class="feather icon-download"></span></button>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5>Import Configuration</h5>
+                                </div>
+                                <div class="card-block">
+                                    <iframe class="d-none" name="dummyframe" id="dummyframe"></iframe>
+                                    <form method="POST" action="/import_config" target="dummyframe" enctype="multipart/form-data">
+                                        <div class="custom-file mb-4">
+                                            <input type="file" class="custom-file-input" id="configUpload" name="imported_config" accept=".json">
+                                            <label class="custom-file-label text-muted m-0 pt-2" for="configUpload">Select config file</label>
+                                        </div>
+                                        <div class="text-center">
+                                            <a href="/import_config">
+                                                <button type="submit" id="import_btn" class="btn btn-primary btn-block m-0">Import <span class="feather icon-upload"></span></button>
+                                            </a>
+                                        </div>
+                                    </form>
+                                    <div class="mt-4">
+                                        <p class="mb-2">Restart MLSC for changes to take effect.</p>
+                                        <p class="mb-2 text-danger">WARNING:</p>
+                                        <p class="mb-2">This will replace your current devices and effect settings.</p>
+                                        <p class="mb-0">Make sure to export a configuration file as a backup before importing a new one.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- [ Main Content ] end -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+<script src="/static/assets/js/settings.js"></script>
+<script src="/static/assets/js/settings.general.js"></script>
+{% endblock javascripts %}

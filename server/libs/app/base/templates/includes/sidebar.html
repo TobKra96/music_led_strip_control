@@ -1,0 +1,78 @@
+
+    <nav class="pcoded-navbar">
+        <div class="navbar-wrapper">
+            <div class="navbar-brand header-logo">
+                <div class="b-brand">
+                    <img src="{{ url_for('static', filename='assets/images/mlsc_icon.svg') }}" alt="MLSC" draggable="false" width="40px">
+                    <span class="b-title">MLSC</span>
+                </div>
+                <a class="mobile-menu" id="mobile-collapse" href="javascript:"><span></span></a>
+            </div>
+
+            <div class="navbar-content scroll-div">
+                <ul class="nav pcoded-inner-navbar">
+                    <li class="nav-item pcoded-menu-caption">
+                        <label>Navigation</label>
+                    </li>
+                    <li class="nav-item {{'active' if segment == 'dashboard'}}">
+                        <a href="/" class="nav-link"><span class="pcoded-micon"><i class="feather icon-home"></i></span><span class="pcoded-mtext">Dashboard</span></a>
+                    </li>
+                    <li class="nav-item pcoded-menu-caption">
+                        <label>General</label>
+                    </li>
+                    <li class="nav-item pcoded-hasmenu">
+                        <a href="javascript:" class="nav-link"><span class="pcoded-micon"><i class="feather icon-edit"></i></span><span class="pcoded-mtext">Edit Effects</span></a>
+                        <ul class="pcoded-submenu">
+                            <li class="{{'active' if segment == 'effect_single'}}"><a href="/effects/effect_single">Single</a></li>
+                            <li class="{{'active' if segment == 'effect_gradient'}}"><a href="/effects/effect_gradient">Gradient</a></li>
+                            <li class="{{'active' if segment == 'effect_fade'}}"><a href="/effects/effect_fade">Fade</a></li>
+                            <li class="{{'active' if segment == 'effect_sync_fade'}}"><a href="/effects/effect_sync_fade">Sync Fade</a></li>
+                            <li class="{{'active' if segment == 'effect_slide'}}"><a href="/effects/effect_slide">Slide</a></li>
+                            <li class="{{'active' if segment == 'effect_bubble'}}"><a href="/effects/effect_bubble">Bubble</a></li>
+                            <li class="{{'active' if segment == 'effect_twinkle'}}"><a href="/effects/effect_twinkle">Twinkle</a></li>
+                            <li class="{{'active' if segment == 'effect_pendulum'}}"><a href="/effects/effect_pendulum">Pendulum</a></li>
+                            <li class="{{'active' if segment == 'effect_rods'}}"><a href="/effects/effect_rods">Rods</a></li>
+                            <li class="{{'active' if segment == 'effect_segment_color'}}"><a href="/effects/effect_segment_color">Segment Color</a></li>
+
+                            <li class="mt-4 {{'active' if segment == 'effect_scroll'}}"><a href="/effects/effect_scroll">Scroll</a></li>
+                            <li class="{{'active' if segment == 'effect_advanced_scroll'}}"><a href="/effects/effect_advanced_scroll">Advanced Scroll</a></li>
+                            <li class="{{'active' if segment == 'effect_energy'}}"><a href="/effects/effect_energy">Energy</a></li>
+                            <li class="{{'active' if segment == 'effect_wavelength'}}"><a href="/effects/effect_wavelength">Wavelength</a></li>
+                            <li class="{{'active' if segment == 'effect_bars'}}"><a href="/effects/effect_bars">Bars</a></li>
+                            <li class="{{'active' if segment == 'effect_power'}}"><a href="/effects/effect_power">Power</a></li>
+                            <li class="{{'active' if segment == 'effect_beat'}}"><a href="/effects/effect_beat">Beat</a></li>
+                            <li class="{{'active' if segment == 'effect_beat_twinkle'}}"><a href="/effects/effect_beat_twinkle">Beat Twinkle</a></li>
+                            <li class="{{'active' if segment == 'effect_beat_slide'}}"><a href="/effects/effect_beat_slide">Beat Slide</a></li>
+                            <li class="{{'active' if segment == 'effect_wave'}}"><a href="/effects/effect_wave">Wave</a></li>
+                            <li class="{{'active' if segment == 'effect_wiggle'}}"><a href="/effects/effect_wiggle">Wiggle</a></li>
+                            <li class="{{'active' if segment == 'effect_vu_meter'}}"><a href="/effects/effect_vu_meter">VU Meter</a></li>
+                            <li class="{{'active' if segment == 'effect_spectrum_analyzer'}}"><a href="/effects/effect_spectrum_analyzer">Spectrum Analyzer</a></li>
+                            <li class="{{'active' if segment == 'effect_direction_changer'}}"><a href="/effects/effect_direction_changer">Direction Changer</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item pcoded-hasmenu">
+                        <a href="javascript:" class="nav-link"><span class="pcoded-micon"><i class="feather icon-settings"></i></span><span class="pcoded-mtext">Settings</span></a>
+                        <ul class="pcoded-submenu">
+                            <li class="{{'active' if segment == 'general_settings'}}"><a href="/settings/general_settings"></i>General Settings</a></li>
+                            <li class="{{'active' if segment == 'device_settings'}}"><a href="/settings/device_settings"></i>Device Settings</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item pcoded-menu-caption {{'d-none' if not current_user.is_authenticated}}">
+                        <label>Security</label>
+                    </li>
+                    <li class="nav-item {{'d-none' if not current_user.is_authenticated}}">
+                        <a href="/logout" class="nav-link"><span class="pcoded-micon"><i class="feather icon-lock"></i></span><span class="pcoded-mtext">Lock Dashboard</span></a>
+                    </li>
+                    <li class="nav-item pcoded-menu-caption">
+                        <label>Information</label>
+                    </li>
+                    <li class="nav-item">
+                        <a href="https://github.com/TobKra96/music_led_strip_control" target="_blank" rel="noopener noreferrer" class="nav-link"><span class="pcoded-micon"><i class="feather icon-github"></i></span><span class="pcoded-mtext">GitHub Homepage</span></a>
+                    </li>
+                    <li class="nav-item mb-4">
+                        <a href="https://discord.gg/Xa28JAvAZA" target="_blank" rel="noopener noreferrer" class="nav-link"><span class="pcoded-micon"><i class="feather icon-message-square"></i></span><span class="pcoded-mtext">Discord Channel</span></a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
