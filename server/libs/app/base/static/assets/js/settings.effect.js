@@ -191,9 +191,9 @@ function SetLocalInput(setting_key, setting_value){
     if(setting_value){
       $("#" + setting_key).click();
     }
-  }else if($("#" + setting_key).attr('id') == 'color_input'){
+  }else if($("#" + setting_key).hasClass('color_input')){
     // Set RGB color and value from config
-    $("#color_input").val(setting_value);
+    $(".color_input").val(setting_value);
     pickr.setColor(setting_value);
   }else{
     $("#" + setting_key).val(setting_value);
@@ -272,9 +272,9 @@ function SetLocalSettings(){
       }else if($("#" + setting_key).attr('type') == 'number'){
         setting_value = parseFloat($("#" + setting_key).val());
       }
-      else if($("#" + setting_key).attr('id') == 'color_input'){
+      else if($("#" + setting_key).hasClass('color_input')){
         // Save RGB value to config
-        setting_value = $("#color_input").val();
+        setting_value = $(".color_input").val();
       }
       else{
         setting_value = $("#" + setting_key).val();
@@ -342,7 +342,7 @@ document.getElementById("save_btn").addEventListener("click",function(e) {
 
 // Create color picker instance
 let parent = document.querySelector('#color_picker');
-let input = document.querySelector('#color_input');
+let input = document.querySelector('.color_input');
 
 if (parent && input) {
     var pickr = Pickr.create({
