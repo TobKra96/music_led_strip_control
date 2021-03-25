@@ -163,7 +163,7 @@ function ParseGetEffectSetting(response){
 
   SetLocalInput(setting_key, setting_value)
 
- // Set initial slider values
+ // Set initial effect slider values
   $("span[for='" + setting_key + "']").text(setting_value)
 }
 
@@ -191,9 +191,10 @@ function SetLocalInput(setting_key, setting_value){
     if(setting_value){
       $("#" + setting_key).click();
     }
-  }else if($("#" + setting_key).hasClass('colorpicker_input')){
-    var hexcolor = rgbToHex(setting_value[0], setting_value[1], setting_value[2]);
-    $("#" + setting_key).val("rgb(" + setting_value[0] + "," + setting_value[1] + "," +setting_value[2] + ")");
+  }else if($("#" + setting_key).attr('id') == 'color_input'){
+    // Set RGB color and value from config
+    $("#color_input").val(setting_value);
+    pickr.setColor(setting_value);
   }else{
     $("#" + setting_key).val(setting_value);
   }
@@ -271,9 +272,9 @@ function SetLocalSettings(){
       }else if($("#" + setting_key).attr('type') == 'number'){
         setting_value = parseFloat($("#" + setting_key).val());
       }
-      else if($("#" + setting_key).hasClass('colorpicker_input')){
-        rgb_color =  hexToRgb($("#" + setting_key).val());
-        setting_value = rgb_color;
+      else if($("#" + setting_key).attr('id') == 'color_input'){
+        // Save RGB value to config
+        setting_value = $("#color_input").val();
       }
       else{
         setting_value = $("#" + setting_key).val();
@@ -339,29 +340,67 @@ document.getElementById("save_btn").addEventListener("click",function(e) {
   SetLocalSettings();
 });
 
+// Create color picker instance
+let parent = document.querySelector('#color_picker');
+let input = document.querySelector('#color_input');
 
-$(function() {
-  if($('#colorpickerDiv').length) {
-    $('#colorpickerDiv').colorpicker({
-        color: '#000000',
-        format: 'rgb'
+if (parent && input) {
+    var pickr = Pickr.create({
+        el: parent,
+        theme: 'monolith',
+        default: 'rgb(255,255,255)',
+        position: 'left-middle',
+        lockOpacity: false,
+        comparison: false,
+        useAsButton: true,
+
+        swatches: [
+            'rgb(244, 67, 54)',
+            'rgb(233, 30, 99)',
+            'rgb(156, 39, 176)',
+            'rgb(103, 58, 183)',
+            'rgb(63, 81, 181)',
+            'rgb(33, 150, 243)',
+            'rgb(3, 169, 244)',
+            'rgb(0, 188, 212)',
+            'rgb(0, 150, 136)',
+            'rgb(76, 175, 80)',
+            'rgb(139, 195, 74)',
+            'rgb(205, 220, 57)',
+            'rgb(255, 235, 59)',
+            'rgb(255, 193, 7)'
+        ],
+
+        components: {
+            hue: true
+        }
+    }).on('init', pickr => {
+        let newColor = pickr.getSelectedColor().toRGBA().toString(0).replace(', 1)', ')').replace('rgba', 'rgb');
+        parent.style.background = newColor;
+        input.value = newColor;
+    }).on('change', color => {
+        let newColor = color.toRGBA().toString(0).replace(', 1)', ')').replace('rgba', 'rgb');
+        parent.style.background = newColor;
+        input.value = newColor;
+    })
+
+    // Parse color selection
+    input.addEventListener('input', () => {
+        let rgb = input.value.replace(/[^\d,]/g, '').split(',');
+        let red = parseInt(rgb[0]);
+        let green = parseInt(rgb[1]);
+        let blue = parseInt(rgb[2]);
+        if (red > 255 || red < 0 || isNaN(red)) {
+            red = 0
+        };
+        if (green > 255 || green < 0 || isNaN(green)) {
+            green = 0
+        };
+        if (blue > 255 || blue < 0 || isNaN(blue)) {
+            blue = 0
+        };
+        let newColor = 'rgb(' + [red,green,blue].join(',') + ')';
+        parent.style.background = newColor
+        pickr.setColor(newColor);
     });
-  }
-});
-
-
-
-function componentToHex(c) {
-  var hex = c.toString(16);
-  return hex.length == 1 ? "0" + hex : hex;
 }
-
-function rgbToHex(r, g, b) {
-  return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
-}
-
-function hexToRgb(str) {
-  var match = str.match(/rgb?\((\d{1,3}), ?(\d{1,3}), ?(\d{1,3})\)?(?:, ?(\d(?:\.\d?))\))?/);
-  return match ? [match[1], match[2], match[3]] : [0,0,0];
-}
-
