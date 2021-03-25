@@ -49,7 +49,7 @@ function ParseDevices(devices){
     currentDevice = Object.keys(devices)[0];
   }
 
-  BuildDeviceCombobox();
+  BuildDeviceTab();
   UpdateCurrentDeviceText();
 
   AddEventListeners();
@@ -440,12 +440,23 @@ function DeleteDevice(device){
 
 /* Device Handling */
 
-function BuildDeviceCombobox(){
+function BuildDeviceTab(){
   var devices = this.devices
-
+  var first = true;
+  var pill_counter = 0;
   Object.keys(devices).forEach(device_key => {
-      $( ".dropdown-menu").append( "<a class=\"dropdown-item device_item\" id=\"" + device_key +"\">" + devices[device_key] + "</a>" );
+    if(first){
+      $('#deviceTabID').append("<li class='nav-item device_item'><a class='nav-link active' id=\"" + device_key + "\" data-toggle='pill' href='#pills-" + pill_counter + "' role='tab' aria-controls='pills-" + pill_counter + "' aria-selected='true'>" + devices[device_key] + "</a></li>")  
+      first = false;
+    }
+    else{
+      $('#deviceTabID').append("<li class='nav-item device_item'><a class='nav-link' id=\"" + device_key + "\" data-toggle='pill' href='#pills-" + pill_counter + "' role='tab' aria-controls='pills-" + pill_counter + "' aria-selected='false'>" + devices[device_key] + "</a></li>")
+    }
+    pill_counter++;
+    
   });
+
+  $('#device_count').text(Object.keys(devices).length);
 
 }
 
@@ -461,9 +472,16 @@ function AddEventListeners(){
 
 function UpdateCurrentDeviceText(){
   var text = "";
-  text = "Current device: " + this.devices[this.currentDevice]
-  $("#selected_device_txt").text(text);
 
+  if(this.currentDevice == "all_devices"){
+      text = "All Devices"
+  }
+  else
+  {
+      text = this.devices[this.currentDevice]
+  }
+
+  $("#selected_device_txt").text(text);
 }
 
 function SwitchDevice(e){

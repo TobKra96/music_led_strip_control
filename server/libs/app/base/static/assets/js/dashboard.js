@@ -47,7 +47,7 @@ function ParseDevices(devices){
     this.currentDevice = "all_devices"
     this.devices = devices;
 
-    this.BuildDeviceCombobox();
+    this.BuildDeviceTab();
     this.AddEventListeners();
     this.UpdateCurrentDeviceText();
     this.UpdateActiveEffectTile();
@@ -124,16 +124,18 @@ function SetActiveEffect(newActiveEffect){
 
 /* Device Handling */
 
-function BuildDeviceCombobox(){
+function BuildDeviceTab(){
     var devices = this.devices
-
-    $( ".dropdown-menu").append("<a class=\"dropdown-item device_item\" id=\"all_devices\">All Devices</a>")
-
+  
+    $('#deviceTabID').append("<li class='nav-item device_item'><a class='nav-link active' id='all_devices' data-toggle='pill' href='#pills-0' role='tab' aria-controls='pills-0' aria-selected='false'>All Devices</a></li>")
+  
     Object.keys(devices).forEach(device_key => {
-        $( ".dropdown-menu").append( "<a class=\"dropdown-item device_item\" id=\"" + device_key +"\">" + devices[device_key] + "</a>" );
+      $('#deviceTabID').append("<li class='nav-item device_item'><a class='nav-link' id=\"" + device_key + "\" data-toggle='pill' href='#pills-0' role='tab' aria-controls='pills-0' aria-selected='false'>" + devices[device_key] + "</a></li>")
     });
-
-}
+  
+    $('#device_count').text(Object.keys(devices).length);
+  
+  }
 
 function AddEventListeners(){
     var elements = document.getElementsByClassName("device_item");
@@ -147,20 +149,17 @@ function AddEventListeners(){
 
 function UpdateCurrentDeviceText(){
     var text = "";
-
+  
     if(this.currentDevice == "all_devices"){
-        text = "Current device: All Devices"
+        text = "All Devices"
     }
     else
     {
-        text = "Current device: " + this.devices[this.currentDevice]
+        text = this.devices[this.currentDevice]
     }
-
+  
     $("#selected_device_txt").text(text);
-    if(this.activeEffect != ""){
-        this.removeActiveStyle(this.activeEffect);
-    }
-}
+  }
 
 function UpdateActiveEffectTile(){
 
