@@ -342,6 +342,11 @@ document.getElementById("save_btn").addEventListener("click",function(e) {
   SetLocalSettings();
 });
 
+// Set effect slider values
+$('input[type=range]').on('input', function() {
+    $("span[for='" + $(this).attr('id') + "']").text(this.value)
+});
+
 // Create color picker instance
 let parent = document.querySelector('#color_picker');
 let input = document.querySelector('.color_input');
