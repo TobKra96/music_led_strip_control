@@ -193,8 +193,9 @@ function SetLocalInput(setting_key, setting_value){
     }
   }else if($("#" + setting_key).hasClass('color_input')){
     // Set RGB color and value from config
-    $(".color_input").val(setting_value);
-    pickr.setColor(setting_value);
+    formattedRGB = formatRGB(setting_value)
+    $(".color_input").val(formattedRGB);
+    pickr.setColor(formattedRGB);
   }else{
     $("#" + setting_key).val(setting_value);
   }
@@ -274,7 +275,8 @@ function SetLocalSettings(){
       }
       else if($("#" + setting_key).hasClass('color_input')){
         // Save RGB value to config
-        setting_value = $(".color_input").val();
+        rgb = $(".color_input").val();
+        setting_value = parseRGB(rgb)
       }
       else{
         setting_value = $("#" + setting_key).val();
@@ -384,23 +386,35 @@ if (parent && input) {
         input.value = newColor;
     })
 
-    // Parse color selection
+    // Parse and validate RGB value when typing
     input.addEventListener('input', () => {
-        let rgb = input.value.replace(/[^\d,]/g, '').split(',');
-        let red = parseInt(rgb[0]);
-        let green = parseInt(rgb[1]);
-        let blue = parseInt(rgb[2]);
-        if (red > 255 || red < 0 || isNaN(red)) {
-            red = 0
-        };
-        if (green > 255 || green < 0 || isNaN(green)) {
-            green = 0
-        };
-        if (blue > 255 || blue < 0 || isNaN(blue)) {
-            blue = 0
-        };
-        let newColor = 'rgb(' + [red,green,blue].join(',') + ')';
-        parent.style.background = newColor
-        pickr.setColor(newColor);
+        let formattedRGB = formatRGB(validateRGB(parseRGB(input.value)))
+        parent.style.background = formattedRGB
+        pickr.setColor(formattedRGB);
     });
+}
+
+/** Parse "rgb(r,g,b)" into [r,g,b] **/
+function parseRGB(rgb) {
+    rgb = rgb.replace(/[^\d,]/g, '').split(',')
+    return [parseInt(rgb[0]), parseInt(rgb[1]), parseInt(rgb[2])];
+}
+
+/** Validate if [r,g,b] is a valid RGB value **/
+function validateRGB(rgb) {
+    if (rgb[0] > 255 || rgb[0] < 0 || isNaN(rgb[0])) {
+        rgb[0] = 0
+    };
+    if (rgb[1] > 255 || rgb[1] < 0 || isNaN(rgb[1])) {
+        rgb[1] = 0
+    };
+    if (rgb[2] > 255 || rgb[2] < 0 || isNaN(rgb[2])) {
+        rgb[2] = 0
+    };
+    return rgb;
+}
+
+/** Format [r,g,b] into "rgb(r,g,b)" **/
+function formatRGB(rgb) {
+    return 'rgb(' + [rgb[0],rgb[1],rgb[2]].join(',') + ')';
 }
