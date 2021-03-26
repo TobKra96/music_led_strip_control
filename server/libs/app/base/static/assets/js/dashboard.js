@@ -50,7 +50,7 @@ function ParseDevices(devices){
     this.BuildDeviceTab();
     this.AddEventListeners();
     this.UpdateCurrentDeviceText();
-    this.UpdateActiveEffectTile();
+    this.clearAllActiveEffects();
 }
 
 function GetActiveEffect(device){
@@ -77,8 +77,6 @@ function SetActiveEffect(newActiveEffect){
 
     var lastEffect = this.activeEffect;
     this.activeEffect = newActiveEffect;
-
-    removeActiveStyle(lastEffect);
 
     if(this.currentDevice == "all_devices"){
         var data = {};
@@ -118,7 +116,7 @@ function SetActiveEffect(newActiveEffect){
           });
     }
 
-    setActiveStyle(this.activeEffect);
+    this.UpdateActiveEffectTile();
 }
 
 
@@ -164,18 +162,18 @@ function UpdateCurrentDeviceText(){
 function UpdateActiveEffectTile(){
 
     if(this.activeEffect != ""){
+        this.clearAllActiveEffects();
         this.setActiveStyle(this.activeEffect);
     }
 }
 
 function SwitchDevice(e){
     var newDeviceId = e.target.id;
-
     this.currentDevice = newDeviceId;
+    
 
     if(newDeviceId == "all_devices"){
-        this.removeActiveStyle(this.activeEffect);
-        this.UpdateActiveEffectTile();
+        this.clearAllActiveEffects();
         this.UpdateCurrentDeviceText();
         return;
     }
@@ -188,60 +186,43 @@ function SwitchDevice(e){
 
 
 
-/* Effect Handling */
 
+/* Effect Handling */
+function clearAllActiveEffects(){
+    $(".dashboard_effect_active").removeClass("dashboard_effect_active");
+}
 
 function setActiveStyle(currentEffect){
-
-    $("#" + currentEffect).addClass("active-dashboard-item");
-}
-
-function removeActiveStyle(currentEffect){
-    $("#" + currentEffect).removeClass("active-dashboard-item");
+    $("#" + currentEffect).addClass("dashboard_effect_active");
 }
 
 // locate your element and add the Click Event Listener
-document.getElementById("dashboard-list-special").addEventListener("click",function(e) {
+document.getElementById("dashboard-item-list").addEventListener("click",function(e) {
     // e.target is our targetted element.
     // try doing console.log(e.target.nodeName), it will result LI
 
-    switchEffect(e, "dashboard-list-special");
+    switchEffect(e);
 });
 
-// locate your element and add the Click Event Listener
-document.getElementById("dashboard-list-none-music").addEventListener("click",function(e) {
-    // e.target is our targetted element.
-    // try doing console.log(e.target.nodeName), it will result LI
 
-    switchEffect(e, "dashboard-list-none-music");
-});
-
-// locate your element and add the Click Event Listener
-document.getElementById("dashboard-list-music").addEventListener("click",function(e) {
-    // e.target is our targetted element.
-    // try doing console.log(e.target.nodeName), it will result LI
-
-    switchEffect(e, "dashboard-list-music");
-});
-
-function switchEffect(e, listName){
+function switchEffect(e){
     var newActiveEffect = "";
+    var BreakException = {};
 
-    // Click on the li element direct
-    if(e.target && e.target.nodeName == "LI") {
-        if(e.target.parentElement && e.target.parentElement.id == listName){
-            newActiveEffect = e.target.id;
-        }
-
-    // Click on some of the span elements inside the li element.
-    }else if((e.target && e.target.nodeName == "SPAN")||(e.target && e.target.nodeName == "I")){
-        if(e.target.parentElement && e.target.parentElement.nodeName == "LI"){
-            if(e.target.parentElement.parentElement && e.target.parentElement.parentElement.id == listName){
-                newActiveEffect = e.target.parentElement.id;
+    try {
+        e.path.forEach(element => {
+            if(element.classList != null){
+                if(element.classList.contains("dashboard_effect")){
+                    newActiveEffect = element.id;
+                    throw BreakException;
+                }
             }
-        }
+        });
     }
-
+    catch (e) {
+        if (e !== BreakException) throw e;
+      }
+  
     if(newActiveEffect.length > 0){
         console.log(newActiveEffect + " was clicked");
         SetActiveEffect(newActiveEffect);
