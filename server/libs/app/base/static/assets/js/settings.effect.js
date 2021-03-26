@@ -163,7 +163,7 @@ function ParseGetEffectSetting(response){
 
   SetLocalInput(setting_key, setting_value)
 
- // Set initial slider values
+ // Set initial effect slider values
   $("span[for='" + setting_key + "']").text(setting_value)
 }
 
@@ -191,9 +191,11 @@ function SetLocalInput(setting_key, setting_value){
     if(setting_value){
       $("#" + setting_key).click();
     }
-  }else if($("#" + setting_key).hasClass('colorpicker_input')){
-    var hexcolor = rgbToHex(setting_value[0], setting_value[1], setting_value[2]);
-    $("#" + setting_key).val("rgb(" + setting_value[0] + "," + setting_value[1] + "," +setting_value[2] + ")");
+  }else if($("#" + setting_key).hasClass('color_input')){
+    // Set RGB color and value from config
+    formattedRGB = formatRGB(setting_value)
+    $(".color_input").val(formattedRGB);
+    pickr.setColor(formattedRGB);
   }else{
     $("#" + setting_key).val(setting_value);
   }
@@ -271,9 +273,10 @@ function SetLocalSettings(){
       }else if($("#" + setting_key).attr('type') == 'number'){
         setting_value = parseFloat($("#" + setting_key).val());
       }
-      else if($("#" + setting_key).hasClass('colorpicker_input')){
-        rgb_color =  hexToRgb($("#" + setting_key).val());
-        setting_value = rgb_color;
+      else if($("#" + setting_key).hasClass('color_input')){
+        // Save RGB value to config
+        rgb = $(".color_input").val();
+        setting_value = parseRGB(rgb)
       }
       else{
         setting_value = $("#" + setting_key).val();
@@ -339,29 +342,84 @@ document.getElementById("save_btn").addEventListener("click",function(e) {
   SetLocalSettings();
 });
 
-
-$(function() {
-  if($('#colorpickerDiv').length) {
-    $('#colorpickerDiv').colorpicker({
-        color: '#000000',
-        format: 'rgb'
-    });
-  }
+// Set effect slider values
+$('input[type=range]').on('input', function() {
+    $("span[for='" + $(this).attr('id') + "']").text(this.value)
 });
 
+// Create color picker instance
+let parent = document.querySelector('#color_picker');
+let input = document.querySelector('.color_input');
 
+if (parent && input) {
+    var pickr = Pickr.create({
+        el: parent,
+        theme: 'monolith',
+        default: 'rgb(255,255,255)',
+        position: 'left-middle',
+        lockOpacity: false,
+        comparison: false,
+        useAsButton: true,
 
-function componentToHex(c) {
-  var hex = c.toString(16);
-  return hex.length == 1 ? "0" + hex : hex;
+        swatches: [
+            'rgb(244, 67, 54)',
+            'rgb(233, 30, 99)',
+            'rgb(156, 39, 176)',
+            'rgb(103, 58, 183)',
+            'rgb(63, 81, 181)',
+            'rgb(33, 150, 243)',
+            'rgb(3, 169, 244)',
+            'rgb(0, 188, 212)',
+            'rgb(0, 150, 136)',
+            'rgb(76, 175, 80)',
+            'rgb(139, 195, 74)',
+            'rgb(205, 220, 57)',
+            'rgb(255, 235, 59)',
+            'rgb(255, 193, 7)'
+        ],
+
+        components: {
+            hue: true
+        }
+    }).on('init', pickr => {
+        let newColor = pickr.getSelectedColor().toRGBA().toString(0).replace(', 1)', ')').replace('rgba', 'rgb');
+        parent.style.background = newColor;
+        input.value = newColor;
+    }).on('change', color => {
+        let newColor = color.toRGBA().toString(0).replace(', 1)', ')').replace('rgba', 'rgb');
+        parent.style.background = newColor;
+        input.value = newColor;
+    })
+
+    // Parse and validate RGB value when typing
+    input.addEventListener('input', () => {
+        let formattedRGB = formatRGB(validateRGB(parseRGB(input.value)))
+        parent.style.background = formattedRGB
+        pickr.setColor(formattedRGB);
+    });
 }
 
-function rgbToHex(r, g, b) {
-  return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
+/** Parse "rgb(r,g,b)" into [r,g,b] **/
+function parseRGB(rgb) {
+    rgb = rgb.replace(/[^\d,]/g, '').split(',')
+    return [parseInt(rgb[0]), parseInt(rgb[1]), parseInt(rgb[2])];
 }
 
-function hexToRgb(str) {
-  var match = str.match(/rgb?\((\d{1,3}), ?(\d{1,3}), ?(\d{1,3})\)?(?:, ?(\d(?:\.\d?))\))?/);
-  return match ? [match[1], match[2], match[3]] : [0,0,0];
+/** Validate if [r,g,b] is a valid RGB value **/
+function validateRGB(rgb) {
+    if (rgb[0] > 255 || rgb[0] < 0 || isNaN(rgb[0])) {
+        rgb[0] = 0
+    };
+    if (rgb[1] > 255 || rgb[1] < 0 || isNaN(rgb[1])) {
+        rgb[1] = 0
+    };
+    if (rgb[2] > 255 || rgb[2] < 0 || isNaN(rgb[2])) {
+        rgb[2] = 0
+    };
+    return rgb;
 }
 
+/** Format [r,g,b] into "rgb(r,g,b)" **/
+function formatRGB(rgb) {
+    return 'rgb(' + [rgb[0],rgb[1],rgb[2]].join(',') + ')';
+}
