@@ -210,6 +210,22 @@ function ResetSettings() {
     });
 }
 
+function ResetPinSettings() {
+    var data = {}
+    data["DEFAULT_PIN"] = ""
+    data["USE_PIN_LOCK"] = false
+
+    $.ajax({
+        url: "/ResetPinSettings",
+        type: "POST",
+        data: JSON.stringify(data, null, '\t'),
+        contentType: 'application/json;charset=UTF-8',
+        success: function (response) {
+            ParseGetPinSetting(response)
+        },
+    });
+}
+
 document.getElementById("save_btn").addEventListener("click", function (e) {
     SetLocalSettings();
 });
@@ -220,5 +236,6 @@ document.getElementById("reset_btn").addEventListener("click", function (e) {
 
 document.getElementById("reset_btn_modal").addEventListener("click", function (e) {
     $('#modal_reset_general').modal('hide')
+    ResetPinSettings()
     ResetSettings(currentDevice);
 });

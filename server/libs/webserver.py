@@ -22,8 +22,6 @@ default_values = {
 
 pin_config = ConfigParser()
 pin_file = '../security.ini'
-DEFAULT_PIN = default_values["DEFAULT_PIN"]
-USE_PIN_LOCK = default_values["USE_PIN_LOCK"]
 
 
 def save_pin_file():
@@ -39,20 +37,31 @@ def reset_pin_file():
     save_pin_file()
 
 
-# Check if .ini file exists and if security options are valid.
-try:
-    dataset = pin_config.read(pin_file)
-except (ParsingError, MissingSectionHeaderError):
-    reset_pin_file()
-    dataset = pin_config.read(pin_file)
-if pin_file in dataset:
+def read_pin_file():
+    # Check if .ini file exists and if security options are valid.
+    file_values = default_values
     try:
-        DEFAULT_PIN = pin_config['SECURITY'].get('DEFAULT_PIN')
-        USE_PIN_LOCK = pin_config['SECURITY'].getboolean('USE_PIN_LOCK')
-    except (ValueError, KeyError):
+        dataset = pin_config.read(pin_file)
+    except (ParsingError, MissingSectionHeaderError):
         reset_pin_file()
-else:
-    reset_pin_file()
+        dataset = pin_config.read(pin_file)
+
+    if pin_file in dataset:
+        try:
+            file_values["DEFAULT_PIN"] = pin_config['SECURITY'].get('DEFAULT_PIN')
+            file_values["USE_PIN_LOCK"] = pin_config['SECURITY'].getboolean('USE_PIN_LOCK')
+            return file_values
+        except (ValueError, KeyError):
+            reset_pin_file()
+            return file_values
+    else:
+        reset_pin_file()
+    return file_values
+
+
+file_values = read_pin_file()
+DEFAULT_PIN = file_values["DEFAULT_PIN"]
+USE_PIN_LOCK = file_values["USE_PIN_LOCK"]
 
 
 def validate_pin(pin):
@@ -500,11 +509,12 @@ class Webserver():
     @server.route('/GetPinSetting', methods=['GET'])
     @login_required
     def GetPinSetting():  # pylint: disable=E0211
-        data = {
-            "DEFAULT_PIN": DEFAULT_PIN,
-            "USE_PIN_LOCK": USE_PIN_LOCK
+        data_in = read_pin_file()
+        data_out = {
+            "DEFAULT_PIN": data_in["DEFAULT_PIN"],
+            "USE_PIN_LOCK": data_in["USE_PIN_LOCK"]
         }
-        return jsonify(data)
+        return jsonify(data_out)
 
     # /SetGeneralSetting
     # {
@@ -529,17 +539,15 @@ class Webserver():
     @server.route('/SetPinSetting', methods=['POST'])
     @login_required
     def SetPinSetting():  # pylint: disable=E0211
-        data = request.get_json()
-        new_pin = data["DEFAULT_PIN"]
-        use_pin_lock = data["USE_PIN_LOCK"]
+        data_in = request.get_json()
 
-        new_values = {
-            "DEFAULT_PIN": new_pin,
-            "USE_PIN_LOCK": use_pin_lock
+        data_out = {
+            "DEFAULT_PIN": data_in["DEFAULT_PIN"],
+            "USE_PIN_LOCK": data_in["USE_PIN_LOCK"]
         }
-        pin_config["SECURITY"] = new_values
+        pin_config["SECURITY"] = data_out
         save_pin_file()
-        return jsonify(data)
+        return jsonify(data_out)
 
     #################################################################
 
@@ -718,3 +726,17 @@ class Webserver():
             Webserver.instance.webserver_executer.ResetSettings()
 
             return jsonify(data_out)
+
+    @server.route('/ResetPinSettings', methods=['POST'])
+    @login_required
+    def ResetPinSettings():  # pylint: disable=E0211
+        data_in = request.get_json()
+        new_values = {
+            "DEFAULT_PIN": data_in["DEFAULT_PIN"],
+            "USE_PIN_LOCK": data_in["USE_PIN_LOCK"]
+        }
+        pin_config["SECURITY"] = new_values
+        save_pin_file()
+        data_out = read_pin_file()
+
+        return jsonify(data_out)
