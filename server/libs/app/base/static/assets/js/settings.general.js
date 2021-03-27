@@ -81,12 +81,32 @@ function ParseGetGeneralSetting(response){
   SetLocalInput(setting_key, setting_value)
 }
 
+function GetPinSetting() {
+    $.ajax({
+        type: 'GET',
+        url: "/GetPinSetting",
+        contentType: 'application/json;charset=UTF-8',
+        success: function(response) {
+            ParseGetPinSetting(response)
+        },
+    });
+}
+
+function ParseGetPinSetting(response) {
+    var pin = response["DEFAULT_PIN"];
+    var use_pin_lock = response["USE_PIN_LOCK"];
+
+    $('#DASHBOARD_PIN').val(pin);
+    $('#PIN_LOCK_ENABLED').prop('checked', use_pin_lock);
+}
+
 function GetLocalSettings(){
   var all_setting_keys = GetAllSettingKeys();
 
   Object.keys(all_setting_keys).forEach(setting_id => {
     GetGeneralSetting(all_setting_keys[setting_id])
   })
+  GetPinSetting()
 
 }
 
@@ -131,7 +151,24 @@ function SetGeneralSetting(settings){
         console.log("Set the general setting. Got an error. Error: " + xhr.responseText);
       }
     });
+}
 
+function SetPinSetting() {
+    var pin = $('#DASHBOARD_PIN').val();
+    var pinCheckbox = false
+    if ($('#PIN_LOCK_ENABLED').is(':checked')) {
+        pinCheckbox = true
+    }
+    var pinData = {};
+    pinData["DEFAULT_PIN"] = pin;
+    pinData["USE_PIN_LOCK"] = pinCheckbox;
+
+    $.ajax({
+        type: 'POST',
+        url: "/SetPinSetting",
+        data: JSON.stringify(pinData),
+        contentType: 'application/json;charset=UTF-8',
+    });
 }
 
 function SetLocalSettings(){
@@ -159,6 +196,7 @@ function SetLocalSettings(){
   })
 
   SetGeneralSetting(settings)
+  SetPinSetting()
 
 }
 

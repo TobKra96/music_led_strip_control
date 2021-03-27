@@ -32,4 +32,18 @@ document.addEventListener("DOMContentLoaded", () => {
         $(outputType).change(toggleOutput).change();
     }
 
+    // Toggle PIN visibility on hover
+    $("#toggle_pin_view").on("mouseover", function(event) {
+        event.preventDefault();
+        $('#DASHBOARD_PIN').attr('type', 'text');
+        $('#toggle_pin_view').removeClass("icon-eye");
+        $('#toggle_pin_view').addClass("icon-eye-off");
+    });
+    $("#toggle_pin_view").on("mouseleave", function(event) {
+        event.preventDefault();
+        $('#DASHBOARD_PIN').attr('type', 'password');
+        $('#toggle_pin_view').addClass("icon-eye");
+        $('#toggle_pin_view').removeClass("icon-eye-off");
+    });
+
 });
