@@ -483,7 +483,11 @@ document.getElementById("create2_btn").addEventListener("click", function (e) {
 });
 
 document.getElementById("delete_btn").addEventListener("click", function (e) {
-    if (confirm('Are you sure you want to delete this device?')) {
-        DeleteDevice(currentDevice);
-    }
+    $('#modal_device_name').text(devices[currentDevice])
+    $('#modal_delete_device').modal('show')
+});
+
+document.getElementById("delete_btn_modal").addEventListener("click", function (e) {
+    $('#modal_delete_device').modal('hide')
+    DeleteDevice(currentDevice);
 });

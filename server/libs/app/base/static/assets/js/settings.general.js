@@ -215,7 +215,10 @@ document.getElementById("save_btn").addEventListener("click", function (e) {
 });
 
 document.getElementById("reset_btn").addEventListener("click", function (e) {
-    if (confirm('Are you sure you want to reset the config to default settings?\nA restart will be required for changes to take effect.')) {
-        ResetSettings(currentDevice);
-    }
+    $('#modal_reset_general').modal('show')
+});
+
+document.getElementById("reset_btn_modal").addEventListener("click", function (e) {
+    $('#modal_reset_general').modal('hide')
+    ResetSettings(currentDevice);
 });
