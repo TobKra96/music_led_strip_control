@@ -1,8 +1,8 @@
 from libs.webserver_executer import WebserverExecuter  # pylint: disable=E0611, E0401
 from libs.config_service import ConfigService  # pylint: disable=E0611, E0401
 
+from flask_login import LoginManager, UserMixin, current_user, login_user, logout_user, login_required
 from flask import render_template, request, jsonify, send_file, redirect, url_for, session, flash
-from flask_login import LoginManager, UserMixin, current_user, login_user, logout_user
 from configparser import ConfigParser, ParsingError, MissingSectionHeaderError
 from urllib.parse import urlparse, urljoin
 from libs.app import create_app
@@ -173,11 +173,13 @@ class Webserver():
             sleep(10)
 
     @server.route('/export_config')
+    @login_required
     def export_config():  # pylint: disable=E0211
         Webserver.instance.logger.debug(f"Send file: {Webserver.instance.export_config_path}")
         return send_file(Webserver.instance.export_config_path, as_attachment=True, cache_timeout=-1, mimetype="text/html")
 
     @server.route('/import_config', methods=['POST'])
+    @login_required
     def import_config():  # pylint: disable=E0211
         Webserver.instance.logger.debug("Import Config Request received.")
         if 'imported_config' not in request.files:
@@ -215,6 +217,7 @@ class Webserver():
     # }
 
     @server.route('/GetDevices', methods=['GET'])
+    @login_required
     def GetDevices():  # pylint: disable=E0211
         if request.method == 'GET':
             data_out = dict()
@@ -241,6 +244,7 @@ class Webserver():
     # "effect" = <effectID>
     # }
     @server.route('/GetActiveEffect', methods=['GET'])
+    @login_required
     def GetActiveEffect():  # pylint: disable=E0211
         if request.method == 'GET':
             data_in = request.args.to_dict()
@@ -263,6 +267,7 @@ class Webserver():
     # "effect" = <effectID>
     # }
     @server.route('/SetActiveEffect', methods=['POST'])
+    @login_required
     def SetActiveEffect():  # pylint: disable=E0211
         if request.method == 'POST':
             data_in = request.get_json()
@@ -280,6 +285,7 @@ class Webserver():
     # "effect" = <effectID>
     # }
     @server.route('/SetActiveEffectForAll', methods=['POST'])
+    @login_required
     def SetActiveEffectForAll():  # pylint: disable=E0211
         if request.method == 'POST':
             data_in = request.get_json()
@@ -308,6 +314,7 @@ class Webserver():
     # "setting_value" = <setting_value>
     # }
     @server.route('/GetEffectSetting', methods=['GET'])
+    @login_required
     def GetEffectSetting():  # pylint: disable=E0211
         if request.method == 'GET':
             data_in = request.args.to_dict()
@@ -334,6 +341,7 @@ class Webserver():
     # ...
     # }
     @server.route('/GetColors', methods=['GET'])
+    @login_required
     def GetColors():  # pylint: disable=E0211
         if request.method == 'GET':
             data_out = dict()
@@ -356,6 +364,7 @@ class Webserver():
     # ...
     # }
     @server.route('/GetGradients', methods=['GET'])
+    @login_required
     def GetGradients():  # pylint: disable=E0211
         if request.method == 'GET':
             data_out = dict()
@@ -378,6 +387,7 @@ class Webserver():
     # ...
     # }
     @server.route('/GetLEDStrips', methods=['GET'])
+    @login_required
     def GetLEDStrips():  # pylint: disable=E0211
         if request.method == 'GET':
             data_out = dict()
@@ -400,6 +410,7 @@ class Webserver():
     # ...
     # }
     @server.route('/GetLoggingLevels', methods=['GET'])
+    @login_required
     def GetLoggingLevels():  # pylint: disable=E0211
         if request.method == 'GET':
             data_out = dict()
@@ -421,6 +432,7 @@ class Webserver():
     # }
     # }
     @server.route('/SetEffectSetting', methods=['POST'])
+    @login_required
     def SetEffectSetting():  # pylint: disable=E0211
         if request.method == 'POST':
             data_in = request.get_json()
@@ -441,6 +453,7 @@ class Webserver():
     # }
     # }
     @server.route('/SetEffectSettingForAll', methods=['POST'])
+    @login_required
     def SetEffectSettingForAll():  # pylint: disable=E0211
         if request.method == 'POST':
             data_in = request.get_json()
@@ -467,6 +480,7 @@ class Webserver():
     # "setting_value" = <setting_value>
     # }
     @server.route('/GetGeneralSetting', methods=['GET'])
+    @login_required
     def GetGeneralSetting():  # pylint: disable=E0211
         if request.method == 'GET':
             data_in = request.args.to_dict()
@@ -484,6 +498,7 @@ class Webserver():
                 return jsonify(data_out)
 
     @server.route('/GetPinSetting', methods=['GET'])
+    @login_required
     def GetPinSetting():  # pylint: disable=E0211
         data = {
             "DEFAULT_PIN": DEFAULT_PIN,
@@ -498,6 +513,7 @@ class Webserver():
     # }
     # }
     @server.route('/SetGeneralSetting', methods=['POST'])
+    @login_required
     def SetGeneralSetting():  # pylint: disable=E0211
         if request.method == 'POST':
             data_in = request.get_json()
@@ -511,6 +527,7 @@ class Webserver():
             return jsonify(data_out)
 
     @server.route('/SetPinSetting', methods=['POST'])
+    @login_required
     def SetPinSetting():  # pylint: disable=E0211
         data = request.get_json()
         new_pin = data["DEFAULT_PIN"]
@@ -540,6 +557,7 @@ class Webserver():
     # "setting_value" = <setting_value>
     # }
     @server.route('/GetDeviceSetting', methods=['GET'])
+    @login_required
     def GetDeviceSetting():  # pylint: disable=E0211
         if request.method == 'GET':
             data_in = request.args.to_dict()
@@ -564,6 +582,7 @@ class Webserver():
     # }
     # }
     @server.route('/SetDeviceSetting', methods=['POST'])
+    @login_required
     def SetDeviceSetting():  # pylint: disable=E0211
         if request.method == 'POST':
             data_in = request.get_json()
@@ -586,6 +605,7 @@ class Webserver():
     # ...
     # }
     @server.route('/GetOutputTypes', methods=['GET'])
+    @login_required
     def GetOutputTypes():  # pylint: disable=E0211
         if request.method == 'GET':
             data_out = dict()
@@ -614,6 +634,7 @@ class Webserver():
     # "setting_value" = <setting_value>
     # }
     @server.route('/GetOutputTypeDeviceSetting', methods=['GET'])
+    @login_required
     def GetOutputTypeDeviceSetting():  # pylint: disable=E0211
         if request.method == 'GET':
             data_in = request.args.to_dict()
@@ -639,6 +660,7 @@ class Webserver():
     # }
     # }
     @server.route('/SetOutputTypeDeviceSetting', methods=['POST'])
+    @login_required
     def SetOutputTypeDeviceSetting():  # pylint: disable=E0211
         if request.method == 'POST':
             data_in = request.get_json()
@@ -655,6 +677,7 @@ class Webserver():
     # {
     # }
     @server.route('/CreateNewDevice', methods=['POST'])
+    @login_required
     def CreateNewDevice():  # pylint: disable=E0211
         if request.method == 'POST':
 
@@ -669,6 +692,7 @@ class Webserver():
     # "device" = <deviceID>
     # }
     @server.route('/DeleteDevice', methods=['POST'])
+    @login_required
     def DeleteDevice():  # pylint: disable=E0211
         if request.method == 'POST':
             data_in = request.get_json()
@@ -685,6 +709,7 @@ class Webserver():
     # {
     # }
     @server.route('/ResetSettings', methods=['POST'])
+    @login_required
     def ResetSettings():  # pylint: disable=E0211
         if request.method == 'POST':
 
