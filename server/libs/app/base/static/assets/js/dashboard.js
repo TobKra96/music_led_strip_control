@@ -3,7 +3,7 @@ var activeEffect = "";
 var currentDevice = "all_devices";
 
 // Init and load all settings
-$(document).ready(function() {
+$(document).ready(function () {
     GetDevices();
 });
 
@@ -11,10 +11,10 @@ function GetDevices() {
     $.ajax({
         url: "/GetDevices",
         type: "GET",
-        success: function(response) {
+        success: function (response) {
             ParseDevices(response);
         },
-        error: function(xhr) {
+        error: function (xhr) {
             // Handle error
         }
     });
@@ -37,10 +37,10 @@ function GetActiveEffect(device) {
         data: {
             "device": device
         },
-        success: function(response) {
+        success: function (response) {
             ParseActiveEffect(response);
         },
-        error: function(xhr) {
+        error: function (xhr) {
             // Handle error
         }
     });
@@ -64,10 +64,10 @@ function SetActiveEffect(newActiveEffect) {
             type: "POST",
             data: JSON.stringify(data, null, '\t'),
             contentType: 'application/json;charset=UTF-8',
-            success: function(response) {
+            success: function (response) {
                 console.log("Effect set successfully. Response:\n\n" + JSON.stringify(response, null, '\t'));
             },
-            error: function(xhr) {
+            error: function (xhr) {
                 console.log("Error while setting effect. Error: " + xhr.responseText);
             }
         });
@@ -82,10 +82,10 @@ function SetActiveEffect(newActiveEffect) {
             type: "POST",
             data: JSON.stringify(data, null, '\t'),
             contentType: 'application/json;charset=UTF-8',
-            success: function(response) {
+            success: function (response) {
                 console.table("Effect set successfully. Response:\n\n" + JSON.stringify(response, null, '\t'));
             },
-            error: function(xhr) {
+            error: function (xhr) {
                 console.log("Error while setting effect. Error: " + xhr.responseText);
             }
         });
@@ -107,13 +107,13 @@ function BuildDeviceTab() {
     });
 
     $('#device_count').text(Object.keys(devices).length);
-  }
+}
 
 function AddEventListeners() {
     var elements = document.getElementsByClassName("device_item");
 
     for (var i = 0; i < elements.length; i++) {
-        elements[i].addEventListener('click', function(e) {
+        elements[i].addEventListener('click', function (e) {
             SwitchDevice(e);
         });
     }
@@ -129,7 +129,7 @@ function UpdateCurrentDeviceText() {
     }
 
     $("#selected_device_txt").text(text);
-  }
+}
 
 function UpdateActiveEffectTile() {
     if (this.activeEffect != "") {
@@ -164,7 +164,7 @@ function setActiveStyle(currentEffect) {
 }
 
 // Listen for effect change on click
-document.getElementById("dashboard-item-list").addEventListener("click",function(e) {
+document.getElementById("dashboard-item-list").addEventListener("click", function (e) {
     switchEffect(e);
 });
 
