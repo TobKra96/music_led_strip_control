@@ -1,26 +1,3 @@
-document.addEventListener("DOMContentLoaded", () => {
-
-    // Restore active effect button on reload
-    let savedEffectId = localStorage.getItem("effectId");
-    let savedEffectButton = document.getElementById(savedEffectId)
-
-    if (savedEffectButton) {
-        $(savedEffectButton).addClass('dashboard_effect_active');
-    }
-
-    // Set selected effect button as active
-    let effectButton = $('.dashboard_effect')
-
-    if (effectButton) {
-        effectButton.click(function() {
-            effectButton.removeClass('dashboard_effect_active');
-            $(this).addClass('dashboard_effect_active');
-            localStorage.setItem('effectId', $(this).attr('id'));
-        });
-    }
-
-});
-
 var devices;
 var activeEffect = "";
 var currentDevice = "all_devices";
@@ -124,15 +101,15 @@ function SetActiveEffect(newActiveEffect){
 
 function BuildDeviceTab(){
     var devices = this.devices
-  
+
     $('#deviceTabID').append("<li class='nav-item device_item'><a class='nav-link active' id='all_devices' data-toggle='pill' href='#pills-0' role='tab' aria-controls='pills-0' aria-selected='false'>All Devices</a></li>")
-  
+
     Object.keys(devices).forEach(device_key => {
       $('#deviceTabID').append("<li class='nav-item device_item'><a class='nav-link' id=\"" + device_key + "\" data-toggle='pill' href='#pills-0' role='tab' aria-controls='pills-0' aria-selected='false'>" + devices[device_key] + "</a></li>")
     });
-  
+
     $('#device_count').text(Object.keys(devices).length);
-  
+
   }
 
 function AddEventListeners(){
@@ -147,7 +124,7 @@ function AddEventListeners(){
 
 function UpdateCurrentDeviceText(){
     var text = "";
-  
+
     if(this.currentDevice == "all_devices"){
         text = "All Devices"
     }
@@ -155,7 +132,7 @@ function UpdateCurrentDeviceText(){
     {
         text = this.devices[this.currentDevice]
     }
-  
+
     $("#selected_device_txt").text(text);
   }
 
@@ -170,7 +147,6 @@ function UpdateActiveEffectTile(){
 function SwitchDevice(e){
     var newDeviceId = e.target.id;
     this.currentDevice = newDeviceId;
-    
 
     if(newDeviceId == "all_devices"){
         this.clearAllActiveEffects();
@@ -222,7 +198,7 @@ function switchEffect(e){
     catch (e) {
         if (e !== BreakException) throw e;
       }
-  
+
     if(newActiveEffect.length > 0){
         console.log(newActiveEffect + " was clicked");
         SetActiveEffect(newActiveEffect);
