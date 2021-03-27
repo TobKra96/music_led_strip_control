@@ -13,7 +13,7 @@ class EffectWiggle(Effect):
         self.bool_lr = 0
 
     def run(self):
-        effect_config = self._device.device_config["effects"]["effect_wiggle"]
+        effect_config = self.get_effect_config("effect_wiggle")
         led_count = self._device.device_config["LED_Count"]
 
         audio_data = self.get_audio_data()

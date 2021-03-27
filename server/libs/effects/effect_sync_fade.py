@@ -6,7 +6,7 @@ import numpy as np
 class EffectSyncFade(Effect):
     def run(self):
         # Get the config of the current effect.
-        effect_config = self._device.device_config["effects"]["effect_sync_fade"]
+        effect_config = self.get_effect_config("effect_sync_fade")
 
         # Prepare the required config inside local variables to enhance the looking of the long array functions.
         current_gradient = effect_config["gradient"]

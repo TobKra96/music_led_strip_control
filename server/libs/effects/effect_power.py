@@ -6,8 +6,7 @@ import random
 
 class EffectPower(Effect):
     def run(self):
-        effect_config = self._device.device_config["effects"]["effect_power"]
-
+        effect_config = self.get_effect_config("effect_power")
         led_count = self._device.device_config["LED_Count"]
         n_fft_bins = self._config["general_settings"]["N_FFT_BINS"]
         led_mid = self._device.device_config["LED_Mid"]

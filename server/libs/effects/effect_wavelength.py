@@ -6,7 +6,7 @@ import numpy as np
 
 class EffectWavelength(Effect):
     def run(self):
-        effect_config = self._device.device_config["effects"]["effect_wavelength"]
+        effect_config = self.get_effect_config("effect_wavelength")
         led_count = self._device.device_config["LED_Count"]
         led_mid = self._device.device_config["LED_Mid"]
 

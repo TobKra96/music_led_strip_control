@@ -13,7 +13,7 @@ class EffectBeat(Effect):
         self.gradient_position = 0
 
     def run(self):
-        effect_config = self._device.device_config["effects"]["effect_beat"]
+        effect_config = self.get_effect_config("effect_beat")
         led_count = self._device.device_config["LED_Count"]
         current_gradient = effect_config["gradient"]
         use_random_color = effect_config["random_color"]

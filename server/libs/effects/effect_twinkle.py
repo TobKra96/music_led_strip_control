@@ -19,7 +19,7 @@ class EffectTwinkle(Effect):
 
     def run(self):
         # Get the config of the current effect.
-        effect_config = self._device.device_config["effects"]["effect_twinkle"]
+        effect_config = self.get_effect_config("effect_twinkle")
         led_count = self._device.device_config["LED_Count"]
 
         # Rising Star array format: [[r,g,b], [start_position, end_position], percent_brightness].

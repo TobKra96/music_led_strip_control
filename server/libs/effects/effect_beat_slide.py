@@ -10,7 +10,7 @@ class EffectBeatSlide(Effect):
         self.current_position = 0
 
     def run(self):
-        effect_config = self._device.device_config["effects"]["effect_beat_slide"]
+        effect_config = self.get_effect_config("effect_beat_slide")
         led_count = self._device.device_config["LED_Count"]
 
         audio_data = self.get_audio_data()

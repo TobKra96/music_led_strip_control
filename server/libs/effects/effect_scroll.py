@@ -15,7 +15,7 @@ class EffectScroll(Effect):
         self.output_scroll_low = np.array([[0 for i in range(self.led_count)] for i in range(3)])
 
     def run(self):
-        effect_config = self._device.device_config["effects"]["effect_scroll"]
+        effect_config = self.get_effect_config("effect_scroll")
         led_count = self._device.device_config["LED_Count"]
         led_mid = self._device.device_config["LED_Mid"]
 

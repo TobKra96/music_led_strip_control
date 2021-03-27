@@ -10,7 +10,7 @@ class EffectBeatTwinkle(Effect):
         super(EffectBeatTwinkle, self).__init__(device)
 
     def run(self):
-        effect_config = self._device.device_config["effects"]["effect_beat_twinkle"]
+        effect_config = self.get_effect_config("effect_beat_twinkle")
         led_count = self._device.device_config["LED_Count"]
         current_gradient = effect_config["gradient"]
         use_random_color = effect_config["random_color"]

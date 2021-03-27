@@ -20,6 +20,8 @@ class WebserverExecuter():
         # Initial config load.
         self._config_instance = ConfigService.instance(self._config_lock)
         self._config = self._config_instance.config
+
+        self.all_devices_id = "all_devices"
     # Ajax Commands.
 
     # Return all devices in a dictionary format: "device_id" = device_name.
@@ -34,25 +36,43 @@ class WebserverExecuter():
 
     # Return active effect.
     def GetActiveEffect(self, device):
-        return self._config["device_configs"][device]["effects"]["last_effect"]
+        if device == self.all_devices_id:
+            return self._config["all_devices"]["effects"]["last_effect"]
+        else:
+            return self._config["device_configs"][device]["effects"]["last_effect"]
 
     def SetActiveEffect(self, device, effect):
-        self._config["device_configs"][device]["effects"]["last_effect"] = effect
-        self.SaveConfig()
+        if device == self.all_devices_id:
+            self.SetActiveEffectForAll(effect)
+            self.SaveConfig()
+            self.RefreshDevice("all_devices")
+            return
+        else:
+            self._config["device_configs"][device]["effects"]["last_effect"] = effect
+            self.SaveConfig()
 
         self.PutIntoEffectQueue(device, effect)
 
     def SetActiveEffectForAll(self, effect):
+        self._config["all_devices"]["effects"]["last_effect"] = effect
         for device_key in self._config["device_configs"]:
             self.SetActiveEffect(device_key, effect)
 
     # Return setting_value.
     def GetEffectSetting(self, device, effect, setting_key):
-        return self._config["device_configs"][device]["effects"][effect][setting_key]
+        if device == self.all_devices_id:
+            return self._config["all_devices"]["effects"][effect][setting_key]
+        else:
+            return self._config["device_configs"][device]["effects"][effect][setting_key]
 
     def SetEffectSetting(self, device, effect, settings):
-        for setting_key in settings:
-            self._config["device_configs"][device]["effects"][effect][setting_key] = settings[setting_key]
+
+        if device == self.all_devices_id:
+            for setting_key in settings:
+                self._config["all_devices"]["effects"][effect][setting_key] = settings[setting_key]
+        else:
+            for setting_key in settings:
+                self._config["device_configs"][device]["effects"][effect][setting_key] = settings[setting_key]
 
         self.SaveConfig()
 

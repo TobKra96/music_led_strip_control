@@ -169,18 +169,10 @@ function ParseGetEffectSetting(response) {
 function GetLocalSettings() {
     var all_setting_keys = GetAllSettingKeys();
 
-    if (currentDevice == "all_devices") {
-        if (Object.keys(devices).length > 0) {
-            var first_device_name = Object.keys(devices)[0];
-            Object.keys(all_setting_keys).forEach(setting_id => {
-                GetEffectSetting(first_device_name, effectIdentifier, all_setting_keys[setting_id])
-            })
-        }
-    } else {
-        Object.keys(all_setting_keys).forEach(setting_id => {
-            GetEffectSetting(currentDevice, effectIdentifier, all_setting_keys[setting_id])
-        })
-    }
+    Object.keys(all_setting_keys).forEach(setting_id => {
+        GetEffectSetting(currentDevice, effectIdentifier, all_setting_keys[setting_id])
+    })
+    
 }
 
 function SetLocalInput(setting_key, setting_value) {
@@ -212,43 +204,24 @@ function GetAllSettingKeys() {
 
 
 function SetEffectSetting(device, effect, settings) {
-    if (this.currentDevice == "all_devices") {
-        var data = {};
-        data["effect"] = effect;
-        data["settings"] = settings;
+    var data = {};
+    data["device"] = this.currentDevice;
+    data["effect"] = effect;
+    data["settings"] = settings;
 
-        $.ajax({
-            url: "/SetEffectSettingForAll",
-            type: "POST",
-            data: JSON.stringify(data, null, '\t'),
-            contentType: 'application/json;charset=UTF-8',
-            success: function (response) {
-                console.log("Effect settings set successfully. Response:\n\n" + JSON.stringify(response, null, '\t'));
-            },
-            error: function (xhr) {
-                console.log("Error while setting effect settings. Error: " + xhr.responseText);
-            }
-        });
-
-    } else {
-        var data = {};
-        data["device"] = this.currentDevice;
-        data["effect"] = effect;
-        data["settings"] = settings;
-
-        $.ajax({
-            url: "/SetEffectSetting",
-            type: "POST",
-            data: JSON.stringify(data, null, '\t'),
-            contentType: 'application/json;charset=UTF-8',
-            success: function (response) {
-                console.log("Effect settings set successfully. Response:\n\n" + JSON.stringify(response, null, '\t'));
-            },
-            error: function (xhr) {
-                console.log("Error while setting effect settings. Error: " + xhr.responseText);
-            }
-        });
-    }
+    $.ajax({
+        url: "/SetEffectSetting",
+        type: "POST",
+        data: JSON.stringify(data, null, '\t'),
+        contentType: 'application/json;charset=UTF-8',
+        success: function (response) {
+            console.log("Effect settings set successfully. Response:\n\n" + JSON.stringify(response, null, '\t'));
+        },
+        error: function (xhr) {
+            console.log("Error while setting effect settings. Error: " + xhr.responseText);
+        }
+    });
+    
 }
 
 function SetLocalSettings() {
@@ -263,6 +236,8 @@ function SetLocalSettings() {
             if ($("#" + setting_key).attr('type') == 'checkbox') {
                 setting_value = $("#" + setting_key).is(':checked')
             } else if ($("#" + setting_key).attr('type') == 'number') {
+                setting_value = parseFloat($("#" + setting_key).val());
+            } else if ($("#" + setting_key).attr('type') == 'range') {
                 setting_value = parseFloat($("#" + setting_key).val());
             } else if ($("#" + setting_key).hasClass('color_input')) {
                 // Save RGB value to config

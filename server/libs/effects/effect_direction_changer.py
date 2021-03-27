@@ -76,7 +76,7 @@ class EffectDirectionChanger(Effect):
         self.current_bar_length_right = 0
 
     def run(self):
-        effect_config = self._device.device_config["effects"]["effect_direction_changer"]
+        effect_config = self.get_effect_config("effect_direction_changer")
         led_count = self._device.device_config["LED_Count"]
 
         current_gradient = effect_config["gradient"]

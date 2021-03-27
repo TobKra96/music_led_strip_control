@@ -5,6 +5,7 @@ var currentDevice = "all_devices";
 // Init and load all settings
 $(document).ready(function () {
     GetDevices();
+    GetActiveEffect(currentDevice);
 });
 
 function GetDevices() {
@@ -27,7 +28,6 @@ function ParseDevices(devices) {
     this.BuildDeviceTab();
     this.AddEventListeners();
     this.UpdateCurrentDeviceText();
-    this.clearAllActiveEffects();
 }
 
 function GetActiveEffect(device) {
@@ -54,42 +54,23 @@ function ParseActiveEffect(respond) {
 function SetActiveEffect(newActiveEffect) {
     var lastEffect = this.activeEffect;
     this.activeEffect = newActiveEffect;
+    
+    var data = {};
+    data["device"] = this.currentDevice;
+    data["effect"] = this.activeEffect;
 
-    if (this.currentDevice == "all_devices") {
-        var data = {};
-        data["effect"] = this.activeEffect;
-
-        $.ajax({
-            url: "/SetActiveEffectForAll",
-            type: "POST",
-            data: JSON.stringify(data, null, '\t'),
-            contentType: 'application/json;charset=UTF-8',
-            success: function (response) {
-                console.log("Effect set successfully. Response:\n\n" + JSON.stringify(response, null, '\t'));
-            },
-            error: function (xhr) {
-                console.log("Error while setting effect. Error: " + xhr.responseText);
-            }
-        });
-
-    } else {
-        var data = {};
-        data["device"] = this.currentDevice;
-        data["effect"] = this.activeEffect;
-
-        $.ajax({
-            url: "/SetActiveEffect",
-            type: "POST",
-            data: JSON.stringify(data, null, '\t'),
-            contentType: 'application/json;charset=UTF-8',
-            success: function (response) {
-                console.table("Effect set successfully. Response:\n\n" + JSON.stringify(response, null, '\t'));
-            },
-            error: function (xhr) {
-                console.log("Error while setting effect. Error: " + xhr.responseText);
-            }
-        });
-    }
+    $.ajax({
+        url: "/SetActiveEffect",
+        type: "POST",
+        data: JSON.stringify(data, null, '\t'),
+        contentType: 'application/json;charset=UTF-8',
+        success: function (response) {
+            console.table("Effect set successfully. Response:\n\n" + JSON.stringify(response, null, '\t'));
+        },
+        error: function (xhr) {
+            console.log("Error while setting effect. Error: " + xhr.responseText);
+        }
+    });
 
     this.UpdateActiveEffectTile();
 }
@@ -141,12 +122,6 @@ function UpdateActiveEffectTile() {
 function SwitchDevice(e) {
     var newDeviceId = e.target.id;
     this.currentDevice = newDeviceId;
-
-    if (newDeviceId == "all_devices") {
-        this.clearAllActiveEffects();
-        this.UpdateCurrentDeviceText();
-        return;
-    }
 
     this.GetActiveEffect(newDeviceId);
     this.UpdateCurrentDeviceText();

@@ -190,3 +190,10 @@ class Effect:
             prev_output_array = self._output_queue.get()
             del prev_output_array
         self._output_queue.put(output_array)
+
+    def get_effect_config(self, effect_id):
+        # Check if we use the global "all_devices" settings or the device specific one.
+        if self._config["all_devices"]["effects"]["last_effect"] == effect_id:
+            return self._config["all_devices"]["effects"][effect_id]
+        else:
+            return self._device.device_config["effects"][effect_id]
