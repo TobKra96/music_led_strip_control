@@ -109,7 +109,7 @@ def first():
 
 @server.route('/login', methods=['GET', 'POST'])
 def login():
-    if not USE_PIN_LOCK:
+    if not USE_PIN_LOCK or current_user.is_authenticated:
         return redirect("/")
     if request.method == 'POST':
         pin = request.form.get('pin')
