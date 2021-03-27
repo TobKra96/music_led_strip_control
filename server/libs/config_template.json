@@ -292,7 +292,7 @@
                 "color": "Orange",
                 "decay": 0.7
             },
-            "last_effect": "effect_single"
+            "last_effect": "effect_off"
         },
         "output": {
             "output_mqtt": {
@@ -551,7 +551,7 @@
                 "color": "Orange",
                 "decay": 0.7
             },
-            "last_effect": "effect_single"
+            "last_effect": "effect_off"
         }
     },
     "development_config": {
