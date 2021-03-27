@@ -44,8 +44,6 @@ class WebserverExecuter():
     def SetActiveEffect(self, device, effect):
         if device == self.all_devices_id:
             self.SetActiveEffectForAll(effect)
-            self.SaveConfig()
-            self.RefreshDevice("all_devices")
             return
         else:
             self._config["device_configs"][device]["effects"]["last_effect"] = effect
@@ -57,6 +55,8 @@ class WebserverExecuter():
         self._config["all_devices"]["effects"]["last_effect"] = effect
         for device_key in self._config["device_configs"]:
             self.SetActiveEffect(device_key, effect)
+        self.SaveConfig()
+        self.RefreshDevice("all_devices")
 
     # Return setting_value.
     def GetEffectSetting(self, device, effect, setting_key):
