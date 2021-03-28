@@ -79,10 +79,8 @@ sudo apt-get -y install libatlas-base-dev portaudio19-dev
 sudo apt-get -y install python3 python3-pip python3-scipy  # Fallback scipy module if the Pip module fails to install.
 
 
-# Install required Python modules:
-sudo pip3 install --no-input --upgrade pip        # Upgrade Pip to the latest version.
-sudo pip3 install --no-input -r requirements.txt  # Install modules from requirements.txt.
-
+# Upgrade Pip to the latest version.
+sudo pip3 install --no-input --upgrade pip
 prompt -s "\nPackages updated and installed."
 
 
@@ -108,6 +106,9 @@ if [[ -d $PROJ_DIR ]]; then
 else
     sudo git clone https://github.com/TobKra96/music_led_strip_control.git
 fi
+
+# Install modules from requirements.txt.
+sudo pip3 install --no-input -r ${PROJ_DIR}/requirements.txt
 
 
 # Setup microphone:
