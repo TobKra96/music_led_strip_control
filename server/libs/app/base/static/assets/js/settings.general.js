@@ -239,3 +239,30 @@ document.getElementById("reset_btn_modal").addEventListener("click", function (e
     ResetPinSettings()
     ResetSettings(currentDevice);
 });
+
+document.getElementById("import_btn").addEventListener("click", function (e) {
+    ImportSettings();
+});
+
+function ImportSettings(){
+    var file_data = $('#configUpload').prop('files')[0];
+    let form_data = new FormData();
+    form_data.append('imported_config', file_data);
+
+    $.ajax({
+        url: '/import_config', // point to server-side PHP script 
+        dataType: 'text',  // what to expect back from the PHP script, if anything
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,                         
+        type: 'post',
+        success: function(response){
+            console.log("Config Imported." + response.responseText);
+            location.reload();
+        },
+        error: function (xhr) {
+            console.log("Import settings got an error. Error: " + xhr.responseText);
+        }
+     });
+}
