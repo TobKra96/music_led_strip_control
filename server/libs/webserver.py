@@ -193,6 +193,7 @@ class Webserver():
         Webserver.instance.logger.debug("Import Config Request received.")
         if 'imported_config' not in request.files:
             Webserver.instance.logger.error("Could not find the file key.")
+            flash('No config file selected', 'error')
             return "Could not import file.", 404
         imported_config = request.files['imported_config']
         content = imported_config.read()
@@ -200,12 +201,16 @@ class Webserver():
             try:
                 Webserver.instance.logger.debug(f"File Received: {json.dumps(json.loads(content), indent=4)}")
                 if Webserver.instance.webserver_executer.ImportConfig(json.loads(content, encoding='utf-8')):
+                    flash('Config file imported', 'success')
                     return "File imported.", 200
                 else:
+                    flash('Could not import config file', 'error')
                     return "Could not import file.", 400
             except (json.decoder.JSONDecodeError, UnicodeDecodeError):
+                flash('Not a valid config file', 'error')
                 return "File is not valid JSON.", 400
         else:
+            flash('No config file selected', 'error')
             return "No config file selected.", 400
 
     #####################################################################

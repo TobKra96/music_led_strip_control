@@ -188,8 +188,8 @@ function SetLocalSettings() {
         settings[setting_key] = setting_value;
     })
 
-    SetGeneralSetting(settings)
-    SetPinSetting()
+    SetGeneralSetting(settings);
+    SetPinSetting();
 }
 
 function ResetSettings() {
@@ -201,11 +201,11 @@ function ResetSettings() {
         data: JSON.stringify(data, null, '\t'),
         contentType: 'application/json;charset=UTF-8',
         success: function (response) {
-            console.log("Reset settings successfully. Response:\n\n" + JSON.stringify(response, null, '\t'));
+            console.log("Settings reset successfully. Response:\n\n" + JSON.stringify(response, null, '\t'));
             location.reload();
         },
         error: function (xhr) {
-            console.log("Reset settings got an error. Error: " + xhr.responseText);
+            console.log("Error while resetting settings. Error: " + xhr.responseText);
         }
     });
 }
@@ -236,7 +236,7 @@ document.getElementById("reset_btn").addEventListener("click", function (e) {
 
 document.getElementById("reset_btn_modal").addEventListener("click", function (e) {
     $('#modal_reset_general').modal('hide')
-    ResetPinSettings()
+    ResetPinSettings();
     ResetSettings(currentDevice);
 });
 
@@ -244,25 +244,24 @@ document.getElementById("import_btn").addEventListener("click", function (e) {
     ImportSettings();
 });
 
-function ImportSettings(){
+function ImportSettings() {
     var file_data = $('#configUpload').prop('files')[0];
     let form_data = new FormData();
     form_data.append('imported_config', file_data);
 
     $.ajax({
-        url: '/import_config', // point to server-side PHP script 
-        dataType: 'text',  // what to expect back from the PHP script, if anything
+        url: '/import_config',
+        dataType: 'text',
         cache: false,
         contentType: false,
         processData: false,
-        data: form_data,                         
-        type: 'post',
-        success: function(response){
-            console.log("Config Imported." + response.responseText);
+        data: form_data,
+        type: 'POST',
+        success: function (response) {
             location.reload();
         },
         error: function (xhr) {
-            console.log("Import settings got an error. Error: " + xhr.responseText);
+            location.reload();
         }
-     });
+    });
 }
