@@ -5,6 +5,12 @@
     font-style: normal;
 }
 
+/* Remove default password eye icon */
+input[type=password]::-ms-reveal,
+input[type=password]::-ms-clear {
+    display: none;
+}
+
 /* Set text highlight color */
 ::selection {
     background: #3F4D67;
