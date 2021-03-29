@@ -50,23 +50,43 @@
                                                         <input id="DEVICE_NAME" class="form-control device_setting_input" type="text" name="text" required>
                                                     </div>
                                                     <div class="form-group">
-                                                        <label>Maximum FPS</label>
+                                                        <label class="row m-0 mb-2 p-0">
+                                                            Maximum FPS
+                                                            <div id="FPS_TOOLTIP" class="pl-1" data-toggle="tooltip" data-placement="top" data-html="true">
+                                                                <i class="feather icon-help-circle"></i>
+                                                            </div>
+                                                        </label>
                                                         <input id="FPS" class="form-control device_setting_input" type="number" name="number" required>
                                                     </div>
                                                 </div>
                                                 <div class="col-lg-6">
                                                     <div class="form-group">
-                                                        <label>Number of LEDs</label>
+                                                        <label class="row m-0 mb-2 p-0">
+                                                            Number of LEDs
+                                                            <div id="LED_Count_TOOLTIP" class="pl-1" data-toggle="tooltip" data-placement="top" data-html="true">
+                                                                <i class="feather icon-help-circle"></i>
+                                                            </div>
+                                                        </label>
                                                         <input id="LED_Count" class="form-control device_setting_input" type="number" name="number" required>
                                                     </div>
                                                     <div class="form-group">
-                                                        <label>LED Strip Middle</label>
+                                                        <label class="row m-0 mb-2 p-0">
+                                                            LED Strip Middle
+                                                            <div id="LED_Mid_TOOLTIP" class="pl-1" data-toggle="tooltip" data-placement="top" data-html="true">
+                                                                <i class="feather icon-help-circle"></i>
+                                                            </div>
+                                                        </label>
                                                         <input id="LED_Mid" class="form-control device_setting_input" type="number" name="number" required>
                                                     </div>
                                                 </div>
                                                 <div class="col-lg-12">
                                                     <div class="form-group">
-                                                        <label>Selected Output Type</label>
+                                                        <label class="row m-0 mb-2 p-0">
+                                                            Selected Output Type
+                                                            <div id="OUTPUT_TYPE_TOOLTIP" class="pl-1" data-toggle="tooltip" data-placement="top" data-html="true">
+                                                                <i class="feather icon-help-circle"></i>
+                                                            </div>
+                                                        </label>
                                                         <select id="OUTPUT_TYPE" class="form-control output_type device_setting_input"></select>
                                                     </div>
                                                 </div>
@@ -83,32 +103,62 @@
                                             <div class="row">
                                                 <div class="col-lg-6">
                                                     <div class="form-group">
-                                                        <label>LED GPIO Pin</label>
+                                                        <label class="row m-0 mb-2 p-0">
+                                                            LED GPIO Pin
+                                                            <div id="LED_Pin_TOOLTIP" class="pl-1" data-toggle="tooltip" data-placement="top" data-html="true">
+                                                                <i class="feather icon-help-circle"></i>
+                                                            </div>
+                                                        </label>
                                                         <input id="LED_Pin" class="form-control output_raspi" type="number" name="number" required>
                                                     </div>
                                                     <div class="form-group">
-                                                        <label>LED Signal Frequency in Hz</label>
+                                                        <label class="row m-0 mb-2 p-0">
+                                                            LED Signal Frequency in Hz
+                                                            <div id="LED_Freq_Hz_TOOLTIP" class="pl-1" data-toggle="tooltip" data-placement="top" data-html="true">
+                                                                <i class="feather icon-help-circle"></i>
+                                                            </div>
+                                                        </label>
                                                         <input id="LED_Freq_Hz" class="form-control output_raspi" type="number" name="number" required>
                                                     </div>
                                                 </div>
                                                 <div class="col-lg-6">
                                                     <div class="form-group">
-                                                        <label>LED Channel</label>
+                                                        <label class="row m-0 mb-2 p-0">
+                                                            LED Channel
+                                                            <div id="LED_Channel_TOOLTIP" class="pl-1" data-toggle="tooltip" data-placement="top" data-html="true">
+                                                                <i class="feather icon-help-circle"></i>
+                                                            </div>
+                                                        </label>
                                                         <input id="LED_Channel" class="form-control output_raspi" type="number" name="number" required>
                                                     </div>
                                                     <div class="form-group">
-                                                        <label>LED DMA</label>
+                                                        <label class="row m-0 mb-2 p-0">
+                                                            LED DMA
+                                                            <div id="LED_Dma_TOOLTIP" class="pl-1" data-toggle="tooltip" data-placement="top" data-html="true">
+                                                                <i class="feather icon-help-circle"></i>
+                                                            </div>
+                                                        </label>
                                                         <input id="LED_Dma" class="form-control output_raspi" type="number" name="number" required>
                                                     </div>
                                                 </div>
                                                 <div class="col-md-12">
                                                     <div class="form-group">
-                                                        <label>LED Strip Type</label>
+                                                        <label class="row m-0 mb-2 p-0">
+                                                            LED Strip Type
+                                                            <div id="LED_Strip_TOOLTIP" class="pl-1" data-toggle="tooltip" data-placement="top" data-html="true">
+                                                                <i class="feather icon-help-circle"></i>
+                                                            </div>
+                                                        </label>
                                                         <select id="LED_Strip" class="form-control led_strips output_raspi"></select>
                                                     </div>
                                                     <div class="custom-control custom-checkbox my-2">
                                                         <input type="checkbox" class="custom-control-input output_raspi" id="LED_Invert">
-                                                        <label class="custom-control-label" for="LED_Invert">Invert LED</label>
+                                                        <label class="custom-control-label row m-0 mb-2 p-0" for="LED_Invert">
+                                                            Invert LED
+                                                            <div id="LED_Invert_TOOLTIP" class="pl-1" data-toggle="tooltip" data-placement="top" data-html="true">
+                                                                <i class="feather icon-help-circle"></i>
+                                                            </div>
+                                                        </label>
                                                     </div>
                                                 </div>
                                                 <div class="col-md-12 mt-2">
@@ -126,11 +176,21 @@
                                         </div>
                                         <div class="card-block">
                                             <div class="form-group">
-                                                <label>UDP Client IP Address</label>
+                                                <label class="row m-0 mb-2 p-0">
+                                                    UDP Client IP Address
+                                                    <div id="UDP_Client_IP_TOOLTIP" class="pl-1" data-toggle="tooltip" data-placement="top" data-html="true">
+                                                        <i class="feather icon-help-circle"></i>
+                                                    </div>
+                                                </label>
                                                 <input id="UDP_Client_IP" class="form-control output_udp" type="text" name="text" required>
                                             </div>
                                             <div class="form-group">
-                                                <label>UDP Client Port</label>
+                                                <label class="row m-0 mb-2 p-0">
+                                                    UDP Client Port
+                                                    <div id="UDP_Client_Port_TOOLTIP" class="pl-1" data-toggle="tooltip" data-placement="top" data-html="true">
+                                                        <i class="feather icon-help-circle"></i>
+                                                    </div>
+                                                </label>
                                                 <input id="UDP_Client_Port" class="form-control output_udp" type="number" name="number" required>
                                             </div>
                                         </div>
