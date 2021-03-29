@@ -74,10 +74,11 @@ input[type=password]::-ms-clear {
     user-select: none;
 }
 
-/* Change tooltip color */
+/* Change tooltip color and width */
 .tooltip-inner {
     background-color: #3F4D67 !important;
     color: #ffffff;
+    max-width: 350px;
   }
 
 .tooltip .arrow::before {
