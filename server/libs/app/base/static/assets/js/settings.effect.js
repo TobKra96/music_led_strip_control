@@ -177,9 +177,7 @@ function GetLocalSettings() {
 
 function SetLocalInput(setting_key, setting_value) {
     if ($("#" + setting_key).attr('type') == 'checkbox') {
-        if (setting_value) {
-            $("#" + setting_key).click();
-        }
+        $("#" + setting_key).prop('checked', setting_value);
     } else if ($("#" + setting_key).hasClass('color_input')) {
         // Set RGB color and value from config
         formattedRGB = formatRGB(setting_value)

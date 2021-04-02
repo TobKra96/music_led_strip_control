@@ -111,10 +111,8 @@ function GetLocalSettings() {
 
 function SetLocalInput(setting_key, setting_value) {
     if ($("#" + setting_key).attr('type') == 'checkbox') {
-        if (setting_value) {
-            $("#" + setting_key).click();
-        }
-    } else {
+        $("#" + setting_key).prop('checked', setting_value);
+    }else {
         $("#" + setting_key).val(setting_value);
     }
 
