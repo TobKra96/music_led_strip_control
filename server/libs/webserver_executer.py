@@ -202,7 +202,6 @@ class WebserverExecuter():
         self.logger.debug(f"EnumItem prepared: {effect_item.effect_enum} {effect_item.device_id}")
         self.effects_queue.put(effect_item)
         self.logger.debug("EnumItem put into queue.")
-        self.logger.debug(f"Effect queue id Webserver {id(self.effects_queue)}")
 
     def PutIntoNotificationQueue(self, notificication, device):
         self.logger.debug("Preparing new Notification...")

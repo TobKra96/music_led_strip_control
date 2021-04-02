@@ -134,7 +134,16 @@ class EffectAdvancedScroll(Effect):
         self.output[1] = self.output_scroll_subbass[1] + self.output_scroll_bass[1] + self.output_scroll_lowmid[1] + self.output_scroll_mid[1] + self.output_scroll_uppermid[1] + self.output_scroll_presence[1] + self.output_scroll_brilliance[1]
         self.output[2] = self.output_scroll_subbass[2] + self.output_scroll_bass[2] + self.output_scroll_lowmid[2] + self.output_scroll_mid[2] + self.output_scroll_uppermid[2] + self.output_scroll_presence[2] + self.output_scroll_brilliance[2]
 
-        self.output = (self.output * effect_config["decay"]).astype(int)
+        # Decay the history arrays for the next round
+        decay = effect_config["decay"]/100
+        self.output_scroll_subbass = (self.output_scroll_subbass * decay).astype(int)
+        self.output_scroll_bass = (self.output_scroll_bass * decay).astype(int)
+        self.output_scroll_lowmid = (self.output_scroll_lowmid * decay).astype(int)
+        self.output_scroll_mid = (self.output_scroll_mid * decay).astype(int)
+        self.output_scroll_uppermid = (self.output_scroll_uppermid * decay).astype(int)
+        self.output_scroll_presence = (self.output_scroll_presence * decay).astype(int)
+        self.output_scroll_brilliance = (self.output_scroll_brilliance * decay).astype(int)
+
         blur_amount = effect_config["blur"]
         if blur_amount > 0:
             self.output = gaussian_filter1d(self.output, sigma=blur_amount)

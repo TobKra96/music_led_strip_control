@@ -80,7 +80,12 @@ class EffectScroll(Effect):
         self.output[1] = self.output_scroll_high[1] + self.output_scroll_mid[1] + self.output_scroll_low[1]
         self.output[2] = self.output_scroll_high[2] + self.output_scroll_mid[2] + self.output_scroll_low[2]
 
-        self.output = (self.output * effect_config["decay"]).astype(int)
+        # Decay the history arrays for the next round
+        decay = effect_config["decay"]/100
+        self.output_scroll_high = (self.output_scroll_high * decay).astype(int)
+        self.output_scroll_mid = (self.output_scroll_mid * decay).astype(int)
+        self.output_scroll_low = (self.output_scroll_low * decay).astype(int)
+        
         blur_amount = effect_config["blur"]
         if blur_amount > 0:
             self.output = gaussian_filter1d(self.output, sigma=blur_amount)

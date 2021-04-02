@@ -66,7 +66,7 @@
                 "brilliance_color": "Blue",
                 "brilliance_multiplier": 1,
                 "brilliance_speed": 4,
-                "decay": 1,
+                "decay": 100,
                 "lowmid_color": "Pink",
                 "lowmid_multiplier": 1,
                 "lowmid_speed": 4,
@@ -100,11 +100,11 @@
                 "random_color": true
             },
             "effect_beat_slide": {
-                "bar_length": 102,
+                "bar_length": 10,
                 "color": "Blue",
                 "decay": 0.7,
-                "slider_length": 10,
-                "speed": 5
+                "slider_length": 15,
+                "speed": 1
             },
             "effect_beat_twinkle": {
                 "color": "Red",
@@ -180,7 +180,7 @@
             },
             "effect_scroll": {
                 "blur": 0.5,
-                "decay": 1,
+                "decay": 100,
                 "high_color": "Blue",
                 "high_multiplier": 1,
                 "high_speed": 4,
@@ -325,7 +325,7 @@
                 "brilliance_color": "Blue",
                 "brilliance_multiplier": 1,
                 "brilliance_speed": 4,
-                "decay": 1,
+                "decay": 100,
                 "lowmid_color": "Pink",
                 "lowmid_multiplier": 1,
                 "lowmid_speed": 4,
@@ -359,11 +359,11 @@
                 "random_color": true
             },
             "effect_beat_slide": {
-                "bar_length": 102,
+                "bar_length": 10,
                 "color": "Blue",
                 "decay": 0.7,
-                "slider_length": 10,
-                "speed": 5
+                "slider_length": 15,
+                "speed": 1
             },
             "effect_beat_twinkle": {
                 "color": "Red",
@@ -439,7 +439,7 @@
             },
             "effect_scroll": {
                 "blur": 0.5,
-                "decay": 1,
+                "decay": 100,
                 "high_color": "Blue",
                 "high_multiplier": 1,
                 "high_speed": 4,
