@@ -46,55 +46,61 @@
                                     <form id="settingsForm" action method="post" novalidate>
                                         <div class="row">
                                             <div class="col-md-6">
+                                                <h5>Low Controls</h5>
                                                 <div class="form-group">
                                                     <label>Low Color</label>
                                                     <select id="lows_color" class="form-control colours setting_input"></select>
                                                 </div>
                                                 <div class="form-group">
+                                                    <label>Speed Low <span for="low_speed" class="mb-0 badge badge-secondary"></span></label>
+                                                    <input id="low_speed" type="range" class="custom-range setting_input" min="0" max="20" step="1" required>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>Lows Multiplier <span for="lows_multiplier" class="mb-0 badge badge-secondary"></span></label>
+                                                    <input id="lows_multiplier" type="range" class="custom-range setting_input" min="0" max="10" step="0.1" required>
+                                                </div>
+
+                                                <hr class="my-4">
+
+                                                <h5>Mid Controls</h5>
+                                                <div class="form-group">
                                                     <label>Mid Color</label>
                                                     <select id="mids_color" class="form-control colours setting_input"></select>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="form-group">
-                                                    <label>High Color</label>
-                                                    <select id="high_color" class="form-control colours setting_input"></select>
-                                                </div>
-                                                <div class="custom-control custom-checkbox my-2">
-                                                    <input type="checkbox" class="custom-control-input setting_input" id="mirror">
-                                                    <label class="custom-control-label" for="mirror">Mirror</label>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="form-group">
-                                                    <label>Decay <span for="decay" class="mb-0 badge badge-secondary"></span></label>
-                                                    <input id="decay" type="range" class="custom-range setting_input" min="0" max="100" step="1" required>
-                                                </div>
-                                                <div class="form-group">
-                                                    <label>Speed High <span for="high_speed" class="mb-0 badge badge-secondary"></span></label>
-                                                    <input id="high_speed" type="range" class="custom-range setting_input" min="0" max="20" step="1" required>
                                                 </div>
                                                 <div class="form-group">
                                                     <label>Speed Mid <span for="mid_speed" class="mb-0 badge badge-secondary"></span></label>
                                                     <input id="mid_speed" type="range" class="custom-range setting_input" min="0" max="20" step="1" required>
                                                 </div>
                                                 <div class="form-group">
-                                                    <label>Speed Low <span for="low_speed" class="mb-0 badge badge-secondary"></span></label>
-                                                    <input id="low_speed" type="range" class="custom-range setting_input" min="0" max="20" step="1" required>
+                                                    <label>Mids Multiplier <span for="mids_multiplier" class="mb-0 badge badge-secondary"></span></label>
+                                                    <input id="mids_multiplier" type="range" class="custom-range setting_input" min="0" max="10" step="0.1" required>
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
+                                                <h5>High Controls</h5>
                                                 <div class="form-group">
-                                                    <label>Lows Multiplier <span for="lows_multiplier" class="mb-0 badge badge-secondary"></span></label>
-                                                    <input id="lows_multiplier" type="range" class="custom-range setting_input" min="0" max="10" step="0.1" required>
+                                                    <label>High Color</label>
+                                                    <select id="high_color" class="form-control colours setting_input"></select>
                                                 </div>
                                                 <div class="form-group">
-                                                    <label>Mids Multiplier <span for="mids_multiplier" class="mb-0 badge badge-secondary"></span></label>
-                                                    <input id="mids_multiplier" type="range" class="custom-range setting_input" min="0" max="10" step="0.1" required>
+                                                    <label>Speed High <span for="high_speed" class="mb-0 badge badge-secondary"></span></label>
+                                                    <input id="high_speed" type="range" class="custom-range setting_input" min="0" max="20" step="1" required>
                                                 </div>
                                                 <div class="form-group">
                                                     <label>Highs Multiplier <span for="high_multiplier" class="mb-0 badge badge-secondary"></span></label>
                                                     <input id="high_multiplier" type="range" class="custom-range setting_input" min="0" max="10" step="0.1" required>
+                                                </div>
+
+                                                <hr class="my-4">
+
+                                                <h5>General Controls</h5>
+                                                <div class="custom-control custom-checkbox my-2">
+                                                    <input type="checkbox" class="custom-control-input setting_input" id="mirror">
+                                                    <label class="custom-control-label" for="mirror">Mirror</label>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>Decay <span for="decay" class="mb-0 badge badge-secondary"></span></label>
+                                                    <input id="decay" type="range" class="custom-range setting_input" min="0" max="100" step="1" required>
                                                 </div>
                                                 <div class="form-group">
                                                     <label>Blur <span for="blur" class="mb-0 badge badge-secondary"></span></label>
