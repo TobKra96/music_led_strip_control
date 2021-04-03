@@ -172,7 +172,7 @@ function GetLocalSettings() {
     Object.keys(all_setting_keys).forEach(setting_id => {
         GetEffectSetting(currentDevice, effectIdentifier, all_setting_keys[setting_id])
     })
-    
+
 }
 
 function SetLocalInput(setting_key, setting_value) {
@@ -219,7 +219,7 @@ function SetEffectSetting(device, effect, settings) {
             console.log("Error while setting effect settings. Error: " + xhr.responseText);
         }
     });
-    
+
 }
 
 function SetLocalSettings() {
