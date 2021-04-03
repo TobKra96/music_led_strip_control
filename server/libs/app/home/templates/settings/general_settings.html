@@ -51,7 +51,7 @@
                                                             <i class="feather icon-help-circle"></i>
                                                         </div>
                                                     </label>
-                                                    <input id="WEBSERVER_PORT" class="form-control setting_input" type="number" name="number" required="required">
+                                                    <input id="WEBSERVER_PORT" class="form-control setting_input" oninput="if (this.value > 65535) this.value = 65535;" onkeypress="return event.charCode >= 48 && event.charCode <= 57" type="number" name="number" required>
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
