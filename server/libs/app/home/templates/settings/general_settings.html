@@ -63,7 +63,7 @@
                                                         </div>
                                                     </label>
                                                     <div class="input-group">
-                                                        <input id="DASHBOARD_PIN" class="form-control" type="password" name="pin">
+                                                        <input id="DASHBOARD_PIN" class="form-control" maxlength="8" oninput="this.value = this.value.replace(/[^0-9]/g, '').replace(/(\.*?)\.*/g, '$1');" type="password" name="pin">
                                                         <div class="input-group-append">
                                                             <span id="toggle_pin_view" class="input-group-text feather icon-eye"></span>
                                                         </div>

@@ -153,6 +153,12 @@ function SetPinSetting() {
     if ($('#PIN_LOCK_ENABLED').is(':checked')) {
         pinCheckbox = true;
     }
+    if (pin.length < 4) {
+        pin = ""
+        pinCheckbox = false;
+        $('#PIN_LOCK_ENABLED').prop('checked', pinCheckbox);
+        $('#DASHBOARD_PIN').val(pin);
+    }
     var pinData = {};
     pinData["DEFAULT_PIN"] = pin;
     pinData["USE_PIN_LOCK"] = pinCheckbox;
