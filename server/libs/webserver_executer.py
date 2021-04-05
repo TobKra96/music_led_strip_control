@@ -57,7 +57,6 @@ class WebserverExecuter():
         self.RefreshDevice("all_devices")
         for device_key in self._config["device_configs"]:
             self.SetActiveEffect(device_key, effect)
-        
 
     # Return setting_value.
     def GetEffectSetting(self, device, effect, setting_key):
