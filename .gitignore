@@ -20,6 +20,7 @@ venv
 
 # other
 .DS_Store
+*.lock
 
 # sphinx docs
 _build
