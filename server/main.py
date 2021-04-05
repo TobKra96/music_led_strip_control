@@ -19,6 +19,7 @@ from libs.webserver import Webserver
 from multiprocessing import Process, Queue, Lock
 from time import sleep
 import subprocess
+import pyaudio
 import logging
 import fcntl
 import os
@@ -79,6 +80,9 @@ class Main():
         # Check config compatibility
         self._config_instance.check_compatibility()
 
+        # Init pyaudio
+        self._py_audio = pyaudio.PyAudio()
+
         # Prepare the queue for the output
         self._output_queue = Queue(2)
         self._effects_queue = Queue(100)
@@ -130,7 +134,8 @@ class Main():
                 self._config_lock,
                 self._notification_queue_webserver_in,
                 self._notification_queue_webserver_out,
-                self._effects_queue
+                self._effects_queue,
+                self._py_audio
             ))
         self._webserver_process.start()
 
@@ -142,7 +147,8 @@ class Main():
                 self._config_lock,
                 self._notification_queue_audio_in,
                 self._notification_queue_audio_out,
-                self._audio_queue
+                self._audio_queue,
+                self._py_audio
             ))
         self._audio_process.start()
 

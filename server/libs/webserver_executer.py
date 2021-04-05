@@ -6,16 +6,19 @@ from libs.notification_item import NotificationItem  # pylint: disable=E0611, E0
 from libs.config_service import ConfigService  # pylint: disable=E0611, E0401
 from libs.effects_enum import EffectsEnum  # pylint: disable=E0611, E0401
 from libs.effect_item import EffectItem  # pylint: disable=E0611, E0401
+from libs.audio_device import AudioDevice  # pylint: disable=E0611, E0401
+from libs.audio_info import AudioInfo  # pylint: disable=E0611, E0401
 
 
 class WebserverExecuter():
-    def __init__(self, config_lock, notification_queue_in, notification_queue_out, effects_queue):
+    def __init__(self, config_lock, notification_queue_in, notification_queue_out, effects_queue, py_audio):
         self.logger = logging.getLogger(__name__)
 
         self._config_lock = config_lock
         self.notification_queue_in = notification_queue_in
         self.notification_queue_out = notification_queue_out
         self.effects_queue = effects_queue
+        self._py_audio = py_audio
 
         # Initial config load.
         self._config_instance = ConfigService.instance(self._config_lock)
@@ -110,6 +113,13 @@ class WebserverExecuter():
         for logging_level_ID in self._config["logging_levels"]:
             logging_levels[logging_level_ID] = self._config["logging_levels"][logging_level_ID]
         return logging_levels
+
+    def GetAudioDevices(self):
+        audio_devices_dict = dict()
+        audio_devices = AudioInfo.GetAudioDevices(self._py_audio)
+        for current_audio_device in audio_devices:
+            audio_devices_dict[current_audio_device.id] = current_audio_device.ToString()
+        return audio_devices_dict
 
     def GetGeneralSetting(self, setting_key):
         return self._config["general_settings"][setting_key]

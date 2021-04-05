@@ -7,6 +7,7 @@ var gradients = {};
 
 var devicesLoading = true;
 var loggingLevelsLoading = true;
+var audioDevicesLoading = true;
 
 // Init and load all settings
 $(document).ready(function () {
@@ -14,11 +15,12 @@ $(document).ready(function () {
     settingsIdentifier = $("#settingsIdentifier").val();
 
     GetLoggingLevels();
+    GetAudioDevices();
 });
 
 //Check if all initial ajax requests are finished.
 function CheckIfFinishedInitialLoading() {
-    if (!loggingLevelsLoading) {
+    if (!loggingLevelsLoading && !audioDevicesLoading) {
         GetLocalSettings();
     }
 }
@@ -53,6 +55,40 @@ function ParseGetLoggingLevels(response) {
     });
 
     loggingLevelsLoading = false;
+    CheckIfFinishedInitialLoading();
+}
+
+
+// Get Audio Devices  -----------------------------------------------------------
+
+function GetAudioDevices() {
+    $.ajax({
+        url: "/GetAudioDevices",
+        type: "GET",
+        data: {},
+        success: function (response) {
+            ParseGetAudioDevices(response);
+        },
+        error: function (xhr) {
+            // Handle error
+        }
+    });
+}
+
+function ParseGetAudioDevices(response) {
+    var context = this;
+    this.audio_devices = response;
+
+    $('.audio_devices').each(function () {
+        var audio_devices = context.audio_devices;
+        for (var currentKey in audio_devices) {
+            var newOption = new Option(audio_devices[currentKey], currentKey);
+            $(newOption).html(audio_devices[currentKey]);
+            $(this).append(newOption);
+        }
+    });
+
+    audioDevicesLoading = false;
     CheckIfFinishedInitialLoading();
 }
 

@@ -81,13 +81,14 @@
                                             </div>
                                             <div class="col-md-6">
                                                 <div class="form-group">
-                                                        <label class="row m-0 mb-2 p-0">
-                                                            Audio Source ID
-                                                            <div id="DEVICE_ID_TOOLTIP" class="pl-1" data-toggle="tooltip" data-placement="top" data-html="true">
-                                                                <i class="feather icon-help-circle"></i>
-                                                            </div>
-                                                        </label>
-                                                    <input id="DEVICE_ID" class="form-control setting_input" onkeypress="return event.charCode >= 48 && event.charCode <= 57" type="number" name="number" required>
+                                                    <label class="row m-0 mb-2 p-0">
+                                                        Audio Device
+                                                        <div id="DEVICE_ID_TOOLTIP" class="pl-1" data-toggle="tooltip" data-placement="top" data-html="true" >
+                                                            <i class="feather icon-help-circle"></i>
+                                                        </div>
+                                                    </label>
+                                                    <select id="DEVICE_ID" class="form-control audio_devices setting_input">
+                                                    </select>
                                                 </div>
                                                 <div class="form-group">
                                                     <label class="row m-0 mb-2 p-0">

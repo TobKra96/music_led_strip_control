@@ -156,15 +156,16 @@ def logout():
 
 
 class Webserver():
-    def start(self, config_lock, notification_queue_in, notification_queue_out, effects_queue):
+    def start(self, config_lock, notification_queue_in, notification_queue_out, effects_queue, py_audio):
         self.logger = logging.getLogger(__name__)
 
         self._config_lock = config_lock
         self.notification_queue_in = notification_queue_in
         self.notification_queue_out = notification_queue_out
         self.effects_queue = effects_queue
+        self._py_audio = py_audio
 
-        self.webserver_executer = WebserverExecuter(config_lock, notification_queue_in, notification_queue_out, effects_queue)
+        self.webserver_executer = WebserverExecuter(config_lock, notification_queue_in, notification_queue_out, effects_queue, py_audio)
         Webserver.instance = self
 
         config_instance = ConfigService.instance(self._config_lock)
@@ -436,6 +437,30 @@ class Webserver():
                 return "Could not find logging_levels.", 403
             else:
                 return jsonify(data_out)
+    
+    # /GetAudioDevices
+    #
+    # return
+    # {
+    # "<AudioDeviceID1>" = <AudioDeviceIDDescription1>
+    # "<AudioDeviceID2>" = <AudioDeviceIDDescription2>
+    # "<AudioDeviceID3>" = <AudioDeviceIDDescription3>
+    # ...
+    # }
+    @server.route('/GetAudioDevices', methods=['GET'])
+    @login_required
+    def GetAudioDevices():  # pylint: disable=E0211
+        if request.method == 'GET':
+            data_out = dict()
+
+            audio_devices = Webserver.instance.webserver_executer.GetAudioDevices()
+            data_out = audio_devices
+
+            if data_out is None:
+                return "Could not find audio_devices.", 403
+            else:
+                return jsonify(data_out)
+
 
     # /SetEffectSetting
     # {

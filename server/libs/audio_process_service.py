@@ -1,8 +1,11 @@
+from libs.audio_device import AudioDevice  # pylint: disable=E0611, E0401
+from libs.audio_info import AudioInfo  # pylint: disable=E0611, E0401
 from libs.notification_item import NotificationItem  # pylint: disable=E0611, E0401
 from libs.notification_enum import NotificationEnum  # pylint: disable=E0611, E0401
 from libs.config_service import ConfigService  # pylint: disable=E0611, E0401
 from libs.fps_limiter import FPSLimiter  # pylint: disable=E0611, E0401
 from libs.dsp import DSP  # pylint: disable=E0611, E0401
+
 
 from multiprocessing import Queue
 from queue import Empty
@@ -14,7 +17,7 @@ import logging
 
 
 class AudioProcessService:
-    def start(self, config_lock, notification_queue_in, notification_queue_out, audio_queue):
+    def start(self, config_lock, notification_queue_in, notification_queue_out, audio_queue, py_audio):
         self.logger = logging.getLogger(__name__)
 
         self._config_lock = config_lock
@@ -23,6 +26,7 @@ class AudioProcessService:
         self._audio_queue = audio_queue
 
         self.audio_buffer_queue = Queue(2)
+        self._py_audio = py_audio
         self.stream = None
 
         self.init_audio_service(show_output=True)
@@ -42,59 +46,44 @@ class AudioProcessService:
 
             # Init FPS Limiter.
             self._fps_limiter = FPSLimiter(120)
-
-            # Init pyaudio.
-            self._py_audio = pyaudio.PyAudio()
-
             self._skip_routine = False
-
-            self._numdevices = self._py_audio.get_device_count()
-            self._default_device_id = self._py_audio.get_default_input_device_info()['index']
-            self._devices = []
+            self._devices = AudioInfo.GetAudioDevices(self._py_audio)
 
             self.log_output(show_output, logging.INFO, "Found the following audio sources:")
 
             # Select the audio device you want to use.
-            selected_device_list_index = self._config["general_settings"]["DEVICE_ID"]
+            selected_device_list_index = 0
+            try:
+                selected_device_list_index = int(self._config["general_settings"]["DEVICE_ID"])
+            except Exception as e:
+                self.logger.exception(f"Could not parse audio id: {e}")
 
             # Check if the index is inside the list.
-            foundMicIndex = False
-
+            self.selected_device = None
             # For each audio device, add to list of devices.
-            for i in range(0, self._numdevices):
-                try:
-                    device_info = self._py_audio.get_device_info_by_host_api_device_index(0, i)
-
-                    if device_info["maxInputChannels"] >= 1:
-                        self._devices.append(device_info)
-                        self.log_output(show_output, logging.INFO, f'{device_info["index"]} - {device_info["name"]} - {device_info["defaultSampleRate"]}')
-
-                        if device_info["index"] == selected_device_list_index:
-                            foundMicIndex = True
-                except Exception as e:
-                    self.log_output(show_output, logging.ERROR, "Could not get device infos.")
-                    self.logger.exception(f"Unexpected error in AudioProcessService: {e}")
+            for current_audio_device in self._devices:
+                
+                if current_audio_device.id == selected_device_list_index:
+                    self.selected_device = current_audio_device
+            
+            self.logger.debug(f"Selected Device: {self.selected_device}")
 
             # Could not find a mic with the selected mic id, so I will use the first device I found.
-            if not foundMicIndex:
+            if self.selected_device is None:
                 self.log_output(show_output, logging.ERROR, "********************************************************")
                 self.log_output(show_output, logging.ERROR, "*                      Error                           *")
                 self.log_output(show_output, logging.ERROR, "********************************************************")
                 self.log_output(show_output, logging.ERROR, f"Could not find the mic with the id: {selected_device_list_index}")
                 self.log_output(show_output, logging.ERROR, "Using the first mic as fallback.")
                 self.log_output(show_output, logging.ERROR, "Please change the id of the mic inside the config.")
-                selected_device_list_index = self._devices[0]["index"]
+                self.selected_device = self._devices[0]
 
-            for device in self._devices:
-                if device["index"] == selected_device_list_index:
-                    self.log_output(show_output, logging.INFO, f"Selected ID: {selected_device_list_index}")
-                    self.log_output(show_output, logging.INFO, f'Using {device["index"]} - {device["name"]} - {device["defaultSampleRate"]}')
-                    self._device_id = device["index"]
-                    self._device_name = device["name"]
-                    self._device_rate = self._config["general_settings"]["DEFAULT_SAMPLE_RATE"]
-                    self._frames_per_buffer = self._config["general_settings"]["FRAMES_PER_BUFFER"]
-                    self.n_fft_bins = self._config["general_settings"]["N_FFT_BINS"]
+            self._device_rate = self._config["general_settings"]["DEFAULT_SAMPLE_RATE"]
+            self._frames_per_buffer = self._config["general_settings"]["FRAMES_PER_BUFFER"]
+            self.n_fft_bins = self._config["general_settings"]["N_FFT_BINS"]
+            self.log_output(show_output, logging.INFO, f"Selected Device: {self.selected_device.ToString()}")
 
+            # Init Timer
             self.start_time_1 = time()
             self.ten_seconds_counter_1 = time()
             self.start_time_2 = time()
@@ -135,7 +124,7 @@ class AudioProcessService:
                 channels=1,
                 rate=self._device_rate,
                 input=True,
-                input_device_index=self._device_id,
+                input_device_index=self.selected_device.id,
                 frames_per_buffer=self._frames_per_buffer,
                 stream_callback=callback
             )
