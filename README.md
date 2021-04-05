@@ -44,10 +44,13 @@
 - 24 effects with many configuration options.
 - Customizable colors and color schemes.
 - Multicore optimized for large LED strips (900+ LEDs).
+- Multi device support
 - Standalone and client compatible for audio processing.
 
 
 ## Installing
+
+Please check if your hardware is inside the [Compatible Hardware List](https://github.com/TobKra96/music_led_strip_control/wiki/Compatible-Hardware-List).
 
 ### Automated installation
 Run the following command in your terminal:
