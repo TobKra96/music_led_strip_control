@@ -47,7 +47,7 @@ def instance_already_running():
 
 
 if instance_already_running():
-    sys.exit("\033[91mError: MLSC is already running.")
+    sys.exit("\033[91mError: MLSC is already running.\nPlease check the service status with 'sudo systemctl status mlsc'.\nIf the service is running, you can stop it with 'sudo systemctl stop mlsc'.")
 
 
 class Main():
@@ -159,15 +159,6 @@ class Main():
 
 
 if __name__ == "__main__":
-
-    # logging.basicConfig(handlers=[
-    #     RotatingFileHandler(logging_path + logging_file, mode='a', maxBytes=5 * 1024 * 1024, backupCount=5, encoding='utf-8'),
-    #     logging.StreamHandler()
-    # ],
-    #     format='%(asctime)s - %(levelname)-8s - %(name)-15s - %(message)s',
-    #     datefmt='%Y.%m.%d %H:%M:%S',
-    #     level=logging.DEBUG
-    # )
 
     main = Main()
     main.start()
