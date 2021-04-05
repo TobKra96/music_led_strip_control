@@ -9,6 +9,8 @@ PROJ_DIR="music_led_strip_control" # Project location
 PROJ_NAME="MLSC" # Project abbreviation
 ASOUND_DIR="/etc/asound.conf" # Asound config location
 ALSA_DIR="/usr/share/alsa/alsa.conf" # Alsa config location
+SERVICE_DIR="/etc/systemd/system/mlsc.service" # MLSC systemd service location
+SERVICE_NAME="mlsc.service" # MLSC systemd service name
 
 
 # Colors
@@ -65,7 +67,7 @@ prompt -s "\t          *********************"
 echo
 
 # Update packages:
-prompt -i "\n[1/3] Updating and installing required packages..."
+prompt -i "\n[1/4] Updating and installing required packages..."
 sudo apt-get update
 sudo apt-get -y upgrade
 
@@ -85,7 +87,7 @@ prompt -s "\nPackages updated and installed."
 
 
 # Install MLSC:
-prompt -i "\n[2/3] Installing $PROJ_NAME..."
+prompt -i "\n[2/4] Installing $PROJ_NAME..."
 if [[ ! -d $INST_DIR ]]; then
 	sudo mkdir $INST_DIR
 fi
@@ -112,7 +114,7 @@ sudo pip3 install --no-input -r ${PROJ_DIR}/requirements.txt
 
 
 # Setup microphone:
-prompt -i "\n[3/3] Configuring microphone settings..."
+prompt -i "\n[3/4] Configuring microphone settings..."
 if [[ ! -f $ASOUND_DIR ]]; then
     sudo touch $ASOUND_DIR
     prompt -s "\n$ASOUND_DIR created."
@@ -152,6 +154,42 @@ sudo sed -e '/pcm.modem cards.pcm.modem/ s/^#*/#/' -i $ALSA_DIR
 sudo sed -e '/pcm.phoneline cards.pcm.phoneline/ s/^#*/#/' -i $ALSA_DIR
 
 prompt -s "\nNew configuration for $ALSA_DIR saved."
+
+
+# Create systemd service:
+prompt -i "\n[4/4] Creating autostart service for ${PROJ_NAME}..."
+if [[ ! -f $SERVICE_DIR ]]; then
+    sudo touch ${SERVICE_DIR}
+echo "[Unit]
+Description=Music LED Strip Control
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/share/music_led_strip_control/server
+ExecStart=python3 main.py
+Restart=always
+RestartSec=5
+KillMode=control-group
+
+[Install]
+WantedBy=multi-user.target" | sudo tee -a ${SERVICE_DIR} > /dev/null
+    prompt -s "\nAutostart script for ${PROJ_NAME} created in '${SERVICE_DIR}'."
+else
+    prompt -s "\nAutostart script for ${PROJ_NAME} already exists in '${SERVICE_DIR}'."
+fi
+
+
+# Enable systemd service:
+systemctl_status=$(sudo systemctl is-enabled $SERVICE_NAME)
+if [[ $systemctl_status == 'disabled' && -f $SERVICE_DIR ]]; then
+    confirm "Do you want to enable autostart for ${PROJ_NAME}"
+    if [[ $? -eq 0 ]]; then
+        sudo systemctl enable ${SERVICE_NAME}
+        prompt -s "\nAutostart for ${PROJ_NAME} enabled."
+    fi
+fi
 
 
 echo
