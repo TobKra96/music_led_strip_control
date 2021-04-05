@@ -437,7 +437,7 @@ class Webserver():
                 return "Could not find logging_levels.", 403
             else:
                 return jsonify(data_out)
-    
+
     # /GetAudioDevices
     #
     # return
@@ -460,7 +460,6 @@ class Webserver():
                 return "Could not find audio_devices.", 403
             else:
                 return jsonify(data_out)
-
 
     # /SetEffectSetting
     # {

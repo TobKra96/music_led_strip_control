@@ -45,14 +45,12 @@ class EffectBeatSlide(Effect):
             start_position = start_position + effect_config["slider_length"]
             if start_position >= led_count:
                 start_position = led_count
-         
+
             self.current_position = start_position
-            
+
         output[0][end_position:start_position] = self.current_color[0]
         output[1][end_position:start_position] = self.current_color[1]
         output[2][end_position:start_position] = self.current_color[2]
 
         self.prev_output = output
         self.queue_output_array_noneblocking(output)
-
-        

@@ -1,13 +1,12 @@
-import logging
-import copy
-
 from libs.notification_enum import NotificationEnum  # pylint: disable=E0611, E0401
 from libs.notification_item import NotificationItem  # pylint: disable=E0611, E0401
 from libs.config_service import ConfigService  # pylint: disable=E0611, E0401
 from libs.effects_enum import EffectsEnum  # pylint: disable=E0611, E0401
 from libs.effect_item import EffectItem  # pylint: disable=E0611, E0401
-from libs.audio_device import AudioDevice  # pylint: disable=E0611, E0401
 from libs.audio_info import AudioInfo  # pylint: disable=E0611, E0401
+
+import logging
+import copy
 
 
 class WebserverExecuter():
