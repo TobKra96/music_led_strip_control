@@ -153,6 +153,12 @@ function SetPinSetting() {
     if ($('#PIN_LOCK_ENABLED').is(':checked')) {
         pinCheckbox = true;
     }
+    if (pin.length < 4) {
+        pin = ""
+        pinCheckbox = false;
+        $('#PIN_LOCK_ENABLED').prop('checked', pinCheckbox);
+        $('#DASHBOARD_PIN').val(pin);
+    }
     var pinData = {};
     pinData["DEFAULT_PIN"] = pin;
     pinData["USE_PIN_LOCK"] = pinCheckbox;
@@ -178,6 +184,9 @@ function SetLocalSettings() {
                 setting_value = $("#" + setting_key).is(':checked')
             } else if ($("#" + setting_key).attr('type') == 'number') {
                 setting_value = parseFloat($("#" + setting_key).val());
+                if (setting_key == "WEBSERVER_PORT" && isNaN(setting_value)) {
+                    setting_value = 8080;
+                }
             } else {
                 setting_value = $("#" + setting_key).val();
             }

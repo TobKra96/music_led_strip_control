@@ -8,7 +8,7 @@ from sys import version_info
 import sys
 
 if version_info < (3, 6):
-    sys.exit("Error: MLSC requires Python 3.6 or greater.")
+    sys.exit("\033[91mError: MLSC requires Python 3.6 or greater.")
 
 from libs.audio_process_service import AudioProcessService
 from libs.notification_service import NotificationService
@@ -19,6 +19,35 @@ from libs.webserver import Webserver
 from multiprocessing import Process, Queue, Lock
 from time import sleep
 import logging
+import fcntl
+import os
+
+
+def instance_already_running():
+    """
+    Detect if an an instance is already running, globally
+    at the operating system level.
+
+    Using `os.open` ensures that the file pointer won't be closed
+    by Python's garbage collector after the function's scope is exited.
+
+    The lock will be released when the program exits, or could be
+    released if the file pointer were closed.
+    """
+
+    lock_path = "../default.lock"
+
+    lock_file_pointer = os.open(lock_path, os.O_WRONLY | os.O_CREAT)
+
+    try:
+        fcntl.lockf(lock_file_pointer, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        return False
+    except IOError:
+        return True
+
+
+if instance_already_running():
+    sys.exit("\033[91mError: MLSC is already running.")
 
 
 class Main():
