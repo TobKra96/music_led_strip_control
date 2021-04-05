@@ -96,6 +96,13 @@ cd $INST_DIR
 if [[ -d $PROJ_DIR ]]; then
     confirm "${PROJ_NAME} is already installed. Do you want to reinstall it"
     if [[ $? -eq 0 ]]; then
+        if [[ -f $SERVICE_DIR ]]; then
+            systemctl_status=$(sudo systemctl is-active $SERVICE_NAME)
+            if [[ $systemctl_status == 'active' ]]; then
+                sudo systemctl stop ${SERVICE_NAME}
+                prompt -s "\nAutostart for ${PROJ_NAME} stopped."
+            fi
+        fi
         if [[ -d "${PROJ_DIR}_bak" ]]; then
             sudo rm -r "${PROJ_DIR}_bak"
             prompt -s "\nPrevious ${PROJ_NAME} backup deleted."
@@ -104,6 +111,12 @@ if [[ -d $PROJ_DIR ]]; then
         prompt -s "\nNew backup of ${PROJ_NAME} created."
         sudo git clone https://github.com/TobKra96/music_led_strip_control.git
         prompt -s "\nConfig is stored in .mlsc, in the same directory as the MLSC installation."
+        if [[ -f $SERVICE_DIR ]]; then
+            if [[ $systemctl_status == 'active' ]]; then
+                sudo systemctl start ${SERVICE_NAME}
+                prompt -s "\nAutostart for ${PROJ_NAME} restarted."
+            fi
+        fi
     fi
 else
     sudo git clone https://github.com/TobKra96/music_led_strip_control.git
@@ -169,8 +182,8 @@ Type=simple
 User=root
 WorkingDirectory=/share/music_led_strip_control/server
 ExecStart=python3 main.py
-Restart=always
-RestartSec=5
+Restart=on-abnormal
+RestartSec=10
 KillMode=control-group
 
 [Install]
@@ -182,12 +195,14 @@ fi
 
 
 # Enable systemd service:
-systemctl_status=$(sudo systemctl is-enabled $SERVICE_NAME)
-if [[ $systemctl_status == 'disabled' && -f $SERVICE_DIR ]]; then
-    confirm "Do you want to enable autostart for ${PROJ_NAME}"
-    if [[ $? -eq 0 ]]; then
-        sudo systemctl enable ${SERVICE_NAME}
-        prompt -s "\nAutostart for ${PROJ_NAME} enabled."
+if [[ -f $SERVICE_DIR ]]; then
+    systemctl_status=$(sudo systemctl is-enabled $SERVICE_NAME)
+    if [[ $systemctl_status == 'disabled' ]]; then
+        confirm "Do you want to enable autostart for ${PROJ_NAME}"
+        if [[ $? -eq 0 ]]; then
+            sudo systemctl enable ${SERVICE_NAME}
+            prompt -s "\nAutostart for ${PROJ_NAME} enabled."
+        fi
     fi
 fi
 
