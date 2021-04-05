@@ -30,12 +30,8 @@ class EffectBeatSlide(Effect):
         # Calculate how many steps the array will roll.
         steps = self.get_roll_steps(effect_config["speed"])
 
-        if self.current_position == 0:
-            self.current_position = effect_config["bar_length"]
-
         self.current_position = self.current_position + steps
-
-        if self.current_position > led_count - 1:
+        if self.current_position > led_count:
             self.current_position = 0
 
         start_position = self.current_position
@@ -43,20 +39,18 @@ class EffectBeatSlide(Effect):
         if end_position < 0:
             end_position = 0
 
+        output = (self.prev_output * effect_config["decay"]).astype(int)
+
         if self.current_freq_detects["beat"]:
-            output = (self.prev_output * effect_config["decay"]).astype(int)
-            output[0][self.current_position:(self.current_position + effect_config["slider_length"])] = self._color_service.colour(effect_config["color"])[0]
-            output[1][self.current_position:(self.current_position + effect_config["slider_length"])] = self._color_service.colour(effect_config["color"])[1]
-            output[2][self.current_position:(self.current_position + effect_config["slider_length"])] = self._color_service.colour(effect_config["color"])[2]
-
-            self.current_position = self.current_position + effect_config["slider_length"]
-
-        else:
-
-            output = (self.prev_output * effect_config["decay"]).astype(int)
-            output[0, end_position:start_position] = self.current_color[0]
-            output[1, end_position:start_position] = self.current_color[1]
-            output[2, end_position:start_position] = self.current_color[2]
+            start_position = start_position + effect_config["slider_length"]
+            if start_position >= led_count:
+                start_position = led_count
+         
+            self.current_position = start_position
+            
+        output[0][end_position:start_position] = self.current_color[0]
+        output[1][end_position:start_position] = self.current_color[1]
+        output[2][end_position:start_position] = self.current_color[2]
 
         self.prev_output = output
         self.queue_output_array_noneblocking(output)
