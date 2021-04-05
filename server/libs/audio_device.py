@@ -6,4 +6,4 @@ class AudioDevice:
         self.defaultSampleRate = defaultSampleRate
 
     def ToString(self):
-        return f"{self.id} - {self.name} - {self.defaultSampleRate}"
+        return f"{self.id} - {self.name} - {self.defaultSampleRate} Hz"
