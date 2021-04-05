@@ -18,6 +18,7 @@ from libs.webserver import Webserver
 
 from multiprocessing import Process, Queue, Lock
 from time import sleep
+import subprocess
 import logging
 import fcntl
 import os
@@ -47,7 +48,12 @@ def instance_already_running():
 
 
 if instance_already_running():
-    sys.exit("\033[91mError: MLSC is already running.")
+    x = subprocess.Popen("systemctl is-active mlsc", stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True, text=True)
+    systemctl_status = x.communicate()[0].strip()
+    if systemctl_status == 'active':
+        sys.exit("\033[91mError: MLSC is already running as a service.\nStop the running service with 'sudo systemctl stop mlsc'.")
+    else:
+        sys.exit("\033[91mError: MLSC is already running directly.\nStop the running instance with 'CTRL+C'.")
 
 
 class Main():
