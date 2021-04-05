@@ -166,14 +166,5 @@ class Main():
 
 if __name__ == "__main__":
 
-    # logging.basicConfig(handlers=[
-    #     RotatingFileHandler(logging_path + logging_file, mode='a', maxBytes=5 * 1024 * 1024, backupCount=5, encoding='utf-8'),
-    #     logging.StreamHandler()
-    # ],
-    #     format='%(asctime)s - %(levelname)-8s - %(name)-15s - %(message)s',
-    #     datefmt='%Y.%m.%d %H:%M:%S',
-    #     level=logging.DEBUG
-    # )
-
     main = Main()
     main.start()
