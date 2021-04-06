@@ -135,7 +135,7 @@ class EffectAdvancedScroll(Effect):
         self.output[2] = self.output_scroll_subbass[2] + self.output_scroll_bass[2] + self.output_scroll_lowmid[2] + self.output_scroll_mid[2] + self.output_scroll_uppermid[2] + self.output_scroll_presence[2] + self.output_scroll_brilliance[2]
 
         # Decay the history arrays for the next round
-        decay = effect_config["decay"]/100
+        decay = effect_config["decay"] / 100
         self.output_scroll_subbass = (self.output_scroll_subbass * decay).astype(int)
         self.output_scroll_bass = (self.output_scroll_bass * decay).astype(int)
         self.output_scroll_lowmid = (self.output_scroll_lowmid * decay).astype(int)

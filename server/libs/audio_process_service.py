@@ -1,9 +1,10 @@
-from libs.audio_device import AudioDevice  # pylint: disable=E0611, E0401
-from libs.audio_info import AudioInfo  # pylint: disable=E0611, E0401
+
 from libs.notification_item import NotificationItem  # pylint: disable=E0611, E0401
 from libs.notification_enum import NotificationEnum  # pylint: disable=E0611, E0401
 from libs.config_service import ConfigService  # pylint: disable=E0611, E0401
+from libs.audio_device import AudioDevice  # pylint: disable=E0611, E0401
 from libs.fps_limiter import FPSLimiter  # pylint: disable=E0611, E0401
+from libs.audio_info import AudioInfo  # pylint: disable=E0611, E0401
 from libs.dsp import DSP  # pylint: disable=E0611, E0401
 
 
@@ -62,10 +63,10 @@ class AudioProcessService:
             self.selected_device = None
             # For each audio device, add to list of devices.
             for current_audio_device in self._devices:
-                
+
                 if current_audio_device.id == selected_device_list_index:
                     self.selected_device = current_audio_device
-            
+
             self.logger.debug(f"Selected Device: {self.selected_device}")
 
             # Could not find a mic with the selected mic id, so I will use the first device I found.

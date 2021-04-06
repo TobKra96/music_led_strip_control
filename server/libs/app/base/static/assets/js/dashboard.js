@@ -49,12 +49,13 @@ function GetActiveEffect(device) {
 function ParseActiveEffect(respond) {
     this.activeEffect = respond["effect"];
     this.UpdateActiveEffectTile();
+    this.UpdateCurrentEffectText();
 }
 
 function SetActiveEffect(newActiveEffect) {
     var lastEffect = this.activeEffect;
     this.activeEffect = newActiveEffect;
-    
+
     var data = {};
     data["device"] = this.currentDevice;
     data["effect"] = this.activeEffect;
@@ -73,6 +74,7 @@ function SetActiveEffect(newActiveEffect) {
     });
 
     this.UpdateActiveEffectTile();
+    this.UpdateCurrentEffectText();
 }
 
 
@@ -110,6 +112,13 @@ function UpdateCurrentDeviceText() {
     }
 
     $("#selected_device_txt").text(text);
+}
+
+function UpdateCurrentEffectText() {
+    if (this.activeEffect != "") {
+        var activeEffectText = $("#" + this.activeEffect).text();
+        $("#selected_effect_txt").text(activeEffectText);
+    }
 }
 
 function UpdateActiveEffectTile() {
