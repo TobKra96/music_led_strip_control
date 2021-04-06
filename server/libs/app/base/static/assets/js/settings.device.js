@@ -289,9 +289,7 @@ function SetLocalDeviceInput(setting_key, setting_value) {
 
 function SetLocalOutputTypeDeviceInput(output_type_key, setting_key, setting_value) {
     if ($("#" + setting_key + "." + output_type_key).attr('type') == 'checkbox') {
-        if (setting_value) {
-            $("#" + setting_key + "." + output_type_key).click();
-        }
+        $("#" + setting_key).prop('checked', setting_value);
 
     } else {
         $("#" + setting_key + "." + output_type_key).val(setting_value);
