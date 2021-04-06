@@ -5,6 +5,7 @@ from libs.effects.effect_segment_color import EffectSegmentColor  # pylint: disa
 from libs.effects.effect_beat_twinkle import EffectBeatTwinkle  # pylint: disable=E0611, E0401
 from libs.effects.effect_wavelength import EffectWavelength  # pylint: disable=E0611, E0401
 from libs.effects.effect_beat_slide import EffectBeatSlide  # pylint: disable=E0611, E0401
+from libs.effects.effect_fireplace import EffectFireplace  # pylint: disable=E0611, E0401
 from libs.effects.effect_sync_fade import EffectSyncFade  # pylint: disable=E0611, E0401
 from libs.effects.effect_gradient import EffectGradient  # pylint: disable=E0611, E0401
 from libs.effects.effect_pendulum import EffectPendulum  # pylint: disable=E0611, E0401
@@ -75,7 +76,8 @@ class EffectService():
             EffectsEnum.effect_wiggle: EffectWiggle,
             EffectsEnum.effect_direction_changer: EffectDirectionChanger,
             EffectsEnum.effect_beat_twinkle: EffectBeatTwinkle,
-            EffectsEnum.effect_segment_color: EffectSegmentColor
+            EffectsEnum.effect_segment_color: EffectSegmentColor,
+            EffectsEnum.effect_fireplace: EffectFireplace
         }
 
         self._initialized_effects = {}
