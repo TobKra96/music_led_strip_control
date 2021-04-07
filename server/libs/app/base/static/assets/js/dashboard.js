@@ -1,12 +1,26 @@
 var devices;
 var activeEffect = "";
 var currentDevice = "all_devices";
+var allNonMusicEffects = getAllEffects("#dashboard-list-none-music");
+var allMusicEffects = getAllEffects("#dashboard-list-music");
 
 // Init and load all settings
 $(document).ready(function () {
     GetDevices();
     GetActiveEffect(currentDevice);
 });
+
+function getAllEffects(listId) {
+    var allEffects = []
+    $(listId + " > div > div").each((_, elem) => {
+        allEffects.push(elem.id);
+    });
+    return allEffects
+}
+
+function getRandomEffect(effects) {
+    return effects[Math.floor(Math.random() * effects.length)];
+}
 
 function GetDevices() {
     $.ajax({
@@ -173,6 +187,12 @@ function switchEffect(e) {
 
     if (newActiveEffect.length > 0) {
         console.log(newActiveEffect + " was clicked.");
+        if (newActiveEffect == 'effect_random_non_music') {
+            newActiveEffect = getRandomEffect(allNonMusicEffects);
+        }
+        if (newActiveEffect == 'effect_random_music') {
+            newActiveEffect = getRandomEffect(allMusicEffects);
+        }
         SetActiveEffect(newActiveEffect);
     }
 }
