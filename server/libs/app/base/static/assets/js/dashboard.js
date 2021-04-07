@@ -19,7 +19,11 @@ function getAllEffects(listId) {
 }
 
 function getRandomEffect(effects) {
-    return effects[Math.floor(Math.random() * effects.length)];
+    var randomEffect = this.activeEffect
+    while (randomEffect == this.activeEffect) {
+        randomEffect = effects[Math.floor(Math.random() * effects.length)];
+    }
+    return randomEffect;
 }
 
 function GetDevices() {
