@@ -176,7 +176,8 @@ function switchEffect(e) {
     var BreakException = {};
 
     try {
-        e.path.forEach(element => {
+        var path = e.path || (e.composedPath && e.composedPath());
+        path.forEach(element => {
             if (element.classList != null) {
                 if (element.classList.contains("dashboard_effect")) {
                     newActiveEffect = element.id;
