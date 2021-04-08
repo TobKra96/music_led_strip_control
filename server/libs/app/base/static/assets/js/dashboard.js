@@ -46,6 +46,15 @@ function ParseDevices(devices) {
     this.BuildDeviceTab();
     this.AddEventListeners();
     this.UpdateCurrentDeviceText();
+
+    // Restore last selected device on reload
+    let lastDeviceId = localStorage.getItem("lastDevice");
+    if (lastDeviceId) {
+        $("#accordionDevices").addClass('d-none')
+        $("#collapseMenu").addClass('show')
+        $("#" + lastDeviceId)[0].click();
+        $("#accordionDevices").removeClass('d-none')
+    }
 }
 
 function GetActiveEffect(device) {
@@ -149,6 +158,8 @@ function UpdateActiveEffectTile() {
 function SwitchDevice(e) {
     var newDeviceId = e.target.id;
     this.currentDevice = newDeviceId;
+    // Save selected device to localStorage
+    localStorage.setItem('lastDevice', newDeviceId);
 
     this.GetActiveEffect(newDeviceId);
     this.UpdateCurrentDeviceText();
