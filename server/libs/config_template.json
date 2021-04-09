@@ -292,6 +292,12 @@
                 "color": "Orange",
                 "decay": 0.7
             },
+            "effect_fireplace": {
+                "firebase_maincolor": "Red",
+                "firebase_secondcolor": "Red",
+                "sparks_maincolor": "Orange",
+                "sparks_secondcolor": "Orange"
+            },
             "last_effect": "effect_off"
         },
         "output": {
@@ -550,6 +556,12 @@
                 "beat_color": "Blue",
                 "color": "Orange",
                 "decay": 0.7
+            },
+            "effect_fireplace": {
+                "firebase_maincolor": "Red",
+                "firebase_secondcolor": "Red",
+                "sparks_maincolor": "Orange",
+                "sparks_secondcolor": "Orange"
             },
             "last_effect": "effect_off"
         }
