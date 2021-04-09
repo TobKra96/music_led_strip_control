@@ -5,19 +5,17 @@ var allNonMusicEffects = getAllEffects("#dashboard-list-none-music");
 var allMusicEffects = getAllEffects("#dashboard-list-music");
 var allEffects = allNonMusicEffects.concat(allMusicEffects);
 var timer;
-var timerActive;
-if (typeof(timer) == "undefined") {
-    timer = new Worker('/static/assets/js/timer.js');
-}
 var hardcodedSec = 10;
 
 // Init and load all settings
 $(document).ready(function () {
     GetDevices();
     GetActiveEffect(currentDevice);
+    initTimerWorker();
 
-    timerActive = sessionStorage.getItem('timer_active');
-    if (timerActive) {
+    // Restore timer if it was running while page reloaded
+    var effectCycleActive = sessionStorage.getItem('effect_cycle_active');
+    if (effectCycleActive) {
         var sec = sessionStorage.getItem('seconds');
         if (sec <= 0) {
             sec = hardcodedSec;
@@ -28,6 +26,11 @@ $(document).ready(function () {
             status: 'start'
         });
     }
+});
+
+function initTimerWorker() {
+    timer = new Worker('/static/assets/js/timer.js');
+
     // Get messages from timer worker
     timer.onmessage = (event) => {
         var sec = event.data;
@@ -38,7 +41,7 @@ $(document).ready(function () {
             $("#effect_random_cycle")[0].click();
         }
     };
-});
+}
 
 function getAllEffects(listId) {
     var allEffects = [];
@@ -235,13 +238,13 @@ function switchEffect(e) {
         console.log(newActiveEffect + " was clicked.");
 
         if (newActiveEffect == 'effect_random_cycle') {
-            timerActive = sessionStorage.getItem('timer_active');
-            if (!timerActive) {
+            var effectCycleActive = sessionStorage.getItem('effect_cycle_active');
+            if (!effectCycleActive) {
                 timer.postMessage({
                     seconds: hardcodedSec,
                     status: 'start'
                 });
-                sessionStorage.setItem('timer_active', true);
+                sessionStorage.setItem('effect_cycle_active', true);
             }
             newActiveEffect = getRandomEffect(allEffects);
         } else {
@@ -252,6 +255,7 @@ function switchEffect(e) {
             sessionStorage.clear();
             $("#effect_random_cycle > div > p").text("Random Cycle");
         }
+
         if (newActiveEffect == 'effect_random_non_music') {
             newActiveEffect = getRandomEffect(allNonMusicEffects);
         }
