@@ -26,4 +26,3 @@ class OutputUDP(Output):
             self.logger.exception(f"Could not send to client", ex)
             self.logger.debug(f"Reinit output of {self._udp_client_ip}")
             self._sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-

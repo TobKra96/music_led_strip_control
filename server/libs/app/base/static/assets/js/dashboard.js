@@ -1,12 +1,63 @@
 var devices;
 var activeEffect = "";
 var currentDevice = "all_devices";
+var allNonMusicEffects = getAllEffects("#dashboard-list-none-music");
+var allMusicEffects = getAllEffects("#dashboard-list-music");
+var allEffects = allNonMusicEffects.concat(allMusicEffects);
+var timer;
+var hardcodedSec = 10;
 
 // Init and load all settings
 $(document).ready(function () {
     GetDevices();
     GetActiveEffect(currentDevice);
+    initTimerWorker();
+
+    // Restore timer if it was running while page reloaded
+    var effectCycleActive = sessionStorage.getItem('effect_cycle_active');
+    if (effectCycleActive) {
+        var sec = sessionStorage.getItem('seconds');
+        if (sec <= 0) {
+            sec = hardcodedSec;
+            sessionStorage.setItem('seconds', sec);
+        }
+        timer.postMessage({
+            seconds: sec,
+            status: 'start'
+        });
+    }
 });
+
+function initTimerWorker() {
+    timer = new Worker('/static/assets/js/timer.js');
+
+    // Get messages from timer worker
+    timer.onmessage = (event) => {
+        var sec = event.data;
+        sessionStorage.setItem('seconds', sec);
+        $("#effect_random_cycle > div > p").text("Random Cycle (" + sec + "s)");
+        if (sec <= 0) {
+            sessionStorage.clear();
+            $("#effect_random_cycle")[0].click();
+        }
+    };
+}
+
+function getAllEffects(listId) {
+    var allEffects = [];
+    $(listId + " > div > div").each((_, elem) => {
+        allEffects.push(elem.id);
+    });
+    return allEffects;
+}
+
+function getRandomEffect(effects) {
+    var randomEffect = this.activeEffect;
+    while (randomEffect == this.activeEffect) {
+        randomEffect = effects[Math.floor(Math.random() * effects.length)];
+    }
+    return randomEffect;
+}
 
 function GetDevices() {
     $.ajax({
@@ -28,6 +79,15 @@ function ParseDevices(devices) {
     this.BuildDeviceTab();
     this.AddEventListeners();
     this.UpdateCurrentDeviceText();
+
+    // Restore last selected device on reload
+    let lastDeviceId = localStorage.getItem("lastDevice");
+    if (lastDeviceId) {
+        $("#accordionDevices").addClass('d-none');
+        $("#collapseMenu").addClass('show');
+        $("#" + lastDeviceId)[0].click();
+        $("#accordionDevices").removeClass('d-none');
+    }
 }
 
 function GetActiveEffect(device) {
@@ -131,6 +191,8 @@ function UpdateActiveEffectTile() {
 function SwitchDevice(e) {
     var newDeviceId = e.target.id;
     this.currentDevice = newDeviceId;
+    // Save selected device to localStorage
+    localStorage.setItem('lastDevice', newDeviceId);
 
     this.GetActiveEffect(newDeviceId);
     this.UpdateCurrentDeviceText();
@@ -158,7 +220,8 @@ function switchEffect(e) {
     var BreakException = {};
 
     try {
-        e.path.forEach(element => {
+        var path = e.path || (e.composedPath && e.composedPath());
+        path.forEach(element => {
             if (element.classList != null) {
                 if (element.classList.contains("dashboard_effect")) {
                     newActiveEffect = element.id;
@@ -173,6 +236,32 @@ function switchEffect(e) {
 
     if (newActiveEffect.length > 0) {
         console.log(newActiveEffect + " was clicked.");
+
+        if (newActiveEffect == 'effect_random_cycle') {
+            var effectCycleActive = sessionStorage.getItem('effect_cycle_active');
+            if (!effectCycleActive) {
+                timer.postMessage({
+                    seconds: hardcodedSec,
+                    status: 'start'
+                });
+                sessionStorage.setItem('effect_cycle_active', true);
+            }
+            newActiveEffect = getRandomEffect(allEffects);
+        } else {
+            timer.postMessage({
+                seconds: 0,
+                status: 'stop'
+            });
+            sessionStorage.clear();
+            $("#effect_random_cycle > div > p").text("Random Cycle");
+        }
+
+        if (newActiveEffect == 'effect_random_non_music') {
+            newActiveEffect = getRandomEffect(allNonMusicEffects);
+        }
+        if (newActiveEffect == 'effect_random_music') {
+            newActiveEffect = getRandomEffect(allMusicEffects);
+        }
         SetActiveEffect(newActiveEffect);
     }
 }

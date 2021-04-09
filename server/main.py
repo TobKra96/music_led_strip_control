@@ -4,7 +4,7 @@
 # The program will start here.
 # This file will only initialize and start the processes.
 
-from sys import version_info
+from sys import version_info, platform
 import sys
 
 if version_info < (3, 6):
@@ -21,7 +21,8 @@ from time import sleep
 import subprocess
 import pyaudio
 import logging
-import fcntl
+if platform == "linux":
+    import fcntl
 import os
 
 
@@ -48,7 +49,7 @@ def instance_already_running():
         return True
 
 
-if instance_already_running():
+if platform == "linux" and instance_already_running():
     x = subprocess.Popen("systemctl is-active mlsc", stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True, text=True)
     systemctl_status = x.communicate()[0].strip()
     if systemctl_status == 'active':

@@ -49,6 +49,7 @@ input[type=password]::-ms-clear {
 .dashboard_effect:hover, .dashboard_effect_active {
     background-color: #3F4D67;
     color: white;
+    cursor: pointer;
 }
 
 /* Prevent text overflow if filename of imported config too long */
@@ -80,7 +81,6 @@ input[type=password]::-ms-clear {
     color: #ffffff;
     max-width: 350px;
   }
-
 .tooltip .arrow::before {
     color: #3F4D67 !important;
 }
