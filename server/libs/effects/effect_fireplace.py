@@ -45,7 +45,7 @@ class EffectFireplace(Effect):
         firebase_area_minlength = 10
         firebase_area_maxlength = 40
         
-        sparks_flicker_speed = 5
+        sparks_flicker_speed = 1
         sparks_fly_speed = 1
         
         sparks_minappear_distance = 20
@@ -57,7 +57,8 @@ class EffectFireplace(Effect):
         sparks_area_minlength = 40
         sparks_area_maxlength = 100
 
-        blur = 0.5
+        blur = 0.7
+        mask_blur = 0.1
         
 
         
@@ -144,9 +145,25 @@ class EffectFireplace(Effect):
         spars_array_cutted[1][:self.sparks_area_current_length] = self.sparks_array[1][:self.sparks_area_current_length] 
         spars_array_cutted[2][:self.sparks_area_current_length] = self.sparks_array[2][:self.sparks_area_current_length] 
 
-        
+        mask_array = np.zeros((3, led_count))
+        mask_array[0][:self.sparks_area_current_length] = 100
+        mask_array[1][:self.sparks_area_current_length] = 100
+        mask_array[2][:self.sparks_area_current_length] = 100
+
+        mask_array[0][self.firebase_area_current_length-5:self.firebase_area_current_length+5] = 50
+        mask_array[1][self.firebase_area_current_length-5:self.firebase_area_current_length+5] = 50
+        mask_array[2][self.firebase_area_current_length-5:self.firebase_area_current_length+5] = 50
+
+        mask_array[0][self.sparks_area_current_length-10:self.sparks_area_current_length+10] = 50
+        mask_array[1][self.sparks_area_current_length-10:self.sparks_area_current_length+10] = 50
+        mask_array[2][self.sparks_area_current_length-10:self.sparks_area_current_length+10] = 50
+
+        mask_array = gaussian_filter1d(mask_array, sigma=mask_blur)
 
         overlay_array = np.where(spars_array_cutted != 0, spars_array_cutted, firebase_array)
+
+        output_array = (output_array * mask_array) / 100
+
         output_array = gaussian_filter1d(overlay_array, sigma=blur)
 
 
