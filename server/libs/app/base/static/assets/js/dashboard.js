@@ -19,7 +19,7 @@ $(document).ready(function () {
     timerActive = sessionStorage.getItem('timer_active');
     if (timerActive) {
         var sec = sessionStorage.getItem('seconds');
-        if (sec < 0) {
+        if (sec <= 0) {
             sec = hardcodedSec;
             sessionStorage.setItem('seconds', sec);
         }
@@ -34,7 +34,7 @@ $(document).ready(function () {
         console.log(sec);
         sessionStorage.setItem('seconds', sec);
         $("#effect_random_cycle > div > p").text("Random Cycle (" + sec + "s)");
-        if (sec < 0) {
+        if (sec <= 0) {
             sessionStorage.clear();
             $("#effect_random_cycle")[0].click();
         }
