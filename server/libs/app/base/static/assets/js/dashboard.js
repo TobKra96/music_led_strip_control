@@ -3,23 +3,54 @@ var activeEffect = "";
 var currentDevice = "all_devices";
 var allNonMusicEffects = getAllEffects("#dashboard-list-none-music");
 var allMusicEffects = getAllEffects("#dashboard-list-music");
+var allEffects = allNonMusicEffects.concat(allMusicEffects);
+var timer;
+var timerActive;
+if (typeof(timer) == "undefined") {
+    timer = new Worker('/static/assets/js/timer.js');
+}
+var hardcodedSec = 10;
 
 // Init and load all settings
 $(document).ready(function () {
     GetDevices();
     GetActiveEffect(currentDevice);
+
+    timerActive = sessionStorage.getItem('timer_active');
+    if (timerActive) {
+        var sec = sessionStorage.getItem('seconds');
+        if (sec < 0) {
+            sec = hardcodedSec;
+            sessionStorage.setItem('seconds', sec);
+        }
+        timer.postMessage({
+            seconds: sec,
+            status: 'start'
+        });
+    }
+    // Get messages from timer worker
+    timer.onmessage = function(event) {
+        var sec = event.data;
+        console.log(sec);
+        sessionStorage.setItem('seconds', sec);
+        $("#effect_random_cycle > div > p").text("Random Cycle (" + sec + "s)");
+        if (sec < 0) {
+            sessionStorage.clear();
+            $("#effect_random_cycle")[0].click();
+        }
+    };
 });
 
 function getAllEffects(listId) {
-    var allEffects = []
+    var allEffects = [];
     $(listId + " > div > div").each((_, elem) => {
         allEffects.push(elem.id);
     });
-    return allEffects
+    return allEffects;
 }
 
 function getRandomEffect(effects) {
-    var randomEffect = this.activeEffect
+    var randomEffect = this.activeEffect;
     while (randomEffect == this.activeEffect) {
         randomEffect = effects[Math.floor(Math.random() * effects.length)];
     }
@@ -50,10 +81,10 @@ function ParseDevices(devices) {
     // Restore last selected device on reload
     let lastDeviceId = localStorage.getItem("lastDevice");
     if (lastDeviceId) {
-        $("#accordionDevices").addClass('d-none')
-        $("#collapseMenu").addClass('show')
+        $("#accordionDevices").addClass('d-none');
+        $("#collapseMenu").addClass('show');
         $("#" + lastDeviceId)[0].click();
-        $("#accordionDevices").removeClass('d-none')
+        $("#accordionDevices").removeClass('d-none');
     }
 }
 
@@ -203,6 +234,25 @@ function switchEffect(e) {
 
     if (newActiveEffect.length > 0) {
         console.log(newActiveEffect + " was clicked.");
+
+        timerActive = sessionStorage.getItem('timer_active');
+        if (newActiveEffect == 'effect_random_cycle') {
+            if (!timerActive) {
+                timer.postMessage({
+                    seconds: hardcodedSec,
+                    status: 'start'
+                });
+                sessionStorage.setItem('timer_active', true);
+            }
+            newActiveEffect = getRandomEffect(allEffects);
+        } else {
+            timer.postMessage({
+                seconds: 0,
+                status: 'stop'
+            });
+            sessionStorage.clear();
+            $("#effect_random_cycle > div > p").text("Random Cycle");
+        }
         if (newActiveEffect == 'effect_random_non_music') {
             newActiveEffect = getRandomEffect(allNonMusicEffects);
         }
