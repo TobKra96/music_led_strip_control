@@ -1,9 +1,10 @@
 var timer;
 
-self.addEventListener('message', function(event) {
+self.addEventListener('message', function (event) {
     var data = event.data;
     var sec = data['seconds'];
-    switch (data['status']) {
+    var status = data['status'];
+    switch (status) {
         case 'start':
             timer = setInterval(function () {
                 postMessage(sec);

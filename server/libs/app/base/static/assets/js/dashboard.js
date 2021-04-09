@@ -29,9 +29,8 @@ $(document).ready(function () {
         });
     }
     // Get messages from timer worker
-    timer.onmessage = function(event) {
+    timer.onmessage = (event) => {
         var sec = event.data;
-        console.log(sec);
         sessionStorage.setItem('seconds', sec);
         $("#effect_random_cycle > div > p").text("Random Cycle (" + sec + "s)");
         if (sec <= 0) {
@@ -235,8 +234,8 @@ function switchEffect(e) {
     if (newActiveEffect.length > 0) {
         console.log(newActiveEffect + " was clicked.");
 
-        timerActive = sessionStorage.getItem('timer_active');
         if (newActiveEffect == 'effect_random_cycle') {
+            timerActive = sessionStorage.getItem('timer_active');
             if (!timerActive) {
                 timer.postMessage({
                     seconds: hardcodedSec,
