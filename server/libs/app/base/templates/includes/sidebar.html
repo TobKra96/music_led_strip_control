@@ -20,9 +20,9 @@
                     <li class="nav-item pcoded-menu-caption">
                         <label>General</label>
                     </li>
-                    <li class="nav-item pcoded-hasmenu">
+                    <li class="nav-item pcoded-hasmenu {{'pcoded-trigger' if 'effect_' in segment}}">
                         <a href="javascript:" class="nav-link"><span class="pcoded-micon"><i class="feather icon-edit"></i></span><span class="pcoded-mtext">Edit Effects</span></a>
-                        <ul class="pcoded-submenu">
+                        <ul id="effect_list" class="pcoded-submenu">
                             <li class="py-0 nav-item pcoded-menu-caption">
                                 <label>Special Effects</label>
                             </li>
@@ -62,9 +62,9 @@
                             <li class="{{'active' if segment == 'effect_direction_changer'}}"><a href="/effects/effect_direction_changer">Direction Changer</a></li>
                         </ul>
                     </li>
-                    <li class="nav-item pcoded-hasmenu">
+                    <li class="nav-item pcoded-hasmenu {{'pcoded-trigger' if '_settings' in segment}}">
                         <a href="javascript:" class="nav-link"><span class="pcoded-micon"><i class="feather icon-settings"></i></span><span class="pcoded-mtext">Settings</span></a>
-                        <ul class="pcoded-submenu">
+                        <ul id="settings_list" class="pcoded-submenu">
                             <li class="{{'active' if segment == 'general_settings'}}"><a href="/settings/general_settings"></i>General Settings</a></li>
                             <li class="{{'active' if segment == 'device_settings'}}"><a href="/settings/device_settings"></i>Device Settings</a></li>
                         </ul>

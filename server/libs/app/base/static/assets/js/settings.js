@@ -1,5 +1,8 @@
 $(document).ready(function () {
 
+    // Open "Settings" sidebar dropdown when on a settings page
+    $("#settings_list").slideDown();
+
     // Set LED strip brightness
     $('input[type=range]').on('input', function () {
         $("span[for='" + $(this).attr('id') + "']").text(this.value)
