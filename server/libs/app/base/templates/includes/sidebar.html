@@ -23,6 +23,14 @@
                     <li class="nav-item pcoded-hasmenu">
                         <a href="javascript:" class="nav-link"><span class="pcoded-micon"><i class="feather icon-edit"></i></span><span class="pcoded-mtext">Edit Effects</span></a>
                         <ul class="pcoded-submenu">
+                            <li class="py-0 nav-item pcoded-menu-caption">
+                                <label>Special Effects</label>
+                            </li>
+                            <li class="{{'active' if segment == 'effect_random_cycle'}}"><a href="/effects/effect_random_cycle">Random Cycle</a></li>
+
+                            <li class="pb-0 nav-item pcoded-menu-caption">
+                                <label>Non-Music Effects</label>
+                            </li>
                             <li class="{{'active' if segment == 'effect_single'}}"><a href="/effects/effect_single">Single</a></li>
                             <li class="{{'active' if segment == 'effect_gradient'}}"><a href="/effects/effect_gradient">Gradient</a></li>
                             <li class="{{'active' if segment == 'effect_fade'}}"><a href="/effects/effect_fade">Fade</a></li>
@@ -35,7 +43,10 @@
                             <li class="{{'active' if segment == 'effect_segment_color'}}"><a href="/effects/effect_segment_color">Segment Color</a></li>
                             <li class="{{'active' if segment == 'effect_fireplace'}}"><a href="/effects/effect_fireplace">Fireplace</a></li>
 
-                            <li class="mt-4 {{'active' if segment == 'effect_scroll'}}"><a href="/effects/effect_scroll">Scroll</a></li>
+                            <li class="pb-0 nav-item pcoded-menu-caption">
+                                <label>Music Effects</label>
+                            </li>
+                            <li class="{{'active' if segment == 'effect_scroll'}}"><a href="/effects/effect_scroll">Scroll</a></li>
                             <li class="{{'active' if segment == 'effect_advanced_scroll'}}"><a href="/effects/effect_advanced_scroll">Advanced Scroll</a></li>
                             <li class="{{'active' if segment == 'effect_energy'}}"><a href="/effects/effect_energy">Energy</a></li>
                             <li class="{{'active' if segment == 'effect_wavelength'}}"><a href="/effects/effect_wavelength">Wavelength</a></li>
