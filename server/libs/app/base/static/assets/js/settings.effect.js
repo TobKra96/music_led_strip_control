@@ -19,6 +19,9 @@ $(document).ready(function () {
     }
     initialized = true;
 
+    // Allow to scroll sidebar when page is reloaded and mouse is already on top of sidebar
+    $(".navbar-content").trigger("mouseover")
+
     // Open "Edit Effects" sidebar dropdown when on an effect page
     $("#effect_list").slideDown();
 
