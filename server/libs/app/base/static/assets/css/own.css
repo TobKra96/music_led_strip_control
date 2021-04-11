@@ -11,6 +11,16 @@ input[type=password]::-ms-clear {
     display: none;
 }
 
+/* Remove arrows from number inputs */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type=number] {
+    -moz-appearance:textfield;
+}}
+
 /* Set text highlight color */
 ::selection {
     background: #3F4D67;
