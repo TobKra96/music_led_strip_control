@@ -82,7 +82,7 @@ function ParseDevices(devices) {
 
     // Restore last selected device on reload
     let lastDeviceId = localStorage.getItem("lastDevice");
-    if (lastDeviceId) {
+    if (lastDeviceId in this.devices) {
         $("#accordionDevices").addClass('d-none');
         $("#collapseMenu").addClass('show');
         $("#" + lastDeviceId)[0].click();
