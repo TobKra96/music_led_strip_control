@@ -46,22 +46,84 @@
                                     <form id="settingsForm">
                                         <div class="row">
                                             <div class="col-md-6">
+                                                <hr class="my-4">
+                                                <h5>Firebase</h5>
+
                                                 <div class="form-group">
-                                                    <label>Color</label>
-                                                    <select id="color" class="form-control colours setting_input"></select>
+                                                    <label>Firebase Color</label>
+                                                    <select id="firebase_maincolor" class="form-control colours setting_input"></select>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>Firebase Flicker Speed <span for="firebase_flicker_speed" class="mb-0 badge badge-secondary"></span></label>
+                                                    <input id="firebase_flicker_speed" type="range" class="custom-range setting_input" min="0" max="10" step="0.1" required>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>Firebase Min Length <span for="firebase_area_minlength" class="mb-0 badge badge-secondary"></span></label>
+                                                    <input id="firebase_area_minlength" type="range" class="custom-range setting_input" min="1" max="1000" step="1" required>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>Firebase Max Length <span for="firebase_area_maxlength" class="mb-0 badge badge-secondary"></span></label>
+                                                    <input id="firebase_area_maxlength" type="range" class="custom-range setting_input" min="1" max="1000" step="1" required>
+                                                </div>
+
+                                                <hr class="my-4">
+                                                <h5>Other Controls</h5>
+
+                                                <div class="custom-control custom-checkbox my-2">
+                                                    <input type="checkbox" class="custom-control-input setting_input" id="use_color_variation">
+                                                    <label class="custom-control-label" for="use_color_variation">Use color variation</label>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>Color variation value<span for="color_variation" class="mb-0 badge badge-secondary"></span></label>
+                                                    <input id="color_variation" type="range" class="custom-range setting_input" min="1" max="100" step="1" required>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>Overall blur <span for="blur" class="mb-0 badge badge-secondary"></span></label>
+                                                    <input id="blur" type="range" class="custom-range setting_input" min="0" max="10" step="0.1" required>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>Mask blur <span for="mask_blur" class="mb-0 badge badge-secondary"></span></label>
+                                                    <input id="mask_blur" type="range" class="custom-range setting_input" min="0" max="10" step="0.1" required>
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
-                                                <label for="basic-url">Custom Color</label>
-                                                <div class="input-group mb-3">
-                                                    <div class="input-group-prepend">
-                                                        <span class="input-group-text pr-4" id="color_picker"></span>
-                                                    </div>
-                                                    <input type="text" class="form-control setting_input color_input" id="custom_color" spellcheck="false">
+                                                <hr class="my-4">
+                                                <h5>Sparks</h5>
+                                                <div class="form-group">
+                                                    <label>Sparks Color</label>
+                                                    <select id="sparks_maincolor" class="form-control colours setting_input"></select>
                                                 </div>
-                                                <div class="custom-control custom-checkbox my-2">
-                                                    <input type="checkbox" class="custom-control-input setting_input" id="use_custom_color">
-                                                    <label class="custom-control-label" for="use_custom_color">Use Custom Color</label>
+                                                <div class="form-group">
+                                                    <label>Sparks Flicker Speed <span for="sparks_flicker_speed" class="mb-0 badge badge-secondary"></span></label>
+                                                    <input id="sparks_flicker_speed" type="range" class="custom-range setting_input" min="0" max="10" step="0.1" required>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>Sparks Fly Speed <span for="sparks_fly_speed" class="mb-0 badge badge-secondary"></span></label>
+                                                    <input id="sparks_fly_speed" type="range" class="custom-range setting_input" min="0" max="10" step="0.1" required>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>Sparks Min Length <span for="sparks_min_length" class="mb-0 badge badge-secondary"></span></label>
+                                                    <input id="sparks_min_length" type="range" class="custom-range setting_input" min="1" max="20" step="1" required>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>Sparks Max Length <span for="sparks_max_length" class="mb-0 badge badge-secondary"></span></label>
+                                                    <input id="sparks_max_length" type="range" class="custom-range setting_input" min="1" max="20" step="1" required>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>Sparks Area Min<span for="sparks_area_minlength" class="mb-0 badge badge-secondary"></span></label>
+                                                    <input id="sparks_area_minlength" type="range" class="custom-range setting_input" min="1" max="1000" step="1" required>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>Sparks Area Max<span for="sparks_area_maxlength" class="mb-0 badge badge-secondary"></span></label>
+                                                    <input id="sparks_area_maxlength" type="range" class="custom-range setting_input" min="1" max="1000" step="1" required>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>Sparks Appear Distance Min<span for="sparks_minappear_distance" class="mb-0 badge badge-secondary"></span></label>
+                                                    <input id="sparks_minappear_distance" type="range" class="custom-range setting_input" min="1" max="1000" step="1" required>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>Sparks Appear Distance Max<span for="sparks_maxappear_distance" class="mb-0 badge badge-secondary"></span></label>
+                                                    <input id="sparks_maxappear_distance" type="range" class="custom-range setting_input" min="1" max="1000" step="1" required>
                                                 </div>
                                             </div>
                                         </div>

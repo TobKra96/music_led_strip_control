@@ -294,9 +294,22 @@
             },
             "effect_fireplace": {
                 "firebase_maincolor": "Red",
-                "firebase_secondcolor": "Red",
                 "sparks_maincolor": "Orange",
-                "sparks_secondcolor": "Orange"
+                "firebase_flicker_speed": 4,
+                "firebase_area_minlength": 20,
+                "firebase_area_maxlength": 40,
+                "sparks_flicker_speed": 0.3,
+                "sparks_fly_speed": 0.7,
+                "sparks_minappear_distance": 20,
+                "sparks_maxappear_distance": 60,
+                "sparks_min_length": 1,
+                "sparks_max_length": 3,
+                "sparks_area_minlength": 40,
+                "sparks_area_maxlength": 80,
+                "use_color_variation": true,
+                "color_variation": 10,
+                "blur": 0.5,
+                "mask_blur": 3
             },
             "last_effect": "effect_off"
         },
@@ -559,9 +572,22 @@
             },
             "effect_fireplace": {
                 "firebase_maincolor": "Red",
-                "firebase_secondcolor": "Red",
                 "sparks_maincolor": "Orange",
-                "sparks_secondcolor": "Orange"
+                "firebase_flicker_speed": 4,
+                "firebase_area_minlength": 20,
+                "firebase_area_maxlength": 40,
+                "sparks_flicker_speed": 0.3,
+                "sparks_fly_speed": 0.7,
+                "sparks_minappear_distance": 20,
+                "sparks_maxappear_distance": 60,
+                "sparks_min_length": 1,
+                "sparks_max_length": 3,
+                "sparks_area_minlength": 40,
+                "sparks_area_maxlength": 80,
+                "use_color_variation": true,
+                "color_variation": 10,
+                "blur": 0.5,
+                "mask_blur": 3
             },
             "last_effect": "effect_off"
         }
