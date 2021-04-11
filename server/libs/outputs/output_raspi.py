@@ -62,7 +62,7 @@ class OutputRaspi(Output):
 
         self._leds = ws.new_ws2811_t()
 
-        self.channel = ws.ws2811_channel_get(self._leds, 0)
+        self.channel = ws.ws2811_channel_get(self._leds, self._led_channel)
 
         ws.ws2811_channel_t_strip_type_set(self.channel, self._led_strip_translated)
         ws.ws2811_channel_t_count_set(self.channel, self._led_count)
