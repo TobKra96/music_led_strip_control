@@ -14,11 +14,13 @@ var initialized = false;
 
 // Init and load all settings
 $(document).ready(function () {
-
     if (initialized) {
         return;
     }
     initialized = true;
+
+    // Open "Edit Effects" sidebar dropdown when on an effect page
+    $("#effect_list").slideDown();
 
     settingsIdentifier = $("#settingsIdentifier").val();
     effectIdentifier = $("#effectIdentifier").val();
