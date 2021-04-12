@@ -161,6 +161,8 @@ class EffectFireplace(Effect):
 
         if blur != 0:
             output_array = gaussian_filter1d(overlay_array, sigma=blur)
+        else:
+            output_array = overlay_array
 
         # Add the output array to the queue.
         self.queue_output_array_blocking(output_array)
