@@ -159,7 +159,8 @@ class EffectFireplace(Effect):
         overlay_array = np.where(spars_array_cutted != 0, spars_array_cutted, firebase_array)
         overlay_array = overlay_array * (mask_array / 100)
 
-        output_array = gaussian_filter1d(overlay_array, sigma=blur)
+        if blur != 0:
+            output_array = gaussian_filter1d(overlay_array, sigma=blur)
 
         # Add the output array to the queue.
         self.queue_output_array_blocking(output_array)
@@ -215,7 +216,8 @@ class EffectFireplace(Effect):
         mask_array[1][self.sparks_area_current_length - one_half_spark_area:self.sparks_area_current_length] = fade_out[1][:fade_out_end_index]
         mask_array[2][self.sparks_area_current_length - one_half_spark_area:self.sparks_area_current_length] = fade_out[2][:fade_out_end_index]
 
-        mask_array = gaussian_filter1d(mask_array, sigma=mask_blur)
+        if mask_blur != 0:
+            mask_array = gaussian_filter1d(mask_array, sigma=mask_blur)
         return mask_array
 
     def get_variation_color(self, main_color, color_variation):
