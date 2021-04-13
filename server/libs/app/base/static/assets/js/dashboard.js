@@ -15,6 +15,17 @@ $(document).ready(function () {
         // data = { device_0: "devicename1", device_1: "devicename2" }
         // todo: return anon Objects from Endpoint
 
+        if(!Object.keys(data).length){
+            console.log("data", data);
+            $("#alerts").append(`
+            <div class="alert alert-info alert-dismissible fade show" role="alert">
+            <strong>No Devices found</strong><hr><a href="#" class='btn btn-primary'>Create a new device</a>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+            </div>`);
+        }
+
         // parse response into device Objects
         Object.keys(data).forEach(device_key => {
             devices.push(new Device(device_key, data[device_key]));
@@ -31,7 +42,7 @@ $(document).ready(function () {
             // Fallback to all_devices
             currentDevice = devices[0];
         }
-        
+
         effectManager.currentDevice = currentDevice;
 
         // Async function
