@@ -35,7 +35,7 @@ function UpdateActiveEffectTile() {
 
 function getRandomEffect(effects) {
     do {
-        randomEffect = effects[Math.floor(Math.random() * effects.length)];
+        var randomEffect = effects[Math.floor(Math.random() * effects.length)];
     } while(randomEffect === activeEffect)
     return randomEffect;
 }
