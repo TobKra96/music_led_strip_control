@@ -79,13 +79,28 @@ export class EffectManager {
                 // UI and State Updates should be here
                 // this could cause Problems later
             }).fail((data) => {
-                $("#alerts").append(`
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                <strong>(`+ new Date().toLocaleTimeString() + `) Error: </strong> ` + data.responseText + `
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                  <span aria-hidden="true">&times;</span>
-                </button>
-                </div>`);
+                $(".toast_block").append(`
+                    <div class="toast" style="min-width: 250px;" role="alert" aria-live="assertive" aria-atomic="true">
+                        <div class="toast-header">
+                            <strong class="mr-auto text-danger"><i class="feather icon-alert-triangle"></i> Error</strong>
+                            <small class="text-muted">`+ new Date().toLocaleTimeString('en-GB') + `</small>
+                            <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+                                <span aria-hidden="true" class="feather icon-x"></span>
+                            </button>
+                        </div>
+                        <div class="toast-body">
+                            Unable to set effect.<br>Error: ` + data.responseText + `
+                        </div>
+                    </div>
+                `);
+
+                $('.toast').toast({
+                    delay: 5000
+                })
+                $('.toast').toast('show')
+                $('.toast').on('hidden.bs.toast', function () {
+                    $(this).remove()
+                })
             });
             // update UI without waiting for a response
             this.currentDevice.setActiveEffect(effect);
