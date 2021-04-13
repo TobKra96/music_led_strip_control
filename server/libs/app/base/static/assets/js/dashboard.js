@@ -8,53 +8,11 @@ function UpdateCurrentDeviceText(text) {
 
 /* Effect Handling */
 
-function GetActiveEffect(id) {
-    $.ajax({
-        url: "/GetActiveEffect",
-        data: {
-            "device": id
-        }
-    }).done((data) => {
-        activeEffect = data["effect"];
-        UpdateActiveEffectTile();
-        UpdateCurrentEffectText();
-    });
-}
-
-function UpdateCurrentEffectText() {
-    if (activeEffect != "") {
-        const activeEffectText = $("#" + activeEffect).text();
-        $("#selected_effect_txt").text(activeEffectText);
-    }
-}
-
-function UpdateActiveEffectTile() {
-    $(".dashboard_effect_active").removeClass("dashboard_effect_active");
-    $("#" + activeEffect).addClass("dashboard_effect_active");
-}
-
 function getRandomEffect(effects) {
     do {
         var randomEffect = effects[Math.floor(Math.random() * effects.length)];
     } while(randomEffect === activeEffect)
     return randomEffect;
-}
-
-function SetActiveEffect(newActiveEffect) {
-    activeEffect = newActiveEffect;
-    $.ajax({
-        url: "/SetActiveEffect",
-        type: "POST",
-        data: JSON.stringify({ "device": currentDevice.id, "effect": activeEffect }),
-        contentType: 'application/json;charset=UTF-8'
-    }).done((data) => {
-        console.table("Effect set successfully. Response:\n\n" + JSON.stringify(data, null, '\t'));
-    }).fail((data) => {
-        console.log("Error while setting effect. Error: " + data.responseText);
-    });
-
-    UpdateActiveEffectTile();
-    UpdateCurrentEffectText();
 }
 
 // Listen for effect change on click
@@ -111,7 +69,18 @@ function switchEffect(e) {
         if (newActiveEffect == 'effect_random_music') {
             newActiveEffect = getRandomEffect(allMusicEffects);
         }
-        SetActiveEffect(newActiveEffect);
+        activeEffect = newActiveEffect;
+        $.ajax({
+            url: "/SetActiveEffect",
+            type: "POST",
+            data: JSON.stringify({ "device": currentDevice.id, "effect": activeEffect }),
+            contentType: 'application/json;charset=UTF-8'
+        }).done((data) => {
+            currentDevice.setActiveEffect(newActiveEffect);
+            console.table("Effect set successfully. Response:\n\n" + JSON.stringify(data, null, '\t'));
+        }).fail((data) => {
+            console.log("Error while setting effect. Error: " + data.responseText);
+        });
     }
 }
 
@@ -182,7 +151,8 @@ $(document).ready(function () {
             currentDevice = devices[0];
         }
         UpdateCurrentDeviceText(currentDevice.name);
-        GetActiveEffect(currentDevice.id);
+        // Async function
+        currentDevice.getActiveEffect();
 
         // Build Device Tab
         devices.forEach(device => {
@@ -199,7 +169,8 @@ $(document).ready(function () {
             link.addEventListener('click', () => {
                 currentDevice = device;
                 localStorage.setItem('lastDevice', device.id);
-                GetActiveEffect(device.id);
+                // Async function
+                device.getActiveEffect();
                 UpdateCurrentDeviceText(device.name);
             });
 
