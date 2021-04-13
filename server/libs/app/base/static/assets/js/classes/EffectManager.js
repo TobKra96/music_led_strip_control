@@ -2,8 +2,8 @@
 export class EffectManager {
     constructor() {
         // todo: refactor server-side
-        this.nonMusicEffects = $("#dashboard-list-none-music > div > div").map(function() { return this.id }).toArray();
-        this.musicEffects = $("#dashboard-list-music > div > div").map(function() { return this.id }).toArray();
+        this.nonMusicEffects = $("#dashboard-list-none-music > div > div").map(function () { return this.id }).toArray();
+        this.musicEffects = $("#dashboard-list-music > div > div").map(function () { return this.id }).toArray();
         this.specialEffects = $("#dashboard-list-special > div > div").map(function () { return this.id }).toArray();
         this.currentDevice;
 
@@ -17,10 +17,10 @@ export class EffectManager {
         initTimerWorker();
     }
 
-    get allEffects () {
+    get allEffects() {
         return this.nonMusicEffects.concat(this.musicEffects, this.specialEffects)
     }
-    
+
     get allLightEffects() {
         return this.nonMusicEffects.concat(this.musicEffects)
     }
@@ -30,7 +30,7 @@ export class EffectManager {
 
         if (type == 'effect_random_non_music') {
             pool = this.nonMusicEffects;
-        }else if (type == 'effect_random_music') {
+        } else if (type == 'effect_random_music') {
             pool = this.musicEffects;
         } else {
             pool = this.allLightEffects;
@@ -38,7 +38,7 @@ export class EffectManager {
 
         do {
             randomEffect = pool[Math.floor(Math.random() * pool.length)];
-        } while(randomEffect === activeEffect)
+        } while (randomEffect === activeEffect)
         return randomEffect;
     }
 
@@ -64,9 +64,9 @@ export class EffectManager {
                 $("#effect_random_cycle > div > p").text("Random Cycle");
                 $("#effect_random_cycle > div").removeClass("border border-secondary");
             }
-            
+
             // pick random effect based on type
-            if(effect == "effect_random_cycle" || effect == "effect_random_non_music" || effect == "effect_random_music") {
+            if (effect == "effect_random_cycle" || effect == "effect_random_non_music" || effect == "effect_random_music") {
                 effect = this.getRandomEffect(effect, this.currentDevice.activeEffect);
             }
 
@@ -79,13 +79,28 @@ export class EffectManager {
                 // UI and State Updates should be here
                 // this could cause Problems later
             }).fail((data) => {
-                $("#alerts").append(`
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                <strong>(`+ new Date().toLocaleTimeString() +`) Error: </strong> `+data.responseText+`
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                  <span aria-hidden="true">&times;</span>
-                </button>
-                </div>`);
+                $(".toast_block").append(`
+                    <div class="toast" style="min-width: 250px;" role="alert" aria-live="assertive" aria-atomic="true">
+                        <div class="toast-header">
+                            <strong class="mr-auto text-danger"><i class="feather icon-alert-triangle"></i> Error</strong>
+                            <small class="text-muted">`+ new Date().toLocaleTimeString('en-GB') + `</small>
+                            <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+                                <span aria-hidden="true" class="feather icon-x"></span>
+                            </button>
+                        </div>
+                        <div class="toast-body">
+                            Unable to set effect.<br>Error: ` + data.responseText + `
+                        </div>
+                    </div>
+                `);
+
+                $('.toast').toast({
+                    delay: 5000
+                })
+                $('.toast').toast('show')
+                $('.toast').on('hidden.bs.toast', function () {
+                    $(this).remove()
+                })
             });
             // update UI without waiting for a response
             this.currentDevice.setActiveEffect(effect);
@@ -110,7 +125,7 @@ function initTimerWorker() {
             $("#effect_random_cycle")[0].click();
         }
     };
-    
+
     // Restore timer if it was running while page reloaded
     var effectCycleActive = sessionStorage.getItem('effect_cycle_active');
     if (effectCycleActive) {
