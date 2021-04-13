@@ -148,7 +148,7 @@ function initTimerWorker() {
 
 // Start with Fake Device
 const devices = [new Device("all_devices", "All Devices")];
-let currentDevice = "all_devices";
+let currentDevice = devices[0];
 let activeEffect = "";
 let timer;
 const hardcodedSec = 10;
@@ -197,6 +197,7 @@ $(document).ready(function () {
             link.setAttribute("aria-controls", "pills-0")
             link.setAttribute("aria-selected", "false")
             link.addEventListener('click', () => {
+                currentDevice = device;
                 localStorage.setItem('lastDevice', device.id);
                 GetActiveEffect(device.id);
                 UpdateCurrentDeviceText(device.name);
