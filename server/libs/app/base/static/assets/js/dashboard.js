@@ -1,212 +1,68 @@
-var devices;
-var activeEffect = "";
-var currentDevice = "all_devices";
-var allNonMusicEffects = getAllEffects("#dashboard-list-none-music");
-var allMusicEffects = getAllEffects("#dashboard-list-music");
-var allEffects = allNonMusicEffects.concat(allMusicEffects);
-var timer;
-var hardcodedSec = 10;
-
-// Init and load all settings
-$(document).ready(function () {
-    GetDevices();
-    GetActiveEffect(currentDevice);
-    initTimerWorker();
-
-    // Restore timer if it was running while page reloaded
-    var effectCycleActive = sessionStorage.getItem('effect_cycle_active');
-    if (effectCycleActive) {
-        var sec = sessionStorage.getItem('seconds');
-        if (sec <= 0) {
-            sec = hardcodedSec;
-            sessionStorage.setItem('seconds', sec);
-        }
-        timer.postMessage({
-            seconds: sec,
-            status: 'start'
-        });
-    }
-});
-
-function initTimerWorker() {
-    timer = new Worker('/static/assets/js/timer.js');
-
-    // Get messages from timer worker
-    timer.onmessage = (event) => {
-        var sec = event.data;
-        sessionStorage.setItem('seconds', sec);
-        $("#effect_random_cycle > div > p").text("Random Cycle (" + sec + "s)");
-        if (sec <= 0) {
-            sessionStorage.clear();
-            $("#effect_random_cycle")[0].click();
-        }
-    };
-}
-
-function getAllEffects(listId) {
-    var allEffects = [];
-    $(listId + " > div > div").each((_, elem) => {
-        allEffects.push(elem.id);
-    });
-    return allEffects;
-}
-
-function getRandomEffect(effects) {
-    var randomEffect = this.activeEffect;
-    while (randomEffect == this.activeEffect) {
-        randomEffect = effects[Math.floor(Math.random() * effects.length)];
-    }
-    return randomEffect;
-}
-
-function GetDevices() {
-    $.ajax({
-        url: "/GetDevices",
-        type: "GET",
-        success: function (response) {
-            ParseDevices(response);
-        },
-        error: function (xhr) {
-            // Handle error
-        }
-    });
-}
-
-function ParseDevices(devices) {
-    this.currentDevice = "all_devices";
-    this.devices = devices;
-
-    this.BuildDeviceTab();
-    this.AddEventListeners();
-    this.UpdateCurrentDeviceText();
-
-    // Restore last selected device on reload
-    let lastDeviceId = localStorage.getItem("lastDevice");
-    if (lastDeviceId in this.devices) {
-        $("#accordionDevices").addClass('d-none');
-        $("#collapseMenu").addClass('show');
-        $("#" + lastDeviceId)[0].click();
-        $("#accordionDevices").removeClass('d-none');
-    }
-}
-
-function GetActiveEffect(device) {
-    $.ajax({
-        url: "/GetActiveEffect",
-        type: "GET",
-        data: {
-            "device": device
-        },
-        success: function (response) {
-            ParseActiveEffect(response);
-        },
-        error: function (xhr) {
-            // Handle error
-        }
-    });
-}
-
-function ParseActiveEffect(respond) {
-    this.activeEffect = respond["effect"];
-    this.UpdateActiveEffectTile();
-    this.UpdateCurrentEffectText();
-}
-
-function SetActiveEffect(newActiveEffect) {
-    var lastEffect = this.activeEffect;
-    this.activeEffect = newActiveEffect;
-
-    var data = {};
-    data["device"] = this.currentDevice;
-    data["effect"] = this.activeEffect;
-
-    $.ajax({
-        url: "/SetActiveEffect",
-        type: "POST",
-        data: JSON.stringify(data, null, '\t'),
-        contentType: 'application/json;charset=UTF-8',
-        success: function (response) {
-            console.table("Effect set successfully. Response:\n\n" + JSON.stringify(response, null, '\t'));
-        },
-        error: function (xhr) {
-            console.log("Error while setting effect. Error: " + xhr.responseText);
-        }
-    });
-
-    this.UpdateActiveEffectTile();
-    this.UpdateCurrentEffectText();
-}
-
+import { Device } from "./classes/Device.js";
 
 /* Device Handling */
 
-function BuildDeviceTab() {
-    var devices = this.devices;
-
-    $('#deviceTabID').append("<li class='nav-item device_item'><a class='nav-link active' id='all_devices' data-toggle='pill' href='#pills-0' role='tab' aria-controls='pills-0' aria-selected='false'>All Devices</a></li>");
-
-    Object.keys(devices).forEach(device_key => {
-        $('#deviceTabID').append("<li class='nav-item device_item'><a class='nav-link' id=\"" + device_key + "\" data-toggle='pill' href='#pills-0' role='tab' aria-controls='pills-0' aria-selected='false'>" + devices[device_key] + "</a></li>");
-    });
-
-    $('#device_count').text(Object.keys(devices).length);
-}
-
-function AddEventListeners() {
-    var elements = document.getElementsByClassName("device_item");
-
-    for (var i = 0; i < elements.length; i++) {
-        elements[i].addEventListener('click', function (e) {
-            SwitchDevice(e);
-        });
-    }
-}
-
-function UpdateCurrentDeviceText() {
-    var text = "";
-
-    if (this.currentDevice == "all_devices") {
-        text = "All Devices";
-    } else {
-        text = this.devices[this.currentDevice];
-    }
-
+function UpdateCurrentDeviceText(text) {
     $("#selected_device_txt").text(text);
 }
 
+function SwitchDevice(deviceId) {
+    currentDevice = devices.find(device => device.id == deviceId);
+    // Save selected device to localStorage
+    localStorage.setItem('lastDevice', currentDevice.id);
+    GetActiveEffect(currentDevice.id);
+    UpdateCurrentDeviceText(currentDevice.name);
+}
+
+/* Effect Handling */
+
+function GetActiveEffect(id) {
+    $.ajax({
+        url: "/GetActiveEffect",
+        data: {
+            "device": id
+        }
+    }).done((data) => {
+        activeEffect = data["effect"];
+        UpdateActiveEffectTile();
+        UpdateCurrentEffectText();
+    });
+}
+
 function UpdateCurrentEffectText() {
-    if (this.activeEffect != "") {
-        var activeEffectText = $("#" + this.activeEffect).text();
+    if (activeEffect != "") {
+        const activeEffectText = $("#" + activeEffect).text();
         $("#selected_effect_txt").text(activeEffectText);
     }
 }
 
 function UpdateActiveEffectTile() {
-    if (this.activeEffect != "") {
-        this.clearAllActiveEffects();
-        this.setActiveStyle(this.activeEffect);
-    }
-}
-
-function SwitchDevice(e) {
-    var newDeviceId = e.target.id;
-    this.currentDevice = newDeviceId;
-    // Save selected device to localStorage
-    localStorage.setItem('lastDevice', newDeviceId);
-
-    this.GetActiveEffect(newDeviceId);
-    this.UpdateCurrentDeviceText();
-}
-
-
-/* Effect Handling */
-
-function clearAllActiveEffects() {
     $(".dashboard_effect_active").removeClass("dashboard_effect_active");
+    $("#" + activeEffect).addClass("dashboard_effect_active");
 }
 
-function setActiveStyle(currentEffect) {
-    $("#" + currentEffect).addClass("dashboard_effect_active");
+function getRandomEffect(effects) {
+    do {
+        randomEffect = effects[Math.floor(Math.random() * effects.length)];
+    } while(randomEffect === activeEffect)
+    return randomEffect;
+}
+
+function SetActiveEffect(newActiveEffect) {
+    activeEffect = newActiveEffect;
+    $.ajax({
+        url: "/SetActiveEffect",
+        type: "POST",
+        data: JSON.stringify({ "device": currentDevice.id, "effect": activeEffect }),
+        contentType: 'application/json;charset=UTF-8'
+    }).done((data) => {
+        console.table("Effect set successfully. Response:\n\n" + JSON.stringify(data, null, '\t'));
+    }).fail((data) => {
+        console.log("Error while setting effect. Error: " + data.responseText);
+    });
+
+    UpdateActiveEffectTile();
+    UpdateCurrentEffectText();
 }
 
 // Listen for effect change on click
@@ -214,11 +70,11 @@ document.getElementById("dashboard-item-list").addEventListener("click", functio
     switchEffect(e);
 });
 
-
 function switchEffect(e) {
-    var newActiveEffect = "";
-    var BreakException = {};
+    let newActiveEffect = "";
+    let BreakException = {};
 
+    // wat (pls refactor)
     try {
         var path = e.path || (e.composedPath && e.composedPath());
         path.forEach(element => {
@@ -233,12 +89,13 @@ function switchEffect(e) {
     catch (e) {
         if (e !== BreakException) throw e;
     }
+    // wat (pls refactor)
 
     if (newActiveEffect.length > 0) {
         console.log(newActiveEffect + " was clicked.");
 
         if (newActiveEffect == 'effect_random_cycle') {
-            var effectCycleActive = sessionStorage.getItem('effect_cycle_active');
+            const effectCycleActive = sessionStorage.getItem('effect_cycle_active');
             if (!effectCycleActive) {
                 timer.postMessage({
                     seconds: hardcodedSec,
@@ -265,3 +122,85 @@ function switchEffect(e) {
         SetActiveEffect(newActiveEffect);
     }
 }
+
+function initTimerWorker() {
+    timer = new Worker('/static/assets/js/timer.js');
+
+    // Get messages from timer worker
+    timer.onmessage = (event) => {
+        var sec = event.data;
+        sessionStorage.setItem('seconds', sec);
+        $("#effect_random_cycle > div > p").text("Random Cycle (" + sec + "s)");
+        if (sec <= 0) {
+            sessionStorage.clear();
+            $("#effect_random_cycle")[0].click();
+        }
+    };
+    
+    // Restore timer if it was running while page reloaded
+    var effectCycleActive = sessionStorage.getItem('effect_cycle_active');
+    if (effectCycleActive) {
+        var sec = sessionStorage.getItem('seconds');
+        if (sec <= 0) {
+            sec = hardcodedSec;
+            sessionStorage.setItem('seconds', sec);
+        }
+        timer.postMessage({
+            seconds: sec,
+            status: 'start'
+        });
+    }
+}
+
+// Global Variables
+
+// Start with Fake Device
+const devices = [new Device("all_devices", "All Devices")];
+let currentDevice = "all_devices";
+let activeEffect = "";
+let timer;
+const hardcodedSec = 10;
+// todo: refactor server-side
+const allNonMusicEffects = $("#dashboard-list-none-music > div > div").map(function() { return this.id }).toArray();
+const allNonMusicEffects = $("#dashboard-list-music > div > div").map(function() { return this.id }).toArray();
+const allEffects = allNonMusicEffects.concat(allMusicEffects);
+
+// Init and load all settings
+$(document).ready(function () {
+
+    $.ajax({ url: "/GetDevices" }).done((data) => {
+        // data = { device_0: "devicename1", device_1: "devicename2" }
+        // todo: return anon Objects from Endpoint
+
+        // parse response into device Objects
+        Object.keys(data).forEach(device_key => {
+            devices.push(new Device(device_key, data[device_key]));
+        });
+
+        // Subtract the fake Device
+        $('#device_count').text(devices.length-1);
+
+        // Restore last selected device on reload
+        let lastDevice = devices.find(device => device.id === localStorage.getItem("lastDevice"));
+        if(lastDevice instanceof Device) {
+            currentDevice = lastDevice;
+        } else {
+            // Fallback to all_devices
+            currentDevice = devices[0];
+        }
+        UpdateCurrentDeviceText(currentDevice.name);
+        GetActiveEffect(currentDevice.id);
+
+        // Build Device Tab
+        devices.forEach((device, index) => {
+            const active = currentDevice.id === device.id ? " active" : "";
+            // todo: remove id="#"
+            $('#deviceTabID').append(
+                "<li class='nav-item device_item'><a onclick='SwitchDevice(\""+device.id+"\")' class='nav-link"+ active +"' id=\"" + index + "\" data-toggle='pill' href='#pills-0' role='tab' aria-controls='pills-0' aria-selected='false'>" + device.name + "</a></li>"
+                )
+        });
+     });
+
+    initTimerWorker();
+
+});
