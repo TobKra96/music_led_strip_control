@@ -1,25 +1,13 @@
 import { Device } from "./classes/Device.js";
 
-/* Device Handling */
-
-function UpdateCurrentDeviceText(text) {
-    $("#selected_device_txt").text(text);
-}
-
 /* Effect Handling */
 
-function getRandomEffect(effects) {
+function getRandomEffect(effects, activeEffect) {
     do {
         var randomEffect = effects[Math.floor(Math.random() * effects.length)];
     } while(randomEffect === activeEffect)
     return randomEffect;
 }
-
-// Listen for effect change on click
-document.getElementById("dashboard-item-list").addEventListener("click", function (e) {
-    switchEffect(e);
-});
-
 function switchEffect(e) {
     let newActiveEffect = "";
     let BreakException = {};
@@ -53,7 +41,7 @@ function switchEffect(e) {
                 });
                 sessionStorage.setItem('effect_cycle_active', true);
             }
-            newActiveEffect = getRandomEffect(allEffects);
+            newActiveEffect = getRandomEffect(allEffects, currentDevice.activeEffect);
         } else {
             timer.postMessage({
                 seconds: 0,
@@ -64,16 +52,15 @@ function switchEffect(e) {
         }
 
         if (newActiveEffect == 'effect_random_non_music') {
-            newActiveEffect = getRandomEffect(allNonMusicEffects);
+            newActiveEffect = getRandomEffect(allNonMusicEffects, currentDevice.activeEffect);
         }
         if (newActiveEffect == 'effect_random_music') {
-            newActiveEffect = getRandomEffect(allMusicEffects);
+            newActiveEffect = getRandomEffect(allMusicEffects, currentDevice.activeEffect);
         }
-        activeEffect = newActiveEffect;
         $.ajax({
             url: "/SetActiveEffect",
             type: "POST",
-            data: JSON.stringify({ "device": currentDevice.id, "effect": activeEffect }),
+            data: JSON.stringify({ "device": currentDevice.id, "effect": newActiveEffect }),
             contentType: 'application/json;charset=UTF-8'
         }).done((data) => {
             currentDevice.setActiveEffect(newActiveEffect);
@@ -83,6 +70,11 @@ function switchEffect(e) {
         });
     }
 }
+
+// Listen for effect change on click
+document.getElementById("dashboard-item-list").addEventListener("click", function (e) {
+    switchEffect(e);
+});
 
 function initTimerWorker() {
     timer = new Worker('/static/assets/js/timer.js');
@@ -118,7 +110,6 @@ function initTimerWorker() {
 // Start with Fake Device
 const devices = [new Device("all_devices", "All Devices")];
 let currentDevice = devices[0];
-let activeEffect = "";
 let timer;
 const hardcodedSec = 10;
 // todo: refactor server-side
@@ -150,7 +141,6 @@ $(document).ready(function () {
             // Fallback to all_devices
             currentDevice = devices[0];
         }
-        UpdateCurrentDeviceText(currentDevice.name);
         // Async function
         currentDevice.getActiveEffect();
 
@@ -171,7 +161,6 @@ $(document).ready(function () {
                 localStorage.setItem('lastDevice', device.id);
                 // Async function
                 device.getActiveEffect();
-                UpdateCurrentDeviceText(device.name);
             });
 
             const li = document.createElement("li");

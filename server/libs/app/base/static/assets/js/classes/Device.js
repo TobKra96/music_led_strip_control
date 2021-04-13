@@ -20,6 +20,7 @@ export class Device {
 
     setActiveEffect(newActiveEffect) {
         this.activeEffect = newActiveEffect;
+        $("#selected_device_txt").text(this.name);
 
         $(".dashboard_effect_active").removeClass("dashboard_effect_active");
         $("#" + this.activeEffect).addClass("dashboard_effect_active");
