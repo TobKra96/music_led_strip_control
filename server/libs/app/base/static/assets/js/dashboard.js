@@ -6,14 +6,6 @@ function UpdateCurrentDeviceText(text) {
     $("#selected_device_txt").text(text);
 }
 
-function SwitchDevice(deviceId) {
-    currentDevice = devices.find(device => device.id == deviceId);
-    // Save selected device to localStorage
-    localStorage.setItem('lastDevice', currentDevice.id);
-    GetActiveEffect(currentDevice.id);
-    UpdateCurrentDeviceText(currentDevice.name);
-}
-
 /* Effect Handling */
 
 function GetActiveEffect(id) {
@@ -162,13 +154,14 @@ let timer;
 const hardcodedSec = 10;
 // todo: refactor server-side
 const allNonMusicEffects = $("#dashboard-list-none-music > div > div").map(function() { return this.id }).toArray();
-const allNonMusicEffects = $("#dashboard-list-music > div > div").map(function() { return this.id }).toArray();
+const allMusicEffects = $("#dashboard-list-music > div > div").map(function() { return this.id }).toArray();
 const allEffects = allNonMusicEffects.concat(allMusicEffects);
 
 // Init and load all settings
 $(document).ready(function () {
 
     $.ajax({ url: "/GetDevices" }).done((data) => {
+
         // data = { device_0: "devicename1", device_1: "devicename2" }
         // todo: return anon Objects from Endpoint
 
@@ -192,12 +185,29 @@ $(document).ready(function () {
         GetActiveEffect(currentDevice.id);
 
         // Build Device Tab
-        devices.forEach((device, index) => {
+        devices.forEach(device => {
+            // todo: do it server side
             const active = currentDevice.id === device.id ? " active" : "";
-            // todo: remove id="#"
-            $('#deviceTabID').append(
-                "<li class='nav-item device_item'><a onclick='SwitchDevice(\""+device.id+"\")' class='nav-link"+ active +"' id=\"" + index + "\" data-toggle='pill' href='#pills-0' role='tab' aria-controls='pills-0' aria-selected='false'>" + device.name + "</a></li>"
-                )
+            const link = document.createElement("a");
+            link.classList = "nav-link" + active;
+            link.innerHTML = device.name;
+            link.href = "#pills-0";
+            link.role = "tab";
+            link.setAttribute("data-toggle", "pill")
+            link.setAttribute("aria-controls", "pills-0")
+            link.setAttribute("aria-selected", "false")
+            link.addEventListener('click', () => {
+                localStorage.setItem('lastDevice', device.id);
+                GetActiveEffect(device.id);
+                UpdateCurrentDeviceText(device.name);
+            });
+
+            const li = document.createElement("li");
+            li.className = "nav-item device_item";
+            li.appendChild(link)
+
+            document.getElementById("deviceTabID").appendChild(li);
+
         });
      });
 
