@@ -718,9 +718,11 @@ class Webserver():
     def CreateNewDevice():  # pylint: disable=E0211
         if request.method == 'POST':
 
-            data_out = dict()
+            index = Webserver.instance.webserver_executer.CreateNewDevice()
 
-            Webserver.instance.webserver_executer.CreateNewDevice()
+            data_out = {
+                "index": index
+            }
 
             return jsonify(data_out)
 
