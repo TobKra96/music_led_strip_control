@@ -50,7 +50,7 @@ File: style.css
      Google Font
 ==========================  **/
 @import url("https://fonts.googleapis.com/css?family=Open+Sans:300,400,600");
-@import url("../plugins/bootstrap/css/bootstrap.min.css");
+@import url("../plugins/bootstrap-4.2.1/css/bootstrap.min.css");
 @import url("../fonts/feather/css/feather.css");
 @import url("../plugins/jquery-scrollbar/css/jquery.scrollbar.min.css");
 @import url("../fonts/datta/datta-icon.css");

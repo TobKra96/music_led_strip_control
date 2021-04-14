@@ -31,11 +31,11 @@ $(document).ready(function () {
         });
 
         // Subtract the fake Device
-        $('#device_count').text(devices.length-1);
+        $('#device_count').text(devices.length - 1);
 
         // Restore last selected device on reload
         let lastDevice = devices.find(device => device.id === localStorage.getItem("lastDevice"));
-        if(lastDevice instanceof Device) {
+        if (lastDevice instanceof Device) {
             currentDevice = lastDevice;
         } else {
             // Fallback to all_devices
@@ -73,5 +73,5 @@ $(document).ready(function () {
 
             document.getElementById("deviceTabID").appendChild(li);
         });
-     });
+    });
 });
