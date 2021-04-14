@@ -56,11 +56,14 @@ export default class EffectManager {
                     $("#effect_random_cycle > div").css("box-shadow", "inset 0 0 0 3px #3f4d67")
                 }
             } else {
-                timer.postMessage({
-                    seconds: 0,
-                    status: 'stop'
-                });
-                sessionStorage.clear();
+                const effectCycleActive = sessionStorage.getItem('effect_cycle_active');
+                if (effectCycleActive) {
+                    timer.postMessage({
+                        seconds: 0,
+                        status: 'stop'
+                    });
+                    sessionStorage.clear();
+                }
                 $("#effect_random_cycle > div > p").text("Random Cycle");
                 $("#effect_random_cycle > div").css("box-shadow", "none")
             }
