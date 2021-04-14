@@ -189,6 +189,12 @@ function SetLocalSettings() {
         }).done((data) => {
             console.log("Device settings set successfully. Response:\n\n" + JSON.stringify(data, null, '\t'));
 
+            // Update device name in device dropdown
+            // Todo: Update device name inside pill too
+            currentDevice.name = data.settings.DEVICE_NAME
+            $("#selected_device_txt").text(currentDevice.name);
+            $("#selected_device_txt").text(currentDevice.name);
+
             let customToast = createToast('Device "' + currentDevice.name + '" saved.')
             $(".toast_block").append(customToast)
             $('.toast').toast('show')
@@ -255,6 +261,7 @@ const createDevice = function () {
         contentType: 'application/json;charset=UTF-8'
     }).done(data => {
         console.log("New device created successfully. Response:\n\n" + JSON.stringify(data, null, '\t'));
+        let newDeviceIndex = data["index"];
         // location.reload();
         $.ajax("/GetDevices").done((data) => {
             devices = [];
@@ -263,8 +270,8 @@ const createDevice = function () {
                 devices.push(new Device(device_key, data[device_key]));
             });
 
-            // Select new created Device
-            currentDevice = devices[devices.length - 1]
+            // Select newly created Device by its index
+            currentDevice = devices[newDeviceIndex]
             refreshDeviceConfig(output_types, currentDevice);
 
             // Remove every pill in the navigation and recreate
