@@ -1,5 +1,5 @@
-import { Device } from "./classes/Device.js";
-import { EffectManager } from "./classes/EffectManager.js";
+import Device from "./classes/Device.js";
+import EffectManager from "./classes/EffectManager.js";
 
 // Global Variables
 const effectManager = new EffectManager();
@@ -11,12 +11,11 @@ let currentDevice = devices[0];
 // Init and load all settings
 $(document).ready(function () {
 
-    $.ajax({ url: "/GetDevices" }).done((data) => {
+    $.ajax("/GetDevices").done((data) => {
         // data = { device_0: "devicename1", device_1: "devicename2" }
         // todo: return anon Objects from Endpoint
 
         if(!Object.keys(data).length){
-            console.log("data", data);
             $("#alerts").append(`
             <div class="alert alert-info alert-dismissible fade show" role="alert">
             <strong>No Devices found</strong><hr><a href="#" class='btn btn-primary'>Create a new device</a>
@@ -49,16 +48,16 @@ $(document).ready(function () {
         currentDevice.getActiveEffect();
 
         // Build Device Tab
-        devices.forEach(device => {
+        devices.forEach((device, index) => {
             // todo: do it server side
             const active = currentDevice.id === device.id ? " active" : "";
             const link = document.createElement("a");
-            link.classList = "nav-link" + active;
+            link.classList = "nav-link"+active;
             link.innerHTML = device.name;
-            link.href = "#pills-0";
+            link.href = `#pills-${index}`;
             link.role = "tab";
             link.setAttribute("data-toggle", "pill")
-            link.setAttribute("aria-controls", "pills-0")
+            link.setAttribute("aria-controls", `pills-${index}`)
             link.setAttribute("aria-selected", "false")
             link.addEventListener('click', () => {
                 currentDevice = device;

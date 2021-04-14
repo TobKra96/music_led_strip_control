@@ -1,5 +1,5 @@
 // classes/EffectManager.js
-export class EffectManager {
+export default class EffectManager {
     constructor() {
         // todo: refactor server-side
         this.nonMusicEffects = $("#dashboard-list-none-music > div > div").map(function() { return this.id }).toArray();
@@ -30,7 +30,7 @@ export class EffectManager {
 
         if (type == 'effect_random_non_music') {
             pool = this.nonMusicEffects;
-        }else if (type == 'effect_random_music') {
+        } else if (type == 'effect_random_music') {
             pool = this.musicEffects;
         } else {
             pool = this.allLightEffects;

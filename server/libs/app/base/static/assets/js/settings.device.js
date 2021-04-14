@@ -1,488 +1,292 @@
-var settingsIdentifier;
-var localSettings = {};
-var currentDevice;
-var output_types = {};
+import Device from "./classes/Device.js";
 
-var devicesLoading = true;
-var outputTypesLoading = true;
-var ledStripsLoading = true;
+let output_types = {};
+let devices = [];
+let currentDevice;
 
-var reloadingCounter = 0;
-var reloadingMax = 0;
+function refreshDeviceConfig(output_types, currentDevice) {
+    if(!currentDevice) return;
+    // fetch Device Config data from Server and update the Form
+    const device_config_input = $(".device_setting_input").map(function() { return this.id }).toArray()
+        .map(id => currentDevice.getSetting(id));
+    const device_config_output = Object.keys(output_types).flatMap(output_type_key => {
+        return $("." + output_type_key).map(function() { return this.id }).toArray()
+            .map(key => currentDevice.getOutputSetting(key, output_type_key))
+    });
+    Promise.all(
+        device_config_input
+        .concat(device_config_output)
+    )
+    .then((response) => {
+        // response array contains ALL current device config objects
+        response.forEach(data => {
+            const setting_key = data["setting_key"];
+            const setting_value = data["setting_value"];
+            $("#" + setting_key).trigger('change');
+        
+            if ($(`#${setting_key}`).attr('type') == 'checkbox') {
+                $(`#${setting_key}`).prop('checked', setting_value);
+            } else {
+                $(`#${setting_key}`).val(setting_value);
+            }
+            $(`#${setting_key}`).trigger('change');
+        
+            // Set initial brightness slider value
+            $(`span[for='${setting_key}']`).text(setting_value)
+        })
+    });
+}
 
 // Init and load all settings
 $(document).ready(function () {
-    settingsIdentifier = $("#settingsIdentifier").val();
+    // Preload
+    Promise.all([
+        // get Output Types
+        $.ajax("/GetOutputTypes").done((data) => {
+            output_types = data;
+            $('.output_type').each(function () {
+                Object.keys(data).forEach(output_type_key => {
+                    const option = new Option(data[output_type_key], output_type_key);
+                    $(this).append(option);
+                });
+            });
+        }),
+        // get LED Strips
+        $.ajax("/GetLEDStrips").done((data) => {
+            $('.led_strips').each(function () {
+                for(let key in data) {
+                    $(this).append(new Option(data[key], key));
+                }
+            });
+        }),
+    ]).then(response => {
+        // all requests finished successfully
+        $.ajax("/GetDevices").done((data) => {
+            // parse data into device Objects
+            Object.keys(data).forEach(device_key => {
+                devices.push(new Device(device_key, data[device_key]));
+            });
 
-    GetDevices();
-    GetOutputTypes();
-    GetLEDStrips();
-});
-
-// Check if all initial ajax requests are finished
-function CheckIfFinishedInitialLoading() {
-    if (!devicesLoading && !outputTypesLoading && !ledStripsLoading) {
-        GetLocalSettings();
-    }
-}
-
-// Get Devices    -----------------------------------------------------------
-
-function GetDevices() {
-    $.ajax({
-        url: "/GetDevices",
-        type: "GET",
-        success: function (response) {
-            ParseDevices(response);
-        },
-        error: function (xhr) {
-            // Handle error
-        }
-    });
-}
-
-function ParseDevices(devices) {
-    this.devices = devices;
-
-    if (Object.keys(devices).length > 0) {
-        currentDevice = Object.keys(devices)[0];
-    }
-
-    BuildDeviceTab();
-    UpdateCurrentDeviceText();
-
-    AddEventListeners();
-
-    devicesLoading = false;
-    CheckIfFinishedInitialLoading();
-}
-
-
-// Get Output Type    -----------------------------------------------------------
-
-function GetOutputTypes() {
-    $.ajax({
-        url: "/GetOutputTypes",
-        type: "GET",
-        data: {},
-        success: function (response) {
-            ParseGetOutputTypes(response);
-        },
-        error: function (xhr) {
-            // Handle error
-        }
-    });
-}
-
-function ParseGetOutputTypes(response) {
-    var context = this;
-    this.output_types = response;
-
-    $('.output_type').each(function () {
-        var output_types = context.output_types;
-
-        Object.keys(output_types).forEach(output_type_key => {
-            var newOption = new Option(output_types[output_type_key], output_type_key);
-            /// jquerify the DOM object 'o' so we can use the html method
-            $(this).append(newOption);
-        });
-    });
-
-    outputTypesLoading = false;
-    CheckIfFinishedInitialLoading();
-}
-
-// Get Device Settings   -----------------------------------------------------------
-
-function GetDeviceSetting(device, setting_key) {
-    $.ajax({
-        url: "/GetDeviceSetting",
-        type: "GET",
-        data: {
-            "device": device,
-            "setting_key": setting_key,
-        },
-        success: function (response) {
-            ParseGetDeviceSetting(response);
-        },
-        error: function (xhr) {
-            // Handle error
-        }
-    });
-}
-
-function ParseGetDeviceSetting(response) {
-    var setting_key = response["setting_key"];
-    var setting_value = response["setting_value"];
-    localSettings[setting_key] = setting_value;
-
-    SetLocalDeviceInput(setting_key, setting_value)
-}
-
-// Get Output Type Device Settings   -----------------------------------------------------------
-
-function GetOutputTypeDeviceSetting(device, output_type_key, setting_key) {
-    $.ajax({
-        url: "/GetOutputTypeDeviceSetting",
-        type: "GET",
-        data: {
-            "device": device,
-            "output_type_key": output_type_key,
-            "setting_key": setting_key,
-        },
-        success: function (response) {
-            ParseGetOutputTypeDeviceSetting(response);
-        },
-        error: function (xhr) {
-            // Handle error
-        }
-    });
-}
-
-function ParseGetOutputTypeDeviceSetting(response) {
-    var output_type_key = response["output_type_key"];
-    var setting_key = response["setting_key"];
-    var setting_value = response["setting_value"];
-    localSettings[setting_key] = setting_value;
-
-    SetLocalOutputTypeDeviceInput(output_type_key, setting_key, setting_value)
-
-    // Set initial brightness slider value
-    $("span[for='" + setting_key + "']").text(setting_value)
-}
-
-// Get LED Strips   -----------------------------------------------------------
-
-function GetLEDStrips() {
-    $.ajax({
-        url: "/GetLEDStrips",
-        type: "GET",
-        data: {},
-        success: function (response) {
-            ParseGetLEDStrips(response);
-        },
-        error: function (xhr) {
-            // Handle error
-        }
-    });
-}
-
-function ParseGetLEDStrips(response) {
-    var context = this;
-    this.led_strips = response;
-
-    $('.led_strips').each(function () {
-        var led_strips = context.led_strips;
-        for (var currentKey in led_strips) {
-            var newOption = new Option(led_strips[currentKey], currentKey);
-            $(newOption).html(led_strips[currentKey]);
-            $(this).append(newOption);
-        }
-    });
-
-    ledStripsLoading = false;
-    CheckIfFinishedInitialLoading();
-}
-
-
-
-// Set Device Setting   -----------------------------------------------------------
-
-function SetDeviceSetting(device, settings) {
-    var data = {};
-    data["device"] = device;
-    data["settings"] = settings;
-
-    $.ajax({
-        url: "/SetDeviceSetting",
-        type: "POST",
-        data: JSON.stringify(data, null, '\t'),
-        contentType: 'application/json;charset=UTF-8',
-        success: function (response) {
-            console.log("Device settings set successfully. Response:\n\n" + JSON.stringify(response, null, '\t'));
-            reloadingCounter++;
-            if (reloadingCounter >= reloadingMax) {
-                location.reload();
-            }
-        },
-        error: function (xhr) {
-            console.log("Error while setting device settings. Error: " + xhr.responseText);
-            reloadingCounter++;
-            if (reloadingCounter >= reloadingMax) {
-                location.reload();
-            }
-        }
-    });
-}
-
-// Set Output Type Device Setting   -----------------------------------------------------------
-
-function SetOutputTypeDeviceSetting(device, output_type_key, settings) {
-    var data = {};
-    data["device"] = device;
-    data["output_type_key"] = output_type_key;
-    data["settings"] = settings;
-
-    $.ajax({
-        url: "/SetOutputTypeDeviceSetting",
-        type: "POST",
-        data: JSON.stringify(data, null, '\t'),
-        contentType: 'application/json;charset=UTF-8',
-        success: function (response) {
-            console.log("Device settings set successfully. Response:\n\n" + JSON.stringify(response, null, '\t'));
-            reloadingCounter++;
-            if (reloadingCounter >= reloadingMax) {
-                location.reload();
+            // Restore last selected device on reload
+            let lastDevice = devices.find(device => device.id === localStorage.getItem("lastDevice"));
+            if(lastDevice instanceof Device) {
+                currentDevice = lastDevice;
+            } else {
+                // Fallback to all_devices
+                currentDevice = devices.length > 0 ? devices[0] : undefined;
             }
 
-        },
-        error: function (xhr) {
-            console.log("Error while setting device settings. Error: " + xhr.responseText);
-            reloadingCounter++;
-            if (reloadingCounter >= reloadingMax) {
-                location.reload();
+            refreshDeviceConfig(output_types, currentDevice)
+
+            // Build Device Tab
+            devices.forEach((device, index) => {
+                // todo: do it server side
+                const link = device.getPill(currentDevice.id, index);
+                link.addEventListener('click', () => {
+                    currentDevice = device;
+                    localStorage.setItem('lastDevice', device.id);
+                    $("#selected_device_txt").text(device.name);
+                    refreshDeviceConfig(output_types, currentDevice)
+                });
+
+                const li = document.createElement("li");
+                li.className = "nav-item device_item";
+                li.appendChild(link)
+
+                document.getElementById("deviceTabID").appendChild(li);
+            });
+
+            $('#device_count').text(devices.length);
+
+            if (devices.length > 0) {
+                $("#deviceFound").removeClass('d-none');
+                $("#noDeviceFound").addClass('d-none');
+            } else {
+                $("#deviceFound").addClass('d-none');
+                $("#noDeviceFound").removeClass('d-none');
+                return;
             }
-        }
-    });
-}
 
+            $("#selected_device_txt").text(currentDevice.name);
 
-// Load Functions   -----------------------------------------------------------
-
-function GetLocalSettings() {
-    if (Object.keys(devices).length > 0) {
-        $("#deviceFound").removeClass('d-none');
-        $("#noDeviceFound").addClass('d-none');
-    } else {
-        $("#deviceFound").addClass('d-none');
-        $("#noDeviceFound").removeClass('d-none');
-
-        return;
-    }
-
-    var all_device_setting_keys = GetDeviceSettingKeys();
-
-    Object.keys(all_device_setting_keys).forEach(setting_id => {
-        GetDeviceSetting(currentDevice, all_device_setting_keys[setting_id])
-    })
-
-    Object.keys(output_types).forEach(output_type_key => {
-        var all_output_type_setting_keys = GetOutputTypeSettingKeys(output_type_key);
-
-        Object.keys(all_output_type_setting_keys).forEach(setting_id => {
-            GetOutputTypeDeviceSetting(currentDevice, output_type_key, all_output_type_setting_keys[setting_id])
         })
-
+    }).catch((response) => {
+        if(devices.length === 0) {
+            return;
+        }
+        console.warn(response);
+        // all requests finished but one or more failed
+        $("#alerts").append(`
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong>(`+ new Date().toLocaleTimeString() +`) Error: </strong>${response.responseText}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+            </button>
+            </div>`);
     });
 
-}
-
-function SetLocalDeviceInput(setting_key, setting_value) {
-    if ($("#" + setting_key).attr('type') == 'checkbox') {
-        $("#" + setting_key).prop('checked', setting_value);
-    } else {
-        $("#" + setting_key).val(setting_value);
-    }
-
-    $("#" + setting_key).trigger('change');
-}
-
-function SetLocalOutputTypeDeviceInput(output_type_key, setting_key, setting_value) {
-    if ($("#" + setting_key + "." + output_type_key).attr('type') == 'checkbox') {
-        $("#" + setting_key).prop('checked', setting_value);
-
-    } else {
-        $("#" + setting_key + "." + output_type_key).val(setting_value);
-    }
-
-    $("#" + setting_key + "." + output_type_key).trigger('change');
-}
-
-
-function GetDeviceSettingKeys() {
-    var all_setting_keys = $(".device_setting_input").map(function () {
-        return this.attributes["id"].value;
-    }).get();
-
-    return all_setting_keys;
-}
-
-function GetOutputTypeSettingKeys(output_type) {
-    var all_setting_keys = $("." + output_type).map(function () {
-        return this.attributes["id"].value;
-    }).get();
-
-    return all_setting_keys;
-}
-
-
+});
 
 // Save Functions   -----------------------------------------------------------
 
 function SetLocalSettings() {
-    var all_device_setting_keys = GetDeviceSettingKeys();
+    let settings_device = {};
+    $(".device_setting_input").each((i, v) => {
+        const setting_key = v.id;
+        let setting_value = "";
 
-    reloadingCounter = 0;
-    reloadingMax = 1; // Device Settings
-    reloadingMax += Object.keys(output_types).length; // All output types
-
-    settings_device = {};
-    Object.keys(all_device_setting_keys).forEach(setting_id => {
-        var setting_key = all_device_setting_keys[setting_id];
-        var setting_value = "";
-
-        var elementIdentifier = "#" + setting_key + ".device_setting_input";
-        if ($(elementIdentifier).length) {
-            if ($(elementIdentifier).attr('type') == 'checkbox') {
-                setting_value = $(elementIdentifier).is(':checked')
-            } else if ($(elementIdentifier).attr('type') == 'number') {
-                setting_value = parseFloat($(elementIdentifier).val());
-            } else {
-                setting_value = $(elementIdentifier).val();
-            }
+        const element = $(`#${setting_key}.device_setting_input`);
+        switch(element.attr("type")) {
+            case "checkbox":
+                setting_value = element.is(':checked');
+                break;
+            case "number":
+                setting_value = parseFloat(element.val());
+                break;
+            default:
+                setting_value = element.val();
         }
-
         settings_device[setting_key] = setting_value;
+    });
+    const data = { "device": currentDevice.id, "settings": settings_device };
 
-    })
-
-    SetDeviceSetting(currentDevice, settings_device)
-
+    const saveProgress = [
+        $.ajax({
+            url: "/SetDeviceSetting",
+            type: "POST",
+            data: JSON.stringify(data, null, '\t'),
+            contentType: 'application/json;charset=UTF-8'
+        }).done((data) => {
+            // todo: output toast
+            console.log("Device settings set successfully. Response:\n\n" + JSON.stringify(data, null, '\t'));
+        }).fail((data) => {
+            console.log("Error while setting device settings. Error: " + data);
+        })
+    ];
 
     Object.keys(output_types).forEach(output_type_key => {
-        var all_output_type_setting_keys = GetOutputTypeSettingKeys(output_type_key);
+        const all_output_type_setting_keys = $("." + output_type_key).map(function() { return this.id }).toArray();
+        let settings_output_type = {};
 
-        settings_output_type = {};
+        Object.keys(all_output_type_setting_keys).forEach((setting_id) => {
+            const setting_key = all_output_type_setting_keys[setting_id];
+            let setting_value = "";
 
-        Object.keys(all_output_type_setting_keys).forEach(setting_id => {
-            var setting_key = all_output_type_setting_keys[setting_id];
-            var setting_value = "";
-
-            var elementIdentifier = "#" + setting_key + "." + output_type_key;
-            if ($(elementIdentifier).length) {
-                if ($(elementIdentifier).attr('type') == 'checkbox') {
-                    setting_value = $(elementIdentifier).is(':checked')
-                } else if ($(elementIdentifier).attr('type') == 'number') {
-                    setting_value = parseFloat($(elementIdentifier).val());
-                } else {
-                    setting_value = $(elementIdentifier).val();
-                }
+            const element = $(`#${setting_key}.${output_type_key}`);
+            switch(element.attr("type")) {
+                case "checkbox":
+                    setting_value = element.is(':checked');
+                    break;
+                case "number":
+                    setting_value = parseFloat(element.val());
+                    break;
+                default:
+                    setting_value = element.val();
             }
-
             settings_output_type[setting_key] = setting_value;
         });
 
-        SetOutputTypeDeviceSetting(currentDevice, output_type_key, settings_output_type)
+        const data2 = { "device": currentDevice.id, "output_type_key": output_type_key, "settings": settings_output_type };
+        saveProgress.push( 
+            $.ajax({
+                url: "/SetOutputTypeDeviceSetting",
+                type: "POST",
+                data: JSON.stringify(data2, null, '\t'),
+                contentType: 'application/json;charset=UTF-8'
+            }).done(data => {
+                console.log("Device settings set successfully. Response:\n\n" + JSON.stringify(data, null, '\t'));
+            }).fail(data => {
+                console.log("Error while setting device settings. Error: " + data);
+            })
+        );
+
     });
+
+    Promise.all(saveProgress).then(response => {
+        console.log("all saved", response);
+    }).catch((response) => {
+        // todo: show toast alert
+        console.warn(response);
+    });
+
 }
 
-
-// General Functions   -----------------------------------------------------------
-
-function CreateNewDevice() {
-    var data = {};
-
+const createDevice = function() {
     $.ajax({
         url: "/CreateNewDevice",
         type: "POST",
-        data: JSON.stringify(data, null, '\t'),
-        contentType: 'application/json;charset=UTF-8',
-        success: function (response) {
-            console.log("New device created successfully. Response:\n\n" + JSON.stringify(response, null, '\t'));
-            location.reload();
-        },
-        error: function (xhr) {
-            console.log("Error while creating new device. Error: " + xhr.responseText);
-        }
+        contentType: 'application/json;charset=UTF-8'
+    }).done(data => {
+        console.log("New device created successfully. Response:\n\n" + JSON.stringify(data, null, '\t'));
+        // location.reload();
+        $.ajax("/GetDevices").done((data) => {
+            devices = [];
+            // parse data into device Objects
+            Object.keys(data).forEach(device_key => {
+                devices.push(new Device(device_key, data[device_key]));
+            });
+
+            // Select new created Device
+            currentDevice = devices[devices.length-1]
+            refreshDeviceConfig(output_types, currentDevice);
+
+            // Remove every pill in the navigation and recreate
+            const tabs = document.getElementById("deviceTabID");
+            tabs.innerHTML = "";
+
+            // Build Device Tab
+            devices.forEach((device, index) => {
+                // todo: do it server side
+                const link = device.getPill(currentDevice.id, index);
+                link.addEventListener('click', () => {
+                    currentDevice = device;
+                    localStorage.setItem('lastDevice', device.id);
+                    $("#selected_device_txt").text(device.name);
+                    refreshDeviceConfig(output_types, currentDevice)
+                });
+
+                const li = document.createElement("li");
+                li.className = "nav-item device_item";
+                li.appendChild(link)
+                tabs.appendChild(li);
+            });
+
+            $('#device_count').text(devices.length);
+            $("#selected_device_txt").text(currentDevice.name);
+            $("#deviceFound").removeClass('d-none');
+            $("#noDeviceFound").addClass('d-none');
+
+        })
+
+    }).fail(data => {
+        console.log("Error while creating new device. Error: " + data.responseText);
     });
 }
-
-function DeleteDevice(device) {
-    var data = {};
-    data["device"] = device;
-
-    $.ajax({
-        url: "/DeleteDevice",
-        type: "POST",
-        data: JSON.stringify(data, null, '\t'),
-        contentType: 'application/json;charset=UTF-8',
-        success: function (response) {
-            console.log("Device deleted successfully. Response:\n\n" + JSON.stringify(response, null, '\t'));
-            location.reload();
-        },
-        error: function (xhr) {
-            console.log("Error while deleting device. Error: " + xhr.responseText);
-        }
-    });
-}
-
-
-/* Device Handling */
-
-function BuildDeviceTab() {
-    var devices = this.devices
-    var first = true;
-    var pill_counter = 0;
-    Object.keys(devices).forEach(device_key => {
-        if (first) {
-            $('#deviceTabID').append("<li class='nav-item device_item'><a class='nav-link active' id=\"" + device_key + "\" data-toggle='pill' href='#pills-" + pill_counter + "' role='tab' aria-controls='pills-" + pill_counter + "' aria-selected='true'>" + devices[device_key] + "</a></li>")
-            first = false;
-        } else {
-            $('#deviceTabID').append("<li class='nav-item device_item'><a class='nav-link' id=\"" + device_key + "\" data-toggle='pill' href='#pills-" + pill_counter + "' role='tab' aria-controls='pills-" + pill_counter + "' aria-selected='false'>" + devices[device_key] + "</a></li>")
-        }
-        pill_counter++;
-
-    });
-
-    $('#device_count').text(Object.keys(devices).length);
-}
-
-function AddEventListeners() {
-    var elements = document.getElementsByClassName("device_item");
-
-    for (var i = 0; i < elements.length; i++) {
-        elements[i].addEventListener('click', function (e) {
-            SwitchDevice(e);
-        });
-    }
-}
-
-function UpdateCurrentDeviceText() {
-    var text = "";
-
-    if (this.currentDevice == "all_devices") {
-        text = "All Devices"
-    } else {
-        text = this.devices[this.currentDevice]
-    }
-
-    $("#selected_device_txt").text(text);
-}
-
-function SwitchDevice(e) {
-    this.currentDevice = e.target.id;
-    GetLocalSettings();
-    UpdateCurrentDeviceText();
-}
-
 document.getElementById("save_btn").addEventListener("click", function (e) {
     SetLocalSettings();
 });
 
-document.getElementById("create1_btn").addEventListener("click", function (e) {
-    CreateNewDevice();
-});
+document.getElementById("create1_btn").addEventListener("click", createDevice);
 
-document.getElementById("create2_btn").addEventListener("click", function (e) {
-    CreateNewDevice();
-});
+document.getElementById("create2_btn").addEventListener("click", createDevice);
 
 document.getElementById("delete_btn").addEventListener("click", function (e) {
-    $('#modal_device_name').text(devices[currentDevice])
+    $('#modal_device_name').text(currentDevice.name)
     $('#modal_delete_device').modal('show')
 });
 
 document.getElementById("delete_btn_modal").addEventListener("click", function (e) {
     $('#modal_delete_device').modal('hide')
-    DeleteDevice(currentDevice);
+    $.ajax({
+        url: "/DeleteDevice",
+        type: "POST",
+        data: JSON.stringify({ "device": currentDevice.id }, null, '\t'),
+        contentType: 'application/json;charset=UTF-8'
+    }).done(data => {
+        console.log("Device deleted successfully. Response:\n\n" + JSON.stringify(data, null, '\t'));
+        location.reload();
+    }).fail(data => {
+        console.log("Error while deleting device. Error: " + xhr.responseText);
+    });
+
 });
