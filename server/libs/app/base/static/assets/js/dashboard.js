@@ -15,14 +15,15 @@ $(document).ready(function () {
         // data = { device_0: "devicename1", device_1: "devicename2" }
         // todo: return anon Objects from Endpoint
 
-        if(!Object.keys(data).length){
+        if (!Object.keys(data).length) {
             $("#alerts").append(`
-            <div class="alert alert-info alert-dismissible fade show" role="alert">
-            <strong>No Devices found</strong><hr><a href="#" class='btn btn-primary'>Create a new device</a>
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-            </div>`);
+                <div class="alert alert-info alert-dismissible fade show" role="alert">
+                    <strong>No Devices found</strong><hr><a href="#" class='btn btn-primary'>Create a new device</a>
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            `);
         }
 
         // parse response into device Objects
@@ -52,7 +53,7 @@ $(document).ready(function () {
             // todo: do it server side
             const active = currentDevice.id === device.id ? " active" : "";
             const link = document.createElement("a");
-            link.classList = "nav-link"+active;
+            link.classList = "nav-link" + active;
             link.innerHTML = device.name;
             link.href = `#pills-${index}`;
             link.role = "tab";

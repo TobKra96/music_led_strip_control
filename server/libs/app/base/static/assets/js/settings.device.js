@@ -5,36 +5,36 @@ let devices = [];
 let currentDevice;
 
 function refreshDeviceConfig(output_types, currentDevice) {
-    if(!currentDevice) return;
+    if (!currentDevice) return;
     // fetch Device Config data from Server and update the Form
-    const device_config_input = $(".device_setting_input").map(function() { return this.id }).toArray()
+    const device_config_input = $(".device_setting_input").map(function () { return this.id }).toArray()
         .map(id => currentDevice.getSetting(id));
     const device_config_output = Object.keys(output_types).flatMap(output_type_key => {
-        return $("." + output_type_key).map(function() { return this.id }).toArray()
+        return $("." + output_type_key).map(function () { return this.id }).toArray()
             .map(key => currentDevice.getOutputSetting(key, output_type_key))
     });
     Promise.all(
         device_config_input
-        .concat(device_config_output)
+            .concat(device_config_output)
     )
-    .then((response) => {
-        // response array contains ALL current device config objects
-        response.forEach(data => {
-            const setting_key = data["setting_key"];
-            const setting_value = data["setting_value"];
-            $("#" + setting_key).trigger('change');
-        
-            if ($(`#${setting_key}`).attr('type') == 'checkbox') {
-                $(`#${setting_key}`).prop('checked', setting_value);
-            } else {
-                $(`#${setting_key}`).val(setting_value);
-            }
-            $(`#${setting_key}`).trigger('change');
-        
-            // Set initial brightness slider value
-            $(`span[for='${setting_key}']`).text(setting_value)
-        })
-    });
+        .then((response) => {
+            // response array contains ALL current device config objects
+            response.forEach(data => {
+                const setting_key = data["setting_key"];
+                const setting_value = data["setting_value"];
+                $("#" + setting_key).trigger('change');
+
+                if ($(`#${setting_key}`).attr('type') == 'checkbox') {
+                    $(`#${setting_key}`).prop('checked', setting_value);
+                } else {
+                    $(`#${setting_key}`).val(setting_value);
+                }
+                $(`#${setting_key}`).trigger('change');
+
+                // Set initial brightness slider value
+                $(`span[for='${setting_key}']`).text(setting_value)
+            })
+        });
 }
 
 // Init and load all settings
@@ -54,7 +54,7 @@ $(document).ready(function () {
         // get LED Strips
         $.ajax("/GetLEDStrips").done((data) => {
             $('.led_strips').each(function () {
-                for(let key in data) {
+                for (let key in data) {
                     $(this).append(new Option(data[key], key));
                 }
             });
@@ -69,7 +69,7 @@ $(document).ready(function () {
 
             // Restore last selected device on reload
             let lastDevice = devices.find(device => device.id === localStorage.getItem("lastDevice"));
-            if(lastDevice instanceof Device) {
+            if (lastDevice instanceof Device) {
                 currentDevice = lastDevice;
             } else {
                 // Fallback to all_devices
@@ -111,14 +111,14 @@ $(document).ready(function () {
 
         })
     }).catch((response) => {
-        if(devices.length === 0) {
+        if (devices.length === 0) {
             return;
         }
         console.warn(response);
         // all requests finished but one or more failed
         $("#alerts").append(`
             <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            <strong>(`+ new Date().toLocaleTimeString() +`) Error: </strong>${response.responseText}
+            <strong>(`+ new Date().toLocaleTimeString() + `) Error: </strong>${response.responseText}
             <button type="button" class="close" data-dismiss="alert" aria-label="Close">
             <span aria-hidden="true">&times;</span>
             </button>
@@ -136,7 +136,7 @@ function SetLocalSettings() {
         let setting_value = "";
 
         const element = $(`#${setting_key}.device_setting_input`);
-        switch(element.attr("type")) {
+        switch (element.attr("type")) {
             case "checkbox":
                 setting_value = element.is(':checked');
                 break;
@@ -165,7 +165,7 @@ function SetLocalSettings() {
     ];
 
     Object.keys(output_types).forEach(output_type_key => {
-        const all_output_type_setting_keys = $("." + output_type_key).map(function() { return this.id }).toArray();
+        const all_output_type_setting_keys = $("." + output_type_key).map(function () { return this.id }).toArray();
         let settings_output_type = {};
 
         Object.keys(all_output_type_setting_keys).forEach((setting_id) => {
@@ -173,7 +173,7 @@ function SetLocalSettings() {
             let setting_value = "";
 
             const element = $(`#${setting_key}.${output_type_key}`);
-            switch(element.attr("type")) {
+            switch (element.attr("type")) {
                 case "checkbox":
                     setting_value = element.is(':checked');
                     break;
@@ -187,7 +187,7 @@ function SetLocalSettings() {
         });
 
         const data2 = { "device": currentDevice.id, "output_type_key": output_type_key, "settings": settings_output_type };
-        saveProgress.push( 
+        saveProgress.push(
             $.ajax({
                 url: "/SetOutputTypeDeviceSetting",
                 type: "POST",
@@ -211,7 +211,7 @@ function SetLocalSettings() {
 
 }
 
-const createDevice = function() {
+const createDevice = function () {
     $.ajax({
         url: "/CreateNewDevice",
         type: "POST",
@@ -227,7 +227,7 @@ const createDevice = function() {
             });
 
             // Select new created Device
-            currentDevice = devices[devices.length-1]
+            currentDevice = devices[devices.length - 1]
             refreshDeviceConfig(output_types, currentDevice);
 
             // Remove every pill in the navigation and recreate

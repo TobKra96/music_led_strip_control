@@ -10,7 +10,7 @@ export default class Device {
     getPill(currentDeviceId, index) {
         const active = currentDeviceId === this.id ? " active" : "";
         const link = document.createElement("a");
-        link.classList = "nav-link"+active;
+        link.classList = "nav-link" + active;
         link.innerHTML = this.name;
         link.href = `#pills-${index}`;
         link.role = "tab";
@@ -23,11 +23,11 @@ export default class Device {
     getSetting(key) {
         //  returns promise
         return $.ajax({
-                url: "/GetDeviceSetting",
-                data: {
-                    "device": this.id,
-                    "setting_key": key,
-                }
+            url: "/GetDeviceSetting",
+            data: {
+                "device": this.id,
+                "setting_key": key,
+            }
         })
     }
 
