@@ -53,7 +53,7 @@ export default class EffectManager {
                         status: 'start'
                     });
                     sessionStorage.setItem('effect_cycle_active', true);
-                    $("#effect_random_cycle > div").addClass("border border-secondary");
+                    $("#effect_random_cycle > div").css("box-shadow", "inset 0 0 0 3px #3f4d67")
                 }
             } else {
                 timer.postMessage({
@@ -62,7 +62,7 @@ export default class EffectManager {
                 });
                 sessionStorage.clear();
                 $("#effect_random_cycle > div > p").text("Random Cycle");
-                $("#effect_random_cycle > div").removeClass("border border-secondary");
+                $("#effect_random_cycle > div").css("box-shadow", "none")
             }
 
             // pick random effect based on type
@@ -129,6 +129,7 @@ function initTimerWorker() {
     // Restore timer if it was running while page reloaded
     var effectCycleActive = sessionStorage.getItem('effect_cycle_active');
     if (effectCycleActive) {
+        $("#effect_random_cycle > div").css("box-shadow", "inset 0 0 0 3px #3f4d67")
         var sec = sessionStorage.getItem('seconds');
         if (sec <= 0) {
             sec = hardcodedSec;
