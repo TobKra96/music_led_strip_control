@@ -4,6 +4,36 @@ let output_types = {};
 let devices = [];
 let currentDevice;
 
+function createToast(message, isSuccess = true) {
+    let textClass, title, icon;
+    if (isSuccess) {
+        textClass = 'text-success';
+        icon = 'icon-check';
+        title = 'Success';
+    } else {
+        textClass = 'text-danger';
+        icon = 'icon-alert-triangle';
+        title = 'Error';
+    }
+
+    let customToast = `
+        <div class="toast" style="min-width: 250px;" role="alert" aria-live="assertive" aria-atomic="true" data-delay="5000">
+            <div class="toast-header">
+                <strong class="mr-auto ` + textClass + `"><i class="feather ` + icon + `"></i> ` + title + `</strong>
+                <small class="text-muted">`+ new Date().toLocaleTimeString('en-GB') + `</small>
+                <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+                    <span aria-hidden="true" class="feather icon-x"></span>
+                </button>
+            </div>
+            <div class="toast-body">
+                ` + message + `
+            </div>
+        </div>
+    `;
+
+    return customToast;
+}
+
 function refreshDeviceConfig(output_types, currentDevice) {
     if (!currentDevice) return;
     // fetch Device Config data from Server and update the Form
@@ -157,8 +187,15 @@ function SetLocalSettings() {
             data: JSON.stringify(data, null, '\t'),
             contentType: 'application/json;charset=UTF-8'
         }).done((data) => {
-            // todo: output toast
             console.log("Device settings set successfully. Response:\n\n" + JSON.stringify(data, null, '\t'));
+
+            let customToast = createToast('Device "' + currentDevice.name + '" saved.')
+            $(".toast_block").append(customToast)
+            $('.toast').toast('show')
+            $('.toast').on('hidden.bs.toast', function () {
+                $(this).remove()
+            })
+
         }).fail((data) => {
             console.log("Error while setting device settings. Error: " + data);
         })
@@ -256,24 +293,8 @@ const createDevice = function () {
             $("#deviceFound").removeClass('d-none');
             $("#noDeviceFound").addClass('d-none');
 
-            $(".toast_block").append(`
-                <div class="toast" style="min-width: 250px;" role="alert" aria-live="assertive" aria-atomic="true">
-                    <div class="toast-header">
-                        <strong class="mr-auto text-success"><i class="feather icon-check"></i> Success</strong>
-                        <small class="text-muted">`+ new Date().toLocaleTimeString('en-GB') + `</small>
-                        <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
-                            <span aria-hidden="true" class="feather icon-x"></span>
-                        </button>
-                    </div>
-                    <div class="toast-body">
-                    Device "` + currentDevice.name + `" created.
-                    </div>
-                </div>
-            `);
-
-            $('.toast').toast({
-                delay: 5000
-            })
+            let customToast = createToast('Device "' + currentDevice.name + '" created.')
+            $(".toast_block").append(customToast)
             $('.toast').toast('show')
             $('.toast').on('hidden.bs.toast', function () {
                 $(this).remove()
