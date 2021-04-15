@@ -170,6 +170,7 @@ class WebserverExecuter():
                 break
 
             i += 1
+        return i
 
     def DeleteDevice(self, device):
         del self._config["device_configs"][device]

@@ -1,3 +1,5 @@
+import Toast from "./Toast.js";
+
 // classes/EffectManager.js
 export default class EffectManager {
     constructor() {
@@ -53,7 +55,7 @@ export default class EffectManager {
                         status: 'start'
                     });
                     sessionStorage.setItem('effect_cycle_active', true);
-                    $("#effect_random_cycle > div").css("box-shadow", "inset 0 0 0 3px #3f4d67")
+                    $("#effect_random_cycle").css("box-shadow", "inset 0 0 0 3px #3f4d67")
                 }
             } else {
                 const effectCycleActive = sessionStorage.getItem('effect_cycle_active');
@@ -65,7 +67,7 @@ export default class EffectManager {
                     sessionStorage.clear();
                 }
                 $("#effect_random_cycle > div > p").text("Random Cycle");
-                $("#effect_random_cycle > div").css("box-shadow", "none")
+                $("#effect_random_cycle").css("box-shadow", "none")
             }
 
             // pick random effect based on type
@@ -82,28 +84,7 @@ export default class EffectManager {
                 // UI and State Updates should be here
                 // this could cause Problems later
             }).fail((data) => {
-                $(".toast_block").append(`
-                    <div class="toast" style="min-width: 250px;" role="alert" aria-live="assertive" aria-atomic="true">
-                        <div class="toast-header">
-                            <strong class="mr-auto text-danger"><i class="feather icon-alert-triangle"></i> Error</strong>
-                            <small class="text-muted">`+ new Date().toLocaleTimeString('en-GB') + `</small>
-                            <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
-                                <span aria-hidden="true" class="feather icon-x"></span>
-                            </button>
-                        </div>
-                        <div class="toast-body">
-                            Unable to set effect.<br>Error: ` + data.responseText + `
-                        </div>
-                    </div>
-                `);
-
-                $('.toast').toast({
-                    delay: 5000
-                })
-                $('.toast').toast('show')
-                $('.toast').on('hidden.bs.toast', function () {
-                    $(this).remove()
-                })
+                new Toast('Unable to set effect. Error: ' + JSON.stringify(data, null, '\t')).error();
             });
             // update UI without waiting for a response
             this.currentDevice.setActiveEffect(effect);
@@ -132,7 +113,7 @@ function initTimerWorker() {
     // Restore timer if it was running while page reloaded
     var effectCycleActive = sessionStorage.getItem('effect_cycle_active');
     if (effectCycleActive) {
-        $("#effect_random_cycle > div").css("box-shadow", "inset 0 0 0 3px #3f4d67")
+        $("#effect_random_cycle").css("box-shadow", "inset 0 0 0 3px #3f4d67")
         var sec = sessionStorage.getItem('seconds');
         if (sec <= 0) {
             sec = hardcodedSec;

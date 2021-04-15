@@ -1,4 +1,5 @@
 import Device from "./classes/Device.js";
+import Toast from "./classes/Toast.js";
 
 let output_types = {};
 let devices = [];
@@ -114,15 +115,8 @@ $(document).ready(function () {
         if (devices.length === 0) {
             return;
         }
-        console.warn(response);
         // all requests finished but one or more failed
-        $("#alerts").append(`
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            <strong>(`+ new Date().toLocaleTimeString() + `) Error: </strong>${response.responseText}
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-            </button>
-            </div>`);
+        new Toast(JSON.stringify(response, null, '\t')).error();
     });
 
 });
@@ -157,8 +151,16 @@ function SetLocalSettings() {
             data: JSON.stringify(data, null, '\t'),
             contentType: 'application/json;charset=UTF-8'
         }).done((data) => {
-            // todo: output toast
             console.log("Device settings set successfully. Response:\n\n" + JSON.stringify(data, null, '\t'));
+
+            // Update device name in device dropdown
+            // Todo: Update device name inside pill too
+            currentDevice.name = data.settings.DEVICE_NAME
+            $("#selected_device_txt").text(currentDevice.name);
+            $("#selected_device_txt").text(currentDevice.name);
+
+            new Toast('Device "' + currentDevice.name + '" saved.').success();
+
         }).fail((data) => {
             console.log("Error while setting device settings. Error: " + data);
         })
@@ -205,8 +207,7 @@ function SetLocalSettings() {
     Promise.all(saveProgress).then(response => {
         console.log("all saved", response);
     }).catch((response) => {
-        // todo: show toast alert
-        console.warn(response);
+        new Toast('Error while saving device "' + currentDevice.name + '". Error: ' + JSON.stringify(response, null, '\t')).error();
     });
 
 }
@@ -218,6 +219,7 @@ const createDevice = function () {
         contentType: 'application/json;charset=UTF-8'
     }).done(data => {
         console.log("New device created successfully. Response:\n\n" + JSON.stringify(data, null, '\t'));
+        let newDeviceIndex = data["index"];
         // location.reload();
         $.ajax("/GetDevices").done((data) => {
             devices = [];
@@ -226,8 +228,8 @@ const createDevice = function () {
                 devices.push(new Device(device_key, data[device_key]));
             });
 
-            // Select new created Device
-            currentDevice = devices[devices.length - 1]
+            // Select newly created Device by its index
+            currentDevice = devices[newDeviceIndex]
             refreshDeviceConfig(output_types, currentDevice);
 
             // Remove every pill in the navigation and recreate
@@ -256,28 +258,7 @@ const createDevice = function () {
             $("#deviceFound").removeClass('d-none');
             $("#noDeviceFound").addClass('d-none');
 
-            $(".toast_block").append(`
-                <div class="toast" style="min-width: 250px;" role="alert" aria-live="assertive" aria-atomic="true">
-                    <div class="toast-header">
-                        <strong class="mr-auto text-success"><i class="feather icon-check"></i> Success</strong>
-                        <small class="text-muted">`+ new Date().toLocaleTimeString('en-GB') + `</small>
-                        <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
-                            <span aria-hidden="true" class="feather icon-x"></span>
-                        </button>
-                    </div>
-                    <div class="toast-body">
-                    Device "` + currentDevice.name + `" created.
-                    </div>
-                </div>
-            `);
-
-            $('.toast').toast({
-                delay: 5000
-            })
-            $('.toast').toast('show')
-            $('.toast').on('hidden.bs.toast', function () {
-                $(this).remove()
-            })
+            new Toast('Device "' + currentDevice.name + '" created.').success();
 
         })
 
@@ -307,6 +288,8 @@ document.getElementById("delete_btn_modal").addEventListener("click", function (
         contentType: 'application/json;charset=UTF-8'
     }).done(data => {
         console.log("Device deleted successfully. Response:\n\n" + JSON.stringify(data, null, '\t'));
+        // Todo: Delete device without reloading
+        // Todo: Add toast on success or error
         location.reload();
     }).fail(data => {
         console.log("Error while deleting device. Error: " + data.responseText);
