@@ -84,11 +84,7 @@ export default class EffectManager {
                 // UI and State Updates should be here
                 // this could cause Problems later
             }).fail((data) => {
-                let toast = new Toast('Unable to set effect. Error: ' + JSON.stringify(data, null, '\t')).error();
-                $(".toast_block").append(toast);
-                $('.toast').toast('show').on('hidden.bs.toast', function () {
-                    $(this).remove();
-                })
+                new Toast('Unable to set effect. Error: ' + JSON.stringify(data, null, '\t')).error();
             });
             // update UI without waiting for a response
             this.currentDevice.setActiveEffect(effect);

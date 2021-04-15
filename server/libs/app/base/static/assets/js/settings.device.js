@@ -116,11 +116,7 @@ $(document).ready(function () {
             return;
         }
         // all requests finished but one or more failed
-        let toast = new Toast(JSON.stringify(response, null, '\t')).error();
-        $(".toast_block").append(toast);
-        $('.toast').toast('show').on('hidden.bs.toast', function () {
-            $(this).remove();
-        })
+        new Toast(JSON.stringify(response, null, '\t')).error();
     });
 
 });
@@ -163,11 +159,7 @@ function SetLocalSettings() {
             $("#selected_device_txt").text(currentDevice.name);
             $("#selected_device_txt").text(currentDevice.name);
 
-            let toast = new Toast('Device "' + currentDevice.name + '" saved.').success();
-            $(".toast_block").append(toast);
-            $('.toast').toast('show').on('hidden.bs.toast', function () {
-                $(this).remove();
-            })
+            new Toast('Device "' + currentDevice.name + '" saved.').success();
 
         }).fail((data) => {
             console.log("Error while setting device settings. Error: " + data);
@@ -215,11 +207,7 @@ function SetLocalSettings() {
     Promise.all(saveProgress).then(response => {
         console.log("all saved", response);
     }).catch((response) => {
-        let toast = new Toast('Error while saving device "' + currentDevice.name + '". Error: ' + JSON.stringify(response, null, '\t')).error();
-        $(".toast_block").append(toast);
-        $('.toast').toast('show').on('hidden.bs.toast', function () {
-            $(this).remove();
-        })
+        new Toast('Error while saving device "' + currentDevice.name + '". Error: ' + JSON.stringify(response, null, '\t')).error();
     });
 
 }
@@ -270,11 +258,7 @@ const createDevice = function () {
             $("#deviceFound").removeClass('d-none');
             $("#noDeviceFound").addClass('d-none');
 
-            let toast = new Toast('Device "' + currentDevice.name + '" created.').success();
-            $(".toast_block").append(toast);
-            $('.toast').toast('show').on('hidden.bs.toast', function () {
-                $(this).remove();
-            })
+            new Toast('Device "' + currentDevice.name + '" created.').success();
 
         })
 

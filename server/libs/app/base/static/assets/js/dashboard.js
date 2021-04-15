@@ -17,11 +17,7 @@ $(document).ready(function () {
         // todo: return anon Objects from Endpoint
 
         if (!Object.keys(data).length) {
-            let toast = new Toast('No device found. Create a new device in "Device Settings".').info();
-            $(".toast_block").append(toast);
-            $('.toast').toast('show').on('hidden.bs.toast', function () {
-                $(this).remove();
-            })
+            new Toast('No device found. Create a new device in "Device Settings".').info()
         }
 
         // parse response into device Objects
