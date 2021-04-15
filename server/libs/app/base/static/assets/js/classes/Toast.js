@@ -27,8 +27,8 @@ export default class Toast {
     }
 
     _base(type) {
-        let style = types[type];
-        let toast = `
+        const style = types[type];
+        const toast = `
             <div class="toast toast_bg" style="min-width: 250px;" role="alert" aria-live="assertive" aria-atomic="true" data-delay="5000">
                 <div class="toast-header">
                     <strong class="mr-auto ${style.class} "><i class="feather ${style.icon}"></i> ${style.title}</strong>
