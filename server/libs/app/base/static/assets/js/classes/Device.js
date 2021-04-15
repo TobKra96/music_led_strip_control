@@ -11,7 +11,6 @@ export default class Device {
     set name(name) {
         this._name = name;
         // Update HTML elements on namechange
-        $("#selected_device_txt").text(name);
         if(this._link !== "") {
             this._link.innerHTML = name;
         }
