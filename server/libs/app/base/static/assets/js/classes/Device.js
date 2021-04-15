@@ -2,22 +2,37 @@
 export default class Device {
     constructor(id, name) {
         this.id = id;
-        this.name = name;
+        this._name = name;
         this.activeEffect = "";
         this.settings = {};
+        this.link = "";
     }
 
-    getPill(currentDeviceId, index) {
+    set name(name) {
+        this._name = name;
+        // Update HTML elements on namechange
+        $("#selected_device_txt").text(name);
+        if(this._link !== "") {
+            this._link.innerHTML = name;
+        }
+    }
+
+    get name() {
+        return this._name;
+    }
+
+    getPill(currentDeviceId) {
         const active = currentDeviceId === this.id ? " active" : "";
         const link = document.createElement("a");
         link.classList = "nav-link" + active;
         link.innerHTML = this.name;
-        link.href = `#pills-${index}`;
+        link.href = `#pills-${this.id}`;
         link.role = "tab";
-        link.setAttribute("data-toggle", "pill")
-        link.setAttribute("aria-controls", `pills-${index}`)
-        link.setAttribute("aria-selected", "false")
-        return link;
+        link.setAttribute("data-toggle", "pill");
+        link.setAttribute("aria-controls", `pills-${this.id}`);
+        link.setAttribute("aria-selected", "false");
+        this._link = link;
+        return this._link;
     }
 
     getSetting(key) {
