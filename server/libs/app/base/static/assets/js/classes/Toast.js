@@ -43,7 +43,7 @@ export default class Toast {
             </div>
         `;
 
-        $(".toast_block").append(toast);
+        $(".toast_block").prepend(toast);
         $('.toast').toast('show').on('hidden.bs.toast', function () {
             $(this).remove();
         })
