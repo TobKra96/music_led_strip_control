@@ -41,6 +41,14 @@ input[type=number] {
     height: calc(2.55rem + 2px);
 }
 
+/* Overwrite file input box height */
+.custom-file-label {
+    height: calc(2.25rem + 2px);
+}
+.custom-file-label::after {
+    height: 2.25rem;
+}
+
 /* Overwrite checkbox style */
 .custom-control-label::before {
     background-color: #dee2e6;
