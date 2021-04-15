@@ -28,7 +28,7 @@ class EffectFireplace(Effect):
         self.firebase_area_target_length = 0
         self.firebase_flicker_speed_counter = 0
 
-        self.current_variation_spark_color = [0,0,0]
+        self.current_variation_spark_color = [0, 0, 0]
 
     def run(self):
         #
@@ -69,7 +69,7 @@ class EffectFireplace(Effect):
 
         firebase_maincolor = self._config_colours[effect_config["firebase_maincolor"]]
         sparks_maincolor = self._config_colours[effect_config["sparks_maincolor"]]
-        
+
         # Calculate the target area lengths.
         if self.firebase_area_target_length == 0 or self.firebase_area_current_length == self.firebase_area_target_length:
             self.firebase_area_target_length = randint(firebase_area_minlength, firebase_area_maxlength)
@@ -99,8 +99,8 @@ class EffectFireplace(Effect):
         firebase_array[2][:self.firebase_area_current_length] = firebase_maincolor[2]
 
         if sparks_fly_steps > 0:
-           
-            self.sparks_area_current_length = self.get_current_length(self.sparks_area_current_length, sparks_steps, self.sparks_area_target_length)           
+
+            self.sparks_area_current_length = self.get_current_length(self.sparks_area_current_length, sparks_steps, self.sparks_area_target_length)
 
             #
             #                  sparks_target_appear_distance
@@ -155,11 +155,14 @@ class EffectFireplace(Effect):
 
         # Get the mask array to smooth out the edges
         mask_array = self.get_mask_array(led_count, mask_blur)
-        
-        overlay_array = np.where(spars_array_cutted != 0, spars_array_cutted, firebase_array)
-        overlay_array = overlay_array * (mask_array/ 100) 
 
-        output_array = gaussian_filter1d(overlay_array, sigma=blur)
+        overlay_array = np.where(spars_array_cutted != 0, spars_array_cutted, firebase_array)
+        overlay_array = overlay_array * (mask_array / 100)
+
+        if blur != 0:
+            output_array = gaussian_filter1d(overlay_array, sigma=blur)
+        else:
+            output_array = overlay_array
 
         # Add the output array to the queue.
         self.queue_output_array_blocking(output_array)
@@ -195,27 +198,28 @@ class EffectFireplace(Effect):
         mask_array[2][self.firebase_area_current_length - 5:self.firebase_area_current_length + 5] = 0
 
         one_half_spark_area = self.sparks_area_current_length
-        
+
         fade_out = np.zeros((3, one_half_spark_area))
         fade_out[0] = np.linspace(50, 0, one_half_spark_area, endpoint=True)
         fade_out[1] = np.linspace(50, 0, one_half_spark_area, endpoint=True)
         fade_out[2] = np.linspace(50, 0, one_half_spark_area, endpoint=True)
 
-        #print(fade_out)
+        # print(fade_out)
         fade_out_end_cut = len(mask_array[0]) - (self.sparks_area_current_length - one_half_spark_area)
         if fade_out_end_cut < one_half_spark_area:
             fade_out_end_index = fade_out_end_cut
         else:
             fade_out_end_index = one_half_spark_area
-        
+
         if fade_out_end_index < 0:
             fade_out_end_index = 0
 
-        mask_array[0][self.sparks_area_current_length - one_half_spark_area :self.sparks_area_current_length] = fade_out[0][:fade_out_end_index]
-        mask_array[1][self.sparks_area_current_length - one_half_spark_area :self.sparks_area_current_length] = fade_out[1][:fade_out_end_index]
-        mask_array[2][self.sparks_area_current_length - one_half_spark_area :self.sparks_area_current_length] = fade_out[2][:fade_out_end_index]
+        mask_array[0][self.sparks_area_current_length - one_half_spark_area:self.sparks_area_current_length] = fade_out[0][:fade_out_end_index]
+        mask_array[1][self.sparks_area_current_length - one_half_spark_area:self.sparks_area_current_length] = fade_out[1][:fade_out_end_index]
+        mask_array[2][self.sparks_area_current_length - one_half_spark_area:self.sparks_area_current_length] = fade_out[2][:fade_out_end_index]
 
-        mask_array = gaussian_filter1d(mask_array, sigma=mask_blur)
+        if mask_blur != 0:
+            mask_array = gaussian_filter1d(mask_array, sigma=mask_blur)
         return mask_array
 
     def get_variation_color(self, main_color, color_variation):
@@ -242,15 +246,13 @@ class EffectFireplace(Effect):
 
         if blue_max > 255:
             blue_max = 255
-        
-        result_color = [0,0,0]
+
+        result_color = [0, 0, 0]
         result_color[0] = randint(red_min, red_max)
         result_color[1] = randint(green_min, green_max)
         result_color[2] = randint(blue_min, blue_max)
 
         return result_color
-
-
 
     def get_firebase_flicker_steps(self, current_speed):
         """

@@ -76,6 +76,15 @@ function ParseDevices(devices) {
 
     devicesLoading = false;
     CheckIfFinishedInitialLoading();
+
+    // Restore last selected device on reload
+    let lastDeviceId = localStorage.getItem("lastDevice");
+    if (lastDeviceId in this.devices) {
+        $("#accordionDevices").addClass('d-none');
+        $("#collapseMenu").addClass('show');
+        $("#" + lastDeviceId)[0].click();
+        $("#accordionDevices").removeClass('d-none');
+    }
 }
 
 function GetColors() {
@@ -297,6 +306,8 @@ function UpdateCurrentDeviceText() {
 
 function SwitchDevice(e) {
     this.currentDevice = e.target.id;
+    // Save selected device to localStorage
+    localStorage.setItem('lastDevice', this.currentDevice);
     GetLocalSettings();
     UpdateCurrentDeviceText();
 }
