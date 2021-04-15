@@ -80,9 +80,9 @@ $(document).ready(function () {
             refreshDeviceConfig(output_types, currentDevice)
 
             // Build Device Tab
-            devices.forEach((device, index) => {
+            devices.forEach(device => {
                 // todo: do it server side
-                const link = device.getPill(currentDevice.id, index);
+                const link = device.getPill(currentDevice.id);
                 link.addEventListener('click', () => {
                     currentDevice = device;
                     localStorage.setItem('lastDevice', device.id);
@@ -152,12 +152,8 @@ function SetLocalSettings() {
             contentType: 'application/json;charset=UTF-8'
         }).done((data) => {
             console.log("Device settings set successfully. Response:\n\n" + JSON.stringify(data, null, '\t'));
-
-            // Update device name in device dropdown
-            // Todo: Update device name inside pill too
-            currentDevice.name = data.settings.DEVICE_NAME
-            $("#selected_device_txt").text(currentDevice.name);
-            $("#selected_device_txt").text(currentDevice.name);
+            currentDevice.name = data.settings.DEVICE_NAME;
+            $("#selected_device_txt").text(data.settings.DEVICE_NAME);
 
             new Toast('Device "' + currentDevice.name + '" saved.').success();
 
@@ -289,10 +285,10 @@ document.getElementById("delete_btn_modal").addEventListener("click", function (
     }).done(data => {
         console.log("Device deleted successfully. Response:\n\n" + JSON.stringify(data, null, '\t'));
         // Todo: Delete device without reloading
-        // Todo: Add toast on success or error
+        // Todo: Add toast on success
         location.reload();
     }).fail(data => {
-        console.log("Error while deleting device. Error: " + data.responseText);
+        new Toast(`Error while deleting device ${currentDevice.name}: ${data.responseText} `).error();
     });
 
 });

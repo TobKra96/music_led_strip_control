@@ -43,17 +43,9 @@ $(document).ready(function () {
         currentDevice.getActiveEffect();
 
         // Build Device Tab
-        devices.forEach((device, index) => {
+        devices.forEach(device => {
             // todo: do it server side
-            const active = currentDevice.id === device.id ? " active" : "";
-            const link = document.createElement("a");
-            link.classList = "nav-link" + active;
-            link.innerHTML = device.name;
-            link.href = `#pills-${index}`;
-            link.role = "tab";
-            link.setAttribute("data-toggle", "pill")
-            link.setAttribute("aria-controls", `pills-${index}`)
-            link.setAttribute("aria-selected", "false")
+            const link = device.getPill(currentDevice.id);
             link.addEventListener('click', () => {
                 currentDevice = device;
                 localStorage.setItem('lastDevice', device.id);
