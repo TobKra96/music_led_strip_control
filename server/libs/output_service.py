@@ -1,4 +1,5 @@
 import logging
+import numpy as np
 from time import time
 
 from libs.notification_enum import NotificationEnum  # pylint: disable=E0611, E0401
@@ -14,6 +15,7 @@ class OutputService():
         self.logger = logging.getLogger(__name__)
 
         self._device = device
+        self._led_strip = self._device.device_config["output"]["output_raspi"]["LED_Strip"]
 
         self.logger.info(f'Starting Output service... Device: {self._device.device_config["DEVICE_NAME"]}')
 
@@ -83,6 +85,10 @@ class OutputService():
         # Check if the queue is empty and stop if its empty.
         if not self._output_queue.empty():
             current_output_array = self._output_queue.get()
+            # Add another Array of LEDS for White Channel
+            if "SK6812" in self._led_strip and len(current_output_array) == 3:
+                current_output_array = np.vstack((current_output_array, np.zeros(self._device.device_config["LED_Count"])))
+
             self._current_output.show(current_output_array)
 
         self.end_time = time()
