@@ -1,8 +1,17 @@
 @font-face {
     font-family: "Quicksand";
-    src:url("../fonts/quicksand/fonts/Quicksand_Bold.otf");
+    src: url("../fonts/quicksand/fonts/Quicksand_Bold.otf");
     font-weight: normal;
     font-style: normal;
+}
+
+/* Add blur to toast body */
+@supports (-webkit-backdrop-filter: none) or (backdrop-filter: none) {
+    .toast_bg {
+        -webkit-backdrop-filter: blur(10px);
+        backdrop-filter: blur(10px);
+        background-color: rgba(255, 255, 255, 0.8);
+    }
 }
 
 /* Remove default password eye icon */
@@ -14,26 +23,45 @@ input[type=password]::-ms-clear {
 /* Remove arrows from number inputs */
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
+    -webkit-appearance: none;
+    margin: 0;
 }
 input[type=number] {
-    -moz-appearance:textfield;
-}}
+    -moz-appearance: textfield;
+}
 
 /* Set text highlight color */
 ::selection {
-    background: #3F4D67;
+    background: #3f4d67;
     color: #ffffff;
 }
 ::-moz-selection {
-    background: #3F4D67;
+    background: #3f4d67;
     color: #ffffff;
 }
 
 /* Resize svg logo */
 .logo {
     width: 200px;
+}
+
+/* Overwrite input box height */
+.form-control {
+    height: calc(2.55rem + 2px);
+}
+
+/* Overwrite file input box height */
+.custom-file-label {
+    height: calc(2.25rem + 2px);
+}
+.custom-file-label::after {
+    height: 2.25rem;
+}
+
+/* Overwrite checkbox style */
+.custom-control-label::before {
+    background-color: #dee2e6;
+    border: none;
 }
 
 /* Overwrite sidebar logo style */
@@ -46,7 +74,7 @@ input[type=number] {
     font-family: "Quicksand";
     margin-left: 15px;
     letter-spacing: 10px;
-    color: #3498DB;
+    color: #3498db;
     font-weight: normal;
     font-size: 26px;
 }
@@ -56,8 +84,9 @@ input[type=number] {
     user-select: none;
     transition: 0.2s;
 }
-.dashboard_effect:hover, .dashboard_effect_active {
-    background-color: #3F4D67;
+.dashboard_effect:hover,
+.dashboard_effect_active {
+    background-color: #3f4d67;
     color: white;
     cursor: pointer;
 }
@@ -72,7 +101,7 @@ input[type=number] {
 
 /* Align "Browse" button text */
 .custom-file-label::after {
-    padding-top: .5rem!important;
+    padding-top: .5rem !important;
 }
 
 /* Remove text highlight from checkboxes */
@@ -87,10 +116,10 @@ input[type=number] {
 
 /* Change tooltip color and width */
 .tooltip-inner {
-    background-color: #3F4D67 !important;
+    background-color: #3f4d67 !important;
     color: #ffffff;
     max-width: 350px;
-  }
+}
 .tooltip .arrow::before {
-    color: #3F4D67 !important;
+    color: #3f4d67 !important;
 }

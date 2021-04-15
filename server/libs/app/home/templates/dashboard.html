@@ -9,6 +9,9 @@
 
     <div class="pcoded-content">
         <div class="pcoded-inner-content">
+
+            {% include 'includes/toasts.html' %}
+
             <!-- [ breadcrumb ] start -->
 
             <!-- [ breadcrumb ] end -->
@@ -302,5 +305,5 @@
 
 <!-- Specific Page JS goes HERE  -->
 {% block javascripts %}
-<script src="/static/assets/js/dashboard.js"></script>
+<script src="/static/assets/js/dashboard.js" type="module"></script>
 {% endblock javascripts %}

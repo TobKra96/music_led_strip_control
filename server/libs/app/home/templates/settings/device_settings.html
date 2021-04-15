@@ -9,6 +9,9 @@
 
     <div class="pcoded-content">
         <div class="pcoded-inner-content">
+
+            {% include 'includes/toasts.html' %}
+
             <!-- [ breadcrumb ] start -->
             <div class="page-header">
                 <div class="page-block">
@@ -211,20 +214,22 @@
                         </form>
                     </div>
                     <div id="noDeviceFound" class="d-none">
-                        <div class="class="col-md-12 m-0">
-                            <div class="card">
-                                <div class="card-block">
-                                    <form id="noDeviceForm" action method="post" novalidate>
-                                        <div class="text-center">
-                                            <span id="dashboard-header-2" class="h3 text-danger">No device found. Please create one.</span>
+                        <div class="alert alert-danger text-center" role="alert">
+                            No device found. Please create one.
+                        </div>
+                        <form id="noDeviceForm" action method="post" novalidate>
+                            <div class="row mt-4">
+                                <div class="col-md-12 m-0">
+                                    <div class="card">
+                                        <div class="card-block">
+                                            <div class="d-flex flex-md-row flex-column justify-content-md-end">
+                                                <button type="button" id="create2_btn" class="btn btn-primary m-0">Create Device</button>
+                                            </div>
                                         </div>
-                                        <div class="mt-4 d-flex flex-md-row flex-column justify-content-md-end">
-                                            <button type="button" id="create2_btn" class="btn btn-primary">Create Device</button>
-                                        </div>
-                                    </form>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        </form>
                     </div>
 
                     <div class="modal fade" id="modal_delete_device" tabindex="-1" role="dialog" aria-labelledby="modal_delete_device" aria-hidden="true">
@@ -259,5 +264,5 @@
 <!-- Specific Page JS goes HERE  -->
 {% block javascripts %}
 <script src="/static/assets/js/settings.js"></script>
-<script src="/static/assets/js/settings.device.js"></script>
+<script src="/static/assets/js/settings.device.js" type="module"></script>
 {% endblock javascripts %}
