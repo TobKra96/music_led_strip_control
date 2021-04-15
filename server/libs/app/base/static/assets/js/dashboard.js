@@ -1,5 +1,6 @@
 import Device from "./classes/Device.js";
 import EffectManager from "./classes/EffectManager.js";
+import Toast from "./classes/Toast.js";
 
 // Global Variables
 const effectManager = new EffectManager();
@@ -16,14 +17,11 @@ $(document).ready(function () {
         // todo: return anon Objects from Endpoint
 
         if (!Object.keys(data).length) {
-            $("#alerts").append(`
-                <div class="alert alert-info alert-dismissible fade show" role="alert">
-                    <strong>No Devices found</strong><hr><a href="#" class='btn btn-primary'>Create a new device</a>
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-            `);
+            let toast = new Toast('No device found. Create a new device in "Device Settings".').info();
+            $(".toast_block").append(toast);
+            $('.toast').toast('show').on('hidden.bs.toast', function () {
+                $(this).remove();
+            })
         }
 
         // parse response into device Objects
