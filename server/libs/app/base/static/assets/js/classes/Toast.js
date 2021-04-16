@@ -21,6 +21,21 @@ const types = {
     },
 };
 
+// Detect when toast animation ends
+const animationEnd = (function (el) {
+    const animations = {
+        "animation": "animationend",
+        "OAnimation": "oAnimationEnd",
+        "MozAnimation": "mozAnimationEnd",
+        "WebkitAnimation": "webkitAnimationEnd"
+    };
+    for (var t in animations) {
+        if (el.style[t] !== undefined) {
+            return animations[t];
+        }
+    }
+})(document.createElement("div"));
+
 export default class Toast {
     constructor(message) {
         this.message = message;
@@ -29,11 +44,11 @@ export default class Toast {
     _base(type) {
         const style = types[type];
         const toast = `
-            <div class="toast toast_bg" style="min-width: 250px;" role="alert" aria-live="assertive" aria-atomic="true" data-delay="5000">
+            <div class="toast toast_bg animated fadeInRight" style="min-width: 250px;" role="alert" aria-live="assertive" aria-atomic="true" data-autohide="false">
                 <div class="toast-header">
-                    <strong class="mr-auto ${style.class} "><i class="feather ${style.icon}"></i> ${style.title}</strong>
+                    <strong class="mr-auto ${style.class}"><i class="feather ${style.icon}"></i> ${style.title}</strong>
                     <small class="text-muted">${new Date().toLocaleTimeString()}</small>
-                    <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+                    <button type="button" class="ml-2 mb-1 close" aria-label="Close">
                         <span aria-hidden="true" class="feather icon-x"></span>
                     </button>
                 </div>
@@ -44,8 +59,22 @@ export default class Toast {
         `;
 
         $(".toast_block").prepend(toast);
-        $('.toast').toast('show').on('hidden.bs.toast', function () {
-            $(this).remove();
+        const curToast = $('.toast').toast('show')
+
+        // Hide toast after 5 seconds
+        setTimeout(function () {
+            $(curToast).addClass("animated fadeOutRight");
+            $(curToast).one(animationEnd, function () {
+                $(this).remove();
+            });
+        }, 5000);
+
+        // Hide toast after clicking X button
+        $(".close").on('click', function () {
+            $(this).parents().eq(1).addClass("animated fadeOutRight");
+            $(this).parents().eq(1).one(animationEnd, function () {
+                $(this).remove();
+            });
         })
 
         return toast;
