@@ -102,9 +102,11 @@ $(document).ready(function () {
             if (devices.length > 0) {
                 $("#deviceFound").removeClass('d-none');
                 $("#noDeviceFound").addClass('d-none');
+                $("#selected_device_label").removeClass('d-none');
             } else {
                 $("#deviceFound").addClass('d-none');
                 $("#noDeviceFound").removeClass('d-none');
+                $("#selected_device_label").addClass('d-none');
                 return;
             }
 
@@ -250,6 +252,7 @@ const createDevice = function () {
             });
 
             $('#device_count').text(devices.length);
+            $("#selected_device_label").removeClass('d-none');
             $("#selected_device_txt").text(currentDevice.name);
             $("#deviceFound").removeClass('d-none');
             $("#noDeviceFound").addClass('d-none');
