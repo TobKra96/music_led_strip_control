@@ -5,15 +5,14 @@ $(document).ready(function () {
 
     // Set LED strip brightness
     $('input[type=range]').on('input', function () {
-        $("span[for='" + $(this).attr('id') + "']").text(this.value)
+        $("span[for='" + $(this).attr('id') + "']").text(this.value);
     });
 
     // Insert filename of imported config
     $('.custom-file-input').on('change', (e) => {
         let fileName = $('#configUpload').val().split('\\').pop();
-        let nextSibling = e.target.nextElementSibling
-        nextSibling.innerText = fileName
-        console.log(fileName)
+        let nextSibling = e.target.nextElementSibling;
+        nextSibling.innerText = fileName;
     })
 
     // Hide unused output settings
