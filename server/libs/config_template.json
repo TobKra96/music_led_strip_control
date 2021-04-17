@@ -231,7 +231,8 @@
                     0,
                     255
                 ],
-                "use_custom_color": "false"
+                "use_custom_color": "false",
+                "white": 0
             },
             "effect_slide": {
                 "gradient": "Spectral",
@@ -509,7 +510,8 @@
                     0,
                     255
                 ],
-                "use_custom_color": "false"
+                "use_custom_color": "false",
+                "white": 0
             },
             "effect_slide": {
                 "gradient": "Spectral",
