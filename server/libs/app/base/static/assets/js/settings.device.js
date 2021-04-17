@@ -102,9 +102,11 @@ $(document).ready(function () {
             if (devices.length > 0) {
                 $("#deviceFound").removeClass('d-none');
                 $("#noDeviceFound").addClass('d-none');
+                $("#selected_device_label").removeClass('d-none');
             } else {
                 $("#deviceFound").addClass('d-none');
                 $("#noDeviceFound").removeClass('d-none');
+                $("#selected_device_label").addClass('d-none');
                 return;
             }
 
@@ -155,7 +157,7 @@ function SetLocalSettings() {
             currentDevice.name = data.settings.DEVICE_NAME;
             $("#selected_device_txt").text(data.settings.DEVICE_NAME);
 
-            new Toast('Device "' + currentDevice.name + '" saved.').success();
+            new Toast(`Device "${currentDevice.name}" saved.`).success();
 
         }).fail((data) => {
             console.log("Error while setting device settings. Error: " + data);
@@ -203,7 +205,7 @@ function SetLocalSettings() {
     Promise.all(saveProgress).then(response => {
         console.log("all saved", response);
     }).catch((response) => {
-        new Toast('Error while saving device "' + currentDevice.name + '". Error: ' + JSON.stringify(response, null, '\t')).error();
+        new Toast(`Error while saving device "${currentDevice.name}". Error: ` + JSON.stringify(response, null, '\t')).error();
     });
 
 }
@@ -240,21 +242,22 @@ const createDevice = function () {
                     currentDevice = device;
                     localStorage.setItem('lastDevice', device.id);
                     $("#selected_device_txt").text(device.name);
-                    refreshDeviceConfig(output_types, currentDevice)
+                    refreshDeviceConfig(output_types, currentDevice);
                 });
 
                 const li = document.createElement("li");
                 li.className = "nav-item device_item";
-                li.appendChild(link)
+                li.appendChild(link);
                 tabs.appendChild(li);
             });
 
             $('#device_count').text(devices.length);
+            $("#selected_device_label").removeClass('d-none');
             $("#selected_device_txt").text(currentDevice.name);
             $("#deviceFound").removeClass('d-none');
             $("#noDeviceFound").addClass('d-none');
 
-            new Toast('Device "' + currentDevice.name + '" created.').success();
+            new Toast(`Device "${currentDevice.name}" created.`).success();
 
         })
 
@@ -262,21 +265,22 @@ const createDevice = function () {
         console.log("Error while creating new device. Error: " + data.responseText);
     });
 }
-document.getElementById("save_btn").addEventListener("click", function (e) {
+
+$("#save_btn").on("click", function () {
     SetLocalSettings();
 });
 
-document.getElementById("create1_btn").addEventListener("click", createDevice);
-
-document.getElementById("create2_btn").addEventListener("click", createDevice);
-
-document.getElementById("delete_btn").addEventListener("click", function (e) {
-    $('#modal_device_name').text(currentDevice.name)
-    $('#modal_delete_device').modal('show')
+$("#create1_btn, #create2_btn").on("click", function () {
+    createDevice();
 });
 
-document.getElementById("delete_btn_modal").addEventListener("click", function (e) {
-    $('#modal_delete_device').modal('hide')
+$("#delete_btn").on("click", function () {
+    $('#modal_device_name').text(currentDevice.name);
+    $('#modal_delete_device').modal('show');
+})
+
+$("#delete_btn_modal").on("click", function () {
+    $('#modal_delete_device').modal('hide');
     $.ajax({
         url: "/DeleteDevice",
         type: "POST",
@@ -288,7 +292,6 @@ document.getElementById("delete_btn_modal").addEventListener("click", function (
         // Todo: Add toast on success
         location.reload();
     }).fail(data => {
-        new Toast(`Error while deleting device ${currentDevice.name}: ${data.responseText} `).error();
+        new Toast(`Error while deleting device "${currentDevice.name}". Error: ${data.responseText}`).error();
     });
-
-});
+})

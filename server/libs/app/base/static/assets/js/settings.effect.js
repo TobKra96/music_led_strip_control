@@ -20,7 +20,7 @@ $(document).ready(function () {
     initialized = true;
 
     // Allow to scroll sidebar when page is reloaded and mouse is already on top of sidebar
-    $(".navbar-content").trigger("mouseover")
+    $(".navbar-content").trigger("mouseover");
 
     // Open "Edit Effects" sidebar dropdown when on an effect page
     $("#effect_list").slideDown();
@@ -174,17 +174,17 @@ function ParseGetEffectSetting(response) {
     var setting_value = response["setting_value"];
     localSettings[setting_key] = setting_value;
 
-    SetLocalInput(setting_key, setting_value)
+    SetLocalInput(setting_key, setting_value);
 
     // Set initial effect slider values
-    $("span[for='" + setting_key + "']").text(setting_value)
+    $("span[for='" + setting_key + "']").text(setting_value);
 }
 
 function GetLocalSettings() {
     var all_setting_keys = GetAllSettingKeys();
 
     Object.keys(all_setting_keys).forEach(setting_id => {
-        GetEffectSetting(currentDevice, effectIdentifier, all_setting_keys[setting_id])
+        GetEffectSetting(currentDevice, effectIdentifier, all_setting_keys[setting_id]);
     })
 
 }
@@ -194,7 +194,7 @@ function SetLocalInput(setting_key, setting_value) {
         $("#" + setting_key).prop('checked', setting_value);
     } else if ($("#" + setting_key).hasClass('color_input')) {
         // Set RGB color and value from config
-        formattedRGB = formatRGB(setting_value)
+        formattedRGB = formatRGB(setting_value);
         $(".color_input").val(formattedRGB);
         pickr.setColor(formattedRGB);
     } else {
@@ -246,7 +246,7 @@ function SetLocalSettings() {
 
         if ($("#" + setting_key).length) {
             if ($("#" + setting_key).attr('type') == 'checkbox') {
-                setting_value = $("#" + setting_key).is(':checked')
+                setting_value = $("#" + setting_key).is(':checked');
             } else if ($("#" + setting_key).attr('type') == 'number') {
                 setting_value = parseFloat($("#" + setting_key).val());
             } else if ($("#" + setting_key).attr('type') == 'range') {
@@ -254,7 +254,7 @@ function SetLocalSettings() {
             } else if ($("#" + setting_key).hasClass('color_input')) {
                 // Save RGB value to config
                 rgb = $(".color_input").val();
-                setting_value = parseRGB(rgb)
+                setting_value = parseRGB(rgb);
             } else {
                 setting_value = $("#" + setting_key).val();
             }
@@ -263,19 +263,19 @@ function SetLocalSettings() {
         settings[setting_key] = setting_value;
     })
 
-    SetEffectSetting(currentDevice, effectIdentifier, settings)
+    SetEffectSetting(currentDevice, effectIdentifier, settings);
 }
 
 
 /* Device Handling */
 
 function BuildDeviceTab() {
-    var devices = this.devices
+    var devices = this.devices;
 
-    $('#deviceTabID').append("<li class='nav-item device_item'><a class='nav-link active' id='all_devices' data-toggle='pill' href='#pills-0' role='tab' aria-controls='pills-0' aria-selected='true'>All Devices</a></li>")
+    $('#deviceTabID').append("<li class='nav-item device_item'><a class='nav-link active' id='all_devices' data-toggle='pill' href='#pills-0' role='tab' aria-controls='pills-0' aria-selected='true'>All Devices</a></li>");
 
     Object.keys(devices).forEach(device_key => {
-        $('#deviceTabID').append("<li class='nav-item device_item'><a class='nav-link' id=\"" + device_key + "\" data-toggle='pill' href='#pills-0' role='tab' aria-controls='pills-0' aria-selected='false'>" + devices[device_key] + "</a></li>")
+        $('#deviceTabID').append("<li class='nav-item device_item'><a class='nav-link' id=\"" + device_key + "\" data-toggle='pill' href='#pills-0' role='tab' aria-controls='pills-0' aria-selected='false'>" + devices[device_key] + "</a></li>");
     });
 
     $('#device_count').text(Object.keys(devices).length);
@@ -312,13 +312,13 @@ function SwitchDevice(e) {
     UpdateCurrentDeviceText();
 }
 
-document.getElementById("save_btn").addEventListener("click", function (e) {
+$("#save_btn").on("click", function () {
     SetLocalSettings();
 });
 
 // Set effect slider values
 $('input[type=range]').on('input', function () {
-    $("span[for='" + $(this).attr('id') + "']").text(this.value)
+    $("span[for='" + $(this).attr('id') + "']").text(this.value);
 });
 
 // Create color picker instance
@@ -367,28 +367,28 @@ if (parent && input) {
 
     // Parse and validate RGB value when typing
     input.addEventListener('input', () => {
-        let formattedRGB = formatRGB(validateRGB(parseRGB(input.value)))
-        parent.style.background = formattedRGB
+        let formattedRGB = formatRGB(validateRGB(parseRGB(input.value)));
+        parent.style.background = formattedRGB;
         pickr.setColor(formattedRGB);
     });
 }
 
 /** Parse "rgb(r,g,b)" into [r,g,b] **/
 function parseRGB(rgb) {
-    rgb = rgb.replace(/[^\d,]/g, '').split(',')
+    rgb = rgb.replace(/[^\d,]/g, '').split(',');
     return [parseInt(rgb[0]), parseInt(rgb[1]), parseInt(rgb[2])];
 }
 
 /** Validate if [r,g,b] is a valid RGB value **/
 function validateRGB(rgb) {
     if (rgb[0] > 255 || rgb[0] < 0 || isNaN(rgb[0])) {
-        rgb[0] = 0
+        rgb[0] = 0;
     };
     if (rgb[1] > 255 || rgb[1] < 0 || isNaN(rgb[1])) {
-        rgb[1] = 0
+        rgb[1] = 0;
     };
     if (rgb[2] > 255 || rgb[2] < 0 || isNaN(rgb[2])) {
-        rgb[2] = 0
+        rgb[2] = 0;
     };
     return rgb;
 }
