@@ -27,17 +27,12 @@ $(document).ready(function () {
     });
 
     // Toggle PIN visibility on hover
-    $("#toggle_pin_view").on("mouseover", function (event) {
+    $("#toggle_pin_view").on("mouseover mouseleave", function (event) {
         event.preventDefault();
-        $('#DASHBOARD_PIN').attr('type', 'text');
-        $('#toggle_pin_view').removeClass("icon-eye");
-        $('#toggle_pin_view').addClass("icon-eye-off");
-    });
-    $("#toggle_pin_view").on("mouseleave", function (event) {
-        event.preventDefault();
-        $('#DASHBOARD_PIN').attr('type', 'password');
-        $('#toggle_pin_view').addClass("icon-eye");
-        $('#toggle_pin_view').removeClass("icon-eye-off");
+        let pinField = $('#DASHBOARD_PIN')
+        pinField.attr('type') == 'text' ? pinField.attr('type', 'password') : pinField.attr('type', 'text')
+        $('#toggle_pin_view').toggleClass("icon-eye");
+        $('#toggle_pin_view').toggleClass("icon-eye-off");
     });
 
     // Tooltip descriptions for general settings
