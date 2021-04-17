@@ -1,4 +1,5 @@
 from libs.webserver.executer_base import ExecuterBase
+import copy
 
 class DeviceExecuter(ExecuterBase):
 

@@ -18,8 +18,8 @@ def first():
 
 @authentication_api.route('/login', methods=['GET', 'POST'])
 def login():
-    use_pin_lock = Executer.instance.authentication_executer.USE_PIN_LOCK
-    is_authenticated = Executer.instance.authentication_executer.current_user.is_authenticated
+    use_pin_lock = Executer.instance.authentication_executer.get_use_pin_lock()
+    is_authenticated = current_user.is_authenticated
 
     if not use_pin_lock or is_authenticated:
         return redirect("/")
@@ -31,16 +31,16 @@ def login():
             session['next'] = None
         if not pin:
             flash('PIN is required')
-            return redirect(url_for('login', next=session['next']))
+            return redirect(url_for('authentication_api.login', next=session['next']))
         if not pin.isdigit():
             flash('PIN must only contain digits')
-            return redirect(url_for('login', next=session['next']))
+            return redirect(url_for('authentication_api.login', next=session['next']))
         if not Executer.instance.authentication_executer.validate_pin(pin):
             flash('PIN must be at least 4 digits long')
-            return redirect(url_for('login', next=session['next']))
+            return redirect(url_for('authentication_api.login', next=session['next']))
         if pin != Executer.instance.authentication_executer.DEFAULT_PIN:
             flash('Invalid PIN')
-            return redirect(url_for('login', next=session['next']))
+            return redirect(url_for('authentication_api.login', next=session['next']))
         elif pin == Executer.instance.authentication_executer.DEFAULT_PIN:
             Executer.instance.authentication_executer.login()
             if session['next'] is not None:
@@ -52,8 +52,8 @@ def login():
 
 @authentication_api.route('/logout')
 def logout():
-    if Executer.instance.authentication_executer.current_user.is_authenticated:
-        Executer.instance.authentication_executer.logout_user()
+    if current_user.is_authenticated:
+        logout_user()
     return redirect(url_for('login'))
 
 
