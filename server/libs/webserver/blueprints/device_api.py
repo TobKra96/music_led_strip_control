@@ -7,6 +7,7 @@ import json
 
 device_api = Blueprint('device_api', __name__)
 
+
 # /GetDevices
 # in
 # {
@@ -19,7 +20,6 @@ device_api = Blueprint('device_api', __name__)
 # "<device_id3>" = <device_name3>
 # ...
 # }
-
 @device_api.route('/GetDevices', methods=['GET'])
 @login_required
 def GetDevices():  # pylint: disable=E0211
@@ -33,6 +33,7 @@ def GetDevices():  # pylint: disable=E0211
             return "Could not find devices: ", 403
         else:
             return jsonify(data_out)
+
 
 # /CreateNewDevice
 # {
@@ -49,6 +50,7 @@ def CreateNewDevice():  # pylint: disable=E0211
         }
 
         return jsonify(data_out)
+
 
 # /DeleteDevice
 # {

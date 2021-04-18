@@ -1,7 +1,8 @@
 from libs.webserver.executer_base import ExecuterBase
 
+
 class EffectExecuter(ExecuterBase):
-    
+
     # Return active effect.
     def GetActiveEffect(self, device):
         if device == self.all_devices_id:

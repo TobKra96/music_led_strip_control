@@ -20,10 +20,9 @@ import logging
 import copy
 import json
 
-
-
 # Flask DEBUG switch.
 DEBUG = False
+
 
 class Webserver():
     def start(self, config_lock, notification_queue_in, notification_queue_out, effects_queue, py_audio):
@@ -39,7 +38,7 @@ class Webserver():
         Webserver.instance = self
 
         self.server = create_app()
-        
+
         self.server = Executer.instance.authentication_executer.add_server_authentication(self.server)
 
         self.server.config["TEMPLATES_AUTO_RELOAD"] = True
@@ -53,7 +52,6 @@ class Webserver():
         self.server.register_blueprint(general_api)
         self.server.register_blueprint(general_settings_api)
 
-
         if DEBUG:
             self.server.run(host='0.0.0.0', port=webserver_port, load_dotenv=False, debug=True)
         else:
@@ -61,7 +59,3 @@ class Webserver():
 
         while True:
             sleep(10)
-
-    
-
-

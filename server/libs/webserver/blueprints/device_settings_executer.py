@@ -1,5 +1,6 @@
 from libs.webserver.executer_base import ExecuterBase
 
+
 class DeviceSettingsExecuter(ExecuterBase):
 
     # Return setting_value
@@ -9,7 +10,7 @@ class DeviceSettingsExecuter(ExecuterBase):
     def GetDeviceSettings(self, device, setting_key):
         device_settings_dict = dict()
         for device_setting_key in self._config["device_configs"][device]:
-            device_settings_dict[device_setting_key] = self._config["device_configs"][device][device_setting_key]        
+            device_settings_dict[device_setting_key] = self._config["device_configs"][device][device_setting_key]
         return device_settings_dict
 
     def SetDeviceSetting(self, device, settings):

@@ -7,6 +7,7 @@ import json
 
 general_settings_api = Blueprint('general_settings_api', __name__)
 
+
 #################################################################
 
 # /GetGeneralSetting
@@ -69,7 +70,7 @@ def GetGeneralSettings():  # pylint: disable=E0211
 # "settings" = {
 #   "<settings_key>" = <setting_value>
 # }
-# 
+#
 @general_settings_api.route('/SetGeneralSetting', methods=['POST'])
 @login_required
 def SetGeneralSetting():  # pylint: disable=E0211
@@ -90,6 +91,7 @@ def SetGeneralSetting():  # pylint: disable=E0211
 def export_config():  # pylint: disable=E0211
     Executer.instance.logger.debug(f"Send file: {Executer.instance.general_settings_executer.export_config_path}")
     return send_file(Executer.instance.general_settings_executer.export_config_path, as_attachment=True, cache_timeout=-1, mimetype="text/html")
+
 
 @general_settings_api.route('/import_config', methods=['POST'])
 @login_required
@@ -117,6 +119,7 @@ def import_config():  # pylint: disable=E0211
         flash('No config file selected', 'error')
         return "No config file selected.", 400
 
+
 # /ResetSettings
 # {
 # }
@@ -130,4 +133,3 @@ def ResetSettings():  # pylint: disable=E0211
         Executer.instance.general_settings_executer.ResetSettings()
 
         return jsonify(data_out)
-

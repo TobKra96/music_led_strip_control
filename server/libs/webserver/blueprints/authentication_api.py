@@ -9,7 +9,8 @@ import json
 
 authentication_api = Blueprint('authentication_api', __name__)
 
-#@authentication_api.before_first_request
+# @authentication_api.before_first_request
+
 
 @authentication_api.before_app_first_request
 def first():
@@ -57,7 +58,6 @@ def logout():
     return redirect(url_for('login'))
 
 
-
 @authentication_api.route('/SetPinSetting', methods=['POST'])
 @login_required
 def SetPinSetting():  # pylint: disable=E0211
@@ -70,6 +70,7 @@ def SetPinSetting():  # pylint: disable=E0211
     Executer.instance.authentication_executer.set_pin_setting(data_out)
     return jsonify(data_out)
 
+
 @authentication_api.route('/GetPinSetting', methods=['GET'])
 @login_required
 def GetPinSetting():  # pylint: disable=E0211
@@ -80,6 +81,7 @@ def GetPinSetting():  # pylint: disable=E0211
     }
     return jsonify(data_out)
 
+
 @authentication_api.route('/ResetPinSettings', methods=['POST'])
 @login_required
 def ResetPinSettings():  # pylint: disable=E0211
@@ -88,6 +90,6 @@ def ResetPinSettings():  # pylint: disable=E0211
         "DEFAULT_PIN": data_in["DEFAULT_PIN"],
         "USE_PIN_LOCK": data_in["USE_PIN_LOCK"]
     }
-    
+
     data_out = Executer.instance.authentication_executer.reset_pin_settings(new_values)
     return jsonify(data_out)

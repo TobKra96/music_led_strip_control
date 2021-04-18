@@ -7,6 +7,7 @@ import json
 
 effect_api = Blueprint('effect_api', __name__)
 
+
 #################################################################
 
 # /GetActiveEffect
@@ -38,6 +39,7 @@ def GetActiveEffect():  # pylint: disable=E0211
         else:
             return jsonify(data_out)
 
+
 # /SetActiveEffect
 # {
 # "device" = <deviceID>
@@ -56,6 +58,7 @@ def SetActiveEffect():  # pylint: disable=E0211
         Executer.instance.effect_executer.SetActiveEffect(data_in["device"], data_in["effect"])
 
         return jsonify(data_out)
+
 
 # SetActiveEffectForAll
 # {
