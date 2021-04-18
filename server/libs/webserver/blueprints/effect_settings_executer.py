@@ -1,7 +1,8 @@
 from libs.webserver.executer_base import ExecuterBase
 
+
 class EffectSettingsExecuter(ExecuterBase):
-    
+
     # Return setting_value.
     def GetEffectSetting(self, device, effect, setting_key):
         if device == self.all_devices_id:
@@ -13,7 +14,7 @@ class EffectSettingsExecuter(ExecuterBase):
         settings = dict()
         if device == self.all_devices_id:
             for effect_setting_key in self._config["all_devices"]["effects"][effect]:
-                settings[effect_setting_key] = self._config["all_devices"]["effects"][effect][setting_key]                
+                settings[effect_setting_key] = self._config["all_devices"]["effects"][effect][setting_key]
             return settings
         else:
             for effect_setting_key in self._config["device_configs"][device]["effects"][effect]:

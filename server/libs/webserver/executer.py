@@ -10,6 +10,7 @@ from libs.webserver.executer_base import ExecuterBase
 
 import logging
 
+
 class Executer():
     def __init__(self, config_lock, notification_queue_in, notification_queue_out, effects_queue, py_audio):
         self.logger = logging.getLogger(__name__)
@@ -23,4 +24,3 @@ class Executer():
         self.general_settings_executer = GeneralSettingsExecuter(config_lock, notification_queue_in, notification_queue_out, effects_queue, py_audio)
 
         Executer.instance = self
-

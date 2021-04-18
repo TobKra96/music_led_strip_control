@@ -1,5 +1,6 @@
 from libs.webserver.executer_base import ExecuterBase
 
+
 class GeneralSettingsExecuter(ExecuterBase):
 
     def GetGeneralSetting(self, setting_key):
@@ -9,7 +10,7 @@ class GeneralSettingsExecuter(ExecuterBase):
         general_settings = dict()
         for setting_key in self._config["general_settings"]:
             general_settings[setting_key] = self._config["general_settings"][setting_key]
-        
+
         return general_settings
 
     def SetGeneralSetting(self, settings):

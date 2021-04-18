@@ -2,8 +2,9 @@ from libs.webserver.executer_base import ExecuterBase
 
 from libs.audio_info import AudioInfo  # pylint: disable=E0611, E0401
 
+
 class GeneralExecuter(ExecuterBase):
-    
+
     def GetColors(self):
         colors = dict()
         for colorID in self._config["colours"]:

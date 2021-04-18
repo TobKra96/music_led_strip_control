@@ -1,6 +1,7 @@
 from libs.webserver.executer_base import ExecuterBase
 import copy
 
+
 class DeviceExecuter(ExecuterBase):
 
     # Return all devices in a dictionary format: "device_id" = device_name.

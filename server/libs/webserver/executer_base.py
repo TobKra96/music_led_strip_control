@@ -70,4 +70,3 @@ class ExecuterBase():
                 return False
 
         return True
-

@@ -7,6 +7,7 @@ import json
 
 effect_settings_api = Blueprint('effect_settings_api', __name__)
 
+
 # /GetEffectSetting
 # in
 # {
@@ -39,6 +40,7 @@ def GetEffectSetting():  # pylint: disable=E0211
             return "Could not find settings value: ", 403
         else:
             return jsonify(data_out)
+
 
 # /GetEffectSettings
 # in
@@ -95,6 +97,7 @@ def SetEffectSetting():  # pylint: disable=E0211
         Executer.instance.effect_settings_executer.SetEffectSetting(data_in["device"], data_in["effect"], data_in["settings"])
 
         return jsonify(data_out)
+
 
 # /SetEffectSettingForAll
 # {

@@ -7,6 +7,7 @@ import json
 
 device_settings_api = Blueprint('device_settings_api', __name__)
 
+
 #################################################################
 # Get one specific device setting of one device
 # /GetDeviceSetting
@@ -40,6 +41,7 @@ def GetDeviceSetting():  # pylint: disable=E0211
         else:
             return jsonify(data_out)
 
+
 # Get all device settings of a specific device
 # /GetDeviceSettings
 # in
@@ -53,7 +55,7 @@ def GetDeviceSetting():  # pylint: disable=E0211
 # "settings" = {
 #   "<settings_key>" = <setting_value>
 # }
-# 
+#
 @device_settings_api.route('/GetDeviceSettings', methods=['GET'])
 @login_required
 def GetDeviceSettings():  # pylint: disable=E0211
@@ -128,6 +130,7 @@ def GetOutputTypeDeviceSetting():  # pylint: disable=E0211
         else:
             return jsonify(data_out)
 
+
 # /SetOutputTypeDeviceSetting
 # {
 # "device" = <deviceID>
@@ -149,4 +152,3 @@ def SetOutputTypeDeviceSetting():  # pylint: disable=E0211
         Executer.instance.device_settings_executer.SetOutputTypeDeviceSetting(data_in["device"], data_in["output_type_key"], data_in["settings"])
 
         return jsonify(data_out)
-

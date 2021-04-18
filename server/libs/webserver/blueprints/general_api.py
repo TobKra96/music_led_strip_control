@@ -31,6 +31,7 @@ def GetColors():  # pylint: disable=E0211
         else:
             return jsonify(data_out)
 
+
 # /GetGradients
 #
 # return
@@ -53,6 +54,7 @@ def GetGradients():  # pylint: disable=E0211
             return "Could not find gradients.", 403
         else:
             return jsonify(data_out)
+
 
 # /GetLEDStrips
 #
@@ -77,6 +79,7 @@ def GetLEDStrips():  # pylint: disable=E0211
         else:
             return jsonify(data_out)
 
+
 # /GetLoggingLevels
 #
 # return
@@ -99,6 +102,7 @@ def GetLoggingLevels():  # pylint: disable=E0211
             return "Could not find logging_levels.", 403
         else:
             return jsonify(data_out)
+
 
 # /GetAudioDevices
 #
@@ -123,7 +127,8 @@ def GetAudioDevices():  # pylint: disable=E0211
         else:
             return jsonify(data_out)
 
- # /GetOutputTypes
+
+# /GetOutputTypes
 #
 # return
 # {
