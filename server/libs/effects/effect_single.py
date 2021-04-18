@@ -10,7 +10,7 @@ class EffectSingle(Effect):
         """
         # Get the config of the current effect.
         effect_config = self.get_effect_config("effect_single")
-        self._led_strip = self._device.device_config["output"]["output_raspi"]["LED_Strip"]
+        self._led_strip = self._device.device_config["LED_Strip"]
         # Set Fallback Strip
         # self._led_strip_translated = ws.WS2811_STRIP_RGB
 

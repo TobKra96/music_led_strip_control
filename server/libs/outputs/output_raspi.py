@@ -19,10 +19,10 @@ class OutputRaspi(Output):
         self._led_pin = int(self._device_config["output"][output_id]["LED_Pin"])                # GPIO pin connected to the pixels (18 uses PWM!).
         self._led_freq_hz = int(self._device_config["output"][output_id]["LED_Freq_Hz"])        # LED signal frequency in hertz (usually 800khz).
         self._led_dma = int(self._device_config["output"][output_id]["LED_Dma"])                # DMA channel to use for generating signal (try 10).
-        self._led_brightness = int(self._device_config["output"][output_id]["LED_Brightness"])  # Set to '0' for darkest and 100 for brightest.
+        self._led_brightness = int(self._device_config["LED_Brightness"])  # Set to '0' for darkest and 100 for brightest.
         self._led_invert = int(self._device_config["output"][output_id]["LED_Invert"])          # Set to 'True' to invert the signal (when using NPN transistor level shift).
         self._led_channel = int(self._device_config["output"][output_id]["LED_Channel"])        # set to '1' for GPIOs 13, 19, 41, 45 or 53.
-        self._led_strip = self._device_config["output"][output_id]["LED_Strip"]
+        self._led_strip = self._device_config["LED_Strip"]
 
         # Set Fallback Strip
         self._led_strip_translated = ws.WS2811_STRIP_RGB
@@ -85,16 +85,28 @@ class OutputRaspi(Output):
         # Typecast the array to int.
         output_array = output_array.clip(0, 255).astype(int)
 
-        # Sort the colors as RGB type.
-        r = np.left_shift(output_array[0][:].astype(int), 16)  # pylint: disable=assignment-from-no-return
-        g = np.left_shift(output_array[1][:].astype(int), 8)  # pylint: disable=assignment-from-no-return
-        b = output_array[2][:].astype(int)
-        rgb = np.bitwise_or(np.bitwise_or(r, g), b).astype(int)
+        # Check if we have a white channel or not.
+        if len(output_array[:]) == 4 and "SK6812" in self._led_strip:
+            # Sort the colors as RGB type.
+            g = np.left_shift(output_array[1][:].astype(int), 24)  # pylint: disable=assignment-from-no-return
+            r = np.left_shift(output_array[0][:].astype(int), 16)  # pylint: disable=assignment-from-no-return
+            b = np.left_shift(output_array[2][:].astype(int), 8)  # pylint: disable=assignment-from-no-return
+            w = output_array[3][:].astype(int)
+            grbw = np.bitwise_or(np.bitwise_or(np.bitwise_or(r, g), b), w).astype(int)
 
-        # You can only use ws2811_leds_set with the custom version.
-        # ws.ws2811_leds_set(self.channel, rgb)
-        for i in range(self._led_count):
-            ws.ws2811_led_set(self.channel, i, rgb[i].item())
+            # You can only use ws2811_leds_set with the custom version.
+            for i in range(self._led_count):
+                ws.ws2811_led_set(self.channel, i, int(grbw[i].item()))
+        else:
+            # Sort the colors as RGB type.
+            g = np.left_shift(output_array[1][:].astype(int), 16)  # pylint: disable=assignment-from-no-return
+            r = np.left_shift(output_array[0][:].astype(int), 8)  # pylint: disable=assignment-from-no-return
+            b = output_array[2][:].astype(int)
+            grb = np.bitwise_or(np.bitwise_or(r, g), b).astype(int)
+
+            # You can only use ws2811_leds_set with the custom version.
+            for i in range(self._led_count):
+                ws.ws2811_led_set(self.channel, i, grb[i].item())
 
         resp = ws.ws2811_render(self._leds)
 

@@ -56,6 +56,8 @@
         "FPS": 60,
         "LED_Count": 124,
         "LED_Mid": 64,
+        "LED_Strip": "WS2812_STRIP",
+        "LED_Brightness": 100,
         "OUTPUT_TYPE": "output_raspi",
         "effects": {
             "effect_advanced_scroll": {
@@ -320,13 +322,11 @@
                 "MQTT_Path": "led/device_a"
             },
             "output_raspi": {
-                "LED_Brightness": 100,
                 "LED_Channel": 0,
                 "LED_Dma": 10,
                 "LED_Freq_Hz": 800000,
                 "LED_Invert": false,
-                "LED_Pin": 18,
-                "LED_Strip": "WS2812_STRIP"
+                "LED_Pin": 18
             },
             "output_udp": {
                 "UDP_Client_IP": "127.0.0.1",
