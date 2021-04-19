@@ -7,7 +7,7 @@ class DeviceSettingsExecuter(ExecuterBase):
     def GetDeviceSetting(self, device, setting_key):
         return self._config["device_configs"][device][setting_key]
 
-    def GetDeviceSettings(self, device, setting_key):
+    def GetDeviceSettings(self, device):
         device_settings_dict = dict()
         for device_setting_key in self._config["device_configs"][device]:
             device_settings_dict[device_setting_key] = self._config["device_configs"][device][device_setting_key]

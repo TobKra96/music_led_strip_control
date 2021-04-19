@@ -69,7 +69,7 @@ def GetDeviceSettings():  # pylint: disable=E0211
         setting_values = Executer.instance.device_settings_executer.GetDeviceSettings(data_in["device"])
         data_out["settings"] = setting_values
 
-        if setting_value is None:
+        if setting_values is None:
             return "Could not find settings value: ", 403
         else:
             return jsonify(data_out)
