@@ -19,11 +19,11 @@ general_api = Blueprint('general_api', __name__)
 # }
 @general_api.route('/GetColors', methods=['GET'])
 @login_required
-def GetColors():  # pylint: disable=E0211
+def get_colors():  # pylint: disable=E0211
     if request.method == 'GET':
         data_out = dict()
 
-        colors = Executer.instance.general_executer.GetColors()
+        colors = Executer.instance.general_executer.get_colors()
         data_out = colors
 
         if data_out is None:
@@ -43,11 +43,11 @@ def GetColors():  # pylint: disable=E0211
 # }
 @general_api.route('/GetGradients', methods=['GET'])
 @login_required
-def GetGradients():  # pylint: disable=E0211
+def get_gradients():  # pylint: disable=E0211
     if request.method == 'GET':
         data_out = dict()
 
-        gradients = Executer.instance.general_executer.GetGradients()
+        gradients = Executer.instance.general_executer.get_gradients()
         data_out = gradients
 
         if data_out is None:
@@ -67,11 +67,11 @@ def GetGradients():  # pylint: disable=E0211
 # }
 @general_api.route('/GetLEDStrips', methods=['GET'])
 @login_required
-def GetLEDStrips():  # pylint: disable=E0211
+def get_led_strips():  # pylint: disable=E0211
     if request.method == 'GET':
         data_out = dict()
 
-        led_strips = Executer.instance.general_executer.GetLEDStrips()
+        led_strips = Executer.instance.general_executer.get_led_strips()
         data_out = led_strips
 
         if data_out is None:
@@ -91,11 +91,11 @@ def GetLEDStrips():  # pylint: disable=E0211
 # }
 @general_api.route('/GetLoggingLevels', methods=['GET'])
 @login_required
-def GetLoggingLevels():  # pylint: disable=E0211
+def get_logging_levels():  # pylint: disable=E0211
     if request.method == 'GET':
         data_out = dict()
 
-        logging_levels = Executer.instance.general_executer.GetLoggingLevels()
+        logging_levels = Executer.instance.general_executer.get_logging_levels()
         data_out = logging_levels
 
         if data_out is None:
@@ -104,7 +104,7 @@ def GetLoggingLevels():  # pylint: disable=E0211
             return jsonify(data_out)
 
 
-# /GetAudioDevices
+# /get_audio_devices
 #
 # return
 # {
@@ -115,11 +115,11 @@ def GetLoggingLevels():  # pylint: disable=E0211
 # }
 @general_api.route('/GetAudioDevices', methods=['GET'])
 @login_required
-def GetAudioDevices():  # pylint: disable=E0211
+def get_audio_devices():  # pylint: disable=E0211
     if request.method == 'GET':
         data_out = dict()
 
-        audio_devices = Executer.instance.general_executer.GetAudioDevices()
+        audio_devices = Executer.instance.general_executer.get_audio_devices()
         data_out = audio_devices
 
         if data_out is None:
@@ -139,11 +139,11 @@ def GetAudioDevices():  # pylint: disable=E0211
 # }
 @general_api.route('/GetOutputTypes', methods=['GET'])
 @login_required
-def GetOutputTypes():  # pylint: disable=E0211
+def get_output_types():  # pylint: disable=E0211
     if request.method == 'GET':
         data_out = dict()
 
-        output_types = Executer.instance.general_executer.GetOutputTypes()
+        output_types = Executer.instance.general_executer.get_output_types()
         data_out = output_types
 
         if data_out is None:

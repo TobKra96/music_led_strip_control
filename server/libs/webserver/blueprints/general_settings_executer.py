@@ -3,22 +3,22 @@ from libs.webserver.executer_base import ExecuterBase
 
 class GeneralSettingsExecuter(ExecuterBase):
 
-    def GetGeneralSetting(self, setting_key):
+    def get_general_setting(self, setting_key):
         return self._config["general_settings"][setting_key]
 
-    def GetGeneralSettings(self):
+    def get_general_settings(self):
         general_settings = dict()
         for setting_key in self._config["general_settings"]:
             general_settings[setting_key] = self._config["general_settings"][setting_key]
 
         return general_settings
 
-    def SetGeneralSetting(self, settings):
+    def set_general_setting(self, settings):
         for setting_key in settings:
             self._config["general_settings"][setting_key] = settings[setting_key]
-        self.SaveConfig()
+        self.save_config()
 
-        self.RefreshDevice("all_devices")
+        self.refresh_device("all_devices")
 
     def GetWebserverPort(self):
         webserver_port = 8080
@@ -27,15 +27,15 @@ class GeneralSettingsExecuter(ExecuterBase):
 
         return webserver_port
 
-    def ResetSettings(self):
-        self.ResetConfig()
-        self.RefreshDevice("all_devices")
+    def reset_settings(self):
+        self.reset_config()
+        self.refresh_device("all_devices")
 
-    def ResetConfig(self):
+    def reset_config(self):
         self._config_instance.reset_config()
         self._config = self._config_instance.config
 
-    def ImportConfig(self, imported_config):
+    def import_config(self, imported_config):
         if imported_config is None:
             self.logger.error("Could not import Config. Config is None.")
             return False
@@ -43,9 +43,9 @@ class GeneralSettingsExecuter(ExecuterBase):
         self.logger.debug(f"Type of imported config: {type(imported_config)}")
         if type(imported_config) is dict:
             self._config = imported_config
-            self.SaveConfig()
+            self.save_config()
             self._config_instance.check_compatibility()
-            self.RefreshDevice("all_devices")
+            self.refresh_device("all_devices")
             return True
         else:
             self.logger.error("Unknown Type.")

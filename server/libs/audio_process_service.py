@@ -48,7 +48,7 @@ class AudioProcessService:
             # Init FPS Limiter.
             self._fps_limiter = FPSLimiter(120)
             self._skip_routine = False
-            self._devices = AudioInfo.GetAudioDevices(self._py_audio)
+            self._devices = AudioInfo.get_audio_devices(self._py_audio)
 
             self.log_output(show_output, logging.INFO, "Found the following audio sources:")
 
@@ -82,7 +82,7 @@ class AudioProcessService:
             self._device_rate = self._config["general_settings"]["DEFAULT_SAMPLE_RATE"]
             self._frames_per_buffer = self._config["general_settings"]["FRAMES_PER_BUFFER"]
             self.n_fft_bins = self._config["general_settings"]["N_FFT_BINS"]
-            self.log_output(show_output, logging.INFO, f"Selected Device: {self.selected_device.ToString()}")
+            self.log_output(show_output, logging.INFO, f"Selected Device: {self.selected_device.to_string()}")
 
             # Init Timer
             self.start_time_1 = time()

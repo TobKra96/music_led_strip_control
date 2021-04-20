@@ -27,44 +27,44 @@ class ExecuterBase():
         self.all_devices_id = "all_devices"
 
     # Helper
-    def SaveConfig(self):
+    def save_config(self):
         self._config_instance.save_config(self._config)
 
-    def PutIntoEffectQueue(self, device, effect):
+    def put_into_effect_queue(self, device, effect):
         self.logger.debug("Preparing new EnumItem...")
         effect_item = EffectItem(EffectsEnum[effect], device)
         self.logger.debug(f"EnumItem prepared: {effect_item.effect_enum} {effect_item.device_id}")
         self.effects_queue.put(effect_item)
         self.logger.debug("EnumItem put into queue.")
 
-    def PutIntoNotificationQueue(self, notificication, device):
+    def put_into_notification_queue(self, notificication, device):
         self.logger.debug("Preparing new Notification...")
         notification_item = NotificationItem(notificication, device)
         self.logger.debug(f"Notification Item prepared: {notification_item.notification_enum} {notification_item.device_id}")
         self.notification_queue_out.put(notification_item)
         self.logger.debug("Notification Item put into queue.")
 
-    def RefreshDevice(self, deviceId):
-        self.PutIntoNotificationQueue(NotificationEnum.config_refresh, deviceId)
+    def refresh_device(self, deviceId):
+        self.put_into_notification_queue(NotificationEnum.config_refresh, deviceId)
 
-    def ValidateDataIn(self, dictionary, keys):
+    def validate_data_in(self, dictionary, keys):
         if not (type(dictionary) is dict):
-            self.logger.error("Error in ValidateDataIn: dictionary is not a dict.")
+            self.logger.error("Error in validate_data_in: dictionary is not a dict.")
             return False
 
         if keys is None:
-            self.logger.error("Error in ValidateDataIn: keys tuple is None.")
+            self.logger.error("Error in validate_data_in: keys tuple is None.")
             return False
 
         for currentkey in keys:
             if not (currentkey in dictionary):
-                self.logger.error(f"Error in ValidateDataIn: Could not find the key: {currentkey}")
+                self.logger.error(f"Error in validate_data_in: Could not find the key: {currentkey}")
                 self.logger.error("Dict:")
                 self.logger.error(str(dictionary))
                 return False
 
             if dictionary[currentkey] is None:
-                self.logger.error(f"Error in ValidateDataIn: dictionary entry is None. Key: {currentkey}")
+                self.logger.error(f"Error in validate_data_in: dictionary entry is None. Key: {currentkey}")
                 self.logger.error("Dict:")
                 self.logger.error(str(dictionary))
                 return False

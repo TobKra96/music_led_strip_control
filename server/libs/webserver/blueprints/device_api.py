@@ -22,11 +22,11 @@ device_api = Blueprint('device_api', __name__)
 # }
 @device_api.route('/GetDevices', methods=['GET'])
 @login_required
-def GetDevices():  # pylint: disable=E0211
+def get_devices():  # pylint: disable=E0211
     if request.method == 'GET':
         data_out = dict()
 
-        devices = Executer.instance.device_executer.GetDevices()
+        devices = Executer.instance.device_executer.get_devices()
         data_out = devices
 
         if devices is None:
@@ -40,10 +40,10 @@ def GetDevices():  # pylint: disable=E0211
 # }
 @device_api.route('/CreateNewDevice', methods=['POST'])
 @login_required
-def CreateNewDevice():  # pylint: disable=E0211
+def create_new_device():  # pylint: disable=E0211
     if request.method == 'POST':
 
-        index = Executer.instance.device_executer.CreateNewDevice()
+        index = Executer.instance.device_executer.create_new_device()
 
         data_out = {
             "index": index
@@ -58,14 +58,14 @@ def CreateNewDevice():  # pylint: disable=E0211
 # }
 @device_api.route('/DeleteDevice', methods=['POST'])
 @login_required
-def DeleteDevice():  # pylint: disable=E0211
+def delete_device():  # pylint: disable=E0211
     if request.method == 'POST':
         data_in = request.get_json()
         data_out = copy.deepcopy(data_in)
 
-        if not Executer.instance.device_executer.ValidateDataIn(data_in, ("device",)):
+        if not Executer.instance.device_executer.validate_data_in(data_in, ("device",)):
             return "Input data are wrong.", 403
 
-        Executer.instance.device_executer.DeleteDevice(data_in["device"])
+        Executer.instance.device_executer.delete_device(data_in["device"])
 
         return jsonify(data_out)

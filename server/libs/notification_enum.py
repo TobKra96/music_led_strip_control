@@ -1,6 +1,4 @@
 from enum import Enum
-
-
 class NotificationEnum(Enum):
     config_refresh = 1
     config_refresh_finished = 2

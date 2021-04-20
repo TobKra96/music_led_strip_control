@@ -5,38 +5,38 @@ from libs.audio_info import AudioInfo  # pylint: disable=E0611, E0401
 
 class GeneralExecuter(ExecuterBase):
 
-    def GetColors(self):
+    def get_colors(self):
         colors = dict()
         for colorID in self._config["colours"]:
             colors[colorID] = colorID
         return colors
 
-    def GetGradients(self):
+    def get_gradients(self):
         gradients = dict()
         for gradientID in self._config["gradients"]:
             gradients[gradientID] = gradientID
         return gradients
 
-    def GetLEDStrips(self):
+    def get_led_strips(self):
         led_strips = dict()
         for led_strip_ID in self._config["led_strips"]:
             led_strips[led_strip_ID] = self._config["led_strips"][led_strip_ID]
         return led_strips
 
-    def GetLoggingLevels(self):
+    def get_logging_levels(self):
         logging_levels = dict()
         for logging_level_ID in self._config["logging_levels"]:
             logging_levels[logging_level_ID] = self._config["logging_levels"][logging_level_ID]
         return logging_levels
 
-    def GetAudioDevices(self):
+    def get_audio_devices(self):
         audio_devices_dict = dict()
-        audio_devices = AudioInfo.GetAudioDevices(self._py_audio)
+        audio_devices = AudioInfo.get_audio_devices(self._py_audio)
         for current_audio_device in audio_devices:
-            audio_devices_dict[current_audio_device.id] = current_audio_device.ToString()
+            audio_devices_dict[current_audio_device.id] = current_audio_device.to_string()
         return audio_devices_dict
 
-    def GetOutputTypes(self):
+    def get_output_types(self):
         output_types = dict()
         output_types["output_raspi"] = "Output Raspberry Pi"
         output_types["output_udp"] = "Output Network via UDP"

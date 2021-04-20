@@ -5,7 +5,7 @@ import copy
 class DeviceExecuter(ExecuterBase):
 
     # Return all devices in a dictionary format: "device_id" = device_name.
-    def GetDevices(self):
+    def get_devices(self):
 
         devices = dict()
 
@@ -14,21 +14,21 @@ class DeviceExecuter(ExecuterBase):
 
         return devices
 
-    def CreateNewDevice(self):
+    def create_new_device(self):
         i = 0
         while i < 100:
             new_device_id = "device_" + str(i)
             if new_device_id not in self._config["device_configs"]:
                 self._config["device_configs"][new_device_id] = copy.deepcopy(self._config["default_device"])
-                self.SaveConfig()
+                self.save_config()
 
-                self.RefreshDevice("all_devices")
+                self.refresh_device("all_devices")
                 break
 
             i += 1
         return i
 
-    def DeleteDevice(self, device):
+    def delete_device(self, device):
         del self._config["device_configs"][device]
-        self.SaveConfig()
-        self.RefreshDevice("all_devices")
+        self.save_config()
+        self.refresh_device("all_devices")

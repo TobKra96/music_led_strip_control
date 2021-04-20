@@ -23,15 +23,15 @@ general_settings_api = Blueprint('general_settings_api', __name__)
 # }
 @general_settings_api.route('/GetGeneralSetting', methods=['GET'])
 @login_required
-def GetGeneralSetting():  # pylint: disable=E0211
+def get_general_setting():  # pylint: disable=E0211
     if request.method == 'GET':
         data_in = request.args.to_dict()
         data_out = copy.deepcopy(data_in)
 
-        if not Executer.instance.general_settings_executer.ValidateDataIn(data_in, ("setting_key",)):
+        if not Executer.instance.general_settings_executer.validate_data_in(data_in, ("setting_key",)):
             return "Input data are wrong.", 403
 
-        setting_value = Executer.instance.general_settings_executer.GetGeneralSetting(data_in["setting_key"])
+        setting_value = Executer.instance.general_settings_executer.get_general_setting(data_in["setting_key"])
         data_out["setting_value"] = setting_value
 
         if setting_value is None:
@@ -52,11 +52,11 @@ def GetGeneralSetting():  # pylint: disable=E0211
 # }
 @general_settings_api.route('/GetGeneralSettings', methods=['GET'])
 @login_required
-def GetGeneralSettings():  # pylint: disable=E0211
+def get_general_settings():  # pylint: disable=E0211
     if request.method == 'GET':
         data_out = dict()
 
-        settings = Executer.instance.general_settings_executer.GetGeneralSettings()
+        settings = Executer.instance.general_settings_executer.get_general_settings()
         data_out["setting_value"] = settings
 
         if settings is None:
@@ -73,15 +73,15 @@ def GetGeneralSettings():  # pylint: disable=E0211
 #
 @general_settings_api.route('/SetGeneralSetting', methods=['POST'])
 @login_required
-def SetGeneralSetting():  # pylint: disable=E0211
+def set_general_setting():  # pylint: disable=E0211
     if request.method == 'POST':
         data_in = request.get_json()
         data_out = copy.deepcopy(data_in)
 
-        if not Executer.instance.general_settings_executer.ValidateDataIn(data_in, ("settings", )):
+        if not Executer.instance.general_settings_executer.validate_data_in(data_in, ("settings", )):
             return "Input data are wrong.", 403
 
-        Executer.instance.general_settings_executer.SetGeneralSetting(data_in["settings"])
+        Executer.instance.general_settings_executer.set_general_setting(data_in["settings"])
 
         return jsonify(data_out)
 
@@ -106,7 +106,7 @@ def import_config():  # pylint: disable=E0211
     if content:
         try:
             Executer.instance.logger.debug(f"File Received: {json.dumps(json.loads(content), indent=4)}")
-            if Executer.instance.general_settings_executer.ImportConfig(json.loads(content, encoding='utf-8')):
+            if Executer.instance.general_settings_executer.import_config(json.loads(content, encoding='utf-8')):
                 flash('Config file imported', 'success')
                 return "File imported.", 200
             else:
@@ -125,11 +125,11 @@ def import_config():  # pylint: disable=E0211
 # }
 @general_settings_api.route('/ResetSettings', methods=['POST'])
 @login_required
-def ResetSettings():  # pylint: disable=E0211
+def reset_settings():  # pylint: disable=E0211
     if request.method == 'POST':
 
         data_out = dict()
 
-        Executer.instance.general_settings_executer.ResetSettings()
+        Executer.instance.general_settings_executer.reset_settings()
 
         return jsonify(data_out)

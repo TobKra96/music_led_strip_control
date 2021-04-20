@@ -37,7 +37,6 @@ class DSP():
         self.samples_per_frame = int(frames_per_buffer)
         # Array containing the rolling audio sample window.
         self.y_roll = np.random.rand(n_rolling_history, self.samples_per_frame) / 1e16
-        # self.fft_window = np.hamming(int(default_sample_rate / fps) * n_rolling_history)
         self.fft_window = np.hamming(int(frames_per_buffer) * n_rolling_history)
 
         self.samples = None
