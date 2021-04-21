@@ -92,7 +92,7 @@ Also, check out the tutorial video I created for the manual installation:
   <a style="text-decoration:none" href="https://youtu.be/jAL1DfeYQI8">
     <img src="https://user-images.githubusercontent.com/24798198/108499975-68eae580-72af-11eb-9115-594b11f503cf.png" alt="Version1_Github" />
   </a>
-  <a style="text-decoration:none" href="media/web_interface_mockup.png">
+  <a style="text-decoration:none" href="">
     <img src="https://user-images.githubusercontent.com/24798198/112079905-48999980-8b81-11eb-846f-30a475092874.png" alt="Mockup" />
   </a>
 </p>
