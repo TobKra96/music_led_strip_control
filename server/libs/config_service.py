@@ -2,11 +2,13 @@
 #   Contains all configuration for the server.
 #   Load and save the config after every change.
 #
+from libs.config_converter.config_converter_service import ConfigConverterService  # pylint: disable=E0611, E0401
 
 from logging.handlers import RotatingFileHandler
 from shutil import copyfile, copy
 from pathlib import Path
 import coloredlogs
+import fileinput
 import logging
 import json
 import sys
@@ -120,6 +122,11 @@ class ConfigService():
         loaded_config = self.config
         template_config = self.load_template()
 
+        config_converter_service = ConfigConverterService()
+        loaded_config = config_converter_service.upgrade(loaded_config)
+
+        self.logger.debug(f"After rename: {loaded_config}")
+
         # Loop through the root.
         for key, value in template_config.items():
             if key == "device_configs":
@@ -133,6 +140,9 @@ class ConfigService():
 
         self.check_devices(loaded_config["device_configs"], template_config["default_device"])
 
+        self.logger.debug(f"After compatibility: {loaded_config}")
+
+        self.config = loaded_config
         self.save_config()
 
     def check_leaf(self, loaded_config_leaf, template_config_leaf):
