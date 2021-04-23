@@ -313,7 +313,9 @@
                 "use_color_variation": true,
                 "color_variation": 10,
                 "blur": 0.5,
-                "mask_blur": 3
+                "mask_blur": 3,
+                "mirror": false,
+                "swap_side": false
             },
             "last_effect": "effect_off"
         },
@@ -590,7 +592,9 @@
                 "use_color_variation": true,
                 "color_variation": 10,
                 "blur": 0.5,
-                "mask_blur": 3
+                "mask_blur": 3,
+                "mirror": false,
+                "swap_side": false
             },
             "last_effect": "effect_off"
         }

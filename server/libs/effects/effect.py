@@ -197,3 +197,24 @@ class Effect:
             return self._config["all_devices"]["effects"][effect_id]
         else:
             return self._device.device_config["effects"][effect_id]
+
+    def mirror_array(self, array, led_mid, led_count):
+        # Calculate the real mid
+        # |                   |real_mid             |
+        # |---------------------------|-------------|
+        # |                         led_mid (set in config)
+
+        real_mid = led_count / 2
+
+        # Add some tolerance for the real mid.
+        if (real_mid >= led_mid - 2) and (real_mid <= led_mid + 2):
+            # Use the option with shrinking the array.
+            mirrored_array = np.concatenate((array[:, ::-2], array[:, ::2]), axis=1)
+            return mirrored_array
+        else:
+            # Mirror the whole array. After this the array has the double size than led_count.
+            big_mirrored_array = np.concatenate((array[:, ::-1], array[:, ::1]), axis=1)
+            start_of_array = led_count - led_mid
+            end_of_array = start_of_array + led_count
+            mirrored_array = big_mirrored_array[:, start_of_array:end_of_array]
+            return mirrored_array

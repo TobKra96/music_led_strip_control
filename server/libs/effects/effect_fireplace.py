@@ -41,25 +41,35 @@ class EffectFireplace(Effect):
         effect_config = self.get_effect_config("effect_fireplace")
 
         led_count = self._device.device_config["led_count"]
+        led_mid = self._device.device_config["led_mid"]
 
         # Build an empty array.
         output_array = np.zeros((3, led_count))
 
         firebase_flicker_speed = effect_config["firebase_flicker_speed"]
-        firebase_area_minlength = effect_config["firebase_area_minlength"]
         firebase_area_maxlength = effect_config["firebase_area_maxlength"]
+        firebase_area_minlength = effect_config["firebase_area_minlength"]
+        if firebase_area_minlength > firebase_area_maxlength:
+            firebase_area_minlength = firebase_area_maxlength
+
 
         sparks_flicker_speed = effect_config["sparks_flicker_speed"]
         sparks_fly_speed = effect_config["sparks_fly_speed"]
 
-        sparks_minappear_distance = effect_config["sparks_minappear_distance"]
         sparks_maxappear_distance = effect_config["sparks_maxappear_distance"]
+        sparks_minappear_distance = effect_config["sparks_minappear_distance"]
+        if sparks_minappear_distance > sparks_maxappear_distance:
+            sparks_minappear_distance = sparks_maxappear_distance
 
-        sparks_min_length = effect_config["sparks_min_length"]
         sparks_max_length = effect_config["sparks_max_length"]
+        sparks_min_length = effect_config["sparks_min_length"]
+        if sparks_minappear_distance > sparks_maxappear_distance:
+            sparks_minappear_distance = sparks_maxappear_distance
 
         sparks_area_minlength = effect_config["sparks_area_minlength"]
         sparks_area_maxlength = effect_config["sparks_area_maxlength"]
+        if sparks_area_minlength > sparks_area_maxlength:
+            sparks_area_minlength = sparks_area_maxlength
 
         use_color_variation = effect_config["use_color_variation"]
         color_variation = effect_config["color_variation"]
@@ -164,6 +174,13 @@ class EffectFireplace(Effect):
         else:
             output_array = overlay_array
 
+        if effect_config["swap_side"]:
+            output_array[:, ::] = output_array[:, ::-1]
+
+        if effect_config["mirror"]:
+            output_array = self.mirror_array(output_array, led_mid, led_count)
+
+
         # Add the output array to the queue.
         self.queue_output_array_blocking(output_array)
 
@@ -204,7 +221,6 @@ class EffectFireplace(Effect):
         fade_out[1] = np.linspace(50, 0, one_half_spark_area, endpoint=True)
         fade_out[2] = np.linspace(50, 0, one_half_spark_area, endpoint=True)
 
-        # print(fade_out)
         fade_out_end_cut = len(mask_array[0]) - (self.sparks_area_current_length - one_half_spark_area)
         if fade_out_end_cut < one_half_spark_area:
             fade_out_end_index = fade_out_end_cut

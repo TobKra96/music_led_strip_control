@@ -52,17 +52,6 @@ class EffectBars(Effect):
             output = np.fliplr(output)
 
         if effect_config["mirror"]:
-            # Calculate the real mid.
-            real_mid = led_count / 2
-            # Add some tolerance for the real mid.
-            if (real_mid >= led_mid - 2) and (real_mid <= led_mid + 2):
-                # Use the option with shrinking the array.
-                output = np.concatenate((output[:, ::-2], output[:, ::2]), axis=1)
-            else:
-                # Mirror the whole array. After this the array has a two times bigger size than led_count.
-                big_mirrored_array = np.concatenate((output[:, ::-1], output[:, ::1]), axis=1)
-                start_of_array = led_count - led_mid
-                end_of_array = start_of_array + led_count
-                output = big_mirrored_array[:, start_of_array:end_of_array]
+            output = self.mirror_array(output, led_mid, led_count)
 
         self.queue_output_array_noneblocking(output)

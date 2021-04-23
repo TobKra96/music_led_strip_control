@@ -125,8 +125,6 @@ class ConfigService():
         config_converter_service = ConfigConverterService()
         loaded_config = config_converter_service.upgrade(loaded_config)
 
-        self.logger.debug(f"After rename: {loaded_config}")
-
         # Loop through the root.
         for key, value in template_config.items():
             if key == "device_configs":
@@ -139,8 +137,6 @@ class ConfigService():
             self.check_leaf(loaded_config[key], template_config[key])
 
         self.check_devices(loaded_config["device_configs"], template_config["default_device"])
-
-        self.logger.debug(f"After compatibility: {loaded_config}")
 
         self.config = loaded_config
         self.save_config()

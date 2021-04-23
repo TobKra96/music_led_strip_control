@@ -91,18 +91,7 @@ class EffectScroll(Effect):
             self.output = gaussian_filter1d(self.output, sigma=blur_amount)
 
         if effect_config["mirror"]:
-            # Calculate the real mid.
-            real_mid = led_count / 2
-            # Add some tolerance for the real mid.
-            if (real_mid >= led_mid - 2) and (real_mid <= led_mid + 2):
-                # Use the option with shrinking the array.
-                output_array = np.concatenate((self.output[:, ::-2], self.output[:, ::2]), axis=1)
-            else:
-                # Mirror the whole array. After this the array has the double size than led_count.
-                big_mirrored_array = np.concatenate((self.output[:, ::-1], self.output[:, ::1]), axis=1)
-                start_of_array = led_count - led_mid
-                end_of_array = start_of_array + led_count
-                output_array = big_mirrored_array[:, start_of_array:end_of_array]
+            output_array = self.mirror_array(self.output, led_mid, led_count)
         else:
             output_array = self.output
 
