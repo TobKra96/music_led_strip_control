@@ -63,8 +63,12 @@ class ConfigService():
         """Load the configuration file inside the self.config variable."""
         self.config_lock.acquire()
 
-        with open(self._config_path, "r") as read_file:
-            self.config = json.load(read_file)
+        try:
+            with open(self._config_path, "r") as read_file:
+                self.config = json.load(read_file)
+        except Exception as e:
+            self.logger.error(f"Could not load config due to exception: {e}")
+            self.load_backup()
 
         self.config_lock.release()
 
@@ -87,6 +91,13 @@ class ConfigService():
         # Maybe the logging updated
         self.setup_logging()
         self.config_lock.release()
+
+    def load_backup(self):
+        try:
+            with open(self._backup_path, "r") as read_file:
+                self.config = json.load(read_file)
+        except Exception as e:
+            self.logger.error(f"Could not load backup config due to exception: {e}")
 
     def save_backup(self):
         copy(self._config_path, self._backup_path)
