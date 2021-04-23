@@ -8,6 +8,7 @@ from libs.webserver.blueprints.effect_api import effect_api
 from libs.webserver.blueprints.effect_settings_api import effect_settings_api
 from libs.webserver.blueprints.general_api import general_api
 from libs.webserver.blueprints.general_settings_api import general_settings_api
+from libs.webserver.blueprints.system_info_api import system_info_api
 
 from flask_login import LoginManager, UserMixin, current_user, login_user, logout_user, login_required
 from flask import render_template, request, jsonify, send_file, redirect, url_for, session, flash
@@ -51,6 +52,7 @@ class Webserver():
         self.server.register_blueprint(effect_settings_api)
         self.server.register_blueprint(general_api)
         self.server.register_blueprint(general_settings_api)
+        self.server.register_blueprint(system_info_api)
 
         if DEBUG:
             self.server.run(host='0.0.0.0', port=webserver_port, load_dotenv=False, debug=True)
