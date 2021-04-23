@@ -591,8 +591,8 @@
                 "sparks_area_maxlength": 80,
                 "use_color_variation": true,
                 "color_variation": 10,
-                "blur": 0.5,
-                "mask_blur": 3,
+                "blur": 0.7,
+                "mask_blur": 2,
                 "mirror": false,
                 "swap_side": false
             },
