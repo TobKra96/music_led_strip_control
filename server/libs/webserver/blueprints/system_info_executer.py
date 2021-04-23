@@ -74,6 +74,8 @@ class SystemInfoExecuter(ExecuterBase):
             service_info["status"] = stat
             if(stat == 0):  # if 0 (active), print "Active"
                 service_info["running"] = True
+            else:
+                service_info["running"] = False
             service_info["service_not_found"] = False
         except Exception as e:
             self.logger.debug(f"Could not get service status: {service_name}")
