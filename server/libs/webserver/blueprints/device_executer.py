@@ -10,7 +10,7 @@ class DeviceExecuter(ExecuterBase):
         devices = dict()
 
         for device_key in self._config["device_configs"]:
-            devices[device_key] = self._config["device_configs"][device_key]["DEVICE_NAME"]
+            devices[device_key] = self._config["device_configs"][device_key]["device_name"]
 
         return devices
 

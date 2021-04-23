@@ -15,9 +15,9 @@ class OutputService():
         self.logger = logging.getLogger(__name__)
 
         self._device = device
-        self._led_strip = self._device.device_config["output"]["output_raspi"]["LED_Strip"]
+        self._led_strip = self._device.device_config["output"]["output_raspi"]["led_strip"]
 
-        self.logger.info(f'Starting Output service... Device: {self._device.device_config["DEVICE_NAME"]}')
+        self.logger.info(f'Starting Output service... Device: {self._device.device_config["device_name"]}')
 
         # Initial config load.
         self._config = self._device.config
@@ -31,7 +31,7 @@ class OutputService():
         self.start_time = time()
 
         # Init FPS Limiter.
-        self._fps_limiter = FPSLimiter(self._device.device_config["FPS"])
+        self._fps_limiter = FPSLimiter(self._device.device_config["fps"])
 
         self._skip_output = False
         self._cancel_token = False
@@ -42,11 +42,11 @@ class OutputService():
             OutputsEnum.output_udp: OutputUDP
         }
 
-        current_output_enum = OutputsEnum[self._device.device_config["OUTPUT_TYPE"]]
+        current_output_enum = OutputsEnum[self._device.device_config["output_type"]]
         self.logger.debug(f"Found output: {current_output_enum}")
         self._current_output = self._available_outputs[current_output_enum](self._device)
 
-        self.logger.debug(f'Output component started. Device: {self._device.device_config["DEVICE_NAME"]}')
+        self.logger.debug(f'Output component started. Device: {self._device.device_config["device_name"]}')
 
         while not self._cancel_token:
             try:
@@ -87,7 +87,7 @@ class OutputService():
             current_output_array = self._output_queue.get()
             # Add another Array of LEDS for White Channel
             if "SK6812" in self._led_strip and len(current_output_array) == 3:
-                current_output_array = np.vstack((current_output_array, np.zeros(self._device.device_config["LED_Count"])))
+                current_output_array = np.vstack((current_output_array, np.zeros(self._device.device_config["led_count"])))
 
             self._current_output.show(current_output_array)
 
@@ -97,7 +97,7 @@ class OutputService():
             self.ten_seconds_counter = time()
             self.time_dif = self.end_time - self.start_time
             self.fps = 1 / self.time_dif
-            self.logger.info(f'FPS: {self.fps:.2f} | Device: {self._device.device_config["DEVICE_NAME"]}')
+            self.logger.info(f'FPS: {self.fps:.2f} | Device: {self._device.device_config["device_name"]}')
 
         self.start_time = time()
 

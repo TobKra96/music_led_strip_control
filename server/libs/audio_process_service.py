@@ -55,7 +55,7 @@ class AudioProcessService:
             # Select the audio device you want to use.
             selected_device_list_index = 0
             try:
-                selected_device_list_index = int(self._config["general_settings"]["DEVICE_ID"])
+                selected_device_list_index = int(self._config["general_settings"]["device_id"])
             except Exception as e:
                 self.logger.exception(f"Could not parse audio id: {e}")
 
@@ -79,9 +79,9 @@ class AudioProcessService:
                 self.log_output(show_output, logging.ERROR, "Please change the id of the mic inside the config.")
                 self.selected_device = self._devices[0]
 
-            self._device_rate = self._config["general_settings"]["DEFAULT_SAMPLE_RATE"]
-            self._frames_per_buffer = self._config["general_settings"]["FRAMES_PER_BUFFER"]
-            self.n_fft_bins = self._config["general_settings"]["N_FFT_BINS"]
+            self._device_rate = self._config["general_settings"]["default_sample_rate"]
+            self._frames_per_buffer = self._config["general_settings"]["frames_per_buffer"]
+            self.n_fft_bins = self._config["general_settings"]["n_fft_bins"]
             self.log_output(show_output, logging.INFO, f"Selected Device: {self.selected_device.to_string()}")
 
             # Init Timer
@@ -180,7 +180,7 @@ class AudioProcessService:
             audio_datas = self._dsp.update(y)
 
             # Check if value is higher than min value.
-            if audio_datas["vol"] < self._config["general_settings"]["MIN_VOLUME_THRESHOLD"]:
+            if audio_datas["vol"] < self._config["general_settings"]["min_volume_threshold"]:
                 # Fill the array with zeros, to fade out the effect.
                 audio_datas["mel"] = np.zeros(self.n_fft_bins)
 

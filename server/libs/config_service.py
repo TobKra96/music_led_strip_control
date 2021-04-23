@@ -174,19 +174,19 @@ class ConfigService():
         logging_file_enabled = False
 
         logging_level_map = {
-            "NOTSET": logging.NOTSET,
-            "DEBUG": logging.DEBUG,
-            "INFO": logging.INFO,
-            "WARNING": logging.WARNING,
-            "ERROR": logging.ERROR,
-            "CRITICAL": logging.CRITICAL
+            "notset": logging.NOTSET,
+            "debug": logging.DEBUG,
+            "info": logging.INFO,
+            "warning": logging.WARNING,
+            "error": logging.ERROR,
+            "critical": logging.CRITICAL
         }
 
         if self.config is not None:
             try:
-                logging_level_console = logging_level_map[self.config["general_settings"]["LOG_LEVEL_CONSOLE"]]
-                logging_level_file = logging_level_map[self.config["general_settings"]["LOG_LEVEL_FILE"]]
-                logging_file_enabled = self.config["general_settings"]["LOG_FILE_ENABLED"]
+                logging_level_console = logging_level_map[self.config["general_settings"]["log_level_console"]]
+                logging_level_file = logging_level_map[self.config["general_settings"]["log_level_file"]]
+                logging_file_enabled = self.config["general_settings"]["log_file_enabled"]
             except Exception as e:
                 print(f"Could not load logging settings. Exception {e}")
                 pass

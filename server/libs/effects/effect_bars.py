@@ -6,8 +6,8 @@ import numpy as np
 class EffectBars(Effect):
     def run(self):
         effect_config = self.get_effect_config("effect_bars")
-        led_count = self._device.device_config["LED_Count"]
-        led_mid = self._device.device_config["LED_Mid"]
+        led_count = self._device.device_config["led_count"]
+        led_mid = self._device.device_config["led_mid"]
 
         audio_data = self.get_audio_data()
         y = self.get_mel(audio_data)

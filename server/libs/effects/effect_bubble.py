@@ -7,8 +7,8 @@ class EffectBubble(Effect):
     def run(self):
         # Get the config of the current effect.
         effect_config = self.get_effect_config("effect_bubble")
-        led_count = self._device.device_config["LED_Count"]
-        led_mid = self._device.device_config["LED_Mid"]
+        led_count = self._device.device_config["led_count"]
+        led_mid = self._device.device_config["led_mid"]
 
         # Translate the true and false to a number, for the function use.
         current_reverse_translated = 0

@@ -52,8 +52,8 @@ class ColorServiceGlobal():
         returns np.array of given length that eases between specified colors
 
         parameters:
-        colors - list, colours must be in self.config.colour_manager["colours"]
-            eg. ["Red", "Orange", "Blue", "Purple"]
+        colors - list, colors must be in self.config.colour_manager["colors"]
+            eg. ["red", "orange", "blue", "purple"]
         length - int, length of array to return. should be from self.config.settings
             eg. self.config.settings["devices"]["my strip"]["configuration"]["N_PIXELS"]
         """
@@ -102,8 +102,8 @@ class ColorServiceGlobal():
         Returns the values of a given color.
         Use this function to get color values.
         """
-        if colour in self._config["colours"]:
-            return self._config["colours"][colour]
+        if colour in self._config["colors"]:
+            return self._config["colors"][colour]
         else:
             self.logger.error(f"Color '{colour}' has not been defined.")
             return (0, 0, 0)

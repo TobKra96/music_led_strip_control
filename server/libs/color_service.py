@@ -20,7 +20,7 @@ class ColorService():
         for key in self._config["gradients"].keys():
             not_mirrored_gradient = self._easing_gradient_generator(
                 self._config["gradients"][key],  # All colors of the current gradient.
-                self._device_config["LED_Count"]
+                self._device_config["led_count"]
             )
 
             # Mirror the gradient to get seamless transition from start to the end.
@@ -53,8 +53,8 @@ class ColorService():
         returns np.array of given length that eases between specified colors
 
         parameters:
-        colors - list, colors must be in self.config.colour_manager["colours"]
-            eg. ["Red", "Orange", "Blue", "Purple"]
+        colors - list, colors must be in self.config.colour_manager["colors"]
+            eg. ["red", "orange", "blue", "purple"]
         length - int, length of array to return. should be from self.config.settings
             eg. self.config.settings["devices"]["my strip"]["configuration"]["N_PIXELS"]
         """
@@ -103,14 +103,14 @@ class ColorService():
         Returns the values of a given color.
         Use this function to get color values.
         """
-        if colour in self._config["colours"]:
-            return self._config["colours"][colour]
+        if colour in self._config["colors"]:
+            return self._config["colors"][colour]
         else:
             self.logger.error(f"Color '{colour}' has not been defined.")
             return (0, 0, 0)
 
     def build_slidearrays(self):
-        led_count = self._device_config["LED_Count"]
+        led_count = self._device_config["led_count"]
 
         self.full_slide = {}
 
@@ -130,7 +130,7 @@ class ColorService():
                     self.full_slide[gradient] = np.concatenate((self.full_slide[gradient], currentColorArray), axis=1)
 
     def build_bubblearrays(self):
-        led_count = self._device_config["LED_Count"]
+        led_count = self._device_config["led_count"]
         effect_config = self._device_config["effects"]["effect_bubble"]
 
         self.full_bubble = {}

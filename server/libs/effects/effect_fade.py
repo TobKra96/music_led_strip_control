@@ -13,7 +13,7 @@ class EffectFade(Effect):
         current_speed = effect_config["speed"]
         current_reverse = effect_config["reverse"]
 
-        led_count = self._device.device_config["LED_Count"]
+        led_count = self._device.device_config["led_count"]
 
         # Translate the true and false to a number, for the function use.
         current_reverse_translated = 0

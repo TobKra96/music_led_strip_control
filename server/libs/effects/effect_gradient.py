@@ -13,8 +13,8 @@ class EffectGradient(Effect):
         current_speed = effect_config["speed"]
         current_reverse = effect_config["reverse"]
 
-        led_count = self._device.device_config["LED_Count"]
-        led_mid = self._device.device_config["LED_Mid"]
+        led_count = self._device.device_config["led_count"]
+        led_mid = self._device.device_config["led_mid"]
 
         # Translate the true and false to a number, for the function use.
         current_reverse_translated = 0

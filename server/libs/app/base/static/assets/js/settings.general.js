@@ -220,7 +220,7 @@ function SetLocalSettings() {
                 setting_value = $("#" + setting_key).is(':checked')
             } else if ($("#" + setting_key).attr('type') == 'number') {
                 setting_value = parseFloat($("#" + setting_key).val());
-                if (setting_key == "WEBSERVER_PORT" && isNaN(setting_value)) {
+                if (setting_key == "webserver_port" && isNaN(setting_value)) {
                     setting_value = 8080;
                 }
             } else {

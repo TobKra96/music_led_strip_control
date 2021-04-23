@@ -12,11 +12,11 @@ class OutputUDP(Output):
 
         output_id = "output_udp"
 
-        self._udp_client_ip = self._device_config["output"][output_id]["UDP_Client_IP"]
-        self._udp_client_port = int(self._device_config["output"][output_id]["UDP_Client_Port"])
+        self._udp_client_ip = self._device_config["output"][output_id]["udp_client_ip"]
+        self._udp_client_port = int(self._device_config["output"][output_id]["udp_client_port"])
         self._sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        self._led_strip = self._device_config["LED_Strip"]
-        self._led_brightness = int(self._device_config["LED_Brightness"])  # Set to '0' for darkest and 100 for brightest.
+        self._led_strip = self._device_config["led_strip"]
+        self._led_brightness = int(self._device_config["led_brightness"])  # Set to '0' for darkest and 100 for brightest.
 
     def show(self, output_array):
 
@@ -50,27 +50,27 @@ class OutputUDP(Output):
 
         output_array_out = np.zeros((3, len(r)))
 
-        if self._led_strip == "WS2811_STRIP_BGR":
+        if self._led_strip == "ws2811_strip_bgr":
             output_array_out[0] = b
             output_array_out[1] = g
             output_array_out[2] = r
             return output_array_out
-        elif self._led_strip == "WS2811_STRIP_BRG":
+        elif self._led_strip == "ws2811_strip_brg":
             output_array_out[0] = b
             output_array_out[1] = r
             output_array_out[2] = g
             return output_array_out
-        elif self._led_strip == "WS2811_STRIP_GBR":
+        elif self._led_strip == "ws2811_strip_gbr":
             output_array_out[0] = g
             output_array_out[1] = b
             output_array_out[2] = r
             return output_array_out
-        elif self._led_strip == "WS2811_STRIP_GRB":
+        elif self._led_strip == "ws2811_strip_grb":
             output_array_out[0] = g
             output_array_out[1] = r
             output_array_out[2] = b
             return output_array_out
-        elif self._led_strip == "WS2811_STRIP_RBG":
+        elif self._led_strip == "ws2811_strip_rbg":
             output_array_out[0] = r
             output_array_out[1] = b
             output_array_out[2] = g
@@ -85,27 +85,27 @@ class OutputUDP(Output):
 
         output_array_out = np.zeros((3, len(r)))
 
-        if self._led_strip == "SK6812_STRIP_BGRW":
+        if self._led_strip == "sk6812_strip_bgrw":
             output_array_out[0] = b
             output_array_out[1] = g
             output_array_out[2] = r
             return output_array_out
-        elif self._led_strip == "SK6812_STRIP_BRGW":
+        elif self._led_strip == "sk6812_strip_brgw":
             output_array_out[0] = b
             output_array_out[1] = r
             output_array_out[2] = g
             return output_array_out
-        elif self._led_strip == "SK6812_STRIP_GBRW":
+        elif self._led_strip == "sk6812_strip_gbrw":
             output_array_out[0] = g
             output_array_out[1] = b
             output_array_out[2] = r
             return output_array_out
-        elif self._led_strip == "SK6812_STRIP_GRBW":
+        elif self._led_strip == "sk6812_strip_grbw":
             output_array_out[0] = g
             output_array_out[1] = r
             output_array_out[2] = b
             return output_array_out
-        elif self._led_strip == "SK6812_STRIP_RBGW":
+        elif self._led_strip == "sk6812_strip_rbgw":
             output_array_out[0] = r
             output_array_out[1] = b
             output_array_out[2] = g
@@ -121,31 +121,31 @@ class OutputUDP(Output):
 
         output_array_out = np.zeros((4, len(r)))
 
-        if self._led_strip == "SK6812_STRIP_BGRW":
+        if self._led_strip == "sk6812_strip_bgrw":
             output_array_out[0] = b
             output_array_out[1] = g
             output_array_out[2] = r
             output_array_out[3] = w
             return output_array_out
-        elif self._led_strip == "SK6812_STRIP_BRGW":
+        elif self._led_strip == "sk6812_strip_brgw":
             output_array_out[0] = b
             output_array_out[1] = r
             output_array_out[2] = g
             output_array_out[3] = w
             return output_array_out
-        elif self._led_strip == "SK6812_STRIP_GBRW":
+        elif self._led_strip == "sk6812_strip_gbrw":
             output_array_out[0] = g
             output_array_out[1] = b
             output_array_out[2] = r
             output_array_out[3] = w
             return output_array_out
-        elif self._led_strip == "SK6812_STRIP_GRBW":
+        elif self._led_strip == "sk6812_strip_grbw":
             output_array_out[0] = g
             output_array_out[1] = r
             output_array_out[2] = b
             output_array_out[3] = w
             return output_array_out
-        elif self._led_strip == "SK6812_STRIP_RBGW":
+        elif self._led_strip == "sk6812_strip_rbgw":
             output_array_out[0] = r
             output_array_out[1] = b
             output_array_out[2] = g

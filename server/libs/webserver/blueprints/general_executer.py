@@ -7,7 +7,7 @@ class GeneralExecuter(ExecuterBase):
 
     def get_colors(self):
         colors = dict()
-        for colorID in self._config["colours"]:
+        for colorID in self._config["colors"]:
             colors[colorID] = colorID
         return colors
 

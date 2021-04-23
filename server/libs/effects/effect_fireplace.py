@@ -22,7 +22,7 @@ class EffectFireplace(Effect):
         self.sparks_flicker_speed_counter = 0
         self.sparks_fly_speed_counter = 0
 
-        self.sparks_array = np.zeros((3, self._device.device_config["LED_Count"]))
+        self.sparks_array = np.zeros((3, self._device.device_config["led_count"]))
 
         self.firebase_area_current_length = 0
         self.firebase_area_target_length = 0
@@ -40,7 +40,7 @@ class EffectFireplace(Effect):
         # Get the config of the current effect.
         effect_config = self.get_effect_config("effect_fireplace")
 
-        led_count = self._device.device_config["LED_Count"]
+        led_count = self._device.device_config["led_count"]
 
         # Build an empty array.
         output_array = np.zeros((3, led_count))

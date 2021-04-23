@@ -14,7 +14,7 @@ class Effect:
 
         # Initial config load.
         self._config = self._device.config
-        self._config_colours = self._config["colours"]
+        self._config_colours = self._config["colors"]
         self._config_gradients = self._config["gradients"]
 
         self._device_config = self._device.device_config
@@ -36,8 +36,8 @@ class Effect:
         self._dsp = DSP(self._config, self._device_config)
 
         # Init some variables for the effects.
-        self.led_count = self._device_config["LED_Count"]
-        self.n_fft_bins = self._config["general_settings"]["N_FFT_BINS"]
+        self.led_count = self._device_config["led_count"]
+        self.n_fft_bins = self._config["general_settings"]["n_fft_bins"]
 
         self.prev_spectrum = np.array([self.led_count // 2])
         self.freq_channel_history = 40
@@ -62,13 +62,13 @@ class Effect:
             "high": 0
         }
         self.detection_ranges = {
-            "beat": (0, int(self._config["general_settings"]["N_FFT_BINS"] * 0.13)),
-            "low": (int(self._config["general_settings"]["N_FFT_BINS"] * 0.13),
-                    int(self._config["general_settings"]["N_FFT_BINS"] * 0.4)),
-            "mid": (int(self._config["general_settings"]["N_FFT_BINS"] * 0.4),
-                    int(self._config["general_settings"]["N_FFT_BINS"] * 0.7)),
-            "high": (int(self._config["general_settings"]["N_FFT_BINS"] * 0.8),
-                     int(self._config["general_settings"]["N_FFT_BINS"]))
+            "beat": (0, int(self._config["general_settings"]["n_fft_bins"] * 0.13)),
+            "low": (int(self._config["general_settings"]["n_fft_bins"] * 0.13),
+                    int(self._config["general_settings"]["n_fft_bins"] * 0.4)),
+            "mid": (int(self._config["general_settings"]["n_fft_bins"] * 0.4),
+                    int(self._config["general_settings"]["n_fft_bins"] * 0.7)),
+            "high": (int(self._config["general_settings"]["n_fft_bins"] * 0.8),
+                     int(self._config["general_settings"]["n_fft_bins"]))
         }
         self.min_detect_amplitude = {
             "beat": 0.7,
@@ -102,7 +102,7 @@ class Effect:
         Function that updates current_freq_detects. Any visualisation algorithm can check if
         there is currently a beat, low, mid, or high by querying the self.current_freq_detects dict.
         """
-        n_fft_bins = self._config["general_settings"]["N_FFT_BINS"]
+        n_fft_bins = self._config["general_settings"]["n_fft_bins"]
         channel_avgs = []
         differences = []
 

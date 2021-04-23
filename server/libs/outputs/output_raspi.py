@@ -15,35 +15,35 @@ class OutputRaspi(Output):
         output_id = "output_raspi"
 
         # LED strip configuration:
-        self._led_count = int(self._device_config["LED_Count"])                                 # Number of LED pixels.
-        self._led_pin = int(self._device_config["output"][output_id]["LED_Pin"])                # GPIO pin connected to the pixels (18 uses PWM!).
-        self._led_freq_hz = int(self._device_config["output"][output_id]["LED_Freq_Hz"])        # LED signal frequency in hertz (usually 800khz).
-        self._led_dma = int(self._device_config["output"][output_id]["LED_Dma"])                # DMA channel to use for generating signal (try 10).
-        self._led_brightness = int(self._device_config["LED_Brightness"])  # Set to '0' for darkest and 100 for brightest.
-        self._led_invert = int(self._device_config["output"][output_id]["LED_Invert"])          # Set to 'True' to invert the signal (when using NPN transistor level shift).
-        self._led_channel = int(self._device_config["output"][output_id]["LED_Channel"])        # set to '1' for GPIOs 13, 19, 41, 45 or 53.
-        self._led_strip = self._device_config["LED_Strip"]
+        self._led_count = int(self._device_config["led_count"])                                 # Number of LED pixels.
+        self._led_pin = int(self._device_config["output"][output_id]["led_pin"])                # GPIO pin connected to the pixels (18 uses PWM!).
+        self._led_freq_hz = int(self._device_config["output"][output_id]["led_freq_hz"])        # LED signal frequency in hertz (usually 800khz).
+        self._led_dma = int(self._device_config["output"][output_id]["led_dma"])                # DMA channel to use for generating signal (try 10).
+        self._led_brightness = int(self._device_config["led_brightness"])  # Set to '0' for darkest and 100 for brightest.
+        self._led_invert = int(self._device_config["output"][output_id]["led_invert"])          # Set to 'True' to invert the signal (when using NPN transistor level shift).
+        self._led_channel = int(self._device_config["output"][output_id]["led_channel"])        # set to '1' for GPIOs 13, 19, 41, 45 or 53.
+        self._led_strip = self._device_config["led_strip"]
 
         # Set Fallback Strip
         self._led_strip_translated = ws.WS2811_STRIP_RGB
 
         self._led_strip_mapper = {
-            "SK6812_STRIP_RGBW": ws.SK6812_STRIP_RGBW,
-            "SK6812_STRIP_RBGW": ws.SK6812_STRIP_RBGW,
-            "SK6812_STRIP_GRBW": ws.SK6812_STRIP_GRBW,
-            "SK6812_STRIP_GBRW": ws.SK6812_STRIP_GBRW,
-            "SK6812_STRIP_BRGW": ws.SK6812_STRIP_BRGW,
-            "SK6812_STRIP_BGRW": ws.SK6812_STRIP_BGRW,
-            "SK6812_SHIFT_WMASK": ws.SK6812_SHIFT_WMASK,
-            "WS2811_STRIP_RGB": ws.WS2811_STRIP_RGB,
-            "WS2811_STRIP_RBG": ws.WS2811_STRIP_RBG,
-            "WS2811_STRIP_GRB": ws.WS2811_STRIP_GRB,
-            "WS2811_STRIP_GBR": ws.WS2811_STRIP_GBR,
-            "WS2811_STRIP_BRG": ws.WS2811_STRIP_BRG,
-            "WS2811_STRIP_BGR": ws.WS2811_STRIP_BGR,
-            "WS2812_STRIP": ws.WS2812_STRIP,
-            "SK6812_STRIP": ws.SK6812_STRIP,
-            "SK6812W_STRIP": ws.SK6812W_STRIP
+            "sk6812_strip_rgbw": ws.SK6812_STRIP_RGBW,
+            "sk6812_strip_rbgw": ws.SK6812_STRIP_RBGW,
+            "sk6812_strip_grbw": ws.SK6812_STRIP_GRBW,
+            "sk6812_strip_gbrw": ws.SK6812_STRIP_GBRW,
+            "sk6812_strip_brgw": ws.SK6812_STRIP_BRGW,
+            "sk6812_strip_bgrw": ws.SK6812_STRIP_BGRW,
+            "sk6812_shift_wmask": ws.SK6812_SHIFT_WMASK,
+            "ws2811_strip_rgb": ws.WS2811_STRIP_RGB,
+            "ws2811_strip_rbg": ws.WS2811_STRIP_RBG,
+            "ws2811_strip_grb": ws.WS2811_STRIP_GRB,
+            "ws2811_strip_gbr": ws.WS2811_STRIP_GBR,
+            "ws2811_strip_brg": ws.WS2811_STRIP_BRG,
+            "ws2811_strip_bgr": ws.WS2811_STRIP_BGR,
+            "ws2812_strip": ws.WS2812_STRIP,
+            "sk6812_strip": ws.SK6812_STRIP,
+            "sk6812w_strip": ws.SK6812W_STRIP
         }
 
         try:

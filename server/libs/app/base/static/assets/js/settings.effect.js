@@ -105,9 +105,9 @@ function ParseGetColors(response) {
     var context = this;
     this.colors = response;
 
-    $('.colours').each(function () {
-        var colours = context.colors;
-        for (var currentKey in colours) {
+    $('.colors').each(function () {
+        var colors = context.colors;
+        for (var currentKey in colors) {
             var newOption = new Option(currentKey, currentKey);
             /// jquerify the DOM object 'o' so we can use the html method
             $(newOption).html(currentKey);

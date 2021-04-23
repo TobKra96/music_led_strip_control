@@ -22,8 +22,8 @@ class GeneralSettingsExecuter(ExecuterBase):
 
     def GetWebserverPort(self):
         webserver_port = 8080
-        if 'WEBSERVER_PORT' in self._config["general_settings"]:
-            webserver_port = self._config["general_settings"]["WEBSERVER_PORT"]
+        if 'webserver_port' in self._config["general_settings"]:
+            webserver_port = self._config["general_settings"]["webserver_port"]
 
         return webserver_port
 

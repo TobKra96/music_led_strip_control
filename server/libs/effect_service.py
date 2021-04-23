@@ -44,12 +44,12 @@ class EffectService():
         self.logger = logging.getLogger(__name__)
 
         self._device = device
-        self.logger.info(f'Starting Effect Service component from device: {self._device.device_config["DEVICE_NAME"]}')
+        self.logger.info(f'Starting Effect Service component from device: {self._device.device_config["device_name"]}')
 
         self.ten_seconds_counter = time()
         self.start_time = time()
 
-        self._fps_limiter = FPSLimiter(self._device.device_config["FPS"])
+        self._fps_limiter = FPSLimiter(self._device.device_config["fps"])
 
         self._available_effects = {
             EffectsEnum.effect_off: EffectOff,
@@ -94,7 +94,7 @@ class EffectService():
         # A token to cancel the while loop.
         self._cancel_token = False
         self._skip_effect = False
-        self.logger.info(f'Effects component started. Device: {self._device.device_config["DEVICE_NAME"]}')
+        self.logger.info(f'Effects component started. Device: {self._device.device_config["device_name"]}')
 
         while not self._cancel_token:
             try:
@@ -102,7 +102,7 @@ class EffectService():
             except KeyboardInterrupt:
                 break
 
-        self.logger.info(f'Effects component stopped. Device: {self._device.device_config["DEVICE_NAME"]}')
+        self.logger.info(f'Effects component stopped. Device: {self._device.device_config["device_name"]}')
 
     def effect_routine(self):
         # Limit the fps to decrease lags caused by 100 percent CPU.
@@ -111,7 +111,7 @@ class EffectService():
         # Check the notification queue.
         if not self._device.device_notification_queue_in.empty():
             self._current_notification_in = self._device.device_notification_queue_in.get()
-            self.logger.debug(f'Effects Service has a new notification in. Notification: {self._current_notification_in} | Device: {self._device.device_config["DEVICE_NAME"]}')
+            self.logger.debug(f'Effects Service has a new notification in. Notification: {self._current_notification_in} | Device: {self._device.device_config["device_name"]}')
 
         if hasattr(self, "_current_notification_in"):
             if self._current_notification_in is NotificationEnum.config_refresh:
@@ -152,7 +152,7 @@ class EffectService():
             self.ten_seconds_counter = time()
             self.time_dif = self.end_time - self.start_time
             self.fps = 1 / self.time_dif
-            self.logger.info(f'FPS: {self.fps:.2f} | Device: {self._device.device_config["DEVICE_NAME"]}')
+            self.logger.info(f'fps: {self.fps:.2f} | Device: {self._device.device_config["device_name"]}')
 
         self.start_time = time()
 
@@ -166,7 +166,7 @@ class EffectService():
         self.logger.debug("Refreshing effects...")
         self._initialized_effects = {}
 
-        self._fps_limiter = FPSLimiter(self._device.device_config["FPS"])
+        self._fps_limiter = FPSLimiter(self._device.device_config["fps"])
 
         # Notify the master component, that I'm finished.
         self._device.device_notification_queue_out.put(NotificationEnum.config_refresh_finished)

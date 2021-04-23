@@ -13,7 +13,7 @@ class EffectSyncFade(Effect):
         current_speed = effect_config["speed"]
         current_reverse = effect_config["reverse"]
 
-        led_count = self._device.device_config["LED_Count"]
+        led_count = self._device.device_config["led_count"]
 
         current_color = self._device.color_service_global.get_global_fade_color(current_speed, current_gradient, current_reverse)
 

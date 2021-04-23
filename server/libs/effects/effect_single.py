@@ -10,15 +10,15 @@ class EffectSingle(Effect):
         """
         # Get the config of the current effect.
         effect_config = self.get_effect_config("effect_single")
-        self._led_strip = self._device.device_config["LED_Strip"]
+        self._led_strip = self._device.device_config["led_strip"]
         # Set Fallback Strip
         # self._led_strip_translated = ws.WS2811_STRIP_RGB
 
         # Build an empty array.
         if "SK6812" in self._led_strip:
-            output_array = np.zeros((4, self._device.device_config["LED_Count"]))
+            output_array = np.zeros((4, self._device.device_config["led_count"]))
         else:
-            output_array = np.zeros((3, self._device.device_config["LED_Count"]))
+            output_array = np.zeros((3, self._device.device_config["led_count"]))
 
         if effect_config["use_custom_color"]:
             output_array[0][:] = effect_config["custom_color"][0]

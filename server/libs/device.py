@@ -17,12 +17,12 @@ class Device:
         self.create_processes()
 
     def start_device(self):
-        self.logger.info(f'Starting device: {self.__device_config["DEVICE_NAME"]}')
+        self.logger.info(f'Starting device: {self.__device_config["device_name"]}')
         self.__output_process.start()
         self.__effect_process.start()
 
     def stop_device(self):
-        self.logger.info(f'Stopping device: {self.__device_config["DEVICE_NAME"]}')
+        self.logger.info(f'Stopping device: {self.__device_config["device_name"]}')
         self.__effect_process.terminate()
         self.__output_process.terminate()
 
@@ -47,7 +47,7 @@ class Device:
         self.__output_queue = Queue(2)
 
     def refresh_config(self, config, device_config):
-        self.logger.info(f'Refreshing config of device: {self.__device_config["DEVICE_NAME"]}')
+        self.logger.info(f'Refreshing config of device: {self.__device_config["device_name"]}')
 
         self.stop_device()
 

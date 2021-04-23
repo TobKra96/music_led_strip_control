@@ -154,8 +154,8 @@ function SetLocalSettings() {
             contentType: 'application/json;charset=UTF-8'
         }).done((data) => {
             console.log("Device settings set successfully. Response:\n\n" + JSON.stringify(data, null, '\t'));
-            currentDevice.name = data.settings.DEVICE_NAME;
-            $("#selected_device_txt").text(data.settings.DEVICE_NAME);
+            currentDevice.name = data.settings.device_name;
+            $("#selected_device_txt").text(data.settings.device_name);
 
             new Toast(`Device "${currentDevice.name}" saved.`).success();
 
