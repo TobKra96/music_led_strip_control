@@ -34,6 +34,38 @@ def get_devices():  # pylint: disable=E0211
         else:
             return jsonify(data_out)
 
+# /GetDevices2
+# in
+# {
+# }
+
+# return
+# {
+#       [
+#           {
+#               "name":"<name>"
+#               "id":"<id>"
+#           },
+#           {
+#               "name":"<name>"
+#               "id":"<id>"
+#           }
+#       ]
+# }
+@device_api.route('/GetDevices2', methods=['GET'])
+@login_required
+def get_devices2():  # pylint: disable=E0211
+    if request.method == 'GET':
+        data_out = dict()
+
+        devices = Executer.instance.device_executer.get_devices2()
+        data_out = devices
+
+        if devices is None:
+            return "Could not find devices: ", 403
+        else:
+            return jsonify(data_out)
+
 
 # /CreateNewDevice
 # {

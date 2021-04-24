@@ -14,6 +14,19 @@ class DeviceExecuter(ExecuterBase):
 
         return devices
 
+    def get_devices2(self):
+
+        devices = []
+
+        for device_key in self._config["device_configs"]:
+            current_device = dict()
+            current_device["name"] = self._config["device_configs"][device_key]["device_name"]
+            current_device["id"] = device_key
+
+            devices.append(current_device)
+
+        return devices
+
     def create_new_device(self):
         i = 0
         while i < 100:
