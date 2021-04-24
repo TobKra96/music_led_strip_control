@@ -1,0 +1,240 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} System Status {% endblock %}
+
+<!-- Specific CSS goes HERE -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+    <div class="pcoded-content">
+        <div class="pcoded-inner-content">
+            <!-- [ breadcrumb ] start -->
+            <div class="page-header">
+                <div class="page-block">
+                    <div class="row align-items-center">
+                        <div class="col-md-12">
+                            <div class="page-header-title">
+                                <h5 class="m-b-10">System Status</h5>
+                            </div>
+                            <ul class="breadcrumb">
+                                <li class="breadcrumb-item"><a href="/"><i class="feather icon-home"></i></a></li>
+                                <li class="breadcrumb-item"><a href="javascript:">System Status</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- [ breadcrumb ] end -->
+            <div class="main-body">
+                <div class="page-wrapper">
+                    <!-- [ Main Content ] start -->
+
+                    <div class="row mt-4">
+                        <div class="col-md-6 col-lg-4">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5>CPU</h5>
+                                </div>
+                                <div class="card-block border-bottom">
+                                    <h6 class="mb-4">Usage</h6>
+                                    <div class="row d-flex align-items-center">
+                                        <div class="col-9">
+                                            <h3 class="f-w-300 d-flex align-items-center m-b-0"><i class="feather icon-bar-chart-2 text-c-green f-30 m-r-10"></i>
+                                                54.5%
+                                            </h3>
+                                        </div>
+                                    </div>
+                                    <div class="progress m-t-30" style="height: 6px;">
+                                        <div class="progress-bar progress-c-theme2" role="progressbar" style="width: 54.5%;" aria-valuenow="70" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                </div>
+                                <div class="card-block">
+                                    <h6 class="mb-4">Temperature</h6>
+                                    <div class="row d-flex align-items-center">
+                                        <div class="col-9">
+                                            <h3 class="f-w-300 d-flex align-items-center m-b-0"><i class="feather icon-thermometer text-c-green f-30 m-r-10"></i>
+                                                51.5°C
+                                            </h3>
+                                        </div>
+                                    </div>
+                                    <div class="progress m-t-30" style="height: 6px; background: linear-gradient(to right, #b4ecb4 0%, #fefec8 75%, #ffb2ae 95%);">
+                                        <div class="progress-bar progress-c-theme2" role="progressbar" style="width: 51.5%;" aria-valuenow="35" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5>Disk</h5>
+                                </div>
+                                <div class="card-block border-bottom">
+                                    <h6 class="mb-4">Usage</h6>
+                                    <div class="row d-flex align-items-center">
+                                        <div class="col-9">
+                                            <h3 class="f-w-300 d-flex align-items-center m-b-0"><i class="feather icon-bar-chart-2 text-c-green f-30 m-r-10"></i>
+                                                8.4%
+                                            </h3>
+                                        </div>
+                                    </div>
+                                    <div class="progress m-t-30" style="height: 6px;">
+                                        <div class="progress-bar progress-c-theme2" role="progressbar" style="width: 8.4%;" aria-valuenow="70" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                </div>
+                                <div class="card-block">
+                                    <div class="row d-flex align-items-center">
+                                        <div class="col-auto">
+                                            <i class="feather icon-pie-chart f-30 text-c-green"></i>
+                                        </div>
+                                        <div class="col">
+                                            <h3 class="f-w-300">2.3 GB</h3>
+                                            <span class="d-block text-uppercase">Used</span>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="feather icon-box f-30 text-c-green"></i>
+                                        </div>
+                                        <div class="col">
+                                            <h3 class="f-w-300">28.9 GB</h3>
+                                            <span class="d-block text-uppercase">total</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 col-lg-4">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5>Memory</h5>
+                                </div>
+                                <div class="card-block border-bottom">
+                                    <h6 class="mb-4">Usage</h6>
+                                    <div class="row d-flex align-items-center">
+                                        <div class="col-9">
+                                            <h3 class="f-w-300 d-flex align-items-center m-b-0"><i class="feather icon-bar-chart-2 text-c-green f-30 m-r-10"></i>
+                                                11.4%
+                                            </h3>
+                                        </div>
+                                    </div>
+                                    <div class="progress m-t-30" style="height: 6px;">
+                                        <div class="progress-bar progress-c-theme2" role="progressbar" style="width: 11.4%;" aria-valuenow="70" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                </div>
+                                <div class="card-block">
+                                    <div class="row d-flex align-items-center">
+                                        <div class="col-auto">
+                                            <i class="feather icon-pie-chart f-30 text-c-green"></i>
+                                        </div>
+                                        <div class="col">
+                                            <h3 class="f-w-300">0.3 GB</h3>
+                                            <span class="d-block text-uppercase">Used</span>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="feather icon-box f-30 text-c-green"></i>
+                                        </div>
+                                        <div class="col">
+                                            <h3 class="f-w-300">3.7 GB</h3>
+                                            <span class="d-block text-uppercase">total</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card card-event">
+                                <div class="card-header">
+                                    <h5>Services</h5>
+                                </div>
+                                <div class="card-block border-bottom">
+                                    <div class="row align-items-center justify-content-center">
+                                        <div class="col">
+                                            <h3 class="m-0 f-w-300">dhcpcd</h3>
+                                        </div>
+                                        <div class="col-auto">
+                                            <label class="label theme-bg text-white f-14 f-w-400 float-right">Running</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card-block border-bottom">
+                                    <div class="row align-items-center justify-content-center">
+                                        <div class="col">
+                                            <h3 class="m-0 f-w-300">dnsmasq</h3>
+                                        </div>
+                                        <div class="col-auto">
+                                            <label class="label bg-danger text-white f-14 f-w-400 float-right">Stopped</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card-block border-bottom">
+                                    <div class="row align-items-center justify-content-center">
+                                        <div class="col">
+                                            <h3 class="m-0 f-w-300">hostapd</h3>
+                                        </div>
+                                        <div class="col-auto">
+                                            <label class="label theme-bg text-white f-14 f-w-400 float-right">Running</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card-block">
+                                    <div class="row align-items-center justify-content-center">
+                                        <div class="col">
+                                            <h3 class="m-0 f-w-300">mlsc</h3>
+                                        </div>
+                                        <div class="col-auto">
+                                            <label class="label theme-bg text-white f-14 f-w-400 float-right">Running</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 col-lg-4">
+                            <div class="card card-event">
+                                <div class="card-header">
+                                    <h5>Network</h5>
+                                </div>
+                                <div class="card-block border-bottom">
+                                    <div class="row">
+                                        <div class="col-auto">
+                                            <label class="label theme-bg2 text-white f-14 f-w-400">eth0</label>
+                                        </div>
+                                    </div>
+                                    <h3 class="mt-3 f-w-300">192.168.178.96</h3>
+                                    <h6 class="text-muted mt-2 mb-0 text-uppercase">address</h6>
+                                    <h3 class="mt-3 f-w-300">255.255.255.0</h3>
+                                    <h6 class="text-muted mt-2 mb-0 text-uppercase">netmask</h6>
+                                </div>
+                                <div class="card-block border-bottom">
+                                    <div class="row">
+                                        <div class="col-auto">
+                                            <label class="label theme-bg2 text-white f-14 f-w-400">lo</label>
+                                        </div>
+                                    </div>
+                                    <h3 class="mt-3 f-w-300">127.0.0.1</h3>
+                                    <h6 class="text-muted mt-2 mb-0 text-uppercase">address</h6>
+                                    <h3 class="mt-3 f-w-300">255.0.0.0</h3>
+                                    <h6 class="text-muted mt-2 mb-0 text-uppercase">netmask</h6>
+                                </div>
+                                <div class="card-block">
+                                    <div class="row">
+                                        <div class="col-auto">
+                                            <label class="label theme-bg2 text-white f-14 f-w-400">wlan1</label>
+                                        </div>
+                                    </div>
+                                    <h3 class="mt-3 f-w-300">172.24.26.1</h3>
+                                    <h6 class="text-muted mt-2 mb-0 text-uppercase">address</h6>
+                                    <h3 class="mt-3 f-w-300">255.255.255.0</h3>
+                                    <h6 class="text-muted mt-2 mb-0 text-uppercase">netmask</h6>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- [ Main Content ] end -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+{% endblock javascripts %}
