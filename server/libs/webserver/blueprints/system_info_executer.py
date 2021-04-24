@@ -1,5 +1,6 @@
 from libs.webserver.executer_base import ExecuterBase
 
+from sys import platform
 import subprocess
 import psutil
 import os
@@ -19,7 +20,8 @@ class SystemInfoExecuter(ExecuterBase):
     def get_cpu_info(self):
         cpu_info = dict()
         cpu_freq = dict(psutil.cpu_freq()._asdict())
-        cpu_percent = psutil.cpu_percent(interval=1)
+        cpu_usage = psutil.cpu_times_percent(0.0)._asdict()
+        cpu_percent = float(f'{(cpu_usage["system"] + cpu_usage["user"]):0.1f}')
         cpu_info["frequency"] = cpu_freq["current"]
         cpu_info["percent"] = cpu_percent
         return cpu_info
@@ -48,12 +50,18 @@ class SystemInfoExecuter(ExecuterBase):
 
     def get_raspi_temp(self):
         cpu_temp_dict = dict()
-        temp = os.popen("vcgencmd measure_temp").readline()
-        cpu_temp_c = float(re.findall(r"\d+\.\d+", temp)[0])
-        cpu_temp_f = float(f"{(cpu_temp_c * 1.8 + 32):0.1f}")
+        if platform == "linux":
+            temp = os.popen("vcgencmd measure_temp").readline()
+            cpu_temp_c = float(re.findall(r"\d+\.\d+", temp)[0])
+            cpu_temp_f = float(f"{(cpu_temp_c * 1.8 + 32):0.1f}")
 
-        cpu_temp_dict["celsius"] = cpu_temp_c
-        cpu_temp_dict["fahrenheit"] = cpu_temp_f
+            cpu_temp_dict["celsius"] = cpu_temp_c
+            cpu_temp_dict["fahrenheit"] = cpu_temp_f
+
+            return cpu_temp_dict
+
+        cpu_temp_dict["celsius"] = 0
+        cpu_temp_dict["fahrenheit"] = 0
 
         return cpu_temp_dict
 
