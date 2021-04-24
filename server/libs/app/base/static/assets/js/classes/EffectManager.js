@@ -2,12 +2,12 @@ import Toast from "./Toast.js";
 
 // classes/EffectManager.js
 export default class EffectManager {
-    constructor() {
+    constructor(currentDevice) {
         // todo: refactor server-side
         this.nonMusicEffects = $("#dashboard-list-none-music > div > div").map(function () { return this.id }).toArray();
         this.musicEffects = $("#dashboard-list-music > div > div").map(function () { return this.id }).toArray();
         this.specialEffects = $("#dashboard-list-special > div > div").map(function () { return this.id }).toArray();
-        this.currentDevice;
+        this.currentDevice = currentDevice ? currentDevice : undefined;
 
         // Listen for effect change on click
         this.allEffects.forEach(effect => {
