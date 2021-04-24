@@ -1,6 +1,7 @@
 from libs.webserver.executer_base import ExecuterBase
 
 import subprocess
+import platform
 import psutil
 import os
 import re
@@ -82,3 +83,39 @@ class SystemInfoExecuter(ExecuterBase):
             service_info["running"] = False
             service_info["service_not_found"] = True
         return service_info
+
+    def get_system_info_device_status(self):
+        devices = []
+        for current_device_key in self._config["device_configs"]:
+            current_device = dict()
+            current_device_config = self._config["device_configs"][current_device_key]
+
+            current_device["name"] = current_device_config["device_name"]
+            current_device["id"] = current_device_key
+            try:
+                if current_device_config["output_type"] == "output_udp":
+                    current_device["connected"] = self.check_device_status(current_device_config["output"]["output_udp"]["udp_client_ip"])
+                else:
+                    current_device["connected"] = True
+            except:
+                self.logger.exception(f"Could not get device status of: {current_device['name']} - {current_device['id']}")
+                current_device["connected"] = False
+
+            devices.append(current_device)
+
+        return devices
+
+    def check_device_status(self, host):
+        """
+        Returns True if host (str) responds to a ping request.
+        Remember that a host may not respond to a ping (ICMP) request even if the host name is valid.
+        """
+
+        # Option for the number of packets as a function of
+        param_count = '-n' if platform.system().lower()=='windows' else '-c'
+        param_timeout = '-w' if platform.system().lower()=='windows' else '-i'
+
+        # Building the command. Ex: "ping -c 1 google.com"
+        command = ['ping', param_count, '1', param_timeout, '0.2',  host]
+
+        return subprocess.call(command) == 0

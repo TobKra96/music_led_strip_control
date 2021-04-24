@@ -93,3 +93,38 @@ def get_system_info_services():  # pylint: disable=E0211
             return "Could not find data value: data", 403
         else:
             return jsonify(data_out)
+
+
+#################################################################
+
+# /GetSystemInfoDeviceStatus
+# in
+# {
+# }
+#
+# return
+# {
+#       [
+#           {
+#               "name":"<name>"
+#               "id":"<id>
+#               "connected":"<connected>"
+#           },
+#           {
+#               "name":"<name>"
+#               "id":"<id>
+#               "connected":"<connected>"
+#           }
+#       ]
+# }
+@system_info_api.route('/GetSystemInfoDeviceStatus', methods=['GET'])
+@login_required
+def get_system_info_device_status():  # pylint: disable=E0211
+    if request.method == 'GET':
+
+        data = Executer.instance.system_info_executer.get_system_info_device_status()
+
+        if data is None:
+            return "Could not find data value: data", 403
+        else:
+            return jsonify(data)
