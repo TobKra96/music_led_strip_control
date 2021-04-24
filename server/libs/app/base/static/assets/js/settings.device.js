@@ -2,12 +2,8 @@ import Device from "./classes/Device.js";
 import Toast from "./classes/Toast.js";
 
 let output_types = {};
-// let devices = [];
-
 let devices = jinja_devices.map(d => { return new Device(d) });
-// Start with Fake Device
-devices.unshift(new Device({id:"all_devices", name:"All Devices" }))
-let currentDevice = devices[0];
+let currentDevice = devices.find(d => d.id === localStorage.getItem("lastDevice") );
 
 function refreshDeviceConfig(output_types, currentDevice) {
     if (!currentDevice) return;
@@ -68,18 +64,20 @@ $(document).ready(function () {
         // all requests finished successfully
         $.ajax("/GetDevices").done((data) => {
             // parse data into device Objects
-            Object.keys(data).forEach(device_key => {
-                devices.push(new Device({ id: device_key, name: data[device_key] }));
-            });
+            // Object.keys(data).forEach(device_key => {
+            //     devices.push(new Device({ id: device_key, name: data[device_key] }));
+            // });
 
             // Restore last selected device on reload
-            let lastDevice = devices.find(device => device.id === localStorage.getItem("lastDevice"));
-            if (lastDevice instanceof Device) {
-                currentDevice = lastDevice;
-            } else {
-                // Fallback to all_devices
-                currentDevice = devices.length > 0 ? devices[0] : undefined;
-            }
+            // let lastDevice = devices.find(device => device.id === localStorage.getItem("lastDevice"));
+            // if (lastDevice instanceof Device) {
+            //     currentDevice = lastDevice;
+            // } else {
+            //     // Fallback to all_devices
+            //     currentDevice = devices.length > 0 ? devices[0] : undefined;
+            // }
+
+            // need current Device
 
             refreshDeviceConfig(output_types, currentDevice)
 

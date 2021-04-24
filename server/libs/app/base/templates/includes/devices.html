@@ -24,8 +24,15 @@
             <div id="collapseMenu" class="card-body p-0 collapse" aria-labelledby="accordionHeading" data-parent="#accordionDevices">
                 <ul class="nav nav-pills shadow-none " id="deviceTabID" role="tablist">
                     {% for device in devices %}
+                        {% if loop.first %}
                         <li class="nav-item device_item">
-                            <a href="#pills-{{ loop.index }}" class="nav-link" data-device_id={{ device.id }} role="tab" data-toggle="pill" aria-controls="pills-{{ loop.index }}" aria-selected="false">
+                            <a href="#pills-{{ loop.index }}" class="nav-link" data-device_id="all_devices" role="tab" data-toggle="pill" aria-controls="pills-{{ loop.index }}" aria-selected="false">
+                                All Devices
+                            </a>
+                        </li>
+                        {% endif %}
+                        <li class="nav-item device_item">
+                            <a href="#pills-{{ loop.index+1 }}" class="nav-link" data-device_id={{ device.id }} role="tab" data-toggle="pill" aria-controls="pills-{{ loop.index+1 }}" aria-selected="false">
                                 {{ device.name }}
                             </a>
                         </li>
