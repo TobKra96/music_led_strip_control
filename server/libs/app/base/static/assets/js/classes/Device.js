@@ -1,8 +1,9 @@
 // classes/Device.js
 export default class Device {
-    constructor(id, name) {
-        this.id = id;
-        this._name = name;
+    constructor(params) {
+        Object.assign(this, params);
+        // this.id = id;
+        // this._name = name;
         this.activeEffect = "";
         this.settings = {};
         this.link = "";
@@ -11,7 +12,7 @@ export default class Device {
     set name(name) {
         this._name = name;
         // Update HTML elements on namechange
-        if(this._link !== "") {
+        if(this._link != undefined && this._link !== "") {
             this._link.innerHTML = name;
         }
     }

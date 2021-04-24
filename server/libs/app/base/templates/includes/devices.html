@@ -1,10 +1,21 @@
+<script type="text/javascript">
+    let jinja_devices = JSON.parse('{{ devices | tojson }}');
+    // Object.keys(data).forEach(device => { devices2.push(device); });
+    function activateDevice(device_id) {
+        // currentDevice = device_id;
+        localStorage.setItem('lastDevice', device_id);
+        // effectManager.currentDevice = currentDevice;
+        // Async function
+        // device.getActiveEffect();
+    }
+</script>
 <div class="accordion my-3" id="accordionDevices">
     <div class="card p-0">
         <a class="p-0" href="#!" data-toggle="collapse" data-target="#collapseMenu" aria-expanded="false" aria-controls="collapseMenu" draggable="false">
             <div class="card-header" id="accordionHeading">
                 <h5 class="mb-0">
                     <span class="text-secondary">
-                        Total devices: <span class="badge badge-secondary" id="device_count"></span>
+                        Total devices: <span class="badge badge-secondary" id="device_count">{{ devices|length }}</span>
                     </span>
                     <span class="text-secondary" id="selected_device_label">
                         &ensp;|&ensp;Device: <span class="badge badge-secondary" id="selected_device_txt"></span>
@@ -17,6 +28,13 @@
             </div>
             <div id="collapseMenu" class="card-body p-0 collapse" aria-labelledby="accordionHeading" data-parent="#accordionDevices">
                 <ul class="nav nav-pills shadow-none " id="deviceTabID" role="tablist">
+                    {% for device in devices %}
+                        <li class="nav-item device_item">
+                            <a href="#pills-{{ loop.index }}" class="nav-link" data-device_id={{ device.id }} onclick="activateDevice('{{ device.id }}')" role="tab" data-toggle="pill" aria-controls="pills-{{ loop.index }}" aria-selected="false">
+                                {{ device.name }}
+                            </a>
+                        </li>
+                    {% endfor %}
                 </ul>
             </div>
         </a>

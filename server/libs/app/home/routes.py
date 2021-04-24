@@ -8,11 +8,15 @@ from flask_login import login_required
 from jinja2 import TemplateNotFound
 from libs.app.home import blueprint
 
+from libs.webserver.executer import Executer
+
+devices = Executer.instance.device_executer.get_devices2()
 
 @blueprint.route('/')
 @login_required
 def index():
-    return render_template('dashboard.html', segment='dashboard')
+    # active_effect = Executer.instance.effect_executer.get_active_effect(data_in["device"])
+    return render_template('dashboard.html', segment='dashboard', devices=devices)
 
 
 @blueprint.route('/<page>/<template>', methods=['GET', 'POST'])
@@ -22,7 +26,7 @@ def route_pages(page, template):
         if not template.endswith('.html'):
             template += '.html'
         segment = get_segment(request)
-        return render_template(f"/{page}/{template}", segment=segment)
+        return render_template(f"/{page}/{template}", segment=segment, devices=devices)
     except TemplateNotFound:
         return render_template('page-404.html'), 404
     except Exception:
@@ -36,7 +40,7 @@ def route_template(template):
         if not template.endswith('.html'):
             template += '.html'
         segment = get_segment(request)
-        return render_template(template, segment=segment)
+        return render_template(template, segment=segment, devices=devices)
     except TemplateNotFound:
         return render_template('page-404.html'), 404
     except Exception:
