@@ -32,6 +32,7 @@
 
                     <div class="row mt-4">
                         <div class="col-md-6 col-lg-4">
+                            <!-- CPU Block -->
                             <div class="card">
                                 <div class="card-header">
                                     <h5><i class="feather icon-cpu text-c-blue"></i> CPU</h5>
@@ -76,49 +77,17 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="card">
+
+                            <!-- Services Block -->
+                            <div id="services" class="card">
                                 <div class="card-header">
-                                    <h5><i class="feather icon-server text-c-blue"></i> Disk</h5>
-                                </div>
-                                <div class="card-block border-bottom">
-                                    <h6 class="mb-4">Usage</h6>
-                                    <div class="row d-flex align-items-center">
-                                        <div class="col-9">
-                                            <h3 class="f-w-300 d-flex align-items-center m-b-0"><i class="feather icon-bar-chart-2 text-c-green f-30 m-r-10"></i>
-                                                <span id="disk_usage_percent"></span>
-                                            </h3>
-                                        </div>
-                                    </div>
-                                    <div class="progress m-t-30" style="height: 6px;">
-                                        <div id="disk_usage_progress" class="progress-bar progress-c-theme2" role="progressbar" style="width: 8.4%;" aria-valuenow="70" aria-valuemin="0" aria-valuemax="100"></div>
-                                    </div>
-                                </div>
-                                <div class="card-block py-0 pb-4">
-                                    <div class="row">
-                                        <div class="d-flex align-items-center pt-4">
-                                            <div class="col-auto">
-                                                <i class="feather icon-pie-chart f-30 text-c-green"></i>
-                                            </div>
-                                            <div class="col-auto">
-                                                <h3 id="disk_used" class="f-w-300"></h3>
-                                                <span class="d-block text-uppercase">Used</span>
-                                            </div>
-                                        </div>
-                                        <div class="d-flex align-items-center pt-4">
-                                            <div class="col-auto">
-                                                <i class="feather icon-box f-30 text-c-green"></i>
-                                            </div>
-                                            <div class="col-auto">
-                                                <h3 id="disk_total" class="f-w-300"></h3>
-                                                <span class="d-block text-uppercase">total</span>
-                                            </div>
-                                        </div>
-                                    </div>
+                                    <h5><i class="feather icon-settings text-c-blue"></i> Services</h5>
                                 </div>
                             </div>
                         </div>
 
                         <div class="col-md-6 col-lg-4">
+                            <!-- Memory Block -->
                             <div class="card">
                                 <div class="card-header">
                                     <h5><i class="feather icon-zap text-c-blue"></i> Memory</h5>
@@ -159,14 +128,59 @@
                                     </div>
                                 </div>
                             </div>
-                            <div id="services" class="card">
+
+                            <!-- Disk Block -->
+                            <div class="card">
                                 <div class="card-header">
-                                    <h5><i class="feather icon-settings text-c-blue"></i> Services</h5>
+                                    <h5><i class="feather icon-server text-c-blue"></i> Disk</h5>
+                                </div>
+                                <div class="card-block border-bottom">
+                                    <h6 class="mb-4">Usage</h6>
+                                    <div class="row d-flex align-items-center">
+                                        <div class="col-9">
+                                            <h3 class="f-w-300 d-flex align-items-center m-b-0"><i class="feather icon-bar-chart-2 text-c-green f-30 m-r-10"></i>
+                                                <span id="disk_usage_percent"></span>
+                                            </h3>
+                                        </div>
+                                    </div>
+                                    <div class="progress m-t-30" style="height: 6px;">
+                                        <div id="disk_usage_progress" class="progress-bar progress-c-theme2" role="progressbar" style="width: 8.4%;" aria-valuenow="70" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                </div>
+                                <div class="card-block py-0 pb-4">
+                                    <div class="row">
+                                        <div class="d-flex align-items-center pt-4">
+                                            <div class="col-auto">
+                                                <i class="feather icon-pie-chart f-30 text-c-green"></i>
+                                            </div>
+                                            <div class="col-auto">
+                                                <h3 id="disk_used" class="f-w-300"></h3>
+                                                <span class="d-block text-uppercase">Used</span>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex align-items-center pt-4">
+                                            <div class="col-auto">
+                                                <i class="feather icon-box f-30 text-c-green"></i>
+                                            </div>
+                                            <div class="col-auto">
+                                                <h3 id="disk_total" class="f-w-300"></h3>
+                                                <span class="d-block text-uppercase">total</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Devices Block -->
+                            <div id="devices" class="card">
+                                <div class="card-header">
+                                    <h5><i class="feather icon-monitor text-c-blue"></i> Devices</h5>
                                 </div>
                             </div>
                         </div>
 
                         <div class="col-md-6 col-lg-4">
+                            <!-- Network Block -->
                             <div id="network_interfaces" class="card">
                                 <div class="card-header">
                                     <h5><i class="feather icon-wifi text-c-blue"></i> Network</h5>

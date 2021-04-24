@@ -31,7 +31,7 @@ $(document).ready(function () {
             $("#disk_total").text(bytesToGigabytes(diskTotal).toFixed(1) + " GB");
 
             const networkInterfaces = data["system"]["network_info"];
-            if ($("#network_interfaces").children().length < Object.keys(networkInterfaces).length) {
+            if ($("#network_interfaces").children().length - 1 < Object.keys(networkInterfaces).length) {
                 for (var i = 0, len = Object.keys(networkInterfaces).length; i < len; i++) {
                     const interfaceName = Object.keys(networkInterfaces)[i];
                     const interfaceAddress = networkInterfaces[interfaceName]["address"];
@@ -106,6 +106,42 @@ $(document).ready(function () {
         });
     }
     getSystemInfoServices()
+
+    function getSystemInfoDeviceStatus() {
+        // Called every 10 seconds
+        $.ajax("/GetSystemInfoDeviceStatus").done((devices) => {
+            if ($("#devices").children().length - 1 < devices.length) {
+                for (var i = 0, len = devices.length; i < len; i++) {
+                    const deviceName = devices[i]["name"];
+                    let status = "Offline";
+                    let statusColor = "bg-danger";
+                    if (devices[i]["connected"]) {
+                        status = "Online";
+                        statusColor = "theme-bg";
+                    }
+                    let border = "border-bottom";
+                    if (i === len - 1) {
+                        border = "";
+                    }
+                    const device = `
+                        <div class="card-block ${border} py-4">
+                            <div class="row align-items-center justify-content-center">
+                                <div class="col">
+                                    <h3 class="m-0 f-w-300">${deviceName}</h3>
+                                </div>
+                                <div class="col-auto">
+                                    <label class="badge badge-pill mt-2 px-3 py-2 ${statusColor} text-white f-14 f-w-400 float-right">${status}</label>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    $("#devices").append(device);
+                }
+            }
+        });
+        setTimeout(getSystemInfoDeviceStatus, 10000);
+    }
+    getSystemInfoDeviceStatus()
 
     function bytesToGigabytes(bytes) {
         return bytes / 1024 / 1024 / 1024;
