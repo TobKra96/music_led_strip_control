@@ -1,6 +1,5 @@
 from libs.webserver.executer_base import ExecuterBase
 
-from sys import platform
 import subprocess
 import platform
 import psutil
@@ -51,7 +50,7 @@ class SystemInfoExecuter(ExecuterBase):
 
     def get_raspi_temp(self):
         cpu_temp_dict = dict()
-        if platform == "linux":
+        if platform.system().lower() == "linux":
             temp = os.popen("vcgencmd measure_temp").readline()
             cpu_temp_c = float(re.findall(r"\d+\.\d+", temp)[0])
             cpu_temp_f = float(f"{(cpu_temp_c * 1.8 + 32):0.1f}")
@@ -105,7 +104,7 @@ class SystemInfoExecuter(ExecuterBase):
                     current_device["connected"] = self.check_device_status(current_device_config["output"]["output_udp"]["udp_client_ip"])
                 else:
                     current_device["connected"] = True
-            except:
+            except Exception:
                 self.logger.exception(f"Could not get device status of: {current_device['name']} - {current_device['id']}")
                 current_device["connected"] = False
 
@@ -120,10 +119,10 @@ class SystemInfoExecuter(ExecuterBase):
         """
 
         # Option for the number of packets as a function of
-        param_count = '-n' if platform.system().lower()=='windows' else '-c'
-        param_timeout = '-w' if platform.system().lower()=='windows' else '-i'
+        param_count = '-n' if platform.system().lower() == 'windows' else '-c'
+        param_timeout = '-w' if platform.system().lower() == 'windows' else '-i'
 
         # Building the command. Ex: "ping -c 1 google.com"
-        command = ['ping', param_count, '1', param_timeout, '0.2',  host]
+        command = ['ping', param_count, '1', param_timeout, '0.2', host]
 
         return subprocess.call(command) == 0
