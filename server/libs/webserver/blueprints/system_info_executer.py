@@ -50,7 +50,7 @@ class SystemInfoExecuter(ExecuterBase):
         cpu_temp_dict = dict()
         temp = os.popen("vcgencmd measure_temp").readline()
         cpu_temp_c = float(re.findall(r"\d+\.\d+", temp)[0])
-        cpu_temp_f = f"{(cpu_temp_c * 1.8 + 32):0.1f}"
+        cpu_temp_f = float(f"{(cpu_temp_c * 1.8 + 32):0.1f}")
 
         cpu_temp_dict["celsius"] = cpu_temp_c
         cpu_temp_dict["fahrenheit"] = cpu_temp_f
