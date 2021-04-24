@@ -1,12 +1,21 @@
 // classes/Device.js
 export default class Device {
-    constructor(params) {
+    constructor(params, manager) {
         Object.assign(this, params);
         // this.id = id;
         // this._name = name;
         this.activeEffect = "";
         this.settings = {};
         this.link = "";
+        this.effectManager = manager;
+
+        // Select last selected device if there is any
+        this.id === localStorage.getItem("lastDevice") && (
+            this.effectManager.currentDevice = this,
+            // Async function
+            this.getActiveEffect(),
+            $(`a[data-device_id=${this.id}`).addClass("active")
+            );
     }
 
     set name(name) {

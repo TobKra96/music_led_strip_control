@@ -2,24 +2,16 @@ import Device from "./classes/Device.js";
 import EffectManager from "./classes/EffectManager.js";
 import Toast from "./classes/Toast.js";
 
+
 if (!jinja_devices.length) {
     new Toast('No device found. Create a new device in "Device Settings".').info()
 } else {
-    const devices = jinja_devices.map(d => { return new Device(d) });
-    
     // Start with Fake Device
-    devices.unshift(new Device({id:"all_devices", name:"All Devices" }))
-    let currentDevice = devices[0];
-    // Select last selected device if there is any
-    let lastDevice = devices.find(device => device.id === localStorage.getItem("lastDevice"));
-    if (lastDevice instanceof Device) {
-        currentDevice = lastDevice;
-    }
-    $(`a[data-device_id=${currentDevice.id}`).addClass("active");
-    
-    const effectManager = new EffectManager(currentDevice);
-    // Async function
-    currentDevice.getActiveEffect();
+    const fake_device = new Device({id:"all_devices", name:"All Devices" });
+    const effectManager = new EffectManager(fake_device);
+    // Create Devices from Jinja
+    const devices = jinja_devices.map(d => { return new Device(d, effectManager) });
+    devices.unshift(fake_device);
     
     // Add Behavior to Device Tab
     devices.forEach(device => {

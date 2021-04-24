@@ -2,8 +2,12 @@ import Device from "./classes/Device.js";
 import Toast from "./classes/Toast.js";
 
 let output_types = {};
-let devices = [];
-let currentDevice;
+// let devices = [];
+
+let devices = jinja_devices.map(d => { return new Device(d) });
+// Start with Fake Device
+devices.unshift(new Device({id:"all_devices", name:"All Devices" }))
+let currentDevice = devices[0];
 
 function refreshDeviceConfig(output_types, currentDevice) {
     if (!currentDevice) return;
@@ -65,7 +69,7 @@ $(document).ready(function () {
         $.ajax("/GetDevices").done((data) => {
             // parse data into device Objects
             Object.keys(data).forEach(device_key => {
-                devices.push(new Device(device_key, data[device_key]));
+                devices.push(new Device({ id: device_key, name: data[device_key] }));
             });
 
             // Restore last selected device on reload
