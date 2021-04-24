@@ -29,7 +29,7 @@ def get_system_info_performance():  # pylint: disable=E0211
         data_out = dict()
 
         data = Executer.instance.system_info_executer.get_system_info_performance()
-        data_out["data"] = data
+        data_out["system"] = data
 
         if data is None:
             return "Could not find data value: data", 403

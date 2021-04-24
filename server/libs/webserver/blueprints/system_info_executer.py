@@ -1,7 +1,6 @@
 from libs.webserver.executer_base import ExecuterBase
 
 import subprocess
-import logging
 import psutil
 import os
 import re
@@ -18,26 +17,18 @@ class SystemInfoExecuter(ExecuterBase):
         return data
 
     def get_cpu_info(self):
-        return psutil.cpu_percent(interval=1)
+        cpu_info = dict()
+        cpu_freq = dict(psutil.cpu_freq()._asdict())
+        cpu_percent = psutil.cpu_percent(interval=1)
+        cpu_info["frequency"] = cpu_freq["current"]
+        cpu_info["percent"] = cpu_percent
+        return cpu_info
 
     def get_memory_info(self):
-        memory_info = dict()
-        svmem_object = psutil.virtual_memory()
-        memory_info["total"] = svmem_object.total
-        memory_info["available"] = svmem_object.available
-        memory_info["percent"] = svmem_object.percent
-        memory_info["used"] = svmem_object.used
-        memory_info["free"] = svmem_object.free
-        return memory_info
+        return dict(psutil.virtual_memory()._asdict())
 
     def get_disk_info(self):
-        disk_info = dict()
-        sdiskusage_object = psutil.disk_usage('/')
-        disk_info["total"] = sdiskusage_object.total
-        disk_info["used"] = sdiskusage_object.used
-        disk_info["free"] = sdiskusage_object.free
-        disk_info["percent"] = sdiskusage_object.percent
-        return disk_info
+        return dict(psutil.disk_usage('/')._asdict())
 
     def get_network_info(self):
         network_info = dict()
@@ -56,8 +47,15 @@ class SystemInfoExecuter(ExecuterBase):
         return data
 
     def get_raspi_temp(self):
+        cpu_temp_dict = dict()
         temp = os.popen("vcgencmd measure_temp").readline()
-        return (re.findall(r"\d+\.\d+", temp)[0])
+        cpu_temp_c = float(re.findall(r"\d+\.\d+", temp)[0])
+        cpu_temp_f = f"{(cpu_temp_c * 1.8 + 32):0.1f}"
+
+        cpu_temp_dict["celsius"] = cpu_temp_c
+        cpu_temp_dict["fahrenheit"] = cpu_temp_f
+
+        return cpu_temp_dict
 
     def get_system_info_services(self):
         data = dict()
@@ -73,7 +71,7 @@ class SystemInfoExecuter(ExecuterBase):
         try:
             stat = subprocess.call(["systemctl", "is-active", "--quiet", service_name])
             service_info["status"] = stat
-            if(stat == 0):  # if 0 (active), print "Active"
+            if stat == 0:  # if 0 (active), print "Active"
                 service_info["running"] = True
             else:
                 service_info["running"] = False
