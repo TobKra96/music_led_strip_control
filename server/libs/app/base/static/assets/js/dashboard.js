@@ -2,7 +2,6 @@ import Device from "./classes/Device.js";
 import EffectManager from "./classes/EffectManager.js";
 import Toast from "./classes/Toast.js";
 
-
 if (!jinja_devices.length) {
     new Toast('No device found. Create a new device in "Device Settings".').info()
 } else {

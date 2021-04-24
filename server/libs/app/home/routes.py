@@ -7,7 +7,6 @@ from flask import render_template, request
 from flask_login import login_required
 from jinja2 import TemplateNotFound
 from libs.app.home import blueprint
-
 from libs.webserver.executer import Executer
 
 devices = Executer.instance.device_executer.get_devices2()

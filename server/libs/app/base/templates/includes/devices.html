@@ -1,13 +1,6 @@
 <script type="text/javascript">
+    // Transfer data to JS
     let jinja_devices = JSON.parse('{{ devices | tojson }}');
-    // Object.keys(data).forEach(device => { devices2.push(device); });
-    function activateDevice(device_id) {
-        // currentDevice = device_id;
-        localStorage.setItem('lastDevice', device_id);
-        // effectManager.currentDevice = currentDevice;
-        // Async function
-        // device.getActiveEffect();
-    }
 </script>
 <div class="accordion my-3" id="accordionDevices">
     <div class="card p-0">
@@ -30,7 +23,7 @@
                 <ul class="nav nav-pills shadow-none " id="deviceTabID" role="tablist">
                     {% for device in devices %}
                         <li class="nav-item device_item">
-                            <a href="#pills-{{ loop.index }}" class="nav-link" data-device_id={{ device.id }} onclick="activateDevice('{{ device.id }}')" role="tab" data-toggle="pill" aria-controls="pills-{{ loop.index }}" aria-selected="false">
+                            <a href="#pills-{{ loop.index }}" class="nav-link" data-device_id={{ device.id }} role="tab" data-toggle="pill" aria-controls="pills-{{ loop.index }}" aria-selected="false">
                                 {{ device.name }}
                             </a>
                         </li>
