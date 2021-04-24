@@ -13,9 +13,11 @@
                     <span class="text-secondary" id="selected_device_label">
                         &ensp;|&ensp;Device: <span class="badge badge-secondary" id="selected_device_txt"></span>
                     </span>
-                    <span class="text-secondary {{'d-none' if segment != 'dashboard'}}">
+                    {% if segment == "dashboard" %}
+                    <span class="text-secondary">
                         &ensp;|&ensp;Effect: <span class="badge badge-secondary" id="selected_effect_txt"></span>
                     </span>
+                    {% endif %}
                 </h5>
                 <i class="fa fa-chevron-down text-secondary float-right d-none d-sm-block mt-1"></i>
             </div>
