@@ -1,11 +1,12 @@
 from flask import Blueprint, request, jsonify, send_file, flash
-from flask_login import login_required
 from libs.webserver.executer import Executer
+from flask_login import login_required
 
 import copy
 import json
 
 system_info_api = Blueprint('system_info_api', __name__)
+
 
 #################################################################
 
@@ -16,7 +17,7 @@ system_info_api = Blueprint('system_info_api', __name__)
 #
 # return
 # {
-#"data" = {
+# "data" = {
 #   "<system_info_key1>" = <system_info_value1>,
 #   "<system_info_key2>" = <system_info_value2>,
 #   "<system_info_key3>" = <system_info_value3>
@@ -35,6 +36,7 @@ def get_system_info_performance():  # pylint: disable=E0211
         else:
             return jsonify(data_out)
 
+
 #################################################################
 
 # /GetSystemInfoTemperature
@@ -44,7 +46,7 @@ def get_system_info_performance():  # pylint: disable=E0211
 #
 # return
 # {
-#"data" = {
+# "data" = {
 #   "<system_info_key1>" = <system_info_value1>,
 #   "<system_info_key2>" = <system_info_value2>,
 #   "<system_info_key3>" = <system_info_value3>
@@ -63,6 +65,7 @@ def get_system_info_temperature():  # pylint: disable=E0211
         else:
             return jsonify(data_out)
 
+
 #################################################################
 
 # /GetSystemInfoServices
@@ -72,7 +75,7 @@ def get_system_info_temperature():  # pylint: disable=E0211
 #
 # return
 # {
-#"data" = {
+# "data" = {
 #   "<system_info_key1>" = <system_info_value1>,
 #   "<system_info_key2>" = <system_info_value2>,
 #   "<system_info_key3>" = <system_info_value3>
