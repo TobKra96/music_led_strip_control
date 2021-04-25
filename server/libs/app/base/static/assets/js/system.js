@@ -1,15 +1,43 @@
 import Toast from "./classes/Toast.js";
 
 $(document).ready(function () {
+    // Do not collapse accordion when clicking on body
     $(".collapse").on('click', (e) => {
         e.stopPropagation();
     });
 
+    // Restore system status card positions on reload
+    const order = JSON.parse(localStorage.getItem('order'));
+    if (order) {
+        for (const key of Object.keys(order)) {
+            $.each(order[key], function (i, item) {
+                let $target = $(".connectedSortable").find('#' + item);
+                $target.appendTo($('#' + key));
+            });
+        }
+    }
+
     $(function () {
         $("#sortable-1, #sortable-2, #sortable-3").sortable({
             connectWith: ".connectedSortable",
+            containment: ".sortableParent",
             placeholder: "highlight",
-            distance: 30
+            forcePlaceholderSize: true,
+            delay: 100,
+            revert: 300,
+            cursor: "move",
+            tolerance: "pointer",
+            update: function (event, ui) {
+                const col1 = $("#sortable-1").sortable('toArray');
+                const col2 = $("#sortable-2").sortable('toArray');
+                const col3 = $("#sortable-3").sortable('toArray');
+                const order = {
+                    "sortable-1": col1,
+                    "sortable-2": col2,
+                    "sortable-3": col3,
+                };
+                localStorage.setItem('order', JSON.stringify(order));
+            }
         }).disableSelection();
     });
 
