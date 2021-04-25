@@ -1,5 +1,6 @@
 from libs.webserver.executer_base import ExecuterBase
 
+from icmplib import ping
 import subprocess
 import platform
 import psutil
@@ -112,17 +113,12 @@ class SystemInfoExecuter(ExecuterBase):
 
         return devices
 
-    def check_device_status(self, host):
+    def check_device_status(self, address):
         """
         Returns True if host (str) responds to a ping request.
         Remember that a host may not respond to a ping (ICMP) request even if the host name is valid.
         """
 
-        # Option for the number of packets as a function of
-        param_count = '-n' if platform.system().lower() == 'windows' else '-c'
-        param_timeout = '-w' if platform.system().lower() == 'windows' else '-i'
+        host = ping(address, count=1, interval=0.2)
 
-        # Building the command. Ex: "ping -c 1 google.com"
-        command = ['ping', param_count, '1', param_timeout, '0.2', host]
-
-        return subprocess.call(command) == 0
+        return host.is_alive
