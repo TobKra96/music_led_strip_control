@@ -7,3 +7,4 @@ Flask_Login==0.5.0
 Jinja2==2.11.3
 waitress==2.0.0
 rpi_ws281x==4.2.6
+icmplib==2.1.1
