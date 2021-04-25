@@ -83,7 +83,7 @@ input[type=number] {
 .highlight {
     padding: 0rem;
     margin-top: 0rem;
-    margin-bottom: 2rem;
+    margin-bottom: calc(2rem - 2px);
     background-color: #e2eaf2;
 }
 
