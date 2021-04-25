@@ -1,6 +1,9 @@
 import Toast from "./classes/Toast.js";
 
 $(document).ready(function () {
+    $(".collapse").on('click', (e) => {
+        e.stopPropagation();
+    });
 
     function getSystemInfoPerformance() {
         // Called every 10 seconds
@@ -33,7 +36,7 @@ $(document).ready(function () {
             $("#disk_total").text(bytesToGigabytes(diskTotal).toFixed(1) + " GB");
 
             const networkInterfaces = data["system"]["network_info"];
-            if ($("#network_interfaces").children().length - 1 < Object.keys(networkInterfaces).length) {
+            if ($("#network_interfaces").children().length < Object.keys(networkInterfaces).length) {
                 for (var i = 0, len = Object.keys(networkInterfaces).length; i < len; i++) {
                     const interfaceName = Object.keys(networkInterfaces)[i];
                     const interfaceAddress = networkInterfaces[interfaceName]["address"];
@@ -114,7 +117,7 @@ $(document).ready(function () {
 
     function getDevices2() {
         $.ajax("/GetDevices2").done((devices) => {
-            if ($("#devices").children().length - 1 < devices.length) {
+            if ($("#devices").children("div").length < devices.length) {
                 for (var i = 0, len = devices.length; i < len; i++) {
                     const deviceName = devices[i]["name"];
                     const deviceId = devices[i]["id"];
