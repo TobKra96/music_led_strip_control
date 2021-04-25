@@ -107,18 +107,13 @@ $(document).ready(function () {
     }
     getSystemInfoServices()
 
-    function getSystemInfoDeviceStatus() {
-        // Called every 10 seconds
-        $.ajax("/GetSystemInfoDeviceStatus").done((devices) => {
+    function getDevices2() {
+        $.ajax("/GetDevices2").done((devices) => {
             if ($("#devices").children().length - 1 < devices.length) {
                 for (var i = 0, len = devices.length; i < len; i++) {
                     const deviceName = devices[i]["name"];
-                    let status = "Offline";
-                    let statusColor = "bg-danger";
-                    if (devices[i]["connected"]) {
-                        status = "Online";
-                        statusColor = "theme-bg";
-                    }
+                    const deviceId = devices[i]["id"];
+                    let status = "Checking";
                     let border = "border-bottom";
                     if (i === len - 1) {
                         border = "";
@@ -130,7 +125,10 @@ $(document).ready(function () {
                                     <h3 class="m-0 f-w-300">${deviceName}</h3>
                                 </div>
                                 <div class="col-auto">
-                                    <label class="badge badge-pill mt-2 px-3 py-2 ${statusColor} text-white f-14 f-w-400 float-right">${status}</label>
+                                    <label id="${deviceId}" class="badge badge-pill mt-2 px-3 py-2 theme-bg2 text-white f-14 f-w-400 float-right">
+                                        <span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span>
+                                        <span>${status}</span>
+                                    </label>
                                 </div>
                             </div>
                         </div>
@@ -139,9 +137,44 @@ $(document).ready(function () {
                 }
             }
         });
-        setTimeout(getSystemInfoDeviceStatus, 10000);
     }
+    getDevices2();
+
+    function getSystemInfoDeviceStatus() {
+        // Called every 10 seconds
+        return new Promise((resolve, reject) => {
+            $.ajax({
+                url: "/GetSystemInfoDeviceStatus",
+                type: 'GET',
+                data: {},
+                contentType: 'application/json;charset=UTF-8',
+                success: function (data) {
+                  resolve(data);
+                },
+                error: function (error) {
+                  reject(error);
+                }
+            });
+            setTimeout(getSystemInfoDeviceStatus, 10000);
+        });
+    }
+
     getSystemInfoDeviceStatus()
+        .then((devices) => {
+            for (var i = 0, len = devices.length; i < len; i++) {
+                const deviceId = devices[i]["id"];
+                let status = "Offline";
+                let statusColor = "bg-danger";
+                if (devices[i]["connected"]) {
+                    status = "Online";
+                    statusColor = "theme-bg";
+                }
+                $("#" + deviceId).text(status).removeClass("theme-bg2").addClass(statusColor);
+            }
+        })
+        .catch((error) => {
+            console.log(error);
+        })
 
     function bytesToGigabytes(bytes) {
         return bytes / 1024 / 1024 / 1024;
