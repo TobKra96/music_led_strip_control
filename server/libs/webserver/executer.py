@@ -6,7 +6,6 @@ from libs.webserver.blueprints.effect_settings_executer import EffectSettingsExe
 from libs.webserver.blueprints.general_executer import GeneralExecuter
 from libs.webserver.blueprints.general_settings_executer import GeneralSettingsExecuter
 from libs.webserver.blueprints.system_info_executer import SystemInfoExecuter
-from libs.webserver.executer_base import ExecuterBase
 
 import logging
 

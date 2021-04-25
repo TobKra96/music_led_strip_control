@@ -3,7 +3,6 @@ from libs.webserver.executer import Executer
 from flask import Blueprint, request, jsonify
 from flask_login import login_required
 import copy
-import json
 
 device_settings_api = Blueprint('device_settings_api', __name__)
 

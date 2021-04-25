@@ -8,7 +8,6 @@ from logging.handlers import RotatingFileHandler
 from shutil import copyfile, copy
 from pathlib import Path
 import coloredlogs
-import fileinput
 import logging
 import json
 import sys

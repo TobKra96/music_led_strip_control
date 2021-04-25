@@ -2,8 +2,6 @@ from libs.webserver.executer import Executer
 
 from flask import Blueprint, request, jsonify
 from flask_login import login_required
-import copy
-import json
 
 general_api = Blueprint('general_api', __name__)
 

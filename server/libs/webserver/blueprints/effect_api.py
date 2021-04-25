@@ -3,7 +3,6 @@ from libs.webserver.executer import Executer
 from flask import Blueprint, request, jsonify
 from flask_login import login_required
 import copy
-import json
 
 effect_api = Blueprint('effect_api', __name__)
 

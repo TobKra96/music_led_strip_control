@@ -1,9 +1,7 @@
 from libs.webserver.executer import Executer
 
-from flask import render_template, request, jsonify, send_file, redirect, url_for, session, flash, Blueprint
-from flask_login import LoginManager, UserMixin, current_user, login_user, logout_user, login_required
-import copy
-import json
+from flask import render_template, request, jsonify, redirect, url_for, session, flash, Blueprint
+from flask_login import current_user, logout_user, login_required
 
 authentication_api = Blueprint('authentication_api', __name__)
 

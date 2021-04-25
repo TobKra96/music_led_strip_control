@@ -1,6 +1,5 @@
 from libs.config_converter.config_converter_base import ConfigConverterBase  # pylint: disable=E0611, E0401
 
-import fileinput
 import logging
 import json
 import os

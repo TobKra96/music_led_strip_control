@@ -1,9 +1,7 @@
 from libs.webserver.executer import Executer
 
-from flask import Blueprint, request, jsonify, send_file, flash
+from flask import Blueprint, request, jsonify
 from flask_login import login_required
-import copy
-import json
 
 system_info_api = Blueprint('system_info_api', __name__)
 

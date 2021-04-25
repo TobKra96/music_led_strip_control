@@ -5,7 +5,6 @@ from libs.effects_enum import EffectsEnum  # pylint: disable=E0611, E0401
 from libs.effect_item import EffectItem  # pylint: disable=E0611, E0401
 
 import logging
-import copy
 
 
 class ExecuterBase():
