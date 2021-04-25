@@ -5,6 +5,14 @@ $(document).ready(function () {
         e.stopPropagation();
     });
 
+    $(function () {
+        $("#sortable-1, #sortable-2, #sortable-3").sortable({
+            connectWith: ".connectedSortable",
+            placeholder: "highlight",
+            distance: 30
+        }).disableSelection();
+    });
+
     function getSystemInfoPerformance() {
         // Called every 10 seconds
         $.ajax("/GetSystemInfoPerformance").done((data) => {

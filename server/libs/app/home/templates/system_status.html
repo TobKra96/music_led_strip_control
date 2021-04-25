@@ -34,7 +34,7 @@
                     <!-- [ Main Content ] start -->
 
                     <div class="row mt-4">
-                        <div class="col-md-6 col-lg-4">
+                        <div id="sortable-1" class="col-md-6 col-lg-4 connectedSortable">
                             <!-- CPU Block -->
                             <div class="accordion" id="accordionCpu">
                                 <div class="card p-0" data-toggle="collapse" data-target="#collapseCpu" aria-expanded="true" aria-controls="collapseCpu" draggable="false">
@@ -100,7 +100,7 @@
                             </div>
                         </div>
 
-                        <div class="col-md-6 col-lg-4">
+                        <div id="sortable-2" class="col-md-6 col-lg-4 connectedSortable">
                             <!-- Memory Block -->
                             <div class="accordion" id="accordionMemory">
                                 <div class="card p-0" data-toggle="collapse" data-target="#collapseMemory" aria-expanded="true" aria-controls="collapseMemory" draggable="false">
@@ -209,7 +209,7 @@
                             </div>
                         </div>
 
-                        <div class="col-md-6 col-lg-4">
+                        <div id="sortable-3" class="col-md-6 col-lg-4 connectedSortable">
                             <!-- Network Block -->
                             <div class="accordion" id="accordionNetwork">
                                 <div class="card p-0" data-toggle="collapse" data-target="#collapseNetwork" aria-expanded="true" aria-controls="collapseNetwork" draggable="false">
@@ -235,5 +235,6 @@
 
 <!-- Specific Page JS goes HERE  -->
 {% block javascripts %}
+<script src = "/static/assets/plugins/jquery-ui/js/jquery-ui.js"></script>
 <script src="/static/assets/js/system.js" type="module"></script>
 {% endblock javascripts %}
