@@ -1,4 +1,3 @@
-from libs.webserver.webserver import Webserver
 from libs.webserver.executer import Executer
 
 from flask import Blueprint, request, jsonify, send_file, flash
@@ -99,7 +98,7 @@ def export_config():  # pylint: disable=E0211
 def import_config():  # pylint: disable=E0211
     Executer.instance.logger.debug("Import Config Request received.")
     if 'imported_config' not in request.files:
-        Webserver.instance.logger.error("Could not find the file key.")
+        Executer.instance.logger.error("Could not find the file key.")
         flash('No config file selected', 'error')
         return "Could not import file.", 404
     imported_config = request.files['imported_config']
