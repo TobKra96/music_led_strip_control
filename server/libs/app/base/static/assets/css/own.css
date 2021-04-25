@@ -79,6 +79,14 @@ input[type=number] {
     font-size: 26px;
 }
 
+/* Apply color to device name in system status */
+.device_link {
+    color: #111111;
+}
+.device_link:hover {
+    color: #3498db;
+}
+
 /* Apply color to effect buttons on hover */
 .dashboard_effect {
     user-select: none;
