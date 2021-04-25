@@ -1,5 +1,4 @@
 from libs.webserver.executer_base import ExecuterBase
-
 from libs.audio_info import AudioInfo  # pylint: disable=E0611, E0401
 
 

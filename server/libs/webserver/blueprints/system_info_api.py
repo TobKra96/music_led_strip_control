@@ -1,7 +1,7 @@
-from flask import Blueprint, request, jsonify, send_file, flash
 from libs.webserver.executer import Executer
-from flask_login import login_required
 
+from flask import Blueprint, request, jsonify, send_file, flash
+from flask_login import login_required
 import copy
 import json
 

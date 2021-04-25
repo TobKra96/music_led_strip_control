@@ -1,6 +1,8 @@
 from libs.audio_device import AudioDevice  # pylint: disable=E0611, E0401
 
 import logging
+
+
 class AudioInfo:
     def get_audio_devices(py_audio):
         logger = logging.getLogger(__name__)
@@ -29,7 +31,6 @@ class AudioInfo:
         logger.debug(f"Found {len(audio_devices)} audio devices.")
         return audio_devices
 
-
     def get_default_audio_device(py_audio):
         logger = logging.getLogger(__name__)
         default_device = AudioDevice(0, "Error", 44100)
@@ -41,7 +42,6 @@ class AudioInfo:
             logger.exception(f"Unexpected error in AudioInfo get_default_audio_device: {e}")
 
         return default_device
-
 
     def parse_raw_audio_device_to_audio_device(raw_audio_device):
         logger = logging.getLogger(__name__)

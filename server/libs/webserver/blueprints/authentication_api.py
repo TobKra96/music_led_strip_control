@@ -1,13 +1,12 @@
-from flask import Blueprint, request, jsonify
-from flask_login import login_required
 from libs.webserver.executer import Executer
-from flask import render_template, request, jsonify, send_file, redirect, url_for, session, flash
-from flask_login import LoginManager, UserMixin, current_user, login_user, logout_user, login_required
 
+from flask import render_template, request, jsonify, send_file, redirect, url_for, session, flash, Blueprint
+from flask_login import LoginManager, UserMixin, current_user, login_user, logout_user, login_required
 import copy
 import json
 
 authentication_api = Blueprint('authentication_api', __name__)
+
 
 @authentication_api.before_app_first_request
 def first():

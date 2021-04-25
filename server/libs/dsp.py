@@ -1,5 +1,4 @@
 from scipy.ndimage.filters import gaussian_filter1d
-
 from numpy import abs, arange, linspace, zeros
 from math import log
 import numpy as np

@@ -1,4 +1,3 @@
-
 from libs.webserver.blueprints.authentication_executer import AuthenticationExecuter
 from libs.webserver.blueprints.device_executer import DeviceExecuter
 from libs.webserver.blueprints.device_settings_executer import DeviceSettingsExecuter

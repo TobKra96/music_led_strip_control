@@ -1,6 +1,3 @@
-from libs.webserver.executer import Executer  # pylint: disable=E0611, E0401
-from libs.config_service import ConfigService  # pylint: disable=E0611, E0401
-
 from libs.webserver.blueprints.authentication_api import authentication_api
 from libs.webserver.blueprints.device_api import device_api
 from libs.webserver.blueprints.device_settings_api import device_settings_api
@@ -9,14 +6,14 @@ from libs.webserver.blueprints.effect_settings_api import effect_settings_api
 from libs.webserver.blueprints.general_api import general_api
 from libs.webserver.blueprints.general_settings_api import general_settings_api
 from libs.webserver.blueprints.system_info_api import system_info_api
+from libs.config_service import ConfigService  # pylint: disable=E0611, E0401
+from libs.webserver.executer import Executer  # pylint: disable=E0611, E0401
+from libs.app import create_app
 
 from flask_login import LoginManager, UserMixin, current_user, login_user, logout_user, login_required
 from flask import render_template, request, jsonify, send_file, redirect, url_for, session, flash
-
-from libs.app import create_app
 from waitress import serve
 from time import sleep
-
 import logging
 import copy
 import json

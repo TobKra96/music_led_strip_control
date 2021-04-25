@@ -1,7 +1,7 @@
 from libs.effects.effect import Effect  # pylint: disable=E0611, E0401
 
-from random import randint
 from scipy.ndimage.filters import gaussian_filter1d
+from random import randint
 import numpy as np
 
 
@@ -51,7 +51,6 @@ class EffectFireplace(Effect):
         firebase_area_minlength = effect_config["firebase_area_minlength"]
         if firebase_area_minlength > firebase_area_maxlength:
             firebase_area_minlength = firebase_area_maxlength
-
 
         sparks_flicker_speed = effect_config["sparks_flicker_speed"]
         sparks_fly_speed = effect_config["sparks_fly_speed"]
@@ -179,7 +178,6 @@ class EffectFireplace(Effect):
 
         if effect_config["mirror"]:
             output_array = self.mirror_array(output_array, led_mid, led_count)
-
 
         # Add the output array to the queue.
         self.queue_output_array_blocking(output_array)

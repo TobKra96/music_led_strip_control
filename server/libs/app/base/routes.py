@@ -2,9 +2,9 @@
 """
 Copyright (c) 2019 - present AppSeed.us
 """
+from libs.app.base import blueprint
 
 from flask import render_template
-from libs.app.base import blueprint
 
 
 # Errors
