@@ -3,40 +3,14 @@ import Toast from "./classes/Toast.js";
 
 let output_types = {};
 let devices = jinja_devices.map(d => { return new Device(d) });
+// select first device if previously "All Devcies" selected
+// could this be done better?
 let currentDevice = devices.find(d => d.id === localStorage.getItem("lastDevice") );
-
-function refreshDeviceConfig(output_types, currentDevice) {
-    if (!currentDevice) return;
-    // fetch Device Config data from Server and update the Form
-    const device_config_input = $(".device_setting_input").map(function () { return this.id }).toArray()
-        .map(id => currentDevice.getSetting(id));
-    const device_config_output = Object.keys(output_types).flatMap(output_type_key => {
-        return $("." + output_type_key).map(function () { return this.id }).toArray()
-            .map(key => currentDevice.getOutputSetting(key, output_type_key))
-    });
-    Promise.all(
-        device_config_input
-            .concat(device_config_output)
-    )
-        .then((response) => {
-            // response array contains ALL current device config objects
-            response.forEach(data => {
-                const setting_key = data["setting_key"];
-                const setting_value = data["setting_value"];
-                $("#" + setting_key).trigger('change');
-
-                if ($(`#${setting_key}`).attr('type') == 'checkbox') {
-                    $(`#${setting_key}`).prop('checked', setting_value);
-                } else {
-                    $(`#${setting_key}`).val(setting_value);
-                }
-                $(`#${setting_key}`).trigger('change');
-
-                // Set initial brightness slider value
-                $(`span[for='${setting_key}']`).text(setting_value)
-            })
-        });
-}
+currentDevice = currentDevice ? currentDevice : devices[devices.length-1];
+localStorage.setItem('lastDevice', currentDevice.id);
+$(`a[data-device_id=${currentDevice.id}`).addClass("active");
+$("#selected_device_txt").text(currentDevice.name);
+console.log("curr dev", currentDevice);
 
 // Init and load all settings
 $(document).ready(function () {
@@ -61,60 +35,27 @@ $(document).ready(function () {
             });
         }),
     ]).then(response => {
-        // all requests finished successfully
-        $.ajax("/GetDevices").done((data) => {
-            // parse data into device Objects
-            // Object.keys(data).forEach(device_key => {
-            //     devices.push(new Device({ id: device_key, name: data[device_key] }));
-            // });
+        currentDevice.refreshConfig(output_types);
 
-            // Restore last selected device on reload
-            // let lastDevice = devices.find(device => device.id === localStorage.getItem("lastDevice"));
-            // if (lastDevice instanceof Device) {
-            //     currentDevice = lastDevice;
-            // } else {
-            //     // Fallback to all_devices
-            //     currentDevice = devices.length > 0 ? devices[0] : undefined;
-            // }
-
-            // need current Device
-
-            refreshDeviceConfig(output_types, currentDevice)
-
-            // Build Device Tab
-            devices.forEach(device => {
-                // todo: do it server side
-                const link = device.getPill(currentDevice.id);
-                link.addEventListener('click', () => {
-                    currentDevice = device;
-                    localStorage.setItem('lastDevice', device.id);
-                    $("#selected_device_txt").text(device.name);
-                    refreshDeviceConfig(output_types, currentDevice)
-                });
-
-                const li = document.createElement("li");
-                li.className = "nav-item device_item";
-                li.appendChild(link)
-
-                document.getElementById("deviceTabID").appendChild(li);
+        // Add behavior to Device Tab
+        devices.forEach(device => {
+            device.link.addEventListener('click', () => {
+                currentDevice = device;
+                device.refreshConfig(output_types);
             });
+        });
 
-            $('#device_count').text(devices.length);
+        if (devices.length > 0) {
+            $("#deviceFound").removeClass('d-none');
+            $("#noDeviceFound").addClass('d-none');
+            $("#selected_device_label").removeClass('d-none');
+        } else {
+            $("#deviceFound").addClass('d-none');
+            $("#noDeviceFound").removeClass('d-none');
+            $("#selected_device_label").addClass('d-none');
+            return;
+        }
 
-            if (devices.length > 0) {
-                $("#deviceFound").removeClass('d-none');
-                $("#noDeviceFound").addClass('d-none');
-                $("#selected_device_label").removeClass('d-none');
-            } else {
-                $("#deviceFound").addClass('d-none');
-                $("#noDeviceFound").removeClass('d-none');
-                $("#selected_device_label").addClass('d-none');
-                return;
-            }
-
-            $("#selected_device_txt").text(currentDevice.name);
-
-        })
     }).catch((response) => {
         if (devices.length === 0) {
             return;
@@ -221,35 +162,38 @@ const createDevice = function () {
         console.log("New device created successfully. Response:\n\n" + JSON.stringify(data, null, '\t'));
         let newDeviceIndex = data["index"];
         // location.reload();
-        $.ajax("/GetDevices").done((data) => {
-            devices = [];
+        $.ajax("/GetDevices2").done((data) => {
+
+            console.warn(data);
+            const newDeviceId = data.find(d => d.id === `device_${newDeviceIndex}` );
+            localStorage.setItem('lastDevice', newDeviceId.id);
             // parse data into device Objects
-            Object.keys(data).forEach(device_key => {
-                devices.push(new Device(device_key, data[device_key]));
-            });
+            devices = data.map(d => { return new Device(d) });
 
             // Select newly created Device by its index
-            currentDevice = devices[newDeviceIndex]
-            refreshDeviceConfig(output_types, currentDevice);
+            currentDevice = devices.find(d => d.id === `device_${newDeviceIndex}` );
+            localStorage.setItem('lastDevice', currentDevice.id);
+
+            // $(`a[data-device_id=${currentDevice.id}`).addClass("active");
+            currentDevice.refreshConfig(output_types);
 
             // Remove every pill in the navigation and recreate
             const tabs = document.getElementById("deviceTabID");
             tabs.innerHTML = "";
 
             // Build Device Tab
-            devices.forEach((device, index) => {
-                // todo: do it server side
-                const link = device.getPill(currentDevice.id, index);
-                link.addEventListener('click', () => {
+            devices.forEach(device => {
+                device.getPill(currentDevice.id);
+
+                device.link.addEventListener('click', () => {
                     currentDevice = device;
-                    localStorage.setItem('lastDevice', device.id);
-                    $("#selected_device_txt").text(device.name);
-                    refreshDeviceConfig(output_types, currentDevice);
+                    $("#selected_device_txt").text(currentDevice.name);
+                    device.refreshConfig(output_types);
                 });
 
                 const li = document.createElement("li");
                 li.className = "nav-item device_item";
-                li.appendChild(link);
+                li.appendChild(device.link);
                 tabs.appendChild(li);
             });
 
@@ -289,6 +233,7 @@ $("#delete_btn_modal").on("click", function () {
         data: JSON.stringify({ "device": currentDevice.id }, null, '\t'),
         contentType: 'application/json;charset=UTF-8'
     }).done(data => {
+        localStorage.removeItem('lastDevice');
         console.log("Device deleted successfully. Response:\n\n" + JSON.stringify(data, null, '\t'));
         // Todo: Delete device without reloading
         // Todo: Add toast on success

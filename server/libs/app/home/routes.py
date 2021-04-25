@@ -9,11 +9,11 @@ from jinja2 import TemplateNotFound
 from libs.app.home import blueprint
 from libs.webserver.executer import Executer
 
-devices = Executer.instance.device_executer.get_devices2()
 
 @blueprint.route('/')
 @login_required
 def index():
+    devices = Executer.instance.device_executer.get_devices2()
     # active_effect = Executer.instance.effect_executer.get_active_effect(data_in["device"])
     return render_template('dashboard.html', segment='dashboard', devices=devices)
 
@@ -21,6 +21,8 @@ def index():
 @blueprint.route('/<page>/<template>', methods=['GET', 'POST'])
 @login_required
 def route_pages(page, template):
+    devices = Executer.instance.device_executer.get_devices2()
+
     try:
         if not template.endswith('.html'):
             template += '.html'
@@ -35,6 +37,8 @@ def route_pages(page, template):
 @blueprint.route('/<template>')
 @login_required
 def route_template(template):
+    devices = Executer.instance.device_executer.get_devices2()
+
     try:
         if not template.endswith('.html'):
             template += '.html'
