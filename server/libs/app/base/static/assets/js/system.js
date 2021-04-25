@@ -1,3 +1,5 @@
+import Toast from "./classes/Toast.js";
+
 $(document).ready(function () {
 
     function getSystemInfoPerformance() {
@@ -56,6 +58,8 @@ $(document).ready(function () {
                     $("#network_interfaces").append(interfaceCard);
                 }
             }
+        }).catch((error) => {
+            new Toast("Unable to reach the server.").error();
         });
         setTimeout(getSystemInfoPerformance, 10000);
     }
@@ -150,10 +154,10 @@ $(document).ready(function () {
                 data: {},
                 contentType: 'application/json;charset=UTF-8',
                 success: function (data) {
-                  resolve(data);
+                    resolve(data);
                 },
                 error: function (error) {
-                  reject(error);
+                    reject(error);
                 }
             });
             setTimeout(getSystemInfoDeviceStatus, 10000);
