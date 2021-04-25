@@ -64,9 +64,10 @@ $(document).ready(function () {
     function getSystemInfoTemperature() {
         // Called every 20 seconds
         $.ajax("/GetSystemInfoTemperature").done((data) => {
-            const cpuTemp = data["system"]["raspi"]["celsius"];
-            $("#cpu_temperature").text(cpuTemp + "°C");
-            $("#cpu_temperature_progress").css("width", cpuTemp + "%");
+            const cpuTempC = data["system"]["raspi"]["celsius"];
+            const cpuTempF = data["system"]["raspi"]["fahrenheit"];
+            $("#cpu_temperature").html(cpuTempC + "°C&nbsp;&nbsp;/&nbsp;&nbsp;" + cpuTempF + "°F");
+            $("#cpu_temperature_progress").css("width", cpuTempC + "%");
         });
         setTimeout(getSystemInfoTemperature, 20000);
     }
