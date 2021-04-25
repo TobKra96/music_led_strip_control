@@ -77,6 +77,16 @@ $(document).ready(function () {
                 currentDevice = devices.length > 0 ? devices[0] : undefined;
             }
 
+            // Get device id from url parameters
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('id')) {
+                let passedId = urlParams.get('id');
+                let selectedDeviceFromUrl = devices.find(device => device.id === passedId);
+                if (selectedDeviceFromUrl !== undefined) {
+                    currentDevice = selectedDeviceFromUrl;
+                }
+            }
+
             refreshDeviceConfig(output_types, currentDevice)
 
             // Build Device Tab

@@ -127,7 +127,7 @@ $(document).ready(function () {
                         <div class="card-block ${border} py-4">
                             <div class="row align-items-center justify-content-center">
                                 <div class="col">
-                                    <h3 class="m-0 f-w-300">${deviceName}</h3>
+                                    <h3 class="m-0 f-w-300"><a href="/settings/device_settings?id=${deviceId}" class="device_link">${deviceName}<a></h3>
                                 </div>
                                 <div class="col-auto">
                                     <label id="${deviceId}" class="badge badge-pill mt-2 px-3 py-2 theme-bg2 text-white f-14 f-w-400 float-right">
