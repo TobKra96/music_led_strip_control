@@ -34,6 +34,7 @@ def get_devices():  # pylint: disable=E0211
         else:
             return jsonify(data_out)
 
+
 # /GetDevices2
 # in
 # {
