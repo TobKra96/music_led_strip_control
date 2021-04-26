@@ -5,7 +5,7 @@ let currentDevice = undefined;
 let effectIdentifier = "";
 
 // Init and load all settings
-$(document).ready(function () {
+$(function() {
 
     // Allow to scroll sidebar when page is reloaded and mouse is already on top of sidebar
     $(".navbar-content").trigger("mouseover");
@@ -38,7 +38,6 @@ $(document).ready(function () {
                 SetLocalSettings();
             });
         });
-
 
         Promise.all([
 
