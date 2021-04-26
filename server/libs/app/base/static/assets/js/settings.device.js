@@ -10,7 +10,6 @@ currentDevice = currentDevice ? currentDevice : devices[devices.length-1];
 localStorage.setItem('lastDevice', currentDevice.id);
 $(`a[data-device_id=${currentDevice.id}`).addClass("active");
 $("#selected_device_txt").text(currentDevice.name);
-console.log("curr dev", currentDevice);
 
 // Init and load all settings
 $(document).ready(function () {
@@ -163,8 +162,6 @@ const createDevice = function () {
         let newDeviceIndex = data["index"];
         // location.reload();
         $.ajax("/GetDevices2").done((data) => {
-
-            console.warn(data);
             const newDeviceId = data.find(d => d.id === `device_${newDeviceIndex}` );
             localStorage.setItem('lastDevice', newDeviceId.id);
             // parse data into device Objects

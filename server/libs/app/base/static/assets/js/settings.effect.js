@@ -1,23 +1,11 @@
-var settingsIdentifier;
-var effectIdentifier;
-var localSettings = {};
-var currentDevice;
-var colors = {};
-var gradients = {};
-var devices = {};
+import Device from "./classes/Device.js";
+import Toast from "./classes/Toast.js";
 
-var devicesLoading = true;
-var coloresLoading = true;
-var gradientsLoading = true;
-
-var initialized = false;
+let currentDevice = undefined;
+let effectIdentifier = "";
 
 // Init and load all settings
 $(document).ready(function () {
-    if (initialized) {
-        return;
-    }
-    initialized = true;
 
     // Allow to scroll sidebar when page is reloaded and mouse is already on top of sidebar
     $(".navbar-content").trigger("mouseover");
@@ -25,224 +13,108 @@ $(document).ready(function () {
     // Open "Edit Effects" sidebar dropdown when on an effect page
     $("#effect_list").slideDown();
 
-    settingsIdentifier = $("#settingsIdentifier").val();
     effectIdentifier = $("#effectIdentifier").val();
 
-    // Only allow all_devices for sync fade effect
-    if (effectIdentifier == "effect_sync_fade") {
-        currentDevice = "all_devices"
-        BuildDeviceTab();
-        UpdateCurrentDeviceText();
-
-        AddEventListeners();
-
-        devicesLoading = false;
+    if (!jinja_devices.length) {
+        new Toast('No device found. Create a new device in "Device Settings".').info()
     } else {
-        GetDevices();
+        // Start with Fake Device & create Devices from Jinja output
+        const fake_device = [new Device({id:"all_devices", name:"All Devices" })];
+
+        // Only allow all_devices for sync fade effect
+        if (effectIdentifier == "effect_sync_fade") {
+            localStorage.setItem('lastDevice', fake_device[0].id);
+            fake_device[0]._activate();
+            $(`a[data-device_id=${fake_device[0].id}`).addClass("active");
+            currentDevice = fake_device[0];
+        }
+
+        const devices = fake_device.concat(jinja_devices.map(d => { return new Device(d) }));
+        currentDevice = devices.find(d => d.isCurrent);
+
+        devices.forEach(device => {
+            device.link.addEventListener('click', () => {
+                currentDevice = device;
+                SetLocalSettings();
+            });
+        });
+
+
+        Promise.all([
+
+            $.ajax("/GetColors").done((response) => {
+                $('.colors').each(function () {
+                    for (var currentKey in response) {
+                        var newOption = new Option(currentKey, currentKey);
+                        // jquerify the DOM object 'o' so we can use the html method
+                        $(newOption).html(currentKey);
+                        $(this).append(newOption);
+                    }
+                });
+            }),
+
+            $.ajax("/GetGradients").done((response) => {
+                $('.gradients').each(function () {
+                    for (var currentKey in response) {
+                        var newOption = new Option(currentKey, currentKey);
+                        /// jquerify the DOM object 'o' so we can use the html method
+                        $(newOption).html(currentKey);
+                        $(this).append(newOption);
+                    }
+                });
+            })
+
+        ]).then(response => {
+            SetLocalSettings();
+        }).catch((response) => {
+            // all requests finished but one or more failed
+            new Toast(JSON.stringify(response, null, '\t')).error();
+        });
     }
 
-    GetColors();
-    GetGradients();
 });
-
-// Check if all initial ajax requests are finished
-function CheckIfFinishedInitialLoading() {
-    if (!devicesLoading && !coloresLoading && !gradientsLoading) {
-        GetLocalSettings();
-    }
-}
-
-function GetDevices() {
-    $.ajax({
-        url: "/GetDevices",
-        type: "GET",
-        success: function (response) {
-            ParseDevices(response);
-        },
-        error: function (xhr) {
-            // Handle error
-        }
-    });
-}
-
-function ParseDevices(devices) {
-    currentDevice = "all_devices"
-    this.devices = devices;
-
-    BuildDeviceTab();
-    UpdateCurrentDeviceText();
-
-    AddEventListeners();
-
-    devicesLoading = false;
-    CheckIfFinishedInitialLoading();
-
-    // Restore last selected device on reload
-    let lastDeviceId = localStorage.getItem("lastDevice");
-    if (lastDeviceId in this.devices) {
-        $("#accordionDevices").addClass('d-none');
-        $("#collapseMenu").addClass('show');
-        $("#" + lastDeviceId)[0].click();
-        $("#accordionDevices").removeClass('d-none');
-    }
-}
-
-function GetColors() {
-    $.ajax({
-        url: "/GetColors",
-        type: "GET",
-        data: {},
-        success: function (response) {
-            ParseGetColors(response);
-        },
-        error: function (xhr) {
-            // Handle error
-        }
-    });
-}
-
-function ParseGetColors(response) {
-    var context = this;
-    this.colors = response;
-
-    $('.colors').each(function () {
-        var colors = context.colors;
-        for (var currentKey in colors) {
-            var newOption = new Option(currentKey, currentKey);
-            /// jquerify the DOM object 'o' so we can use the html method
-            $(newOption).html(currentKey);
-            $(this).append(newOption);
-        }
-    });
-
-    coloresLoading = false;
-    CheckIfFinishedInitialLoading();
-}
-
-function GetGradients() {
-    $.ajax({
-        url: "/GetGradients",
-        type: "GET",
-        data: {},
-        success: function (response) {
-            ParseGetGradients(response);
-        },
-        error: function (xhr) {
-            // Handle error
-        }
-    });
-}
-
-function ParseGetGradients(response) {
-    var context = this;
-    this.gradients = response;
-
-    $('.gradients').each(function () {
-        var gradients = context.gradients;
-        for (var currentKey in gradients) {
-            var newOption = new Option(currentKey, currentKey);
-            /// jquerify the DOM object 'o' so we can use the html method
-            $(newOption).html(currentKey);
-            $(this).append(newOption);
-        }
-    });
-
-    gradientsLoading = false;
-    CheckIfFinishedInitialLoading();
-}
-
-function GetEffectSetting(device, effect, setting_key) {
-    $.ajax({
-        url: "/GetEffectSetting",
-        type: "GET",
-        data: {
-            "device": device,
-            "effect": effect,
-            "setting_key": setting_key,
-        },
-        success: function (response) {
-            ParseGetEffectSetting(response);
-        },
-        error: function (xhr) {
-            // Handle error
-        }
-    });
-}
-
-function ParseGetEffectSetting(response) {
-    var setting_key = response["setting_key"];
-    var setting_value = response["setting_value"];
-    localSettings[setting_key] = setting_value;
-
-    SetLocalInput(setting_key, setting_value);
-
-    // Set initial effect slider values
-    $("span[for='" + setting_key + "']").text(setting_value);
-}
-
-function GetLocalSettings() {
-    var all_setting_keys = GetAllSettingKeys();
-
-    Object.keys(all_setting_keys).forEach(setting_id => {
-        GetEffectSetting(currentDevice, effectIdentifier, all_setting_keys[setting_id]);
-    })
-
-}
-
-function SetLocalInput(setting_key, setting_value) {
-    if ($("#" + setting_key).attr('type') == 'checkbox') {
-        $("#" + setting_key).prop('checked', setting_value);
-    } else if ($("#" + setting_key).hasClass('color_input')) {
-        // Set RGB color and value from config
-        formattedRGB = formatRGB(setting_value);
-        $(".color_input").val(formattedRGB);
-        pickr.setColor(formattedRGB);
-    } else {
-        $("#" + setting_key).val(setting_value);
-    }
-
-    $("#" + setting_key).trigger('change');
-}
-
 
 
 function GetAllSettingKeys() {
-    var all_setting_keys = $(".setting_input").map(function () {
-        return this.attributes["id"].value;
-    }).get();
-
-    return all_setting_keys;
-}
-
-
-function SetEffectSetting(device, effect, settings) {
-    var data = {};
-    data["device"] = this.currentDevice;
-    data["effect"] = effect;
-    data["settings"] = settings;
-
-    $.ajax({
-        url: "/SetEffectSetting",
-        type: "POST",
-        data: JSON.stringify(data, null, '\t'),
-        contentType: 'application/json;charset=UTF-8',
-        success: function (response) {
-            console.log("Effect settings set successfully. Response:\n\n" + JSON.stringify(response, null, '\t'));
-        },
-        error: function (xhr) {
-            console.log("Error while setting effect settings. Error: " + xhr.responseText);
-        }
-    });
-
+    return $(".setting_input").map(function () { return this.id })
+        .toArray();
 }
 
 function SetLocalSettings() {
-    var all_setting_keys = GetAllSettingKeys();
-    settings = {};
+    const all_setting_keys = GetAllSettingKeys();
 
-    Object.keys(all_setting_keys).forEach(setting_id => {
-        var setting_key = all_setting_keys[setting_id];
-        var setting_value = "";
+    all_setting_keys.map((setting) => {
+        currentDevice.getEffectSetting(effectIdentifier, setting).then((response) => {
+            const setting_key = response["setting_key"];
+            const setting_value = response["setting_value"];
+        
+            if ($("#" + setting_key).attr('type') == 'checkbox') {
+                $("#" + setting_key).prop('checked', setting_value);
+            } else if ($("#" + setting_key).hasClass('color_input')) {
+                // Set RGB color and value from config
+                const formattedRGB = formatRGB(setting_value);
+                $(".color_input").val(formattedRGB);
+                pickr.setColor(formattedRGB);
+            } else {
+                $("#" + setting_key).val(setting_value);
+            }
+        
+            $("#" + setting_key).trigger('change');
+        
+            // Set initial effect slider values
+            $("span[for='" + setting_key + "']").text(setting_value);
+        });
+    });
+}
+
+/* Device Handling */
+
+$("#save_btn").on("click", function () {
+    const settings = {};
+    const all_setting_keys = GetAllSettingKeys();
+
+    all_setting_keys.map((setting_key) => {
+        let setting_value = "";
 
         if ($("#" + setting_key).length) {
             if ($("#" + setting_key).attr('type') == 'checkbox') {
@@ -253,8 +125,7 @@ function SetLocalSettings() {
                 setting_value = parseFloat($("#" + setting_key).val());
             } else if ($("#" + setting_key).hasClass('color_input')) {
                 // Save RGB value to config
-                rgb = $(".color_input").val();
-                setting_value = parseRGB(rgb);
+                setting_value = parseRGB($(".color_input").val());
             } else {
                 setting_value = $("#" + setting_key).val();
             }
@@ -263,57 +134,26 @@ function SetLocalSettings() {
         settings[setting_key] = setting_value;
     })
 
-    SetEffectSetting(currentDevice, effectIdentifier, settings);
-}
+    const data = {
+        "device": currentDevice.id,
+        "effect": effectIdentifier,
+        "settings": settings
+    };
 
-
-/* Device Handling */
-
-function BuildDeviceTab() {
-    var devices = this.devices;
-
-    $('#deviceTabID').append("<li class='nav-item device_item'><a class='nav-link active' id='all_devices' data-toggle='pill' href='#pills-0' role='tab' aria-controls='pills-0' aria-selected='true'>All Devices</a></li>");
-
-    Object.keys(devices).forEach(device_key => {
-        $('#deviceTabID').append("<li class='nav-item device_item'><a class='nav-link' id=\"" + device_key + "\" data-toggle='pill' href='#pills-0' role='tab' aria-controls='pills-0' aria-selected='false'>" + devices[device_key] + "</a></li>");
+    $.ajax({
+        url: "/SetEffectSetting",
+        type: "POST",
+        data: JSON.stringify(data, null, '\t'),
+        contentType: 'application/json;charset=UTF-8'
+    })
+    .done(response => {
+        // todo toasts
+        console.log("Effect settings set successfully. Response:\n\n" + JSON.stringify(response, null, '\t'));
+    })
+    .fail(response => {
+        // todo toasts
+        console.log("Error while setting effect settings. Error: " + response.responseText);
     });
-
-    $('#device_count').text(Object.keys(devices).length);
-
-}
-
-function AddEventListeners() {
-    var elements = document.getElementsByClassName("device_item");
-
-    for (var i = 0; i < elements.length; i++) {
-        elements[i].addEventListener('click', function (e) {
-            SwitchDevice(e);
-        });
-    }
-}
-
-function UpdateCurrentDeviceText() {
-    var text = "";
-
-    if (this.currentDevice == "all_devices") {
-        text = "All Devices";
-    } else {
-        text = this.devices[this.currentDevice];
-    }
-
-    $("#selected_device_txt").text(text);
-}
-
-function SwitchDevice(e) {
-    this.currentDevice = e.target.id;
-    // Save selected device to localStorage
-    localStorage.setItem('lastDevice', this.currentDevice);
-    GetLocalSettings();
-    UpdateCurrentDeviceText();
-}
-
-$("#save_btn").on("click", function () {
-    SetLocalSettings();
 });
 
 // Set effect slider values
@@ -322,8 +162,8 @@ $('input[type=range]').on('input', function () {
 });
 
 // Create color picker instance
-let parent = document.querySelector('#color_picker');
-let input = document.querySelector('.color_input');
+const parent = document.querySelector('#color_picker');
+const input = document.querySelector('.color_input');
 
 if (parent && input) {
     var pickr = Pickr.create({
@@ -356,18 +196,18 @@ if (parent && input) {
             hue: true
         }
     }).on('init', pickr => {
-        let newColor = pickr.getSelectedColor().toRGBA().toString(0).replace(', 1)', ')').replace('rgba', 'rgb');
+        const newColor = pickr.getSelectedColor().toRGBA().toString(0).replace(', 1)', ')').replace('rgba', 'rgb');
         parent.style.background = newColor;
         input.value = newColor;
     }).on('change', color => {
-        let newColor = color.toRGBA().toString(0).replace(', 1)', ')').replace('rgba', 'rgb');
+        const newColor = color.toRGBA().toString(0).replace(', 1)', ')').replace('rgba', 'rgb');
         parent.style.background = newColor;
         input.value = newColor;
     })
 
     // Parse and validate RGB value when typing
     input.addEventListener('input', () => {
-        let formattedRGB = formatRGB(validateRGB(parseRGB(input.value)));
+        const formattedRGB = formatRGB(validateRGB(parseRGB(input.value)));
         parent.style.background = formattedRGB;
         pickr.setColor(formattedRGB);
     });

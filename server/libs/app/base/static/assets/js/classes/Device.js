@@ -9,25 +9,32 @@ export default class Device {
         // this._name = name;
         this._activeEffect = "";
         this.link = $(`a[data-device_id=${this.id}`)[0];
+        this._isCurrent = this.id === localStorage.getItem("lastDevice");
 
         // Select last selected device if there is any
         this.id === localStorage.getItem("lastDevice") && (
-            effectManager.currentDevice = this,
+            this._activate(),
+            $(`a[data-device_id=${this.id}`).addClass("active"),
             // Async function
-            this.getActiveEffect(),
-            $(`a[data-device_id=${this.id}`).addClass("active")
+            this.getActiveEffect()
             );
             
-        // Add behavior to Pills
+        // Add basic behavior to Pills
         const self = this;
         $(`a[data-device_id=${this.id}`).on("click", function() {
-            console.log("requesting effect");
             self.link = this;
-            localStorage.setItem('lastDevice', self.id);
-            effectManager.currentDevice = self;
-            // Async function
-            self.getActiveEffect();
+            self._activate();
         });
+    }
+
+    _activate() {
+        $("#selected_device_txt").text(this.name);
+        localStorage.setItem('lastDevice', this.id);
+        effectManager.currentDevice = this;
+    }
+
+    get isCurrent() {
+        return this._isCurrent;
     }
 
     set name(name) {
@@ -73,7 +80,18 @@ export default class Device {
             url: "/GetOutputTypeDeviceSetting",
             data: {
                 "device": this.id,
+                "setting_key": key,
                 "output_type_key": type,
+            }
+        });
+    }
+
+    getEffectSetting(effectIdentifier, key) {
+        return $.ajax({
+            url: "/GetEffectSetting",
+            data: {
+                "device": this.id,
+                "effect": effectIdentifier,
                 "setting_key": key,
             }
         });
@@ -93,7 +111,6 @@ export default class Device {
 
     setActiveEffect(newActiveEffect) {
         this._activeEffect = newActiveEffect;
-        $("#selected_device_txt").text(this.name);
 
         $(".dashboard_effect_active").removeClass("dashboard_effect_active");
         $("#" + this._activeEffect).addClass("dashboard_effect_active");
