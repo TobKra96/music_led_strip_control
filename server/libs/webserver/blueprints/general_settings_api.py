@@ -10,7 +10,8 @@ general_settings_api = Blueprint('general_settings_api', __name__)
 
 #################################################################
 
-# /GetGeneralSetting
+# /api/settings/general
+# GET
 # in
 # {
 # "setting_key" = <setting_key>
@@ -21,60 +22,44 @@ general_settings_api = Blueprint('general_settings_api', __name__)
 # "setting_key" = <setting_key>
 # "setting_value" = <setting_value>
 # }
-@general_settings_api.route('/GetGeneralSetting', methods=['GET'])
-@login_required
-def get_general_setting():  # pylint: disable=E0211
-    if request.method == 'GET':
-        data_in = request.args.to_dict()
-        data_out = copy.deepcopy(data_in)
-
-        if not Executer.instance.general_settings_executer.validate_data_in(data_in, ("setting_key",)):
-            return "Input data are wrong.", 403
-
-        setting_value = Executer.instance.general_settings_executer.get_general_setting(data_in["setting_key"])
-        data_out["setting_value"] = setting_value
-
-        if setting_value is None:
-            return "Could not find settings value: ", 403
-        else:
-            return jsonify(data_out)
-
-
-# /GetGeneralSettings
-# in
-# {
-# }
 #
-# return
-# {
-# "settings" = {
-#   "<settings_key>" = <setting_value>
-# }
-@general_settings_api.route('/GetGeneralSettings', methods=['GET'])
-@login_required
-def get_general_settings():  # pylint: disable=E0211
-    if request.method == 'GET':
-        data_out = dict()
-
-        settings = Executer.instance.general_settings_executer.get_general_settings()
-        data_out["setting_value"] = settings
-
-        if settings is None:
-            return "Could not find settings value: ", 403
-        else:
-            return jsonify(data_out)
-
-
-# /SetGeneralSetting
+# POST
 # {
 # "settings" = {
 #   "<settings_key>" = <setting_value>
 # }
 #
-@general_settings_api.route('/SetGeneralSetting', methods=['POST'])
+@general_settings_api.route('/api/settings/general', methods=['GET', 'POST'])
 @login_required
-def set_general_setting():  # pylint: disable=E0211
-    if request.method == 'POST':
+def general_settings():  # pylint: disable=E0211
+    if request.method == 'GET':
+        if len(request.args) > 0:
+            # Todo: Enforce setting_key as the only allowed query parameter.
+            data_in = request.args.to_dict()
+            data_out = copy.deepcopy(data_in)
+
+            if not Executer.instance.general_settings_executer.validate_data_in(data_in, ("setting_key",)):
+                return "Input data are wrong.", 403
+
+            setting_value = Executer.instance.general_settings_executer.get_general_setting(data_in["setting_key"])
+            data_out["setting_value"] = setting_value
+
+            if setting_value is None:
+                return "Could not find settings value: ", 403
+            else:
+                return jsonify(data_out)
+        else:
+            # If no queries passed, return all settings.
+            data_out = dict()
+
+            settings = Executer.instance.general_settings_executer.get_general_settings()
+            data_out["setting_value"] = settings
+
+            if settings is None:
+                return "Could not find settings value: ", 403
+            else:
+                return jsonify(data_out)
+    elif request.method == 'POST':
         data_in = request.get_json()
         data_out = copy.deepcopy(data_in)
 
@@ -86,14 +71,14 @@ def set_general_setting():  # pylint: disable=E0211
         return jsonify(data_out)
 
 
-@general_settings_api.route('/export_config')
+@general_settings_api.route('/api/settings/export')
 @login_required
 def export_config():  # pylint: disable=E0211
     Executer.instance.logger.debug(f"Send file: {Executer.instance.general_settings_executer.export_config_path}")
     return send_file(Executer.instance.general_settings_executer.export_config_path, as_attachment=True, cache_timeout=-1, mimetype="text/html")
 
 
-@general_settings_api.route('/import_config', methods=['POST'])
+@general_settings_api.route('/api/settings/import', methods=['POST'])
 @login_required
 def import_config():  # pylint: disable=E0211
     Executer.instance.logger.debug("Import Config Request received.")
@@ -120,10 +105,10 @@ def import_config():  # pylint: disable=E0211
         return "No config file selected.", 400
 
 
-# /ResetSettings
+# /api/settings/general/reset
 # {
 # }
-@general_settings_api.route('/ResetSettings', methods=['POST'])
+@general_settings_api.route('/api/settings/general/reset', methods=['POST'])
 @login_required
 def reset_settings():  # pylint: disable=E0211
     if request.method == 'POST':
