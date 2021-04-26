@@ -41,9 +41,9 @@ $(document).ready(function () {
         }).disableSelection();
     });
 
-    function getSystemInfoPerformance() {
+    function getPerformance() {
         // Called every 10 seconds
-        $.ajax("/GetSystemInfoPerformance").done((data) => {
+        $.ajax("/api/system/performance").done((data) => {
             const cpuUsage = data["system"]["cpu_info"]["percent"];
             $("#cpu_usage_percent").text(cpuUsage + "%");
             $("#cpu_usage_progress").css("width", cpuUsage + "%");
@@ -112,25 +112,25 @@ $(document).ready(function () {
         }).catch((error) => {
             new Toast("Unable to reach the server.").error();
         });
-        setTimeout(getSystemInfoPerformance, 10000);
+        setTimeout(getPerformance, 10000);
     }
-    getSystemInfoPerformance();
+    getPerformance();
 
-    function getSystemInfoTemperature() {
+    function getTemperature() {
         // Called every 20 seconds
-        $.ajax("/GetSystemInfoTemperature").done((data) => {
+        $.ajax("/api/system/temperature").done((data) => {
             const cpuTempC = data["system"]["raspi"]["celsius"];
             const cpuTempF = data["system"]["raspi"]["fahrenheit"];
             $("#cpu_temperature").html(cpuTempC + "°C&nbsp;&nbsp;/&nbsp;&nbsp;" + cpuTempF + "°F");
             $("#cpu_temperature_progress").css("width", cpuTempC + "%");
         });
-        setTimeout(getSystemInfoTemperature, 20000);
+        setTimeout(getTemperature, 20000);
     }
-    getSystemInfoTemperature()
+    getTemperature()
 
     function getServices() {
         // Preload services
-        $.ajax("/GetServices").done((data) => {
+        $.ajax("/api/system/services").done((data) => {
             const services = data["services"];
             for (var i = 0, len = services.length; i < len; i++) {
                 const serviceName = services[i];
@@ -161,11 +161,11 @@ $(document).ready(function () {
     }
     getServices();
 
-    function getSystemInfoServices() {
+    function getServicesStatus() {
         // Called once on page load
         return new Promise((resolve, reject) => {
             $.ajax({
-                url: "/GetSystemInfoServices",
+                url: "/api/system/services/status",
                 type: 'GET',
                 data: {},
                 contentType: 'application/json;charset=UTF-8',
@@ -179,7 +179,7 @@ $(document).ready(function () {
         });
     }
 
-    getSystemInfoServices()
+    getServicesStatus()
         // Update service status
         .then((data) => {
             const services = data["services"];
@@ -233,11 +233,11 @@ $(document).ready(function () {
     }
     getDevices2();
 
-    function getSystemInfoDeviceStatus() {
+    function getDevicesStatus() {
         // Called every 10 seconds
         return new Promise((resolve, reject) => {
             $.ajax({
-                url: "/GetSystemInfoDeviceStatus",
+                url: "/api/system/devices/status",
                 type: 'GET',
                 data: {},
                 contentType: 'application/json;charset=UTF-8',
@@ -248,11 +248,11 @@ $(document).ready(function () {
                     reject(error);
                 }
             });
-            setTimeout(getSystemInfoDeviceStatus, 10000);
+            setTimeout(getDevicesStatus, 10000);
         });
     }
 
-    getSystemInfoDeviceStatus()
+    getDevicesStatus()
         // Update device status
         .then((data) => {
             const devices = data["devices"];

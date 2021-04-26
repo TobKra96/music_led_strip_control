@@ -8,7 +8,7 @@ system_info_api = Blueprint('system_info_api', __name__)
 
 #################################################################
 
-# /GetSystemInfoPerformance
+# /api/system/performance
 # return
 # {
 #   "system": {
@@ -41,7 +41,7 @@ system_info_api = Blueprint('system_info_api', __name__)
 #     ]
 #   }
 # }
-@system_info_api.route('/GetSystemInfoPerformance', methods=['GET'])
+@system_info_api.route('/api/system/performance', methods=['GET'])
 @login_required
 def get_system_info_performance():  # pylint: disable=E0211
     if request.method == 'GET':
@@ -58,7 +58,7 @@ def get_system_info_performance():  # pylint: disable=E0211
 
 #################################################################
 
-# /GetSystemInfoTemperature
+# /api/system/temperature
 # return
 # {
 #   "system": {
@@ -68,7 +68,7 @@ def get_system_info_performance():  # pylint: disable=E0211
 #     }
 #   }
 # }
-@system_info_api.route('/GetSystemInfoTemperature', methods=['GET'])
+@system_info_api.route('/api/system/temperature', methods=['GET'])
 @login_required
 def get_system_info_temperature():  # pylint: disable=E0211
     if request.method == 'GET':
@@ -85,7 +85,7 @@ def get_system_info_temperature():  # pylint: disable=E0211
 
 #################################################################
 
-# /GetServices
+# /api/system/services
 # return
 # {
 #   "services": [
@@ -93,7 +93,7 @@ def get_system_info_temperature():  # pylint: disable=E0211
 #     ...
 #   ]
 # }
-@system_info_api.route('/GetServices', methods=['GET'])
+@system_info_api.route('/api/system/services', methods=['GET'])
 @login_required
 def get_services():  # pylint: disable=E0211
     if request.method == 'GET':
@@ -110,7 +110,7 @@ def get_services():  # pylint: disable=E0211
 
 #################################################################
 
-# /GetSystemInfoServices
+# /api/system/services/status
 # return
 # {
 #   "services": [
@@ -123,7 +123,7 @@ def get_services():  # pylint: disable=E0211
 #    ...
 #   ]
 # }
-@system_info_api.route('/GetSystemInfoServices', methods=['GET'])
+@system_info_api.route('/api/system/services/status', methods=['GET'])
 @login_required
 def get_system_info_services():  # pylint: disable=E0211
     if request.method == 'GET':
@@ -140,7 +140,7 @@ def get_system_info_services():  # pylint: disable=E0211
 
 #################################################################
 
-# /GetSystemInfoDeviceStatus
+# /api/system/devices/status
 # return
 # {
 #   "devices": [
@@ -152,7 +152,7 @@ def get_system_info_services():  # pylint: disable=E0211
 #     ...
 #   ]
 # }
-@system_info_api.route('/GetSystemInfoDeviceStatus', methods=['GET'])
+@system_info_api.route('/api/system/devices/status', methods=['GET'])
 @login_required
 def get_system_info_device_status():  # pylint: disable=E0211
     if request.method == 'GET':
