@@ -77,15 +77,27 @@ $(document).ready(function () {
                     const interfaceName = networkInterfaces[i]["name"];
                     const interfaceAddress = networkInterfaces[i]["address"];
                     const interfaceNetmask = networkInterfaces[i]["netmask"];
+                    const interfaceGbRecv = bytesToGigabytes(networkInterfaces[i]["bytes_recv"]).toFixed(1);
+                    const interfaceGbSent = bytesToGigabytes(networkInterfaces[i]["bytes_sent"]).toFixed(1);
                     let border = "border-bottom";
                     if (i === len - 1) {
                         border = "";
                     }
                     const interfaceCard = `
-                        <div id="${interfaceName}" class="card-block ${border}">
+                        <div class="card-block ${border}">
                             <div class="row">
                                 <div class="col-auto">
-                                    <label class="badge badge-pill px-3 py-2 theme-bg2 text-white f-14 f-w-400">${interfaceName}</label>
+                                    <label class="badge badge-pill px-3 py-2 mr-2 theme-bg2 text-white f-14 f-w-400">
+                                        <span>${interfaceName}</span>
+                                    </label>
+                                    <label class="badge badge-pill px-3 py-2 mr-2 theme-bg2 text-white f-14 f-w-400">
+                                        <i class="feather icon-arrow-down text-c-green"></i>
+                                        <span id="">${interfaceGbSent} GB</span>
+                                    </label>
+                                    <label class="badge badge-pill px-3 py-2 theme-bg2 text-white f-14 f-w-400">
+                                        <i class="feather icon-arrow-up text-c-yellow"></i>
+                                        <span id="">${interfaceGbRecv} GB</span>
+                                    </label>
                                 </div>
                             </div>
                             <h3 class="mt-3 f-w-300">${interfaceAddress}</h3>
