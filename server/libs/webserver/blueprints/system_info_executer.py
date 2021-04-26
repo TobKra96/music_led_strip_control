@@ -34,14 +34,19 @@ class SystemInfoExecuter(ExecuterBase):
         return dict(psutil.disk_usage('/')._asdict())
 
     def get_network_info(self):
-        network_info = dict()
+        network_info = []
         all_network_info = psutil.net_if_addrs()
         for current_nic in all_network_info:
             for current_address_family in all_network_info[current_nic]:
                 if current_address_family.family == 2:
-                    network_info[current_nic] = dict()
-                    network_info[current_nic]["address"] = current_address_family.address
-                    network_info[current_nic]["netmask"] = current_address_family.netmask
+                    nic = dict()
+                    io_counters = dict(psutil.net_io_counters(pernic=True)[current_nic]._asdict())
+                    nic["name"] = current_nic
+                    nic["address"] = current_address_family.address
+                    nic["netmask"] = current_address_family.netmask
+                    nic["bytes_recv"] = io_counters["bytes_recv"]
+                    nic["bytes_sent"] = io_counters["bytes_sent"]
+                    network_info.append(nic)
         return network_info
 
     def get_system_info_temperature(self):
@@ -55,28 +60,26 @@ class SystemInfoExecuter(ExecuterBase):
             temp = os.popen("vcgencmd measure_temp").readline()
             cpu_temp_c = float(re.findall(r"\d+\.\d+", temp)[0])
             cpu_temp_f = float(f"{(cpu_temp_c * 1.8 + 32):0.1f}")
-
             cpu_temp_dict["celsius"] = cpu_temp_c
             cpu_temp_dict["fahrenheit"] = cpu_temp_f
-
             return cpu_temp_dict
-
         cpu_temp_dict["celsius"] = 0
         cpu_temp_dict["fahrenheit"] = 0
-
         return cpu_temp_dict
 
-    def get_system_info_services(self):
-        data = dict()
-        data["mlsc"] = self.get_service_status("mlsc")
-        data["hostapd"] = self.get_service_status("hostapd")
-        data["dhcpcd"] = self.get_service_status("dhcpcd")
-        data["dnsmasq"] = self.get_service_status("dnsmasq")
+    def get_services(self):
+        services = ["mlsc", "hostapd", "dhcpcd", "dnsmasq"]
+        return services
 
+    def get_system_info_services(self):
+        data = []
+        for service in self.get_services():
+            data.append(self.get_service_status(service))
         return data
 
     def get_service_status(self, service_name):
         service_info = dict()
+        service_info["name"] = service_name
         try:
             stat = subprocess.call(["systemctl", "is-active", "--quiet", service_name])
             service_info["status"] = stat
@@ -84,12 +87,12 @@ class SystemInfoExecuter(ExecuterBase):
                 service_info["running"] = True
             else:
                 service_info["running"] = False
-            service_info["service_not_found"] = False
+            service_info["not_found"] = False
         except Exception as e:
             self.logger.debug(f"Could not get service status: {service_name}")
             service_info["status"] = 9999
             service_info["running"] = False
-            service_info["service_not_found"] = True
+            service_info["not_found"] = True
         return service_info
 
     def get_system_info_device_status(self):
@@ -110,7 +113,6 @@ class SystemInfoExecuter(ExecuterBase):
                 current_device["connected"] = False
 
             devices.append(current_device)
-
         return devices
 
     def check_device_status(self, address):
@@ -118,7 +120,5 @@ class SystemInfoExecuter(ExecuterBase):
         Returns True if host (str) responds to a ping request.
         Remember that a host may not respond to a ping (ICMP) request even if the host name is valid.
         """
-
         host = ping(address, count=1, interval=0.2)
-
         return host.is_alive
