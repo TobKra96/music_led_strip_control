@@ -29,7 +29,7 @@ function CheckIfFinishedInitialLoading() {
 
 function GetLoggingLevels() {
     $.ajax({
-        url: "/GetLoggingLevels",
+        url: "/api/settings/general/logging-levels",
         type: "GET",
         data: {},
         success: function (response) {
@@ -63,7 +63,7 @@ function ParseGetLoggingLevels(response) {
 
 function GetAudioDevices() {
     $.ajax({
-        url: "/GetAudioDevices",
+        url: "/api/settings/general/audio-devices",
         type: "GET",
         data: {},
         success: function (response) {
@@ -95,7 +95,7 @@ function ParseGetAudioDevices(response) {
 
 function GetGeneralSetting(setting_key) {
     $.ajax({
-        url: "/GetGeneralSetting",
+        url: "/api/settings/general",
         type: "GET",
         data: {
             "setting_key": setting_key,
@@ -120,7 +120,7 @@ function ParseGetGeneralSetting(response) {
 function GetPinSetting() {
     $.ajax({
         type: 'GET',
-        url: "/GetPinSetting",
+        url: "/api/settings/general/pin",
         contentType: 'application/json;charset=UTF-8',
         success: function (response) {
             ParseGetPinSetting(response)
@@ -170,7 +170,7 @@ function SetGeneralSetting(settings) {
     data["settings"] = settings;
 
     $.ajax({
-        url: "/SetGeneralSetting",
+        url: "/api/settings/general",
         type: "POST",
         data: JSON.stringify(data, null, '\t'),
         contentType: 'application/json;charset=UTF-8',
@@ -201,7 +201,7 @@ function SetPinSetting() {
 
     $.ajax({
         type: 'POST',
-        url: "/SetPinSetting",
+        url: "/api/settings/general/pin",
         data: JSON.stringify(pinData),
         contentType: 'application/json;charset=UTF-8',
     });
@@ -239,7 +239,7 @@ function ResetSettings() {
     var data = {};
 
     $.ajax({
-        url: "/ResetSettings",
+        url: "/api/settings/general/reset",
         type: "POST",
         data: JSON.stringify(data, null, '\t'),
         contentType: 'application/json;charset=UTF-8',
@@ -259,7 +259,7 @@ function ResetPinSettings() {
     data["USE_PIN_LOCK"] = false
 
     $.ajax({
-        url: "/ResetPinSettings",
+        url: "/api/settings/general/pin/reset",
         type: "POST",
         data: JSON.stringify(data, null, '\t'),
         contentType: 'application/json;charset=UTF-8',
@@ -293,7 +293,7 @@ function ImportSettings() {
     form_data.append('imported_config', file_data);
 
     $.ajax({
-        url: '/import_config',
+        url: '/api/settings/import',
         dataType: 'text',
         cache: false,
         contentType: false,

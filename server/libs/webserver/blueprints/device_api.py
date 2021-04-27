@@ -1,9 +1,8 @@
-from flask import Blueprint, request, jsonify
-from flask_login import login_required
 from libs.webserver.executer import Executer
 
+from flask import Blueprint, request, jsonify
+from flask_login import login_required
 import copy
-import json
 
 device_api = Blueprint('device_api', __name__)
 
@@ -33,6 +32,7 @@ def get_devices():  # pylint: disable=E0211
             return "Could not find devices: ", 403
         else:
             return jsonify(data_out)
+
 
 # /GetDevices2
 # in

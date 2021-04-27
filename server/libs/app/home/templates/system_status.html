@@ -9,6 +9,9 @@
 
     <div class="pcoded-content">
         <div class="pcoded-inner-content">
+
+            {% include 'includes/toasts.html' %}
+
             <!-- [ breadcrumb ] start -->
             <div class="page-header">
                 <div class="page-block">
@@ -30,198 +33,193 @@
                 <div class="page-wrapper">
                     <!-- [ Main Content ] start -->
 
-                    <div class="row mt-4">
-                        <div class="col-md-6 col-lg-4">
-                            <div class="card">
-                                <div class="card-header">
-                                    <h5>CPU</h5>
-                                </div>
-                                <div class="card-block border-bottom">
-                                    <h6 class="mb-4">Usage</h6>
-                                    <div class="row d-flex align-items-center">
-                                        <div class="col-9">
-                                            <h3 class="f-w-300 d-flex align-items-center m-b-0"><i class="feather icon-bar-chart-2 text-c-green f-30 m-r-10"></i>
-                                                54.5%
-                                            </h3>
+                    <div class="row mt-4 sortableParent">
+                        <div id="sortable-1" class="col-md-6 col-lg-4 connectedSortable">
+                            <!-- CPU Block -->
+                            <div class="accordion" id="accordionCpu">
+                                <div class="card p-0" data-toggle="collapse" data-target="#collapseCpu" aria-expanded="true" aria-controls="collapseCpu" draggable="false">
+                                    <div class="card-header">
+                                        <h5><i class="feather icon-cpu text-c-blue"></i> CPU</h5>
+                                        <i class="fa fa-chevron-down text-c-blue float-right d-none d-sm-block mt-1"></i>
+                                    </div>
+                                    <div id="collapseCpu" class="card-body p-0 collapse show" aria-labelledby="accordionHeading" data-parent="#accordionCpu">
+                                        <div class="card-block border-bottom">
+                                            <h6 class="mb-4">Usage</h6>
+                                            <div class="row d-flex align-items-center">
+                                                <div class="col-9">
+                                                    <h3 class="f-w-300 d-flex align-items-center m-b-0"><i class="feather icon-bar-chart-2 text-c-green f-30 m-r-10"></i>
+                                                        <span id="cpu_usage_percent"></span>
+                                                    </h3>
+                                                </div>
+                                            </div>
+                                            <div class="progress m-t-30" style="height: 6px;">
+                                                <div id="cpu_usage_progress" class="progress-bar progress-c-theme2" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="progress m-t-30" style="height: 6px;">
-                                        <div class="progress-bar progress-c-theme2" role="progressbar" style="width: 54.5%;" aria-valuenow="70" aria-valuemin="0" aria-valuemax="100"></div>
-                                    </div>
-                                </div>
-                                <div class="card-block">
-                                    <h6 class="mb-4">Temperature</h6>
-                                    <div class="row d-flex align-items-center">
-                                        <div class="col-9">
-                                            <h3 class="f-w-300 d-flex align-items-center m-b-0"><i class="feather icon-thermometer text-c-green f-30 m-r-10"></i>
-                                                51.5°C
-                                            </h3>
+                                        <div class="card-block border-bottom">
+                                            <h6 class="mb-4">Temperature</h6>
+                                            <div class="row d-flex align-items-center">
+                                                <div class="col-9">
+                                                    <h3 class="f-w-300 d-flex align-items-center m-b-0"><i class="feather icon-thermometer text-c-green f-30 m-r-10"></i>
+                                                        <span id="cpu_temperature"></span>
+                                                    </h3>
+                                                </div>
+                                            </div>
+                                            <div class="progress m-t-30" style="height: 6px; background: linear-gradient(to right, #b4ecb4 0%, #fefec8 75%, #ffb2ae 95%);">
+                                                <div id="cpu_temperature_progress" class="progress-bar progress-c-theme2" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="progress m-t-30" style="height: 6px; background: linear-gradient(to right, #b4ecb4 0%, #fefec8 75%, #ffb2ae 95%);">
-                                        <div class="progress-bar progress-c-theme2" role="progressbar" style="width: 51.5%;" aria-valuenow="35" aria-valuemin="0" aria-valuemax="100"></div>
+                                        <div class="card-block py-0 pb-4">
+                                            <div class="row">
+                                                <div class="d-flex align-items-center pt-4">
+                                                    <div class="col-auto">
+                                                        <i class="feather icon-activity f-30 text-c-green"></i>
+                                                    </div>
+                                                    <div class="col-auto">
+                                                        <h3 id="cpu_freq" class="f-w-300">3.9 GHz</h3>
+                                                        <span class="d-block text-uppercase">Frequency</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="card">
-                                <div class="card-header">
-                                    <h5>Disk</h5>
-                                </div>
-                                <div class="card-block border-bottom">
-                                    <h6 class="mb-4">Usage</h6>
-                                    <div class="row d-flex align-items-center">
-                                        <div class="col-9">
-                                            <h3 class="f-w-300 d-flex align-items-center m-b-0"><i class="feather icon-bar-chart-2 text-c-green f-30 m-r-10"></i>
-                                                8.4%
-                                            </h3>
-                                        </div>
+
+                            <!-- Services Block -->
+                            <div class="accordion" id="accordionServices">
+                                <div class="card p-0" data-toggle="collapse" data-target="#collapseServices" aria-expanded="true" aria-controls="collapseServices" draggable="false">
+                                    <div class="card-header">
+                                        <h5><i class="feather icon-settings text-c-blue"></i> Services</h5>
+                                        <i class="fa fa-chevron-down text-c-blue float-right d-none d-sm-block mt-1"></i>
                                     </div>
-                                    <div class="progress m-t-30" style="height: 6px;">
-                                        <div class="progress-bar progress-c-theme2" role="progressbar" style="width: 8.4%;" aria-valuenow="70" aria-valuemin="0" aria-valuemax="100"></div>
-                                    </div>
-                                </div>
-                                <div class="card-block">
-                                    <div class="row d-flex align-items-center">
-                                        <div class="col-auto">
-                                            <i class="feather icon-pie-chart f-30 text-c-green"></i>
-                                        </div>
-                                        <div class="col">
-                                            <h3 class="f-w-300">2.3 GB</h3>
-                                            <span class="d-block text-uppercase">Used</span>
-                                        </div>
-                                        <div class="col-auto">
-                                            <i class="feather icon-box f-30 text-c-green"></i>
-                                        </div>
-                                        <div class="col">
-                                            <h3 class="f-w-300">28.9 GB</h3>
-                                            <span class="d-block text-uppercase">total</span>
-                                        </div>
+                                    <div id="collapseServices" class="card-body p-0 collapse show" aria-labelledby="accordionHeading" data-parent="#accordionServices">
+                                        <div id="services"></div>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="col-md-6 col-lg-4">
-                            <div class="card">
-                                <div class="card-header">
-                                    <h5>Memory</h5>
-                                </div>
-                                <div class="card-block border-bottom">
-                                    <h6 class="mb-4">Usage</h6>
-                                    <div class="row d-flex align-items-center">
-                                        <div class="col-9">
-                                            <h3 class="f-w-300 d-flex align-items-center m-b-0"><i class="feather icon-bar-chart-2 text-c-green f-30 m-r-10"></i>
-                                                11.4%
-                                            </h3>
-                                        </div>
+                        <div id="sortable-2" class="col-md-6 col-lg-4 connectedSortable">
+                            <!-- Memory Block -->
+                            <div class="accordion" id="accordionMemory">
+                                <div class="card p-0" data-toggle="collapse" data-target="#collapseMemory" aria-expanded="true" aria-controls="collapseMemory" draggable="false">
+                                    <div class="card-header">
+                                        <h5><i class="feather icon-zap text-c-blue"></i> Memory</h5>
+                                        <i class="fa fa-chevron-down text-c-blue float-right d-none d-sm-block mt-1"></i>
                                     </div>
-                                    <div class="progress m-t-30" style="height: 6px;">
-                                        <div class="progress-bar progress-c-theme2" role="progressbar" style="width: 11.4%;" aria-valuenow="70" aria-valuemin="0" aria-valuemax="100"></div>
-                                    </div>
-                                </div>
-                                <div class="card-block">
-                                    <div class="row d-flex align-items-center">
-                                        <div class="col-auto">
-                                            <i class="feather icon-pie-chart f-30 text-c-green"></i>
+                                    <div id="collapseMemory" class="card-body p-0 collapse show" aria-labelledby="accordionHeading" data-parent="#accordionMemory">
+                                        <div class="card-block border-bottom">
+                                            <h6 class="mb-4">Usage</h6>
+                                            <div class="row d-flex align-items-center">
+                                                <div class="col-9">
+                                                    <h3 class="f-w-300 d-flex align-items-center m-b-0"><i class="feather icon-bar-chart-2 text-c-green f-30 m-r-10"></i>
+                                                        <span id="memory_usage_percent"></span>
+                                                    </h3>
+                                                </div>
+                                            </div>
+                                            <div class="progress m-t-30" style="height: 6px;">
+                                                <div id="memory_usage_progress" class="progress-bar progress-c-theme2" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                                            </div>
                                         </div>
-                                        <div class="col">
-                                            <h3 class="f-w-300">0.3 GB</h3>
-                                            <span class="d-block text-uppercase">Used</span>
-                                        </div>
-                                        <div class="col-auto">
-                                            <i class="feather icon-box f-30 text-c-green"></i>
-                                        </div>
-                                        <div class="col">
-                                            <h3 class="f-w-300">3.7 GB</h3>
-                                            <span class="d-block text-uppercase">total</span>
+                                        <div class="card-block py-0 pb-4">
+                                            <div class="row">
+                                                <div class="d-flex align-items-center pt-4">
+                                                    <div class="col-auto">
+                                                        <i class="feather icon-pie-chart f-30 text-c-green"></i>
+                                                    </div>
+                                                    <div class="col-auto">
+                                                        <h3 id="memory_used" class="f-w-300"></h3>
+                                                        <span class="d-block text-uppercase">Used</span>
+                                                    </div>
+                                                </div>
+                                                <div class="d-flex align-items-center pt-4">
+                                                    <div class="col-auto">
+                                                        <i class="feather icon-box f-30 text-c-green"></i>
+                                                    </div>
+                                                    <div class="col-auto">
+                                                        <h3 id="memory_total" class="f-w-300"></h3>
+                                                        <span class="d-block text-uppercase">total</span>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="card card-event">
-                                <div class="card-header">
-                                    <h5>Services</h5>
-                                </div>
-                                <div class="card-block border-bottom">
-                                    <div class="row align-items-center justify-content-center">
-                                        <div class="col">
-                                            <h3 class="m-0 f-w-300">dhcpcd</h3>
+
+                            <!-- Disk Block -->
+                            <div class="accordion" id="accordionDisk">
+                                <div class="card p-0" data-toggle="collapse" data-target="#collapseDisk" aria-expanded="true" aria-controls="collapseDisk" draggable="false">
+                                    <div class="card-header">
+                                        <h5><i class="feather icon-server text-c-blue"></i> Disk</h5>
+                                        <i class="fa fa-chevron-down text-c-blue float-right d-none d-sm-block mt-1"></i>
+                                    </div>
+                                    <div id="collapseDisk" class="card-body p-0 collapse show" aria-labelledby="accordionHeading" data-parent="#accordionDisk">
+                                        <div class="card-block border-bottom">
+                                            <h6 class="mb-4">Usage</h6>
+                                            <div class="row d-flex align-items-center">
+                                                <div class="col-9">
+                                                    <h3 class="f-w-300 d-flex align-items-center m-b-0"><i class="feather icon-bar-chart-2 text-c-green f-30 m-r-10"></i>
+                                                        <span id="disk_usage_percent"></span>
+                                                    </h3>
+                                                </div>
+                                            </div>
+                                            <div class="progress m-t-30" style="height: 6px;">
+                                                <div id="disk_usage_progress" class="progress-bar progress-c-theme2" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                                            </div>
                                         </div>
-                                        <div class="col-auto">
-                                            <label class="label theme-bg text-white f-14 f-w-400 float-right">Running</label>
+                                        <div class="card-block py-0 pb-4">
+                                            <div class="row">
+                                                <div class="d-flex align-items-center pt-4">
+                                                    <div class="col-auto">
+                                                        <i class="feather icon-pie-chart f-30 text-c-green"></i>
+                                                    </div>
+                                                    <div class="col-auto">
+                                                        <h3 id="disk_used" class="f-w-300"></h3>
+                                                        <span class="d-block text-uppercase">Used</span>
+                                                    </div>
+                                                </div>
+                                                <div class="d-flex align-items-center pt-4">
+                                                    <div class="col-auto">
+                                                        <i class="feather icon-box f-30 text-c-green"></i>
+                                                    </div>
+                                                    <div class="col-auto">
+                                                        <h3 id="disk_total" class="f-w-300"></h3>
+                                                        <span class="d-block text-uppercase">total</span>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="card-block border-bottom">
-                                    <div class="row align-items-center justify-content-center">
-                                        <div class="col">
-                                            <h3 class="m-0 f-w-300">dnsmasq</h3>
-                                        </div>
-                                        <div class="col-auto">
-                                            <label class="label bg-danger text-white f-14 f-w-400 float-right">Stopped</label>
-                                        </div>
+                            </div>
+
+                            <!-- Devices Block -->
+                            <div class="accordion" id="accordionDevices">
+                                <div class="card p-0" data-toggle="collapse" data-target="#collapseDevices" aria-expanded="true" aria-controls="collapseDevices" draggable="false">
+                                    <div class="card-header">
+                                        <h5><i class="feather icon-monitor text-c-blue"></i> Devices</h5>
+                                        <i class="fa fa-chevron-down text-c-blue float-right d-none d-sm-block mt-1"></i>
                                     </div>
-                                </div>
-                                <div class="card-block border-bottom">
-                                    <div class="row align-items-center justify-content-center">
-                                        <div class="col">
-                                            <h3 class="m-0 f-w-300">hostapd</h3>
-                                        </div>
-                                        <div class="col-auto">
-                                            <label class="label theme-bg text-white f-14 f-w-400 float-right">Running</label>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="card-block">
-                                    <div class="row align-items-center justify-content-center">
-                                        <div class="col">
-                                            <h3 class="m-0 f-w-300">mlsc</h3>
-                                        </div>
-                                        <div class="col-auto">
-                                            <label class="label theme-bg text-white f-14 f-w-400 float-right">Running</label>
-                                        </div>
+                                    <div id="collapseDevices" class="card-body p-0 collapse show" aria-labelledby="accordionHeading" data-parent="#accordionDevices">
+                                        <div id="devices"></div>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="col-md-6 col-lg-4">
-                            <div class="card card-event">
-                                <div class="card-header">
-                                    <h5>Network</h5>
-                                </div>
-                                <div class="card-block border-bottom">
-                                    <div class="row">
-                                        <div class="col-auto">
-                                            <label class="label theme-bg2 text-white f-14 f-w-400">eth0</label>
-                                        </div>
+                        <div id="sortable-3" class="col-md-6 col-lg-4 connectedSortable">
+                            <!-- Network Block -->
+                            <div class="accordion" id="accordionNetwork">
+                                <div class="card p-0" data-toggle="collapse" data-target="#collapseNetwork" aria-expanded="true" aria-controls="collapseNetwork" draggable="false">
+                                    <div class="card-header">
+                                        <h5><i class="feather icon-wifi text-c-blue"></i> Network</h5>
+                                        <i class="fa fa-chevron-down text-c-blue float-right d-none d-sm-block mt-1"></i>
                                     </div>
-                                    <h3 class="mt-3 f-w-300">192.168.178.96</h3>
-                                    <h6 class="text-muted mt-2 mb-0 text-uppercase">address</h6>
-                                    <h3 class="mt-3 f-w-300">255.255.255.0</h3>
-                                    <h6 class="text-muted mt-2 mb-0 text-uppercase">netmask</h6>
-                                </div>
-                                <div class="card-block border-bottom">
-                                    <div class="row">
-                                        <div class="col-auto">
-                                            <label class="label theme-bg2 text-white f-14 f-w-400">lo</label>
-                                        </div>
+                                    <div id="collapseNetwork" class="card-body p-0 collapse show" aria-labelledby="accordionHeading" data-parent="#accordionNetwork">
+                                        <div id="network_interfaces"></div>
                                     </div>
-                                    <h3 class="mt-3 f-w-300">127.0.0.1</h3>
-                                    <h6 class="text-muted mt-2 mb-0 text-uppercase">address</h6>
-                                    <h3 class="mt-3 f-w-300">255.0.0.0</h3>
-                                    <h6 class="text-muted mt-2 mb-0 text-uppercase">netmask</h6>
-                                </div>
-                                <div class="card-block">
-                                    <div class="row">
-                                        <div class="col-auto">
-                                            <label class="label theme-bg2 text-white f-14 f-w-400">wlan1</label>
-                                        </div>
-                                    </div>
-                                    <h3 class="mt-3 f-w-300">172.24.26.1</h3>
-                                    <h6 class="text-muted mt-2 mb-0 text-uppercase">address</h6>
-                                    <h3 class="mt-3 f-w-300">255.255.255.0</h3>
-                                    <h6 class="text-muted mt-2 mb-0 text-uppercase">netmask</h6>
                                 </div>
                             </div>
                         </div>
@@ -237,4 +235,6 @@
 
 <!-- Specific Page JS goes HERE  -->
 {% block javascripts %}
+<script src="/static/assets/plugins/jquery-ui/js/jquery-ui.js"></script>
+<script src="/static/assets/js/system.js" type="module"></script>
 {% endblock javascripts %}

@@ -1,7 +1,7 @@
-import logging
-import numpy as np
-
 from libs.outputs.output import Output  # pylint: disable=E0611, E0401
+
+import numpy as np
+import logging
 
 
 class OutputRaspi(Output):

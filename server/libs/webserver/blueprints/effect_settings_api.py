@@ -1,9 +1,8 @@
-from flask import Blueprint, request, jsonify
-from flask_login import login_required
 from libs.webserver.executer import Executer
 
+from flask import Blueprint, request, jsonify
+from flask_login import login_required
 import copy
-import json
 
 effect_settings_api = Blueprint('effect_settings_api', __name__)
 

@@ -79,6 +79,22 @@ input[type=number] {
     font-size: 26px;
 }
 
+/* Overwrite highlight when dragging system status cards */
+.highlight {
+    padding: 0rem;
+    margin-top: 0rem;
+    margin-bottom: calc(2rem - 2px);
+    background-color: #e2eaf2;
+}
+
+/* Apply color to device name in system status */
+.device_link {
+    color: #111111;
+}
+.device_link:hover {
+    color: #3498db;
+}
+
 /* Apply color to effect buttons on hover */
 .dashboard_effect {
     user-select: none;

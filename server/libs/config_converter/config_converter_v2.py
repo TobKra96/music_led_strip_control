@@ -1,9 +1,9 @@
 from libs.config_converter.config_converter_base import ConfigConverterBase  # pylint: disable=E0611, E0401
 
-import fileinput
 import logging
 import json
 import os
+
 
 class ConfigConverterV2(ConfigConverterBase):
     def __init__(self):
@@ -18,21 +18,20 @@ class ConfigConverterV2(ConfigConverterBase):
         config_folder = os.path.abspath(rel_config_path) + "/"
         tmp_convert_file_path = config_folder + "tmp_config_convert.json"
 
-        #self.delete_tmp_json(tmp_convert_file_path)
-        #self.save_tmp_json(old_config, tmp_convert_file_path)
+        # self.delete_tmp_json(tmp_convert_file_path)
+        # self.save_tmp_json(old_config, tmp_convert_file_path)
 
-        #with fileinput.FileInput(tmp_convert_file_path, inplace=True) as file:
-        #    for line in file:
-        #        renamed_line = self.rename_line(line)
-        #        file.write(renamed_line)
+        # with fileinput.FileInput(tmp_convert_file_path, inplace=True) as file:
+        #     for line in file:
+        #         renamed_line = self.rename_line(line)
+        #         file.write(renamed_line)
 
-        #new_config = self.read_tmp_json(tmp_convert_file_path)
-        #self.delete_tmp_json(tmp_convert_file_path)
+        # new_config = self.read_tmp_json(tmp_convert_file_path)
+        # self.delete_tmp_json(tmp_convert_file_path)
 
         json_string = self.dict_to_json_string(old_config)
         renamed_json_string = self.rename_config(json_string)
         new_config = self.json_string_to_dict(renamed_json_string)
-
 
         new_config["version"] = 2
 

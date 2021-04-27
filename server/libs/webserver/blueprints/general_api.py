@@ -1,9 +1,7 @@
-from flask import Blueprint, request, jsonify
-from flask_login import login_required
 from libs.webserver.executer import Executer
 
-import copy
-import json
+from flask import Blueprint, request, jsonify
+from flask_login import login_required
 
 general_api = Blueprint('general_api', __name__)
 
@@ -80,7 +78,7 @@ def get_led_strips():  # pylint: disable=E0211
             return jsonify(data_out)
 
 
-# /GetLoggingLevels
+# /api/settings/general/logging-levels
 #
 # return
 # {
@@ -89,7 +87,7 @@ def get_led_strips():  # pylint: disable=E0211
 # "<GetLoggingLevelID3>" = <LoggingLevelName3>
 # ...
 # }
-@general_api.route('/GetLoggingLevels', methods=['GET'])
+@general_api.route('/api/settings/general/logging-levels', methods=['GET'])
 @login_required
 def get_logging_levels():  # pylint: disable=E0211
     if request.method == 'GET':
@@ -104,7 +102,7 @@ def get_logging_levels():  # pylint: disable=E0211
             return jsonify(data_out)
 
 
-# /get_audio_devices
+# /api/settings/general/audio-devices
 #
 # return
 # {
@@ -113,7 +111,7 @@ def get_logging_levels():  # pylint: disable=E0211
 # "<AudioDeviceID3>" = <AudioDeviceIDDescription3>
 # ...
 # }
-@general_api.route('/GetAudioDevices', methods=['GET'])
+@general_api.route('/api/settings/general/audio-devices', methods=['GET'])
 @login_required
 def get_audio_devices():  # pylint: disable=E0211
     if request.method == 'GET':

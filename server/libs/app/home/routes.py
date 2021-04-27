@@ -2,6 +2,7 @@
 """
 Copyright (c) 2019 - present AppSeed.us
 """
+from libs.app.home import blueprint
 
 from flask import render_template, request
 from flask_login import login_required

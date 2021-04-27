@@ -12,9 +12,9 @@ if version_info < (3, 6):
 
 from libs.audio_process_service import AudioProcessService
 from libs.notification_service import NotificationService
+from libs.webserver.webserver import Webserver
 from libs.device_manager import DeviceManager
 from libs.config_service import ConfigService
-from libs.webserver.webserver import Webserver
 
 from multiprocessing import Process, Queue, Lock
 from time import sleep

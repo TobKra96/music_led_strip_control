@@ -2,6 +2,7 @@ from libs.config_converter.config_converter_v2 import ConfigConverterV2  # pylin
 
 import logging
 
+
 class ConfigConverterService():
     def __init__(self):
         self.logger = logging.getLogger(__name__)

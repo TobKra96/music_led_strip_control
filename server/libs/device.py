@@ -1,8 +1,8 @@
-from multiprocessing import Process, Queue
-import logging
-
 from libs.effect_service import EffectService
 from libs.output_service import OutputService
+
+from multiprocessing import Process, Queue
+import logging
 
 
 class Device:
