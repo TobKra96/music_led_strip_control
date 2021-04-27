@@ -24,13 +24,17 @@ $(function() {
         // Only allow all_devices for sync fade effect
         if (effectIdentifier == "effect_sync_fade") {
             localStorage.setItem('lastDevice', fake_device[0].id);
-            fake_device[0]._activate();
-            $(`a[data-device_id=${fake_device[0].id}`).addClass("active");
-            currentDevice = fake_device[0];
         }
-
+        
         const devices = fake_device.concat(jinja_devices.map(d => { return new Device(d) }));
-        currentDevice = devices.find(d => d.isCurrent);
+        
+        if (effectIdentifier == "effect_sync_fade") {
+            devices[0]._activate();
+            $(`a[data-device_id=${devices[0].id}`).addClass("active");
+            currentDevice = devices[0];
+        } else {
+            currentDevice = devices.find(d => d.isCurrent === true );
+        }
 
         devices.forEach(device => {
             device.link.addEventListener('click', () => {
