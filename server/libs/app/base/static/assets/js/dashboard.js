@@ -1,64 +1,17 @@
 import Device from "./classes/Device.js";
-import EffectManager from "./classes/EffectManager.js";
 import Toast from "./classes/Toast.js";
 
-// Global Variables
-const effectManager = new EffectManager();
+if (!jinja_devices.length) {
+    new Toast('No device found. Create a new device in "Device Settings".').info()
+} else {
+    // Start with Fake Device & create Devices from Jinja output
+    const fake_device = [new Device({id:"all_devices", name:"All Devices" })];
+    const devices = fake_device.concat(jinja_devices.map(d => { return new Device(d) }));
 
-// Start with Fake Device
-const devices = [new Device("all_devices", "All Devices")];
-let currentDevice = devices[0];
-
-// Init and load all settings
-$(document).ready(function () {
-
-    $.ajax("/GetDevices").done((data) => {
-        // data = { device_0: "devicename1", device_1: "devicename2" }
-        // todo: return anon Objects from Endpoint
-
-        if (!Object.keys(data).length) {
-            new Toast('No device found. Create a new device in "Device Settings".').info()
-        }
-
-        // parse response into device Objects
-        Object.keys(data).forEach(device_key => {
-            devices.push(new Device(device_key, data[device_key]));
-        });
-
-        // Subtract the fake Device
-        $('#device_count').text(devices.length - 1);
-
-        // Restore last selected device on reload
-        let lastDevice = devices.find(device => device.id === localStorage.getItem("lastDevice"));
-        if (lastDevice instanceof Device) {
-            currentDevice = lastDevice;
-        } else {
-            // Fallback to all_devices
-            currentDevice = devices[0];
-        }
-
-        effectManager.currentDevice = currentDevice;
-
-        // Async function
-        currentDevice.getActiveEffect();
-
-        // Build Device Tab
-        devices.forEach(device => {
-            // todo: do it server side
-            const link = device.getPill(currentDevice.id);
-            link.addEventListener('click', () => {
-                currentDevice = device;
-                localStorage.setItem('lastDevice', device.id);
-                effectManager.currentDevice = currentDevice;
-                // Async function
-                device.getActiveEffect();
-            });
-
-            const li = document.createElement("li");
-            li.className = "nav-item device_item";
-            li.appendChild(link)
-
-            document.getElementById("deviceTabID").appendChild(li);
+    devices.forEach(device => {
+        device.link.addEventListener('click', () => {
+            // Async function
+            device.getActiveEffect();
         });
     });
-});
+}
