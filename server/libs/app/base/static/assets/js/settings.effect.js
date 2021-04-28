@@ -5,7 +5,7 @@ let currentDevice = undefined;
 let effectIdentifier = "";
 
 // Init and load all settings
-$(function() {
+$(function () {
 
     // Allow to scroll sidebar when page is reloaded and mouse is already on top of sidebar
     $(".navbar-content").trigger("mouseover");
@@ -19,21 +19,21 @@ $(function() {
         new Toast('No device found. Create a new device in "Device Settings".').info()
     } else {
         // Start with Fake Device & create Devices from Jinja output
-        const fake_device = [new Device({id:"all_devices", name:"All Devices" })];
+        const fake_device = [new Device({ id: "all_devices", name: "All Devices" })];
 
         // Only allow all_devices for sync fade effect
         if (effectIdentifier == "effect_sync_fade") {
             localStorage.setItem('lastDevice', fake_device[0].id);
         }
-        
+
         const devices = fake_device.concat(jinja_devices.map(d => { return new Device(d) }));
-        
+
         if (effectIdentifier == "effect_sync_fade") {
             devices[0]._activate();
             $(`a[data-device_id=${devices[0].id}`).addClass("active");
             currentDevice = devices[0];
         } else {
-            currentDevice = devices.find(d => d.isCurrent === true );
+            currentDevice = devices.find(d => d.isCurrent === true);
         }
 
         devices.forEach(device => {
@@ -90,7 +90,7 @@ function SetLocalSettings() {
         currentDevice.getEffectSetting(effectIdentifier, setting).then((response) => {
             const setting_key = response["setting_key"];
             const setting_value = response["setting_value"];
-        
+
             if ($("#" + setting_key).attr('type') == 'checkbox') {
                 $("#" + setting_key).prop('checked', setting_value);
             } else if ($("#" + setting_key).hasClass('color_input')) {
@@ -101,9 +101,9 @@ function SetLocalSettings() {
             } else {
                 $("#" + setting_key).val(setting_value);
             }
-        
+
             $("#" + setting_key).trigger('change');
-        
+
             // Set initial effect slider values
             $("span[for='" + setting_key + "']").text(setting_value);
         });
@@ -148,12 +148,10 @@ $("#save_btn").on("click", function () {
         type: "POST",
         data: JSON.stringify(data, null, '\t'),
         contentType: 'application/json;charset=UTF-8'
-    })
-    .done(response => {
+    }).done(response => {
         // todo toasts
         console.log("Effect settings set successfully. Response:\n\n" + JSON.stringify(response, null, '\t'));
-    })
-    .fail(response => {
+    }).fail(response => {
         // todo toasts
         console.log("Error while setting effect settings. Error: " + response.responseText);
     });
