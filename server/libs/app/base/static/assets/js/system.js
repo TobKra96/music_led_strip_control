@@ -92,11 +92,11 @@ $(document).ready(function () {
                                     </label>
                                     <label class="badge badge-pill px-3 py-2 mr-2 theme-bg2 text-white f-14 f-w-400">
                                         <i class="feather icon-arrow-down text-c-green"></i>
-                                        <span id="">${interfaceGbSent} GB</span>
+                                        <span>${interfaceGbRecv} GB</span>
                                     </label>
                                     <label class="badge badge-pill px-3 py-2 theme-bg2 text-white f-14 f-w-400">
                                         <i class="feather icon-arrow-up text-c-yellow"></i>
-                                        <span id="">${interfaceGbRecv} GB</span>
+                                        <span>${interfaceGbSent} GB</span>
                                     </label>
                                 </div>
                             </div>
