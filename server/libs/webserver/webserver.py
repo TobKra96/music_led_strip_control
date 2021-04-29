@@ -9,6 +9,7 @@ from libs.webserver.blueprints.system_info_api import system_info_api
 from libs.webserver.executer import Executer  # pylint: disable=E0611, E0401
 from libs.app import create_app
 
+from flasgger import Swagger
 from waitress import serve
 from time import sleep
 import logging
@@ -45,6 +46,31 @@ class Webserver():
         self.server.register_blueprint(general_api)
         self.server.register_blueprint(general_settings_api)
         self.server.register_blueprint(system_info_api)
+
+        self.server.config['SWAGGER'] = {
+            "specs": [
+                {
+                    "endpoint": 'openapi',
+                    "route": '/openapi.json'
+                }
+            ],
+            "specs_route": "/api/"
+        }
+
+        swagger_template = {
+            "swagger": "2.0",
+            "info": {
+                "title": "MLSC API",
+                "description": "API for communicating with the MLSC server.",
+                "version": "2.2.0",
+                "license": {
+                    "name": 'MIT',
+                    "url": 'https://github.com/TobKra96/music_led_strip_control/blob/master/LICENSE'
+                }
+            }
+        }
+
+        Swagger(self.server, template=swagger_template)
 
         if DEBUG:
             self.server.run(host='0.0.0.0', port=webserver_port, load_dotenv=False, debug=True)
