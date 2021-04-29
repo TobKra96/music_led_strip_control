@@ -199,9 +199,9 @@ $(document).ready(function () {
             console.log(error);
         })
 
-    function getDevices2() {
+    function getDevices() {
         // Preload devices
-        $.ajax("/GetDevices2").done((devices) => {
+        $.ajax("/api/system/devices").done((devices) => {
             if ($("#devices").children("div").length < devices.length) {
                 for (var i = 0, len = devices.length; i < len; i++) {
                     const deviceName = devices[i]["name"];
@@ -231,7 +231,7 @@ $(document).ready(function () {
             }
         });
     }
-    getDevices2();
+    getDevices();
 
     function getDevicesStatus() {
         // Called every 10 seconds

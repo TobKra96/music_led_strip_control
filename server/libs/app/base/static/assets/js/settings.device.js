@@ -16,7 +16,7 @@ $(document).ready(function () {
     // Preload
     Promise.all([
         // get Output Types
-        $.ajax("/GetOutputTypes").done((data) => {
+        $.ajax("/api/resources/output-types").done((data) => {
             output_types = data;
             $('.output_type').each(function () {
                 Object.keys(data).forEach(output_type_key => {
@@ -26,7 +26,7 @@ $(document).ready(function () {
             });
         }),
         // get LED Strips
-        $.ajax("/GetLEDStrips").done((data) => {
+        $.ajax("/api/resources/led-strips").done((data) => {
             $('.led_strips').each(function () {
                 for (let key in data) {
                     $(this).append(new Option(data[key], key));
@@ -90,7 +90,7 @@ function SetLocalSettings() {
 
     const saveProgress = [
         $.ajax({
-            url: "/SetDeviceSetting",
+            url: "/api/settings/device",
             type: "POST",
             data: JSON.stringify(data, null, '\t'),
             contentType: 'application/json;charset=UTF-8'
@@ -131,7 +131,7 @@ function SetLocalSettings() {
         const data2 = { "device": currentDevice.id, "output_type_key": output_type_key, "settings": settings_output_type };
         saveProgress.push(
             $.ajax({
-                url: "/SetOutputTypeDeviceSetting",
+                url: "/api/settings/device/output-type",
                 type: "POST",
                 data: JSON.stringify(data2, null, '\t'),
                 contentType: 'application/json;charset=UTF-8'
@@ -154,14 +154,14 @@ function SetLocalSettings() {
 
 const createDevice = function () {
     $.ajax({
-        url: "/CreateNewDevice",
+        url: "/api/system/devices",
         type: "POST",
         contentType: 'application/json;charset=UTF-8'
     }).done(data => {
         console.log("New device created successfully. Response:\n\n" + JSON.stringify(data, null, '\t'));
         let newDeviceIndex = data["index"];
         // location.reload();
-        $.ajax("/GetDevices2").done((data) => {
+        $.ajax("/api/system/devices").done((data) => {
             const newDeviceId = data.find(d => d.id === `device_${newDeviceIndex}` );
             localStorage.setItem('lastDevice', newDeviceId.id);
             // parse data into device Objects
@@ -225,8 +225,8 @@ $("#delete_btn").on("click", function () {
 $("#delete_btn_modal").on("click", function () {
     $('#modal_delete_device').modal('hide');
     $.ajax({
-        url: "/DeleteDevice",
-        type: "POST",
+        url: "/api/system/devices",
+        type: "DELETE",
         data: JSON.stringify({ "device": currentDevice.id }, null, '\t'),
         contentType: 'application/json;charset=UTF-8'
     }).done(data => {

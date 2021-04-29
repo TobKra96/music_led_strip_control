@@ -8,33 +8,12 @@ import json
 general_settings_api = Blueprint('general_settings_api', __name__)
 
 
-#################################################################
-
-# /api/settings/general
-# GET
-# in
-# {
-# "setting_key" = <setting_key>
-# }
-#
-# return
-# {
-# "setting_key" = <setting_key>
-# "setting_value" = <setting_value>
-# }
-#
-# POST
-# {
-# "settings" = {
-#   "<settings_key>" = <setting_value>
-# }
-#
-@general_settings_api.route('/api/settings/general', methods=['GET', 'POST'])
+@general_settings_api.route('/api/settings/general', methods=['GET', 'POST', 'DELETE'])
 @login_required
 def general_settings():  # pylint: disable=E0211
     if request.method == 'GET':
-        if len(request.args) > 0:
-            # Todo: Enforce setting_key as the only allowed query parameter.
+        # Retrieve settings from config.
+        if len(request.args) == 1:
             data_in = request.args.to_dict()
             data_out = copy.deepcopy(data_in)
 
@@ -48,7 +27,8 @@ def general_settings():  # pylint: disable=E0211
                 return "Could not find settings value: ", 403
             else:
                 return jsonify(data_out)
-        else:
+
+        elif len(request.args) == 0:
             # If no queries passed, return all settings.
             data_out = dict()
 
@@ -59,7 +39,11 @@ def general_settings():  # pylint: disable=E0211
                 return "Could not find settings value: ", 403
             else:
                 return jsonify(data_out)
+
+        return "Input data are wrong.", 403
+
     elif request.method == 'POST':
+        # Save new settings to config.
         data_in = request.get_json()
         data_out = copy.deepcopy(data_in)
 
@@ -67,6 +51,14 @@ def general_settings():  # pylint: disable=E0211
             return "Input data are wrong.", 403
 
         Executer.instance.general_settings_executer.set_general_setting(data_in["settings"])
+
+        return jsonify(data_out)
+
+    elif request.method == 'DELETE':
+        # Reset settings in config to default.
+        data_out = dict()
+
+        Executer.instance.general_settings_executer.reset_settings()
 
         return jsonify(data_out)
 
@@ -103,18 +95,3 @@ def import_config():  # pylint: disable=E0211
     else:
         flash('No config file selected', 'error')
         return "No config file selected.", 400
-
-
-# /api/settings/general/reset
-# {
-# }
-@general_settings_api.route('/api/settings/general/reset', methods=['POST'])
-@login_required
-def reset_settings():  # pylint: disable=E0211
-    if request.method == 'POST':
-
-        data_out = dict()
-
-        Executer.instance.general_settings_executer.reset_settings()
-
-        return jsonify(data_out)

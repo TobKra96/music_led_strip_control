@@ -7,21 +7,9 @@ import copy
 device_api = Blueprint('device_api', __name__)
 
 
-# /GetDevices
-# in
-# {
-# }
-
-# return
-# {
-# "<device_id1>" = <device_name1>
-# "<device_id2>" = <device_name2>
-# "<device_id3>" = <device_name3>
-# ...
-# }
-@device_api.route('/GetDevices', methods=['GET'])
+@device_api.route('/api/system/devices', methods=['GET', 'POST', 'DELETE'])
 @login_required
-def get_devices():  # pylint: disable=E0211
+def devices():  # pylint: disable=E0211
     if request.method == 'GET':
         data_out = dict()
 
@@ -33,48 +21,7 @@ def get_devices():  # pylint: disable=E0211
         else:
             return jsonify(data_out)
 
-
-# /GetDevices2
-# in
-# {
-# }
-
-# return
-# {
-#       [
-#           {
-#               "name":"<name>"
-#               "id":"<id>"
-#           },
-#           {
-#               "name":"<name>"
-#               "id":"<id>"
-#           }
-#       ]
-# }
-@device_api.route('/GetDevices2', methods=['GET'])
-@login_required
-def get_devices2():  # pylint: disable=E0211
-    if request.method == 'GET':
-        data_out = dict()
-
-        devices = Executer.instance.device_executer.get_devices2()
-        data_out = devices
-
-        if devices is None:
-            return "Could not find devices: ", 403
-        else:
-            return jsonify(data_out)
-
-
-# /CreateNewDevice
-# {
-# }
-@device_api.route('/CreateNewDevice', methods=['POST'])
-@login_required
-def create_new_device():  # pylint: disable=E0211
-    if request.method == 'POST':
-
+    elif request.method == 'POST':
         index = Executer.instance.device_executer.create_new_device()
 
         data_out = {
@@ -83,15 +30,7 @@ def create_new_device():  # pylint: disable=E0211
 
         return jsonify(data_out)
 
-
-# /DeleteDevice
-# {
-# "device" = <deviceID>
-# }
-@device_api.route('/DeleteDevice', methods=['POST'])
-@login_required
-def delete_device():  # pylint: disable=E0211
-    if request.method == 'POST':
+    elif request.method == 'DELETE':
         data_in = request.get_json()
         data_out = copy.deepcopy(data_in)
 

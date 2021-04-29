@@ -18,6 +18,7 @@ def login():
 
     if not use_pin_lock or is_authenticated:
         return redirect("/")
+
     if request.method == 'POST':
         pin = request.form.get('pin')
         if 'next' in request.args:
@@ -52,7 +53,7 @@ def logout():
     return redirect(url_for('login'))
 
 
-@authentication_api.route('/api/settings/general/pin', methods=['GET', 'POST'])
+@authentication_api.route('/api/settings/general/pin', methods=['GET', 'POST', 'DELETE'])
 @login_required
 def pin_setting():  # pylint: disable=E0211
     if request.method == 'GET':
@@ -62,6 +63,7 @@ def pin_setting():  # pylint: disable=E0211
             "USE_PIN_LOCK": data_in["USE_PIN_LOCK"]
         }
         return jsonify(data_out)
+
     elif request.method == 'POST':
         data_in = request.get_json()
 
@@ -72,15 +74,12 @@ def pin_setting():  # pylint: disable=E0211
         Executer.instance.authentication_executer.set_pin_setting(data_out)
         return jsonify(data_out)
 
+    elif request.method == 'DELETE':
+        data_in = request.get_json()
+        new_values = {
+            "DEFAULT_PIN": data_in["DEFAULT_PIN"],
+            "USE_PIN_LOCK": data_in["USE_PIN_LOCK"]
+        }
 
-@authentication_api.route('/api/settings/general/pin/reset', methods=['POST'])
-@login_required
-def reset_pin_settings():  # pylint: disable=E0211
-    data_in = request.get_json()
-    new_values = {
-        "DEFAULT_PIN": data_in["DEFAULT_PIN"],
-        "USE_PIN_LOCK": data_in["USE_PIN_LOCK"]
-    }
-
-    data_out = Executer.instance.authentication_executer.reset_pin_settings(new_values)
-    return jsonify(data_out)
+        data_out = Executer.instance.authentication_executer.reset_pin_settings(new_values)
+        return jsonify(data_out)

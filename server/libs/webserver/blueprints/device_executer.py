@@ -5,18 +5,7 @@ import copy
 
 class DeviceExecuter(ExecuterBase):
 
-    # Return all devices in a dictionary format: "device_id" = device_name.
     def get_devices(self):
-
-        devices = dict()
-
-        for device_key in self._config["device_configs"]:
-            devices[device_key] = self._config["device_configs"][device_key]["device_name"]
-
-        return devices
-
-    def get_devices2(self):
-
         devices = []
 
         for device_key in self._config["device_configs"]:

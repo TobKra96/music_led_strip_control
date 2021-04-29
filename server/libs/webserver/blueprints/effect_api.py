@@ -7,72 +7,50 @@ import copy
 effect_api = Blueprint('effect_api', __name__)
 
 
-#################################################################
-
-# /GetActiveEffect
-# in
-# {
-# "device" = <deviceID>
-# }
-
-# return
-# {
-# "device" = <deviceID>
-# "effect" = <effectID>
-# }
-@effect_api.route('/GetActiveEffect', methods=['GET'])
+@effect_api.route('/api/effect/active', methods=['GET', 'POST'])
 @login_required
-def get_active_effect():  # pylint: disable=E0211
+def active_effect():  # pylint: disable=E0211
     if request.method == 'GET':
-        data_in = request.args.to_dict()
-        data_out = copy.deepcopy(data_in)
+        if len(request.args) == 1:
+            # Retrieve the active effect for specific device.
+            data_in = request.args.to_dict()
+            data_out = copy.deepcopy(data_in)
 
-        if not Executer.instance.effect_executer.validate_data_in(data_in, ("device",)):
-            return "Input data are wrong.", 403
+            if not Executer.instance.effect_executer.validate_data_in(data_in, ("device",)):
+                return "Input data are wrong.", 403
 
-        active_effect = Executer.instance.effect_executer.get_active_effect(data_in["device"])
-        data_out["effect"] = active_effect
+            active_effect = Executer.instance.effect_executer.get_active_effect(data_in["device"])
+            data_out["effect"] = active_effect
 
-        if active_effect is None:
-            return "Could not find active effect: ", 403
-        else:
+            if active_effect is None:
+                return "Could not find active effect: ", 403
+            else:
+                return jsonify(data_out)
+
+        return "Input data are wrong.", 403
+
+    elif request.method == 'POST':
+        data_in = request.get_json()
+        if all(key in data_in for key in ("device", "effect")):
+            # Save the active effect for specific device.
+            data_out = copy.deepcopy(data_in)
+
+            if not Executer.instance.effect_executer.validate_data_in(data_in, ("device", "effect",)):
+                return "Input data are wrong.", 403
+
+            Executer.instance.effect_executer.set_active_effect(data_in["device"], data_in["effect"])
+
             return jsonify(data_out)
 
+        elif all(key in data_in for key in ("effect")):
+            # Save the active effect for all devices.
+            data_out = copy.deepcopy(data_in)
 
-# /SetActiveEffect
-# {
-# "device" = <deviceID>
-# "effect" = <effectID>
-# }
-@effect_api.route('/SetActiveEffect', methods=['POST'])
-@login_required
-def set_active_effect():  # pylint: disable=E0211
-    if request.method == 'POST':
-        data_in = request.get_json()
-        data_out = copy.deepcopy(data_in)
+            if not Executer.instance.effect_executer.validate_data_in(data_in, ("effect",)):
+                return "Input data is wrong.", 403
 
-        if not Executer.instance.effect_executer.validate_data_in(data_in, ("device", "effect",)):
-            return "Input data are wrong.", 403
+            Executer.instance.effect_executer.set_active_effect_for_all(data_in["effect"])
 
-        Executer.instance.effect_executer.set_active_effect(data_in["device"], data_in["effect"])
+            return jsonify(data_out)
 
-        return jsonify(data_out)
-
-
-# SetActiveEffectForAll
-# {
-# "effect" = <effectID>
-# }
-@effect_api.route('/SetActiveEffectForAll', methods=['POST'])
-@login_required
-def set_active_effect_for_all():  # pylint: disable=E0211
-    if request.method == 'POST':
-        data_in = request.get_json()
-        data_out = copy.deepcopy(data_in)
-
-        if not Executer.instance.effect_executer.validate_data_in(data_in, ("effect",)):
-            return "Input data is wrong.", 403
-
-        Executer.instance.effect_executer.set_active_effect_for_all(data_in["effect"])
-
-        return jsonify(data_out)
+        return "Input data are wrong.", 403

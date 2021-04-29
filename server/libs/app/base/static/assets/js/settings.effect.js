@@ -45,7 +45,7 @@ $(function () {
 
         Promise.all([
 
-            $.ajax("/GetColors").done((response) => {
+            $.ajax("/api/resources/colors").done((response) => {
                 $('.colors').each(function () {
                     for (var currentKey in response) {
                         var newOption = new Option(currentKey, currentKey);
@@ -56,7 +56,7 @@ $(function () {
                 });
             }),
 
-            $.ajax("/GetGradients").done((response) => {
+            $.ajax("/api/resources/gradients").done((response) => {
                 $('.gradients').each(function () {
                     for (var currentKey in response) {
                         var newOption = new Option(currentKey, currentKey);
@@ -144,7 +144,7 @@ $("#save_btn").on("click", function () {
     };
 
     $.ajax({
-        url: "/SetEffectSetting",
+        url: "/api/settings/effect",
         type: "POST",
         data: JSON.stringify(data, null, '\t'),
         contentType: 'application/json;charset=UTF-8'

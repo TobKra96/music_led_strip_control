@@ -66,7 +66,7 @@ export default class Device {
     getSetting(key) {
         //  returns promise
         return $.ajax({
-            url: "/GetDeviceSetting",
+            url: "/api/settings/device",
             data: {
                 "device": this.id,
                 "setting_key": key,
@@ -77,7 +77,7 @@ export default class Device {
     getOutputSetting(key, type) {
         //  returns promise
         return $.ajax({
-            url: "/GetOutputTypeDeviceSetting",
+            url: "/api/settings/device/output-type",
             data: {
                 "device": this.id,
                 "setting_key": key,
@@ -88,7 +88,7 @@ export default class Device {
 
     getEffectSetting(effectIdentifier, key) {
         return $.ajax({
-            url: "/GetEffectSetting",
+            url: "/api/settings/effect",
             data: {
                 "device": this.id,
                 "effect": effectIdentifier,
@@ -99,7 +99,7 @@ export default class Device {
 
     getActiveEffect() {
         return $.ajax({
-            url: "/GetActiveEffect",
+            url: "/api/effect/active",
             data: {
                 "device": this.id
             }

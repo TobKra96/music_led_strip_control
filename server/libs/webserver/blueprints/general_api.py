@@ -6,18 +6,9 @@ from flask_login import login_required
 general_api = Blueprint('general_api', __name__)
 
 
-# /GetColors
-#
-# return
-# {
-# "<colorID1>" = <colorName1>
-# "<colorID2>" = <colorName2>
-# "<colorID3>" = <colorName3>
-# ...
-# }
-@general_api.route('/GetColors', methods=['GET'])
+@general_api.route('/api/resources/colors', methods=['GET'])
 @login_required
-def get_colors():  # pylint: disable=E0211
+def colors():  # pylint: disable=E0211
     if request.method == 'GET':
         data_out = dict()
 
@@ -30,18 +21,9 @@ def get_colors():  # pylint: disable=E0211
             return jsonify(data_out)
 
 
-# /GetGradients
-#
-# return
-# {
-# "<gradientID1>" = <gradientName1>
-# "<gradientID2>" = <gradientName2>
-# "<gradientID3>" = <gradientName3>
-# ...
-# }
-@general_api.route('/GetGradients', methods=['GET'])
+@general_api.route('/api/resources/gradients', methods=['GET'])
 @login_required
-def get_gradients():  # pylint: disable=E0211
+def gradients():  # pylint: disable=E0211
     if request.method == 'GET':
         data_out = dict()
 
@@ -54,18 +36,9 @@ def get_gradients():  # pylint: disable=E0211
             return jsonify(data_out)
 
 
-# /GetLEDStrips
-#
-# return
-# {
-# "<LEDStripID1>" = <LEDStripName1>
-# "<LEDStripID2>" = <LEDStripName2>
-# "<LEDStripID3>" = <LEDStripName3>
-# ...
-# }
-@general_api.route('/GetLEDStrips', methods=['GET'])
+@general_api.route('/api/resources/led-strips', methods=['GET'])
 @login_required
-def get_led_strips():  # pylint: disable=E0211
+def led_strips():  # pylint: disable=E0211
     if request.method == 'GET':
         data_out = dict()
 
@@ -78,18 +51,9 @@ def get_led_strips():  # pylint: disable=E0211
             return jsonify(data_out)
 
 
-# /api/settings/general/logging-levels
-#
-# return
-# {
-# "<GetLoggingLevelID1>" = <LoggingLevelName1>
-# "<GetLoggingLevelID2>" = <LoggingLevelName2>
-# "<GetLoggingLevelID3>" = <LoggingLevelName3>
-# ...
-# }
-@general_api.route('/api/settings/general/logging-levels', methods=['GET'])
+@general_api.route('/api/resources/logging-levels', methods=['GET'])
 @login_required
-def get_logging_levels():  # pylint: disable=E0211
+def logging_levels():  # pylint: disable=E0211
     if request.method == 'GET':
         data_out = dict()
 
@@ -102,18 +66,9 @@ def get_logging_levels():  # pylint: disable=E0211
             return jsonify(data_out)
 
 
-# /api/settings/general/audio-devices
-#
-# return
-# {
-# "<AudioDeviceID1>" = <AudioDeviceIDDescription1>
-# "<AudioDeviceID2>" = <AudioDeviceIDDescription2>
-# "<AudioDeviceID3>" = <AudioDeviceIDDescription3>
-# ...
-# }
-@general_api.route('/api/settings/general/audio-devices', methods=['GET'])
+@general_api.route('/api/resources/audio-devices', methods=['GET'])
 @login_required
-def get_audio_devices():  # pylint: disable=E0211
+def audio_devices():  # pylint: disable=E0211
     if request.method == 'GET':
         data_out = dict()
 
@@ -126,18 +81,9 @@ def get_audio_devices():  # pylint: disable=E0211
             return jsonify(data_out)
 
 
-# /GetOutputTypes
-#
-# return
-# {
-# "<outputTypeID1>" = <outputTypeName1>
-# "<outputTypeID2>" = <outputTypeName2>
-# "<outputTypeID3>" = <outputTypeName3>
-# ...
-# }
-@general_api.route('/GetOutputTypes', methods=['GET'])
+@general_api.route('/api/resources/output-types', methods=['GET'])
 @login_required
-def get_output_types():  # pylint: disable=E0211
+def output_types():  # pylint: disable=E0211
     if request.method == 'GET':
         data_out = dict()
 
