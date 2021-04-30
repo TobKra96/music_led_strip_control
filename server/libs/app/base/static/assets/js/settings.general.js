@@ -119,7 +119,7 @@ function ParseGetGeneralSetting(response) {
 
 function GetPinSetting() {
     $.ajax({
-        url: "/api/settings/general/pin",
+        url: "/api/auth/pin",
         type: 'GET',
         contentType: 'application/json;charset=UTF-8',
         success: function (response) {
@@ -200,7 +200,7 @@ function SetPinSetting() {
     pinData["USE_PIN_LOCK"] = pinCheckbox;
 
     $.ajax({
-        url: "/api/settings/general/pin",
+        url: "/api/auth/pin",
         type: 'POST',
         data: JSON.stringify(pinData),
         contentType: 'application/json;charset=UTF-8',
@@ -254,14 +254,10 @@ function ResetSettings() {
 }
 
 function ResetPinSettings() {
-    var data = {}
-    data["DEFAULT_PIN"] = ""
-    data["USE_PIN_LOCK"] = false
-
     $.ajax({
-        url: "/api/settings/general/pin",
+        url: "/api/auth/pin",
         type: "DELETE",
-        data: JSON.stringify(data, null, '\t'),
+        data: {},
         contentType: 'application/json;charset=UTF-8',
         success: function (response) {
             ParseGetPinSetting(response)
@@ -293,7 +289,7 @@ function ImportSettings() {
     form_data.append('imported_config', file_data);
 
     $.ajax({
-        url: '/api/settings/import',
+        url: '/api/settings/configuration/file',
         dataType: 'text',
         cache: false,
         contentType: false,

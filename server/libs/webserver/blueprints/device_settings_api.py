@@ -79,7 +79,7 @@ def get_device_setting():  # pylint: disable=E0211
 @login_required
 def set_device_settings():  # pylint: disable=E0211
     """
-    Set device settings (Incorrect example)
+    Set device settings
     ---
     tags:
         - Settings
@@ -88,22 +88,20 @@ def set_device_settings():  # pylint: disable=E0211
           in: body
           type: string
           required: true
-          description: The `settings` which to set for the specified `device`\n
+          description: The `settings` which to set for the specified `device`
           schema:
                 type: object,
                 example:
                     {
                         device: str,
                         settings: {
-                            settings: {
-                                device_name: str,
-                                fps: int,
-                                led_brightness: str,
-                                led_count: int,
-                                led_mid: int,
-                                led_strip: str,
-                                output_type: str
-                            }
+                            device_name: str,
+                            fps: int,
+                            led_brightness: str,
+                            led_count: int,
+                            led_mid: int,
+                            led_strip: str,
+                            output_type: str
                         }
                     }
     responses:
@@ -115,15 +113,13 @@ def set_device_settings():  # pylint: disable=E0211
                     {
                         device: str,
                         settings: {
-                            settings: {
-                                device_name: str,
-                                fps: int,
-                                led_brightness: str,
-                                led_count: int,
-                                led_mid: int,
-                                led_strip: str,
-                                output_type: str
-                            }
+                            device_name: str,
+                            fps: int,
+                            led_brightness: str,
+                            led_count: int,
+                            led_mid: int,
+                            led_strip: str,
+                            output_type: str
                         }
                     }
         403:
@@ -199,10 +195,56 @@ def get_output_type_device_settings():  # pylint: disable=E0211
 @login_required
 def set_output_type_device_settings():  # pylint: disable=E0211
     """
-    Set a specific output-type setting for a device (Documentation not finished)
+    Set a specific output-type setting for a device
     ---
     tags:
         - Settings
+    parameters:
+        - name: data
+          in: body
+          type: string
+          required: true
+          description: The output-type `settings` which to set for the specified `device`\n\n
+                       Available `output_type_key` keys - output_raspi, output_udp\n\n
+                       If `output_type_key` is output_raspi, the following keys are\n
+                       allowed inside `settings` - led_channel, led_dma, led_freq_hz, led_invert, led_pin\n\n
+                       If `output_type_key` is output_udp, the following keys are\n
+                       allowed inside `settings` - udp_client_ip, udp_client_port\n\n
+                       It is not required to include all above keys inside `settings`
+
+          schema:
+                type: object,
+                example:
+                    {
+                        device: str,
+                        output_type_key: str,
+                        settings: {
+                            led_channel: int,
+                            led_dma: int,
+                            led_freq_hz: int,
+                            led_invert: bool,
+                            led_pin: int
+                        }
+                    }
+    responses:
+        200:
+            description: OK
+            schema:
+                type: object,
+                example:
+                    {
+                        device: str,
+                        output_type_key: str,
+                        settings: {
+                            led_channel: int,
+                            led_dma: int,
+                            led_freq_hz: int,
+                            led_invert: bool,
+                            led_pin: int
+                        }
+                    }
+        403:
+            description: Input data are wrong
     """
     data_in = request.get_json()
     data_out = copy.deepcopy(data_in)
