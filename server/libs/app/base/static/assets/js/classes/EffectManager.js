@@ -76,7 +76,7 @@ export default class EffectManager {
             }
 
             $.ajax({
-                url: "/SetActiveEffect",
+                url: "/api/effect/active",
                 type: "POST",
                 data: JSON.stringify({ "device": this.currentDevice.id, "effect": effect }),
                 contentType: 'application/json;charset=UTF-8'

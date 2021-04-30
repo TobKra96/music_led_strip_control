@@ -92,11 +92,11 @@ $(document).ready(function () {
                                     </label>
                                     <label class="badge badge-pill px-3 py-2 mr-2 theme-bg2 text-white f-14 f-w-400">
                                         <i class="feather icon-arrow-down text-c-green"></i>
-                                        <span id="">${interfaceGbSent} GB</span>
+                                        <span>${interfaceGbRecv} GB</span>
                                     </label>
                                     <label class="badge badge-pill px-3 py-2 theme-bg2 text-white f-14 f-w-400">
                                         <i class="feather icon-arrow-up text-c-yellow"></i>
-                                        <span id="">${interfaceGbRecv} GB</span>
+                                        <span>${interfaceGbSent} GB</span>
                                     </label>
                                 </div>
                             </div>
@@ -199,9 +199,9 @@ $(document).ready(function () {
             console.log(error);
         })
 
-    function getDevices2() {
+    function getDevices() {
         // Preload devices
-        $.ajax("/GetDevices2").done((devices) => {
+        $.ajax("/api/system/devices").done((devices) => {
             if ($("#devices").children("div").length < devices.length) {
                 for (var i = 0, len = devices.length; i < len; i++) {
                     const deviceName = devices[i]["name"];
@@ -231,7 +231,7 @@ $(document).ready(function () {
             }
         });
     }
-    getDevices2();
+    getDevices();
 
     function getDevicesStatus() {
         // Called every 10 seconds

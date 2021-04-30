@@ -29,7 +29,7 @@ function CheckIfFinishedInitialLoading() {
 
 function GetLoggingLevels() {
     $.ajax({
-        url: "/api/settings/general/logging-levels",
+        url: "/api/resources/logging-levels",
         type: "GET",
         data: {},
         success: function (response) {
@@ -63,7 +63,7 @@ function ParseGetLoggingLevels(response) {
 
 function GetAudioDevices() {
     $.ajax({
-        url: "/api/settings/general/audio-devices",
+        url: "/api/resources/audio-devices",
         type: "GET",
         data: {},
         success: function (response) {
@@ -119,8 +119,8 @@ function ParseGetGeneralSetting(response) {
 
 function GetPinSetting() {
     $.ajax({
-        type: 'GET',
         url: "/api/settings/general/pin",
+        type: 'GET',
         contentType: 'application/json;charset=UTF-8',
         success: function (response) {
             ParseGetPinSetting(response)
@@ -200,8 +200,8 @@ function SetPinSetting() {
     pinData["USE_PIN_LOCK"] = pinCheckbox;
 
     $.ajax({
-        type: 'POST',
         url: "/api/settings/general/pin",
+        type: 'POST',
         data: JSON.stringify(pinData),
         contentType: 'application/json;charset=UTF-8',
     });
@@ -239,8 +239,8 @@ function ResetSettings() {
     var data = {};
 
     $.ajax({
-        url: "/api/settings/general/reset",
-        type: "POST",
+        url: "/api/settings/general",
+        type: "DELETE",
         data: JSON.stringify(data, null, '\t'),
         contentType: 'application/json;charset=UTF-8',
         success: function (response) {
@@ -259,8 +259,8 @@ function ResetPinSettings() {
     data["USE_PIN_LOCK"] = false
 
     $.ajax({
-        url: "/api/settings/general/pin/reset",
-        type: "POST",
+        url: "/api/settings/general/pin",
+        type: "DELETE",
         data: JSON.stringify(data, null, '\t'),
         contentType: 'application/json;charset=UTF-8',
         success: function (response) {

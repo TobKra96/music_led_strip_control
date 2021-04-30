@@ -17,11 +17,11 @@ export default class Device {
             $(`a[data-device_id=${this.id}`).addClass("active"),
             // Async function
             this.getActiveEffect()
-            );
-            
+        );
+
         // Add basic behavior to Pills
         const self = this;
-        $(`a[data-device_id=${this.id}`).on("click", function() {
+        $(`a[data-device_id=${this.id}`).on("click", function () {
             self.link = this;
             self._activate();
         });
@@ -40,7 +40,7 @@ export default class Device {
     set name(name) {
         this._name = name;
         // Update HTML elements on namechange
-        if(this.link != undefined && this.link !== "") {
+        if (this.link != undefined && this.link !== "") {
             this.link.innerHTML = name;
         }
     }
@@ -66,7 +66,7 @@ export default class Device {
     getSetting(key) {
         //  returns promise
         return $.ajax({
-            url: "/GetDeviceSetting",
+            url: "/api/settings/device",
             data: {
                 "device": this.id,
                 "setting_key": key,
@@ -77,7 +77,7 @@ export default class Device {
     getOutputSetting(key, type) {
         //  returns promise
         return $.ajax({
-            url: "/GetOutputTypeDeviceSetting",
+            url: "/api/settings/device/output-type",
             data: {
                 "device": this.id,
                 "setting_key": key,
@@ -88,7 +88,7 @@ export default class Device {
 
     getEffectSetting(effectIdentifier, key) {
         return $.ajax({
-            url: "/GetEffectSetting",
+            url: "/api/settings/effect",
             data: {
                 "device": this.id,
                 "effect": effectIdentifier,
@@ -99,7 +99,7 @@ export default class Device {
 
     getActiveEffect() {
         return $.ajax({
-            url: "/GetActiveEffect",
+            url: "/api/effect/active",
             data: {
                 "device": this.id
             }
@@ -122,7 +122,7 @@ export default class Device {
     }
 
     refreshConfig(output_types) {
-        
+
         if (!output_types) return;
         // fetch Device Config data from Server and update the Form
         const device_config_input = $(".device_setting_input").map(function () { return this.id }).toArray()
@@ -141,14 +141,14 @@ export default class Device {
                     const setting_key = data["setting_key"];
                     const setting_value = data["setting_value"];
                     $("#" + setting_key).trigger('change');
-    
+
                     if ($(`#${setting_key}`).attr('type') == 'checkbox') {
                         $(`#${setting_key}`).prop('checked', setting_value);
                     } else {
                         $(`#${setting_key}`).val(setting_value);
                     }
                     $(`#${setting_key}`).trigger('change');
-    
+
                     // Set initial brightness slider value
                     $(`span[for='${setting_key}']`).text(setting_value)
                 })
