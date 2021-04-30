@@ -15,7 +15,7 @@ login_manager = LoginManager()
 
 @login_manager.user_loader
 def user_loader(user_id):
-    if not USE_PIN_LOCK:
+    if not AuthenticationExecuter.instance.get_use_pin_lock():
         return
     user = User()
     user.id = user_id
@@ -29,6 +29,11 @@ def unauthorized():
 
 
 class AuthenticationExecuter(ExecuterBase):
+    def __init__(self, config_lock, notification_queue_in, notification_queue_out, effects_queue, py_audio):
+        super(AuthenticationExecuter, self).__init__(
+            config_lock, notification_queue_in, notification_queue_out, effects_queue, py_audio)
+
+        AuthenticationExecuter.instance = self
 
     def add_server_authentication(self, server):
         self.logger.debug("Enter add_server_authentication()")
@@ -89,8 +94,10 @@ class AuthenticationExecuter(ExecuterBase):
 
         if self.pin_file in dataset:
             try:
-                file_values["DEFAULT_PIN"] = self.pin_config['SECURITY'].get('DEFAULT_PIN')
-                file_values["USE_PIN_LOCK"] = self.pin_config['SECURITY'].getboolean('USE_PIN_LOCK')
+                file_values["DEFAULT_PIN"] = self.pin_config['SECURITY'].get(
+                    'DEFAULT_PIN')
+                file_values["USE_PIN_LOCK"] = self.pin_config['SECURITY'].getboolean(
+                    'USE_PIN_LOCK')
                 return file_values
             except (ValueError, KeyError) as ex:
                 self.logger.debug(f"Pin dataset failed: {ex}")
