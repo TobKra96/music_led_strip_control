@@ -162,7 +162,7 @@ def reset_general_settings():  # pylint: disable=E0211
     return jsonify(data_out)
 
 
-@general_settings_api.route('/api/settings/export', methods=['GET'])
+@general_settings_api.route('/api/settings/configuration/file', methods=['GET'])
 @login_required
 def export_config():  # pylint: disable=E0211
     """
@@ -178,7 +178,7 @@ def export_config():  # pylint: disable=E0211
     return send_file(Executer.instance.general_settings_executer.export_config_path, as_attachment=True, cache_timeout=-1, mimetype="text/html")
 
 
-@general_settings_api.route('/api/settings/import', methods=['POST'])
+@general_settings_api.route('/api/settings/configuration/file', methods=['POST'])
 @login_required
 def import_config():  # pylint: disable=E0211
     """

@@ -293,7 +293,7 @@ function ImportSettings() {
     form_data.append('imported_config', file_data);
 
     $.ajax({
-        url: '/api/settings/import',
+        url: '/api/settings/configuration/file',
         dataType: 'text',
         cache: false,
         contentType: false,
