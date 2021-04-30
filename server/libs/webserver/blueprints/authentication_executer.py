@@ -15,7 +15,6 @@ login_manager = LoginManager()
 
 @login_manager.user_loader
 def user_loader(user_id):
-    print("user loader")
     if not USE_PIN_LOCK:
         return
     user = User()
@@ -25,7 +24,6 @@ def user_loader(user_id):
 
 @login_manager.unauthorized_handler
 def unauthorized():
-    print("unauthorized")
     session['next'] = request.path
     return redirect(url_for('authentication_api.login', next=session['next']))
 
@@ -114,6 +112,7 @@ class AuthenticationExecuter(ExecuterBase):
 
     def first_call(self):
         self.logger.debug("Enter first_call")
+        USE_PIN_LOCK = self.file_values["USE_PIN_LOCK"]
         if USE_PIN_LOCK:
             self.logger.debug("Logout User")
             logout_user()
@@ -139,7 +138,7 @@ class AuthenticationExecuter(ExecuterBase):
 
     def get_use_pin_lock(self):
         self.logger.debug("Enter get_use_pin_lock()")
-        return USE_PIN_LOCK
+        return self.file_values["USE_PIN_LOCK"]
 
 
 class User(UserMixin):
