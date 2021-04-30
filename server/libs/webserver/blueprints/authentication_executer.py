@@ -4,7 +4,9 @@ from configparser import ConfigParser, ParsingError, MissingSectionHeaderError
 from flask_login import LoginManager, UserMixin, login_user, logout_user
 from flask import request, redirect, url_for, session
 from urllib.parse import urlparse, urljoin
+from copy import deepcopy
 from os import chmod
+import platform
 import re
 
 USE_PIN_LOCK = True
@@ -60,21 +62,22 @@ class AuthenticationExecuter(ExecuterBase):
         with open(self.pin_file, 'w') as configfile:
             self.logger.debug("Write pin to file.")
             self.pin_config.write(configfile)
-            chmod(self.pin_file, 775)
+            if platform.system().lower() == "linux":
+                chmod(self.pin_file, 775)
         self.logger.debug("Pin saved to file.")
 
     def reset_pin_file(self):
         self.logger.debug("Reset pin")
         for section in self.pin_config.sections():
             self.pin_config.remove_section(section)
-        self.pin_config["SECURITY"] = self.default_values
+        self.pin_config["SECURITY"] = deepcopy(self.default_values)
         self.save_pin_file()
-        self.logger.debug("Pin reseted")
+        self.logger.debug("Pin reset")
 
     def read_pin_file(self):
         self.logger.debug("Read Pin from file")
         # Check if .ini file exists and if security options are valid.
-        file_values = self.default_values
+        file_values = deepcopy(self.default_values)
         try:
             self.logger.debug("Start reading pin config...")
             dataset = self.pin_config.read(self.pin_file)
@@ -124,10 +127,9 @@ class AuthenticationExecuter(ExecuterBase):
         self.logger.debug("Enter get_pin_setting()")
         return self.read_pin_file()
 
-    def reset_pin_settings(self, data):
+    def reset_pin_settings(self):
         self.logger.debug("Enter reset_pin_settings()")
-        self.pin_config["SECURITY"] = data
-        self.save_pin_file()
+        self.reset_pin_file()
         return self.read_pin_file()
 
     def login(self):
