@@ -7,9 +7,9 @@ let devices = jinja_devices.map(d => { return new Device(d) });
 // could this be done better?
 let currentDevice = devices.find(d => d.id === localStorage.getItem("lastDevice") );
 currentDevice = currentDevice ? currentDevice : devices[devices.length-1];
-localStorage.setItem('lastDevice', currentDevice.id);
-$(`a[data-device_id=${currentDevice.id}`).addClass("active");
-$("#selected_device_txt").text(currentDevice.name);
+// localStorage.setItem('lastDevice', currentDevice.id);
+// $(`a[data-device_id=${currentDevice.id}`).addClass("active");
+// $("#selected_device_txt").text(currentDevice.name);
 
 // Init and load all settings
 $(document).ready(function () {
@@ -34,16 +34,6 @@ $(document).ready(function () {
             });
         }),
     ]).then(response => {
-        currentDevice.refreshConfig(output_types);
-
-        // Add behavior to Device Tab
-        devices.forEach(device => {
-            device.link.addEventListener('click', () => {
-                currentDevice = device;
-                device.refreshConfig(output_types);
-            });
-        });
-
         if (devices.length > 0) {
             $("#deviceFound").removeClass('d-none');
             $("#noDeviceFound").addClass('d-none');
@@ -54,6 +44,15 @@ $(document).ready(function () {
             $("#selected_device_label").addClass('d-none');
             return;
         }
+
+        currentDevice.refreshConfig(output_types);
+        // Add behavior to Device Tab
+        devices.forEach(device => {
+            device.link.addEventListener('click', () => {
+                currentDevice = device;
+                device.refreshConfig(output_types);
+            });
+        });
 
     }).catch((response) => {
         if (devices.length === 0) {
