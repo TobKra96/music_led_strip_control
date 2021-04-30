@@ -1,5 +1,6 @@
 from libs.effect_service import EffectService
 from libs.output_service import OutputService
+from libs.queue_wrapper import QueueWrapper  # pylint: disable=E0611, E0401
 
 from multiprocessing import Process, Queue
 import logging
@@ -17,12 +18,14 @@ class Device:
         self.create_processes()
 
     def start_device(self):
-        self.logger.info(f'Starting device: {self.__device_config["device_name"]}')
+        self.logger.info(
+            f'Starting device: {self.__device_config["device_name"]}')
         self.__output_process.start()
         self.__effect_process.start()
 
     def stop_device(self):
-        self.logger.info(f'Stopping device: {self.__device_config["device_name"]}')
+        self.logger.info(
+            f'Stopping device: {self.__device_config["device_name"]}')
         self.__effect_process.terminate()
         self.__output_process.terminate()
 
@@ -40,14 +43,15 @@ class Device:
         )
 
     def create_queues(self):
-        self.__device_notification_queue_in = Queue(2)
-        self.__device_notification_queue_out = Queue(2)
-        self.__effect_queue = Queue(2)
-        self.__audio_queue = Queue(2)
-        self.__output_queue = Queue(2)
+        self.__device_notification_queue_in = QueueWrapper(Queue(2))
+        self.__device_notification_queue_out = QueueWrapper(Queue(2))
+        self.__effect_queue = QueueWrapper(Queue(2))
+        self.__audio_queue = QueueWrapper(Queue(2))
+        self.__output_queue = QueueWrapper(Queue(2))
 
     def refresh_config(self, config, device_config):
-        self.logger.info(f'Refreshing config of device: {self.__device_config["device_name"]}')
+        self.logger.info(
+            f'Refreshing config of device: {self.__device_config["device_name"]}')
 
         self.stop_device()
 

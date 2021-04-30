@@ -42,10 +42,13 @@ class Effect:
         self.prev_spectrum = np.array([self.led_count // 2])
         self.freq_channel_history = 40
         self.beat_count = 0
-        self.freq_channels = [deque(maxlen=self.freq_channel_history) for i in range(self.n_fft_bins)]
+        self.freq_channels = [deque(maxlen=self.freq_channel_history)
+                              for i in range(self.n_fft_bins)]
 
-        self.output = np.array([[0 for i in range(self.led_count)] for i in range(3)])
-        self.prev_output = np.array([[0 for i in range(self.led_count)] for i in range(3)])
+        self.output = np.array(
+            [[0 for i in range(self.led_count)] for i in range(3)])
+        self.prev_output = np.array(
+            [[0 for i in range(self.led_count)] for i in range(3)])
 
         self.speed_counter = 0
 
@@ -107,9 +110,11 @@ class Effect:
         differences = []
 
         for i in range(n_fft_bins):
-            channel_avgs.append(sum(self.freq_channels[i]) / len(self.freq_channels[i]))
+            channel_avgs.append(
+                sum(self.freq_channels[i]) / len(self.freq_channels[i]))
             if channel_avgs[i] != 0:
-                differences.append(((self.freq_channels[i][0] - channel_avgs[i]) * 100) // channel_avgs[i])
+                differences.append(
+                    ((self.freq_channels[i][0] - channel_avgs[i]) * 100) // channel_avgs[i])
             else:
                 differences.append(0)
         for i in ["beat", "low", "mid", "high"]:
@@ -150,8 +155,7 @@ class Effect:
     def get_audio_data(self):
         audio_data = None
         if not self._audio_queue.empty():
-            audio_data = self._audio_queue.get()
-
+            audio_data = self._audio_queue.get_blocking()
         return audio_data
 
     def get_mel(self, audio_data):
@@ -183,13 +187,10 @@ class Effect:
         return audio_vol
 
     def queue_output_array_blocking(self, output_array):
-        self._output_queue.put(output_array)
+        self._output_queue.put_blocking(output_array)
 
     def queue_output_array_noneblocking(self, output_array):
-        if self._output_queue.full():
-            prev_output_array = self._output_queue.get()
-            del prev_output_array
-        self._output_queue.put(output_array)
+        self._output_queue.put_none_blocking(output_array)
 
     def get_effect_config(self, effect_id):
         # Check if we use the global "all_devices" settings or the device specific one.
@@ -209,11 +210,13 @@ class Effect:
         # Add some tolerance for the real mid.
         if (real_mid >= led_mid - 2) and (real_mid <= led_mid + 2):
             # Use the option with shrinking the array.
-            mirrored_array = np.concatenate((array[:, ::-2], array[:, ::2]), axis=1)
+            mirrored_array = np.concatenate(
+                (array[:, ::-2], array[:, ::2]), axis=1)
             return mirrored_array
         else:
             # Mirror the whole array. After this the array has the double size than led_count.
-            big_mirrored_array = np.concatenate((array[:, ::-1], array[:, ::1]), axis=1)
+            big_mirrored_array = np.concatenate(
+                (array[:, ::-1], array[:, ::1]), axis=1)
             start_of_array = led_count - led_mid
             end_of_array = start_of_array + led_count
             mirrored_array = big_mirrored_array[:, start_of_array:end_of_array]

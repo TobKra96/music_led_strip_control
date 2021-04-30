@@ -4,6 +4,7 @@ from libs.config_service import ConfigService  # pylint: disable=E0611, E0401
 from libs.fps_limiter import FPSLimiter  # pylint: disable=E0611, E0401
 from libs.audio_info import AudioInfo  # pylint: disable=E0611, E0401
 from libs.dsp import DSP  # pylint: disable=E0611, E0401
+from libs.queue_wrapper import QueueWrapper
 
 from multiprocessing import Queue
 from queue import Empty
@@ -18,11 +19,11 @@ class AudioProcessService:
         self.logger = logging.getLogger(__name__)
 
         self._config_lock = config_lock
-        self._notification_queue_in = notification_queue_in
-        self._notification_queue_out = notification_queue_out
-        self._audio_queue = audio_queue
+        self._notification_queue_in = QueueWrapper(notification_queue_in)
+        self._notification_queue_out = QueueWrapper(notification_queue_out)
+        self._audio_queue = QueueWrapper(audio_queue)
 
-        self.audio_buffer_queue = Queue(2)
+        self.audio_buffer_queue = QueueWrapper(Queue(2))
         self._py_audio = py_audio
         self.stream = None
 
@@ -46,12 +47,14 @@ class AudioProcessService:
             self._skip_routine = False
             self._devices = AudioInfo.get_audio_devices(self._py_audio)
 
-            self.log_output(show_output, logging.INFO, "Found the following audio sources:")
+            self.log_output(show_output, logging.INFO,
+                            "Found the following audio sources:")
 
             # Select the audio device you want to use.
             selected_device_list_index = 0
             try:
-                selected_device_list_index = int(self._config["general_settings"]["device_id"])
+                selected_device_list_index = int(
+                    self._config["general_settings"]["device_id"])
             except Exception as e:
                 self.logger.exception(f"Could not parse audio id: {e}")
 
@@ -67,18 +70,25 @@ class AudioProcessService:
 
             # Could not find a mic with the selected mic id, so I will use the first device I found.
             if self.selected_device is None:
-                self.log_output(show_output, logging.ERROR, "********************************************************")
-                self.log_output(show_output, logging.ERROR, "*                      Error                           *")
-                self.log_output(show_output, logging.ERROR, "********************************************************")
-                self.log_output(show_output, logging.ERROR, f"Could not find the mic with the id: {selected_device_list_index}")
-                self.log_output(show_output, logging.ERROR, "Using the first mic as fallback.")
-                self.log_output(show_output, logging.ERROR, "Please change the id of the mic inside the config.")
+                self.log_output(show_output, logging.ERROR,
+                                "********************************************************")
+                self.log_output(show_output, logging.ERROR,
+                                "*                      Error                           *")
+                self.log_output(show_output, logging.ERROR,
+                                "********************************************************")
+                self.log_output(show_output, logging.ERROR,
+                                f"Could not find the mic with the id: {selected_device_list_index}")
+                self.log_output(show_output, logging.ERROR,
+                                "Using the first mic as fallback.")
+                self.log_output(show_output, logging.ERROR,
+                                "Please change the id of the mic inside the config.")
                 self.selected_device = self._devices[0]
 
             self._device_rate = self._config["general_settings"]["default_sample_rate"]
             self._frames_per_buffer = self._config["general_settings"]["frames_per_buffer"]
             self.n_fft_bins = self._config["general_settings"]["n_fft_bins"]
-            self.log_output(show_output, logging.INFO, f"Selected Device: {self.selected_device.to_string()}")
+            self.log_output(show_output, logging.INFO,
+                            f"Selected Device: {self.selected_device.to_string()}")
 
             # Init Timer
             self.start_time_1 = time()
@@ -91,17 +101,14 @@ class AudioProcessService:
             self.audio = np.empty((self._frames_per_buffer), dtype="int16")
 
             # Reinit buffer queue
-            self.audio_buffer_queue = Queue(2)
+            self.audio_buffer_queue = QueueWrapper(Queue(2))
 
             # callback function to stream audio, another thread.
             def callback(in_data, frame_count, time_info, status):
                 if self._skip_routine:
                     return (self.audio, pyaudio.paContinue)
 
-                try:
-                    self.audio_buffer_queue.put(in_data)
-                except Exception as e:
-                    pass
+                self.audio_buffer_queue.put_none_blocking(in_data)
 
                 self.end_time_1 = time()
 
@@ -115,7 +122,8 @@ class AudioProcessService:
 
                 return (self.audio, pyaudio.paContinue)
 
-            self.log_output(show_output, logging.DEBUG, "Starting Open Audio Stream...")
+            self.log_output(show_output, logging.DEBUG,
+                            "Starting Open Audio Stream...")
             self.stream = self._py_audio.open(
                 format=pyaudio.paInt16,
                 channels=1,
@@ -127,7 +135,8 @@ class AudioProcessService:
             )
         except Exception as e:
             self.logger.error("Could not init AudioService.")
-            self.logger.exception(f"Unexpected error in init_audio_service: {e}")
+            self.logger.exception(
+                f"Unexpected error in init_audio_service: {e}")
 
     def log_output(self, show_output, log_level, message):
         if show_output:
@@ -145,14 +154,15 @@ class AudioProcessService:
     def audio_service_routine(self):
         try:
             if not self._notification_queue_in.empty():
-                current_notification_item = self._notification_queue_in.get()
+                current_notification_item = self._notification_queue_in.get_blocking()
 
                 if current_notification_item.notification_enum is NotificationEnum.config_refresh:
                     if self.stream is not None:
                         self.stream.stop_stream()
                         self.stream.close()
                     self.init_audio_service()
-                    self._notification_queue_out.put(NotificationItem(NotificationEnum.config_refresh_finished, current_notification_item.device_id))
+                    self._notification_queue_out.put_blocking(NotificationItem(
+                        NotificationEnum.config_refresh_finished, current_notification_item.device_id))
                 elif current_notification_item.notification_enum is NotificationEnum.process_continue:
                     self._skip_routine = False
                 elif current_notification_item.notification_enum is NotificationEnum.process_pause:
@@ -161,9 +171,9 @@ class AudioProcessService:
             if self._skip_routine:
                 return
 
-            try:
-                in_data = self.audio_buffer_queue.get(block=True, timeout=1)
-            except Empty as e:
+            in_data = None
+            in_data = self.audio_buffer_queue.get_blocking_with_timeout()
+            if in_data is None:
                 self.logger.debug("Audio in timeout. Queue is Empty")
                 return
 
@@ -180,14 +190,7 @@ class AudioProcessService:
                 # Fill the array with zeros, to fade out the effect.
                 audio_datas["mel"] = np.zeros(self.n_fft_bins)
 
-            if self._audio_queue.full():
-                try:
-                    pre_audio_data = self._audio_queue.get(block=True, timeout=0.033)
-                    del pre_audio_data
-                except Exception as e:
-                    pass
-
-            self._audio_queue.put(audio_datas, False)
+            self._audio_queue.put_none_blocking(audio_datas)
 
             self.end_time_2 = time()
 
@@ -200,7 +203,8 @@ class AudioProcessService:
             self.start_time_2 = time()
 
         except IOError:
-            self.logger.exception("IOError while reading the Microphone Stream.")
+            self.logger.exception(
+                "IOError while reading the Microphone Stream.")
             pass
         except Exception as e:
             self.logger.error("Could not run AudioService routine.")
