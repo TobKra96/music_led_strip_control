@@ -15,7 +15,7 @@ class OutputService():
         self.logger = logging.getLogger(__name__)
 
         self._device = device
-        self._led_strip = self._device.device_config["output"]["output_raspi"]["led_strip"]
+        self._led_strip = self._device.device_config["led_strip"]
 
         self.logger.info(
             f'Starting Output service... Device: {self._device.device_config["device_name"]}')
