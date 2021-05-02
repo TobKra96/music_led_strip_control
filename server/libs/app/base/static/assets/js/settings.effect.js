@@ -13,6 +13,20 @@ $(function () {
     // Open "Edit Effects" sidebar dropdown when on an effect page
     $("#effect_list").slideDown();
 
+    // Todo: Get effects from server
+    const effects1 = {
+        "test_1": "Test 1",
+        "test_2": "Test 2",
+        "test_3": "Test 3"
+    };
+    const effects2 = {
+        "test_4": "Test 4",
+        "test_5": "Test 5",
+        "test_6": "Test 6"
+    };
+    generateEffectCheckboxes("#nonMusicEffectCol", effects1);
+    generateEffectCheckboxes("#musicEffectCol", effects2);
+
     effectIdentifier = $("#effectIdentifier").val();
 
     if (!jinja_devices.length) {
@@ -76,6 +90,19 @@ $(function () {
     }
 
 });
+
+
+function generateEffectCheckboxes(parentId, effects) {
+    for (const [effectId, effectName] of Object.entries(effects)) {
+        const checkbox = `
+            <div class="custom-control custom-checkbox my-2">
+                <input type="checkbox" class="custom-control-input setting_input" id="${effectId}">
+                <label class="custom-control-label" for="${effectId}">${effectName}</label>
+            </div>
+        `;
+        $(parentId).append(checkbox)
+    }
+}
 
 
 function GetAllSettingKeys() {
