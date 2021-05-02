@@ -139,3 +139,11 @@ input[type=number] {
 .tooltip .arrow::before {
     color: #3f4d67 !important;
 }
+
+/* Fix checkboxes and file input box not dimming when hovering over collapsed navbar */
+.pcoded-navbar.mob-open ~ .pcoded-header:before,
+.pcoded-navbar.mob-open ~ .pcoded-main-container:before,
+.pcoded-navbar.navbar-collapsed:hover ~ .pcoded-header:before,
+.pcoded-navbar.navbar-collapsed:hover ~ .pcoded-main-container:before {
+	z-index: 2;
+}
