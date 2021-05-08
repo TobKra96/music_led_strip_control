@@ -53,8 +53,9 @@ class AudioProcessService:
             # Select the audio device you want to use.
             selected_device_list_index = 0
             try:
-                selected_device_list_index = int(
-                    self._config["general_settings"]["device_id"])
+                mic_id = self._config["general_settings"]["device_id"]
+                if mic_id != "no_mic":
+                    selected_device_list_index = int(mic_id)
             except Exception as e:
                 self.logger.exception(f"Could not parse audio id: {e}")
 

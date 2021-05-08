@@ -11,43 +11,77 @@ def first():
     Executer.instance.authentication_executer.first_call()
 
 
-@authentication_api.route('/login', methods=['GET', 'POST'])
-def login():
+@authentication_api.route('/login', methods=['GET'])
+def show_login_page():
     use_pin_lock = Executer.instance.authentication_executer.get_use_pin_lock()
     is_authenticated = current_user.is_authenticated
 
     if not use_pin_lock or is_authenticated:
         return redirect("/")
 
-    if request.method == 'POST':
-        pin = request.form.get('pin')
-        if 'next' in request.args:
-            session['next'] = request.args['next']
-        else:
-            session['next'] = None
-        if not pin:
-            flash('PIN is required')
-            return redirect(url_for('authentication_api.login', next=session['next']))
-        if not pin.isdigit():
-            flash('PIN must only contain digits')
-            return redirect(url_for('authentication_api.login', next=session['next']))
-        if not Executer.instance.authentication_executer.validate_pin(pin):
-            flash('PIN must be at least 4 digits long')
-            return redirect(url_for('authentication_api.login', next=session['next']))
-        if pin != Executer.instance.authentication_executer.DEFAULT_PIN:
-            flash('Invalid PIN')
-            return redirect(url_for('authentication_api.login', next=session['next']))
-        elif pin == Executer.instance.authentication_executer.DEFAULT_PIN:
-            Executer.instance.authentication_executer.login()
-            if session['next'] is not None:
-                if Executer.instance.authentication_executer.is_safe_url(session['next']):
-                    return redirect(session['next'])
-            return redirect("/")
+    return render_template('login.html')
+
+
+@authentication_api.route('/login', methods=['POST'])
+def login():
+    """
+    Log in user
+    ---
+    tags:
+        - Auth
+    produces:
+        - text/html
+    parameters:
+        - name: pin
+          in: formData
+          type: string
+          required: true
+          description: Redirects to next page if login successful
+    responses:
+        200:
+            description: OK
+    """
+    pin = request.form.get('pin')
+    if 'next' in request.args:
+        session['next'] = request.args['next']
+    else:
+        session['next'] = None
+    if not pin:
+        flash('PIN is required')
+        return redirect(url_for('authentication_api.login', next=session['next']))
+    if not pin.isdigit():
+        flash('PIN must only contain digits')
+        return redirect(url_for('authentication_api.login', next=session['next']))
+    if not Executer.instance.authentication_executer.validate_pin(pin):
+        flash('PIN must be at least 4 digits long')
+        return redirect(url_for('authentication_api.login', next=session['next']))
+    if pin != Executer.instance.authentication_executer.DEFAULT_PIN:
+        flash('Invalid PIN')
+        return redirect(url_for('authentication_api.login', next=session['next']))
+    elif pin == Executer.instance.authentication_executer.DEFAULT_PIN:
+        Executer.instance.authentication_executer.login()
+        if session['next'] is not None:
+            if Executer.instance.authentication_executer.is_safe_url(session['next']):
+                return redirect(session['next'])
+        return redirect("/")
     return render_template('login.html')
 
 
 @authentication_api.route('/logout')
 def logout():
+    """
+    Log out user
+    ---
+    tags:
+        - Auth
+    produces:
+        - text/html
+    description: Redirects to login page if PIN code is enabled\n
+                 Else, redirects to dashboard
+    responses:
+        200:
+            description: OK
+    """
     if current_user.is_authenticated:
         logout_user()
     return redirect(url_for('authentication_api.login'))
