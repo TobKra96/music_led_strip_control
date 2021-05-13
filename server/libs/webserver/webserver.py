@@ -6,6 +6,7 @@ from libs.webserver.blueprints.effect_settings_api import effect_settings_api
 from libs.webserver.blueprints.general_api import general_api
 from libs.webserver.blueprints.general_settings_api import general_settings_api
 from libs.webserver.blueprints.system_info_api import system_info_api
+from libs.webserver.blueprints.microphone_settings_api import microphone_settings_api
 from libs.webserver.executer import Executer  # pylint: disable=E0611, E0401
 from libs.app import create_app
 
@@ -28,15 +29,17 @@ class Webserver():
         self.effects_queue = effects_queue
         self._py_audio = py_audio
 
-        self.webserver_executer = Executer(config_lock, notification_queue_in, notification_queue_out, effects_queue, py_audio)
+        self.webserver_executer = Executer(
+            config_lock, notification_queue_in, notification_queue_out, effects_queue, py_audio)
         Webserver.instance = self
 
         self.server = create_app()
 
-        self.server = Executer.instance.authentication_executer.add_server_authentication(self.server)
+        self.server = Executer.instance.authentication_executer.add_server_authentication(
+            self.server)
 
         self.server.config["TEMPLATES_AUTO_RELOAD"] = True
-        webserver_port = Executer.instance.general_settings_executer.GetWebserverPort()
+        webserver_port = Executer.instance.general_settings_executer.get_webserver_port()
 
         self.server.register_blueprint(authentication_api)
         self.server.register_blueprint(device_api)
@@ -46,6 +49,7 @@ class Webserver():
         self.server.register_blueprint(general_api)
         self.server.register_blueprint(general_settings_api)
         self.server.register_blueprint(system_info_api)
+        self.server.register_blueprint(microphone_settings_api)
 
         self.server.config['SWAGGER'] = {
             "specs": [
@@ -73,7 +77,8 @@ class Webserver():
         Swagger(self.server, template=swagger_template)
 
         if DEBUG:
-            self.server.run(host='0.0.0.0', port=webserver_port, load_dotenv=False, debug=True)
+            self.server.run(host='0.0.0.0', port=webserver_port,
+                            load_dotenv=False, debug=True)
         else:
             serve(self.server, host='0.0.0.0', port=webserver_port, threads=8)
 

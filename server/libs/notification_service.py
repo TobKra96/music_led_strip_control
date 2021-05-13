@@ -50,6 +50,7 @@ class NotificationService():
                         self.logger.debug("Reloading config...")
                         self.config_refresh(self._current_notification_item)
                         self.logger.debug("Config reloaded.")
+
             except KeyboardInterrupt:
                 break
 

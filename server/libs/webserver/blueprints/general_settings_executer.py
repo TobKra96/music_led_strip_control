@@ -20,7 +20,7 @@ class GeneralSettingsExecuter(ExecuterBase):
 
         self.refresh_device("all_devices")
 
-    def GetWebserverPort(self):
+    def get_webserver_port(self):
         webserver_port = 8080
         if 'webserver_port' in self._config["general_settings"]:
             webserver_port = self._config["general_settings"]["webserver_port"]
