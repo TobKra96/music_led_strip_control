@@ -1,6 +1,7 @@
 import Toast from "./Toast.js";
 
 let intervalSec;
+let selectedEffects = [];
 
 // classes/EffectManager.js
 export default class EffectManager {
@@ -31,6 +32,12 @@ export default class EffectManager {
                 }
             }).done((data) => {
                 intervalSec = data.settings.interval;
+                // Insert only selected effects into array
+                $.each(data.settings, function(key, value) {
+                    if (key != "interval" && value) {
+                        selectedEffects.push(key);
+                    }
+                });
             }),
 
         ]).then(response => {
@@ -55,6 +62,8 @@ export default class EffectManager {
             pool = this.nonMusicEffects;
         } else if (type == 'effect_random_music') {
             pool = this.musicEffects;
+        } else if (type == 'effect_random_cycle') {
+            pool = selectedEffects;
         } else {
             pool = this.allLightEffects;
         }
@@ -93,7 +102,7 @@ export default class EffectManager {
 
             // pick random effect based on type
             if (effect == "effect_random_cycle" || effect == "effect_random_non_music" || effect == "effect_random_music") {
-                effect = this.getRandomEffect(effect, this.currentDevice.activeEffect);
+                effect = this.getRandomEffect(effect, this.currentDevice._activeEffect);
             }
 
             $.ajax({
