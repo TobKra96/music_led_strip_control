@@ -54,7 +54,7 @@ class MicrophoneSettingsExecuter(ExecuterBase):
             return result
 
     def get_level_form_output(self, output):
-        if output is None or output is "":
+        if output is None or not output:
             return 0
 
         level = 0
