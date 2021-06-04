@@ -13,19 +13,20 @@ $(function () {
     // Open "Edit Effects" sidebar dropdown when on an effect page
     $("#effect_list").slideDown();
 
-    // Todo: Get effects from server
-    const effects1 = {
-        "test_1": "Test 1",
-        "test_2": "Test 2",
-        "test_3": "Test 3"
-    };
-    const effects2 = {
-        "test_4": "Test 4",
-        "test_5": "Test 5",
-        "test_6": "Test 6"
-    };
-    generateEffectCheckboxes("#nonMusicEffectCol", effects1);
-    generateEffectCheckboxes("#musicEffectCol", effects2);
+    $.ajax({
+        url: "/api/resources/effects",
+        type: "GET",
+        data: {},
+        success: function (response) {
+            let nonMusicEffects = response.non_music;
+            let musicEffects = response.music;
+            generateEffectCheckboxes("#nonMusicEffectCol", nonMusicEffects);
+            generateEffectCheckboxes("#musicEffectCol", musicEffects);
+        },
+        error: function (xhr) {
+            // Handle error
+        }
+    });
 
     effectIdentifier = $("#effectIdentifier").val();
 
