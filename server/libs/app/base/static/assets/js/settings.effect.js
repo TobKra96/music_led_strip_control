@@ -13,21 +13,6 @@ $(function () {
     // Open "Edit Effects" sidebar dropdown when on an effect page
     $("#effect_list").slideDown();
 
-    $.ajax({
-        url: "/api/resources/effects",
-        type: "GET",
-        data: {},
-        success: function (response) {
-            let nonMusicEffects = response.non_music;
-            let musicEffects = response.music;
-            generateEffectCheckboxes("#nonMusicEffectCol", nonMusicEffects);
-            generateEffectCheckboxes("#musicEffectCol", musicEffects);
-        },
-        error: function (xhr) {
-            // Handle error
-        }
-    });
-
     effectIdentifier = $("#effectIdentifier").val();
 
     if (!jinja_devices.length) {
@@ -36,14 +21,31 @@ $(function () {
         // Start with Fake Device & create Devices from Jinja output
         const fake_device = [new Device({ id: "all_devices", name: "All Devices" })];
 
-        // Only allow all_devices for sync fade effect
-        if (effectIdentifier == "effect_sync_fade") {
+        if (effectIdentifier == "effect_random_cycle") {
+            $.ajax({
+                url: "/api/resources/effects",
+                type: "GET",
+                data: {},
+                success: function (response) {
+                    let nonMusicEffects = response.non_music;
+                    let musicEffects = response.music;
+                    generateEffectCheckboxes("#nonMusicEffectCol", nonMusicEffects);
+                    generateEffectCheckboxes("#musicEffectCol", musicEffects);
+                },
+                error: function (xhr) {
+                    // Handle error
+                }
+            });
+        }
+
+        // Only allow all_devices for sync fade and random cycle effects
+        if (["effect_sync_fade", "effect_random_cycle"].includes(effectIdentifier)) {
             localStorage.setItem('lastDevice', fake_device[0].id);
         }
 
         const devices = fake_device.concat(jinja_devices.map(d => { return new Device(d) }));
 
-        if (effectIdentifier == "effect_sync_fade") {
+        if (["effect_sync_fade", "effect_random_cycle"].includes(effectIdentifier)) {
             devices[0]._activate();
             $(`a[data-device_id=${devices[0].id}`).addClass("active");
             currentDevice = devices[0];
