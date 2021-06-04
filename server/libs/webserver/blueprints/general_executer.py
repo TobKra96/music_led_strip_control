@@ -40,3 +40,44 @@ class GeneralExecuter(ExecuterBase):
         output_types["output_raspi"] = "Output Raspberry Pi"
         output_types["output_udp"] = "Output Network via UDP"
         return output_types
+
+    def get_effects(self):
+        # Hardcoded effects for now.
+        # Todo: Sort effects in json config by type.
+
+        # Unused effects found in config:
+        # effect_music
+        # effect_spectrum
+
+        effects = dict()
+        effects["non_music"] = {
+            "effect_single": "Single",
+            "effect_gradient": "Gradient",
+            "effect_fade": "Fade",
+            "effect_sync_fade": "Sync Fade",
+            "effect_slide": "Slide",
+            "effect_bubble": "Bubble",
+            "effect_twinkle": "Twinkle",
+            "effect_pendulum": "Pendulum",
+            "effect_rods": "Rods",
+            "effect_segment_color": "Segment Color",
+            "effect_fireplace": "Fireplace"
+        }
+        effects["music"] = {
+            "effect_scroll": "Scroll",
+            "effect_advanced_scroll": "Advanced Scroll",
+            "effect_energy": "Energy",
+            "effect_wavelength": "Wavelength",
+            "effect_bars": "Bars",
+            "effect_power": "Power",
+            "effect_beat": "Beat",
+            "effect_beat_twinkle": "Beat Twinkle",
+            "effect_beat_slide": "Beat Slide",
+            "effect_wave": "Wave",
+            "effect_wiggle": "Wiggle",
+            "effect_vu_meter": "VU Meter",
+            "effect_spectrum_analyzer": "Spectrum Analyzer",
+            "effect_direction_changer": "Direction Changer"
+        }
+
+        return effects

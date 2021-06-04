@@ -223,8 +223,8 @@ def output_types():  # pylint: disable=E0211
                 type: object,
                 example:
                     {
-                        "output_raspi": str,
-                        "output_udp": str
+                        output_raspi: str,
+                        output_udp: str
                     }
         403:
             description: Could not find output_types
@@ -236,5 +236,64 @@ def output_types():  # pylint: disable=E0211
 
     if data_out is None:
         return "Could not find output_types.", 403
+    else:
+        return jsonify(data_out)
+
+
+@general_api.route('/api/resources/effects', methods=['GET'])
+@login_required
+def effects():  # pylint: disable=E0211
+    """
+    Return effects
+    ---
+    tags:
+        - Resources
+    responses:
+        200:
+            description: OK
+            schema:
+                type: object,
+                example:
+                    {
+                        music: {
+                            effect_advanced_scroll: str,
+                            effect_bars: str,
+                            effect_beat: str,
+                            effect_beat_slide: str,
+                            effect_beat_twinkle: str,
+                            effect_direction_changer: str,
+                            effect_energy: str,
+                            effect_power: str,
+                            effect_scroll: str,
+                            effect_spectrum_analyzer: str,
+                            effect_vu_meter: str,
+                            effect_wave: str,
+                            effect_wavelength: str,
+                            effect_wiggle: str
+                        },
+                        non_music: {
+                            effect_bubble: str,
+                            effect_fade: str,
+                            effect_fireplace: str,
+                            effect_gradient: str,
+                            effect_pendulum: str,
+                            effect_rods: str,
+                            effect_segment_color: str,
+                            effect_single: str,
+                            effect_slide: str,
+                            effect_sync_fade: str,
+                            effect_twinkle: str
+                        }
+                    }
+        403:
+            description: Could not find effects
+    """
+    data_out = dict()
+
+    effects = Executer.instance.general_executer.get_effects()
+    data_out = effects
+
+    if data_out is None:
+        return "Could not find effects.", 403
     else:
         return jsonify(data_out)
