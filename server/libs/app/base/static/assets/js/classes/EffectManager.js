@@ -62,7 +62,7 @@ export default class EffectManager {
             pool = this.nonMusicEffects;
         } else if (type == 'effect_random_music') {
             pool = this.musicEffects;
-        } else if (type == 'effect_random_cycle') {
+        } else if (type == 'effect_random_cycle' && selectedEffects.length > 1 ) {
             pool = selectedEffects;
         } else {
             pool = this.allLightEffects;
