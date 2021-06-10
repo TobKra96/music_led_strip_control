@@ -51,6 +51,10 @@ $(function () {
             currentDevice = devices[0];
         } else {
             currentDevice = devices.find(d => d.isCurrent === true);
+            currentDevice = currentDevice ? currentDevice : devices[0];
+            localStorage.setItem('lastDevice', currentDevice.id);
+            $(`a[data-device_id=${currentDevice.id}`).addClass("active");
+            $("#selected_device_txt").text(currentDevice.name);
         }
 
         devices.forEach(device => {

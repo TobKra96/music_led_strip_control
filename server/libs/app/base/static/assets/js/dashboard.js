@@ -19,4 +19,12 @@ if (!jinja_devices.length) {
             device.getActiveEffect();
         });
     });
+
+    // Select "All Devices" if localStorage is clear
+    let currentDevice = devices.find(d => d.id === localStorage.getItem("lastDevice"));
+    currentDevice = currentDevice ? currentDevice : devices[0];
+    localStorage.setItem('lastDevice', currentDevice.id);
+    $(`a[data-device_id=${currentDevice.id}`).addClass("active");
+    $("#selected_device_txt").text(currentDevice.name);
+    currentDevice.getActiveEffect();
 }
