@@ -8,7 +8,7 @@ import json
 microphone_settings_api = Blueprint('microphone_settings_api', __name__)
 
 
-@microphone_settings_api.route('/api/settings/microphone/volume', methods=['GET'])
+@microphone_settings_api.get('/api/settings/microphone/volume')
 @login_required
 def microphone_get_volume():  # pylint: disable=E0211
 
@@ -23,7 +23,7 @@ def microphone_get_volume():  # pylint: disable=E0211
         return jsonify(data_out)
 
 
-@microphone_settings_api.route('/api/settings/microphone/volume', methods=['POST'])
+@microphone_settings_api.post('/api/settings/microphone/volume')
 @login_required
 def microphone_set_volume():  # pylint: disable=E0211
 

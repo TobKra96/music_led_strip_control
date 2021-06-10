@@ -8,7 +8,7 @@ import json
 general_settings_api = Blueprint('general_settings_api', __name__)
 
 
-@general_settings_api.route('/api/settings/general', methods=['GET'])
+@general_settings_api.get('/api/settings/general')
 @login_required
 def get_general_settings():  # pylint: disable=E0211
     """
@@ -68,7 +68,7 @@ def get_general_settings():  # pylint: disable=E0211
     return "Input data are wrong.", 403
 
 
-@general_settings_api.route('/api/settings/general', methods=['POST'])
+@general_settings_api.post('/api/settings/general')
 @login_required
 def set_general_settings():  # pylint: disable=E0211
     """
@@ -137,7 +137,7 @@ def set_general_settings():  # pylint: disable=E0211
     return jsonify(data_out)
 
 
-@general_settings_api.route('/api/settings/general', methods=['DELETE'])
+@general_settings_api.delete('/api/settings/general')
 @login_required
 def reset_general_settings():  # pylint: disable=E0211
     """
@@ -162,7 +162,7 @@ def reset_general_settings():  # pylint: disable=E0211
     return jsonify(data_out)
 
 
-@general_settings_api.route('/api/settings/configuration/file', methods=['GET'])
+@general_settings_api.get('/api/settings/configuration/file')
 @login_required
 def export_config():  # pylint: disable=E0211
     """
@@ -178,7 +178,7 @@ def export_config():  # pylint: disable=E0211
     return send_file(Executer.instance.general_settings_executer.export_config_path, as_attachment=True, cache_timeout=-1, mimetype="text/html")
 
 
-@general_settings_api.route('/api/settings/configuration/file', methods=['POST'])
+@general_settings_api.post('/api/settings/configuration/file')
 @login_required
 def import_config():  # pylint: disable=E0211
     """

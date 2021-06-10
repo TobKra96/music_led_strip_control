@@ -11,7 +11,7 @@ def first():
     Executer.instance.authentication_executer.first_call()
 
 
-@authentication_api.route('/login', methods=['GET'])
+@authentication_api.get('/login')
 def show_login_page():
     use_pin_lock = Executer.instance.authentication_executer.get_use_pin_lock()
     is_authenticated = current_user.is_authenticated
@@ -22,7 +22,7 @@ def show_login_page():
     return render_template('login.html')
 
 
-@authentication_api.route('/login', methods=['POST'])
+@authentication_api.post('/login')
 def login():
     """
     Log in user
@@ -67,7 +67,7 @@ def login():
     return render_template('login.html')
 
 
-@authentication_api.route('/logout')
+@authentication_api.get('/logout')
 def logout():
     """
     Log out user
@@ -87,7 +87,7 @@ def logout():
     return redirect(url_for('authentication_api.login'))
 
 
-@authentication_api.route('/api/auth/pin', methods=['GET'])
+@authentication_api.get('/api/auth/pin')
 def get_pin_setting():  # pylint: disable=E0211
     """
     Return PIN code
@@ -122,7 +122,7 @@ def get_pin_setting():  # pylint: disable=E0211
         return "Unauthorized", 401
 
 
-@authentication_api.route('/api/auth/pin', methods=['POST'])
+@authentication_api.post('/api/auth/pin')
 def set_pin_setting():  # pylint: disable=E0211
     """
     Set PIN code
@@ -172,7 +172,7 @@ def set_pin_setting():  # pylint: disable=E0211
         return "Unauthorized", 401
 
 
-@authentication_api.route('/api/auth/pin', methods=['DELETE'])
+@authentication_api.delete('/api/auth/pin')
 def reset_pin_setting():  # pylint: disable=E0211
     """
     Reset PIN code

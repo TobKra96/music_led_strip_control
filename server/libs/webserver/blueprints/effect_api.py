@@ -7,7 +7,7 @@ import copy
 effect_api = Blueprint('effect_api', __name__)
 
 
-@effect_api.route('/api/effect/active', methods=['GET'])
+@effect_api.get('/api/effect/active')
 @login_required
 def get_active_effect():  # pylint: disable=E0211
     """
@@ -53,7 +53,7 @@ def get_active_effect():  # pylint: disable=E0211
     return "Input data are wrong.", 403
 
 
-@effect_api.route('/api/effect/active', methods=['POST'])
+@effect_api.post('/api/effect/active')
 @login_required
 def set_active_effect():  # pylint: disable=E0211
     """

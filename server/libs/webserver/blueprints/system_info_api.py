@@ -6,7 +6,7 @@ from flask_login import login_required
 system_info_api = Blueprint('system_info_api', __name__)
 
 
-@system_info_api.route('/api/system/performance', methods=['GET'])
+@system_info_api.get('/api/system/performance')
 @login_required
 def get_performance():  # pylint: disable=E0211
     """
@@ -65,7 +65,7 @@ def get_performance():  # pylint: disable=E0211
         return jsonify(data_out)
 
 
-@system_info_api.route('/api/system/temperature', methods=['GET'])
+@system_info_api.get('/api/system/temperature')
 @login_required
 def get_temperature():  # pylint: disable=E0211
     """
@@ -101,7 +101,7 @@ def get_temperature():  # pylint: disable=E0211
         return jsonify(data_out)
 
 
-@system_info_api.route('/api/system/services', methods=['GET'])
+@system_info_api.get('/api/system/services')
 @login_required
 def get_services():  # pylint: disable=E0211
     """
@@ -135,7 +135,7 @@ def get_services():  # pylint: disable=E0211
         return jsonify(data_out)
 
 
-@system_info_api.route('/api/system/services/status', methods=['GET'])
+@system_info_api.get('/api/system/services/status')
 @login_required
 def get_services_status():  # pylint: disable=E0211
     """
@@ -174,7 +174,7 @@ def get_services_status():  # pylint: disable=E0211
         return jsonify(data_out)
 
 
-@system_info_api.route('/api/system/devices/status', methods=['GET'])
+@system_info_api.get('/api/system/devices/status')
 @login_required
 def get_devices_status():  # pylint: disable=E0211
     """
@@ -211,7 +211,7 @@ def get_devices_status():  # pylint: disable=E0211
         return jsonify(data_out)
 
 
-@system_info_api.route('/api/system/version', methods=['GET'])
+@system_info_api.get('/api/system/version')
 @login_required
 def get_version():  # pylint: disable=E0211
     """

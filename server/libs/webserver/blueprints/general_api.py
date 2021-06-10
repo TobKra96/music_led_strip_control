@@ -6,7 +6,7 @@ from flask_login import login_required
 general_api = Blueprint('general_api', __name__)
 
 
-@general_api.route('/api/resources/colors', methods=['GET'])
+@general_api.get('/api/resources/colors')
 @login_required
 def colors():  # pylint: disable=E0211
     """
@@ -46,7 +46,7 @@ def colors():  # pylint: disable=E0211
         return jsonify(data_out)
 
 
-@general_api.route('/api/resources/gradients', methods=['GET'])
+@general_api.get('/api/resources/gradients')
 @login_required
 def gradients():  # pylint: disable=E0211
     """
@@ -88,7 +88,7 @@ def gradients():  # pylint: disable=E0211
         return jsonify(data_out)
 
 
-@general_api.route('/api/resources/led-strips', methods=['GET'])
+@general_api.get('/api/resources/led-strips')
 @login_required
 def led_strips():  # pylint: disable=E0211
     """
@@ -140,7 +140,7 @@ def led_strips():  # pylint: disable=E0211
         return jsonify(data_out)
 
 
-@general_api.route('/api/resources/logging-levels', methods=['GET'])
+@general_api.get('/api/resources/logging-levels')
 @login_required
 def logging_levels():  # pylint: disable=E0211
     """
@@ -176,7 +176,7 @@ def logging_levels():  # pylint: disable=E0211
         return jsonify(data_out)
 
 
-@general_api.route('/api/resources/audio-devices', methods=['GET'])
+@general_api.get('/api/resources/audio-devices')
 @login_required
 def audio_devices():  # pylint: disable=E0211
     """
@@ -208,7 +208,7 @@ def audio_devices():  # pylint: disable=E0211
         return jsonify(data_out)
 
 
-@general_api.route('/api/resources/output-types', methods=['GET'])
+@general_api.get('/api/resources/output-types')
 @login_required
 def output_types():  # pylint: disable=E0211
     """
@@ -240,7 +240,7 @@ def output_types():  # pylint: disable=E0211
         return jsonify(data_out)
 
 
-@general_api.route('/api/resources/effects', methods=['GET'])
+@general_api.get('/api/resources/effects')
 @login_required
 def effects():  # pylint: disable=E0211
     """

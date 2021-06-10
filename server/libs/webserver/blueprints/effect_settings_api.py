@@ -7,7 +7,7 @@ import copy
 effect_settings_api = Blueprint('effect_settings_api', __name__)
 
 
-@effect_settings_api.route('/api/settings/effect', methods=['GET'])
+@effect_settings_api.get('/api/settings/effect')
 @login_required
 def get_effect_settings():  # pylint: disable=E0211
     """
@@ -82,7 +82,7 @@ def get_effect_settings():  # pylint: disable=E0211
     return "Input data are wrong.", 403
 
 
-@effect_settings_api.route('/api/settings/effect', methods=['POST'])
+@effect_settings_api.post('/api/settings/effect')
 @login_required
 def set_effect_settings():  # pylint: disable=E0211
     """
