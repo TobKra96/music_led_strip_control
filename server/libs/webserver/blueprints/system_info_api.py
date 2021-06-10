@@ -209,3 +209,39 @@ def get_devices_status():  # pylint: disable=E0211
         return "Could not find data value: data", 403
     else:
         return jsonify(data_out)
+
+
+@system_info_api.route('/api/system/version', methods=['GET'])
+@login_required
+def get_version():  # pylint: disable=E0211
+    """
+    System version
+    ---
+    tags:
+        - System
+    responses:
+        200:
+            description: OK
+            schema:
+                type: object,
+                example:
+                    {
+                        versions: [
+                            {
+                            name: str,
+                            version: str
+                            },
+                            ...
+                        ]
+                    }
+        403:
+            description: Could not find data value
+    """
+    data_out = dict()
+    data = Executer.instance.system_info_executer.get_system_version()
+    data_out["versions"] = data
+
+    if data is None:
+        return "Could not find data value: data", 403
+    else:
+        return jsonify(data_out)
