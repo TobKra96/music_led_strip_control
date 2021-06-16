@@ -9,3 +9,5 @@ waitress==2.0.0
 rpi_ws281x==4.3.0
 icmplib==3.0
 flasgger==0.9.5
+psutil==5.8.0
+
