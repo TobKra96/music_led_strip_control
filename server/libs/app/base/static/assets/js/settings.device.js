@@ -6,7 +6,9 @@ let devices = jinja_devices.map(d => { return new Device(d) });
 let currentDevice = devices.find(d => d.id === localStorage.getItem("lastDevice"));
 // Select first device if previously "All Devices" selected or localStorage is clear
 currentDevice = currentDevice ? currentDevice : devices[0];
-$(`a[data-device_id=${currentDevice.id}`).removeClass("active");
+if (currentDevice) {
+    $(`a[data-device_id=${currentDevice.id}`).removeClass("active");
+}
 
 // Get device id from url parameters
 const urlParams = new URLSearchParams(window.location.search);
@@ -18,9 +20,11 @@ if (urlParams.has('id')) {
     }
 }
 
-localStorage.setItem('lastDevice', currentDevice.id);
-$(`a[data-device_id=${currentDevice.id}`).addClass("active");
-$("#selected_device_txt").text(currentDevice.name);
+if (currentDevice) {
+    localStorage.setItem('lastDevice', currentDevice.id);
+    $(`a[data-device_id=${currentDevice.id}`).addClass("active");
+    $("#selected_device_txt").text(currentDevice.name);
+}
 
 
 // Init and load all settings
