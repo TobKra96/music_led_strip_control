@@ -10,7 +10,7 @@ class EffectExecuter(ExecuterBase):
         else:
             return self._config["device_configs"][device]["effects"]["last_effect"]
 
-    def set_active_effect(self, device, effect):
+    def set_active_effect(self, device, effect, for_all=False):
         if device == self.all_devices_id:
             self.set_active_effect_for_all(effect)
             return
@@ -18,11 +18,11 @@ class EffectExecuter(ExecuterBase):
             self._config["device_configs"][device]["effects"]["last_effect"] = effect
             self.save_config()
 
-        self.put_into_effect_queue(device, effect)
+        self.put_into_effect_queue(device, effect, put_all=for_all)
 
     def set_active_effect_for_all(self, effect):
         self._config[self.all_devices_id]["effects"]["last_effect"] = effect
         self.save_config()
-        # self.refresh_device(self.all_devices_id)
+        self.refresh_device(self.all_devices_id)
         for device_key in self._config["device_configs"]:
-            self.set_active_effect(device_key, effect)
+            self.set_active_effect(device_key, effect, for_all=True)
