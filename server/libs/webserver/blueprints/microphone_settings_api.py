@@ -1,9 +1,8 @@
 from libs.webserver.executer import Executer
 
-from flask import Blueprint, request, jsonify, send_file, flash
+from flask import Blueprint, request, jsonify
 from flask_login import login_required
-import copy
-import json
+
 
 microphone_settings_api = Blueprint('microphone_settings_api', __name__)
 

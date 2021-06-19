@@ -1,17 +1,10 @@
 from libs.webserver.executer_base import ExecuterBase
-from libs.notification_enum import NotificationEnum  # pylint: disable=E0611, E0401
-from libs.notification_item import NotificationItem  # pylint: disable=E0611, E0401
 
 import subprocess
-import pyaudio
-import wave
-import logging
-import os
 import re
 
 
 class MicrophoneSettingsExecuter(ExecuterBase):
-
     def microphone_get_volume(self):
         result = dict()
         try:
@@ -31,7 +24,6 @@ class MicrophoneSettingsExecuter(ExecuterBase):
             result["returncode"] = 1
 
         finally:
-
             return result
 
     def microphone_set_volume(self, level):
@@ -59,7 +51,7 @@ class MicrophoneSettingsExecuter(ExecuterBase):
 
         level = 0
 
-        x = re.search("(\d+)?%", output)
+        x = re.search(r"(\d+)?%", output)
         try:
             level = int(x.group(1))
         except Exception as e:
