@@ -1,5 +1,6 @@
 from libs.webserver.executer_base import ExecuterBase
 
+from sys import platform
 import subprocess
 import re
 
@@ -17,7 +18,8 @@ class MicrophoneSettingsExecuter(ExecuterBase):
             result["level"] = self.get_level_form_output(result["output"])
 
         except Exception as e:
-            self.logger.exception(f"Exeception during mic level down.", e)
+            if platform == "linux":
+                self.logger.exception(f"Exeception during mic level down.", e)
             result["level"] = 0
             result["output"] = ""
             result["error"] = "Could not change set mic volume."
