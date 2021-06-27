@@ -73,10 +73,14 @@ function usage {
     prompt -i "OPTIONS"
     prompt -i "  -b, --branch        git branch to use (master, dev_2.2)"
     prompt -i "  -d, --developer     repository of a developer to use (TobKra96, Teraskull)"
+    prompt -i "  -h, --help          show this list of command-line options"
     echo ""
     prompt -i "Example:"
     prompt -i "  sudo bash $0 --branch dev_2.2 --developer TobKra96"
-    exit 1
+    if [ -n "$1" ]; then
+        exit 1
+    fi
+    exit 0
 }
 
 # Parse arguments.
