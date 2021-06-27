@@ -11,6 +11,8 @@ ASOUND_DIR="/etc/asound.conf" # Asound config location
 ALSA_DIR="/usr/share/alsa/alsa.conf" # Alsa config location
 SERVICE_DIR="/etc/systemd/system/mlsc.service" # MLSC systemd service location
 SERVICE_NAME="mlsc.service" # MLSC systemd service name
+GIT_BRANCH="master"
+GIT_OWNER="TobKra96"
 
 
 # Colors
@@ -58,6 +60,43 @@ function confirm {
         esac
     done
 }
+
+
+# Output help information.
+function usage {
+    if [ -n "$1" ]; then
+        echo -e "${CRER}$1${CDEF}\n";
+    fi
+    prompt -i "Usage:"
+    prompt -i "  sudo bash $0 [options]"
+    echo ""
+    prompt -i "OPTIONS"
+    prompt -i "  -b, --branch        git branch to use (master, dev_2.2)"
+    prompt -i "  -d, --developer     repository of a developer to use (TobKra96, Teraskull)"
+    echo ""
+    prompt -i "Example:"
+    prompt -i "  sudo bash $0 --branch dev_2.2 --developer TobKra96"
+    exit 1
+}
+
+# Parse arguments.
+while [[ "$#" > 0 ]]; do case $1 in
+    -b|--branch) GIT_BRANCH="$2"; shift;shift;;
+    -d|--developer) GIT_OWNER="$2";shift;shift;;
+    -h|--help) usage;shift;;
+    *) usage "Unknown argument passed: $1";shift;shift;;
+esac; done
+
+
+case $GIT_BRANCH in
+    master|dev_2.2);;
+    *) GIT_BRANCH="master";;
+esac
+
+case $GIT_OWNER in
+    TobKra96|Teraskull);;
+    *) GIT_OWNER="TobKra96";;
+esac
 
 
 echo
@@ -109,7 +148,8 @@ if [[ -d $PROJ_DIR ]]; then
         fi
 	    sudo mv -T $PROJ_DIR "${PROJ_DIR}_bak"
         prompt -s "\nNew backup of ${PROJ_NAME} created."
-        sudo git clone https://github.com/TobKra96/music_led_strip_control.git
+        sudo git clone https://github.com/${GIT_OWNER}/music_led_strip_control.git
+        git checkout $GIT_BRANCH
         prompt -s "\nConfig is stored in .mlsc, in the same directory as the MLSC installation."
         if [[ -f $SERVICE_DIR ]]; then
             if [[ $systemctl_status == 'active' ]]; then
@@ -119,7 +159,8 @@ if [[ -d $PROJ_DIR ]]; then
         fi
     fi
 else
-    sudo git clone https://github.com/TobKra96/music_led_strip_control.git
+    sudo git clone https://github.com/${GIT_OWNER}/music_led_strip_control.git
+    git checkout $GIT_BRANCH
 fi
 
 # Install modules from requirements.txt.
