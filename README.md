@@ -55,8 +55,15 @@ Please check if your hardware is inside the [Compatible Hardware List](https://g
 ### Automated installation
 Run the following command in your terminal:
 ```bash
-curl -sSL https://raw.githubusercontent.com/TobKra96/music_led_strip_control/master/setup.sh | sudo bash
+curl -sSL https://raw.githubusercontent.com/TobKra96/music_led_strip_control/master/setup.sh | sudo bash -s -- -b master
 ```
+
+The script also accepts some options:
+
+* `-b`, `--branch`       git branch to use (`master`, `dev_2.2`)
+* `-d`, `--developer`    repository of a developer to use (`TobKra96`, `Teraskull`)
+* `-h`, `--help`         show this list of command-line options
+
 After the installation completes, please check the [Installation Guide](https://github.com/TobKra96/music_led_strip_control/wiki/Installation-Guide#iv-configure-music-led-strip-control) to configure the initial settings.
 
 ### Manual installation

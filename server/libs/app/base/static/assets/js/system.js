@@ -79,10 +79,8 @@ $(document).ready(function () {
                     const interfaceNetmask = networkInterfaces[i]["netmask"];
                     const interfaceGbRecv = bytesToGigabytes(networkInterfaces[i]["bytes_recv"]).toFixed(1);
                     const interfaceGbSent = bytesToGigabytes(networkInterfaces[i]["bytes_sent"]).toFixed(1);
-                    let border = "border-bottom";
-                    if (i === len - 1) {
-                        border = "";
-                    }
+                    let border;
+                    i === len - 1 ? border = "" : border = "border-bottom";
                     const interfaceCard = `
                         <div class="card-block ${border}">
                             <div class="row">
@@ -136,10 +134,8 @@ $(document).ready(function () {
                 const serviceName = services[i];
                 let status = "Checking";
                 let statusColor = "theme-bg2";
-                let border = "border-bottom";
-                if (i === len - 1) {
-                    border = "";
-                }
+                let border;
+                i === len - 1 ? border = "" : border = "border-bottom";
                 const service = `
                     <div class="card-block ${border} py-4">
                         <div class="row align-items-center justify-content-center">
@@ -207,10 +203,8 @@ $(document).ready(function () {
                     const deviceName = devices[i]["name"];
                     const deviceId = devices[i]["id"];
                     let status = "Checking";
-                    let border = "border-bottom";
-                    if (i === len - 1) {
-                        border = "";
-                    }
+                    let border;
+                    i === len - 1 ? border = "" : border = "border-bottom";
                     const device = `
                         <div class="card-block ${border} py-4">
                             <div class="row align-items-center justify-content-center">
@@ -270,6 +264,35 @@ $(document).ready(function () {
         .catch((error) => {
             console.log(error);
         })
+
+    function getVersion() {
+        $.ajax("/api/system/version").done((data) => {
+            const versions = data["versions"];
+            for (var i = 0, len = versions.length; i < len; i++) {
+                const softwareName = versions[i]["name"];
+                const softwareVersion = versions[i]["version"];
+                let statusColor = "theme-bg2";
+                let border;
+                i === len - 1 ? border = "" : border = "border-bottom";
+                const service = `
+                    <div class="card-block ${border} py-4">
+                        <div class="row align-items-center justify-content-center">
+                            <div class="col">
+                                <h3 class="m-0 f-w-300">${softwareName}</h3>
+                            </div>
+                            <div class="col-auto">
+                                <label id="${softwareName}" class="badge badge-pill mt-2 px-3 py-2 ${statusColor} text-white f-14 f-w-400 float-right">
+                                    <span>${softwareVersion}</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                $("#version").append(service);
+            }
+        });
+    }
+    getVersion()
 
     function bytesToGigabytes(bytes) {
         return bytes / 1024 / 1024 / 1024;

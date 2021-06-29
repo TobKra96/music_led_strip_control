@@ -6,7 +6,7 @@ from flask_login import login_required
 system_info_api = Blueprint('system_info_api', __name__)
 
 
-@system_info_api.route('/api/system/performance', methods=['GET'])
+@system_info_api.get('/api/system/performance')
 @login_required
 def get_performance():  # pylint: disable=E0211
     """
@@ -65,7 +65,7 @@ def get_performance():  # pylint: disable=E0211
         return jsonify(data_out)
 
 
-@system_info_api.route('/api/system/temperature', methods=['GET'])
+@system_info_api.get('/api/system/temperature')
 @login_required
 def get_temperature():  # pylint: disable=E0211
     """
@@ -101,7 +101,7 @@ def get_temperature():  # pylint: disable=E0211
         return jsonify(data_out)
 
 
-@system_info_api.route('/api/system/services', methods=['GET'])
+@system_info_api.get('/api/system/services')
 @login_required
 def get_services():  # pylint: disable=E0211
     """
@@ -135,7 +135,7 @@ def get_services():  # pylint: disable=E0211
         return jsonify(data_out)
 
 
-@system_info_api.route('/api/system/services/status', methods=['GET'])
+@system_info_api.get('/api/system/services/status')
 @login_required
 def get_services_status():  # pylint: disable=E0211
     """
@@ -174,7 +174,7 @@ def get_services_status():  # pylint: disable=E0211
         return jsonify(data_out)
 
 
-@system_info_api.route('/api/system/devices/status', methods=['GET'])
+@system_info_api.get('/api/system/devices/status')
 @login_required
 def get_devices_status():  # pylint: disable=E0211
     """
@@ -204,6 +204,42 @@ def get_devices_status():  # pylint: disable=E0211
     data_out = dict()
     data = Executer.instance.system_info_executer.get_system_info_device_status()
     data_out["devices"] = data
+
+    if data is None:
+        return "Could not find data value: data", 403
+    else:
+        return jsonify(data_out)
+
+
+@system_info_api.get('/api/system/version')
+@login_required
+def get_version():  # pylint: disable=E0211
+    """
+    System version
+    ---
+    tags:
+        - System
+    responses:
+        200:
+            description: OK
+            schema:
+                type: object,
+                example:
+                    {
+                        versions: [
+                            {
+                            name: str,
+                            version: str
+                            },
+                            ...
+                        ]
+                    }
+        403:
+            description: Could not find data value
+    """
+    data_out = dict()
+    data = Executer.instance.system_info_executer.get_system_version()
+    data_out["versions"] = data
 
     if data is None:
         return "Could not find data value: data", 403

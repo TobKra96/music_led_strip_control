@@ -3,13 +3,29 @@ import Toast from "./classes/Toast.js";
 
 let output_types = {};
 let devices = jinja_devices.map(d => { return new Device(d) });
-// select first device if previously "All Devcies" selected
-// could this be done better?
-let currentDevice = devices.find(d => d.id === localStorage.getItem("lastDevice") );
-currentDevice = currentDevice ? currentDevice : devices[devices.length-1];
-// localStorage.setItem('lastDevice', currentDevice.id);
-// $(`a[data-device_id=${currentDevice.id}`).addClass("active");
-// $("#selected_device_txt").text(currentDevice.name);
+let currentDevice = devices.find(d => d.id === localStorage.getItem("lastDevice"));
+// Select first device if previously "All Devices" selected or localStorage is clear
+currentDevice = currentDevice ? currentDevice : devices[0];
+if (currentDevice) {
+    $(`a[data-device_id=${currentDevice.id}`).removeClass("active");
+}
+
+// Get device id from url parameters
+const urlParams = new URLSearchParams(window.location.search);
+if (urlParams.has('id')) {
+    let passedId = urlParams.get('id');
+    let selectedDeviceFromUrl = devices.find(device => device.id === passedId);
+    if (selectedDeviceFromUrl !== undefined) {
+        currentDevice = selectedDeviceFromUrl;
+    }
+}
+
+if (currentDevice) {
+    localStorage.setItem('lastDevice', currentDevice.id);
+    $(`a[data-device_id=${currentDevice.id}`).addClass("active");
+    $("#selected_device_txt").text(currentDevice.name);
+}
+
 
 // Init and load all settings
 $(document).ready(function () {
@@ -161,13 +177,13 @@ const createDevice = function () {
         let newDeviceIndex = data["index"];
         // location.reload();
         $.ajax("/api/system/devices").done((data) => {
-            const newDeviceId = data.find(d => d.id === `device_${newDeviceIndex}` );
+            const newDeviceId = data.find(d => d.id === `device_${newDeviceIndex}`);
             localStorage.setItem('lastDevice', newDeviceId.id);
             // parse data into device Objects
             devices = data.map(d => { return new Device(d) });
 
             // Select newly created Device by its index
-            currentDevice = devices.find(d => d.id === `device_${newDeviceIndex}` );
+            currentDevice = devices.find(d => d.id === `device_${newDeviceIndex}`);
             localStorage.setItem('lastDevice', currentDevice.id);
 
             // $(`a[data-device_id=${currentDevice.id}`).addClass("active");

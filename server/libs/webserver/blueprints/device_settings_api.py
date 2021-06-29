@@ -7,7 +7,7 @@ import copy
 device_settings_api = Blueprint('device_settings_api', __name__)
 
 
-@device_settings_api.route('/api/settings/device', methods=['GET'])
+@device_settings_api.get('/api/settings/device')
 @login_required
 def get_device_setting():  # pylint: disable=E0211
     """
@@ -75,7 +75,7 @@ def get_device_setting():  # pylint: disable=E0211
     return "Input data are wrong.", 403
 
 
-@device_settings_api.route('/api/settings/device', methods=['POST'])
+@device_settings_api.post('/api/settings/device')
 @login_required
 def set_device_settings():  # pylint: disable=E0211
     """
@@ -136,7 +136,7 @@ def set_device_settings():  # pylint: disable=E0211
     return jsonify(data_out)
 
 
-@device_settings_api.route('/api/settings/device/output-type', methods=['GET'])
+@device_settings_api.get('/api/settings/device/output-type')
 @login_required
 def get_output_type_device_settings():  # pylint: disable=E0211
     """
@@ -191,7 +191,7 @@ def get_output_type_device_settings():  # pylint: disable=E0211
         return jsonify(data_out)
 
 
-@device_settings_api.route('/api/settings/device/output-type', methods=['POST'])
+@device_settings_api.post('/api/settings/device/output-type')
 @login_required
 def set_output_type_device_settings():  # pylint: disable=E0211
     """

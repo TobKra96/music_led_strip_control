@@ -7,7 +7,7 @@ import copy
 device_api = Blueprint('device_api', __name__)
 
 
-@device_api.route('/api/system/devices', methods=['GET'])
+@device_api.get('/api/system/devices')
 @login_required
 def get_devices():  # pylint: disable=E0211
     """
@@ -42,7 +42,7 @@ def get_devices():  # pylint: disable=E0211
         return jsonify(data_out)
 
 
-@device_api.route('/api/system/devices', methods=['POST'])
+@device_api.post('/api/system/devices')
 @login_required
 def create_device():  # pylint: disable=E0211
     """
@@ -69,7 +69,7 @@ def create_device():  # pylint: disable=E0211
     return jsonify(data_out)
 
 
-@device_api.route('/api/system/devices', methods=['DELETE'])
+@device_api.delete('/api/system/devices')
 @login_required
 def delete_device():  # pylint: disable=E0211
     """

@@ -1,5 +1,8 @@
 import Toast from "./Toast.js";
 
+let intervalSec;
+let selectedEffects = [];
+
 // classes/EffectManager.js
 export default class EffectManager {
     constructor(currentDevice) {
@@ -16,7 +19,32 @@ export default class EffectManager {
             });
         });
 
+        // Hardcoded all_devices for now. Timer.js is unstable with multiple devices.
+        // This is still buggy because if you manually select a different device,
+        // the timer will continue instead of stopping.
         initTimerWorker();
+        Promise.all([
+            $.ajax({
+                url: "/api/settings/effect",
+                data: {
+                    "device": "all_devices",
+                    "effect": "effect_random_cycle",
+                }
+            }).done((data) => {
+                intervalSec = data.settings.interval;
+                // Insert only selected effects into array
+                $.each(data.settings, function(key, value) {
+                    if (key != "interval" && value) {
+                        selectedEffects.push(key);
+                    }
+                });
+            }),
+
+        ]).then(response => {
+
+        }).catch((response) => {
+            new Toast(JSON.stringify(response, null, '\t')).error();
+        });
     }
 
     get allEffects() {
@@ -34,6 +62,8 @@ export default class EffectManager {
             pool = this.nonMusicEffects;
         } else if (type == 'effect_random_music') {
             pool = this.musicEffects;
+        } else if (type == 'effect_random_cycle' && selectedEffects.length > 1 ) {
+            pool = selectedEffects;
         } else {
             pool = this.allLightEffects;
         }
@@ -51,7 +81,7 @@ export default class EffectManager {
                 const effectCycleActive = sessionStorage.getItem('effect_cycle_active');
                 if (!effectCycleActive) {
                     timer.postMessage({
-                        seconds: hardcodedSec,
+                        seconds: intervalSec,
                         status: 'start'
                     });
                     sessionStorage.setItem('effect_cycle_active', true);
@@ -72,7 +102,7 @@ export default class EffectManager {
 
             // pick random effect based on type
             if (effect == "effect_random_cycle" || effect == "effect_random_non_music" || effect == "effect_random_music") {
-                effect = this.getRandomEffect(effect, this.currentDevice.activeEffect);
+                effect = this.getRandomEffect(effect, this.currentDevice._activeEffect);
             }
 
             $.ajax({
@@ -94,7 +124,6 @@ export default class EffectManager {
 }
 
 let timer;
-const hardcodedSec = 10;
 
 function initTimerWorker() {
     timer = new Worker('/static/assets/js/timer.js');
@@ -103,7 +132,7 @@ function initTimerWorker() {
     timer.onmessage = (event) => {
         var sec = event.data;
         sessionStorage.setItem('seconds', sec);
-        $("#effect_random_cycle > div > p").text("Random Cycle (" + sec + "s)");
+        $("#effect_random_cycle > div > p").text(`Random Cycle (${formatTimer(sec)})`);
         if (sec <= 0) {
             sessionStorage.clear();
             $("#effect_random_cycle")[0].click();
@@ -116,7 +145,7 @@ function initTimerWorker() {
         $("#effect_random_cycle").css("box-shadow", "inset 0 0 0 3px #3f4d67")
         var sec = sessionStorage.getItem('seconds');
         if (sec <= 0) {
-            sec = hardcodedSec;
+            sec = intervalSec;
             sessionStorage.setItem('seconds', sec);
         }
         timer.postMessage({
@@ -124,4 +153,18 @@ function initTimerWorker() {
             status: 'start'
         });
     }
+}
+
+function formatTimer(time) {
+    let hrs = ~~(time / 3600);
+    let mins = ~~((time % 3600) / 60);
+    let secs = ~~time % 60;
+
+    let result = "";
+    if (hrs > 0) {
+        result += `${hrs}:${(mins < 10 ? "0" : "")}`
+    }
+    result += `${mins}:${(secs < 10 ? "0" : "")}`
+    result += secs;
+    return result;
 }

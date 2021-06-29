@@ -1,11 +1,15 @@
 from libs.webserver.executer_base import ExecuterBase
 
+from flask import __version__ as flask_version
 from icmplib import ping
 import subprocess
 import platform
 import psutil
 import os
 import re
+
+
+__version__ = "2.2 Dev"
 
 
 class SystemInfoExecuter(ExecuterBase):
@@ -122,3 +126,17 @@ class SystemInfoExecuter(ExecuterBase):
         """
         host = ping(address, count=1, interval=0.2)
         return host.is_alive
+
+    def get_system_version(self):
+        versions = [
+            {
+                "name": "mlsc",
+                "version": __version__
+            },
+            {
+                "name": "flask",
+                "version": flask_version
+            }
+        ]
+
+        return versions

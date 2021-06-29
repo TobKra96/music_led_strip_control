@@ -40,7 +40,10 @@
                                     <h5>Random Cycle Effect Settings</h5>
                                 </div>
                                 <div class="card-block">
-                                    <p>Edit the Random Cycle effect.</p>
+                                    <p>
+                                        Enter the interval between effects. Maximum 3600 seconds (1 hour).<br>
+                                        Select at least two effects from the checkbox list. Otherwise all effects will be enabled.
+                                    </p>
                                     <input type="hidden" id="settingsIdentifier" value="effect">
                                     <input type="hidden" id="effectIdentifier" value="effect_random_cycle">
                                     <form id="settingsForm" action method="post" novalidate>
@@ -48,7 +51,7 @@
                                             <div class="col-md-6">
                                                 <div class="form-group">
                                                     <label>Interval in seconds</label>
-                                                    <input id="led_count" class="form-control device_setting_input" oninput="if (this.value > 3600) this.value = 3600;" onkeypress="return event.charCode >= 48 && event.charCode <= 57" type="number" name="number" required>
+                                                    <input id="interval" class="form-control setting_input" oninput="if (this.value > 3600) this.value = 3600;" onkeypress="return event.charCode >= 48 && event.charCode <= 57" type="number" name="number" required>
                                                 </div>
                                             </div>
                                             <div class="col-md-6"></div>
