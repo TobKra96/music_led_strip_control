@@ -22,7 +22,6 @@ export default class EffectManager {
         // Hardcoded all_devices for now. Timer.js is unstable with multiple devices.
         // This is still buggy because if you manually select a different device,
         // the timer will continue instead of stopping.
-        initTimerWorker();
         Promise.all([
             $.ajax({
                 url: "/api/settings/effect",
@@ -38,6 +37,7 @@ export default class EffectManager {
                         selectedEffects.push(key);
                     }
                 });
+                initTimerWorker();
             }),
 
         ]).then(response => {
@@ -144,7 +144,7 @@ function initTimerWorker() {
     if (effectCycleActive) {
         $("#effect_random_cycle").css("box-shadow", "inset 0 0 0 3px #3f4d67")
         var sec = sessionStorage.getItem('seconds');
-        if (sec <= 0) {
+        if (sec <= 0 || sec == null) {
             sec = intervalSec;
             sessionStorage.setItem('seconds', sec);
         }
