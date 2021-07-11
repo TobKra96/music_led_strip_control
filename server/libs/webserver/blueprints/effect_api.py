@@ -19,8 +19,9 @@ def get_active_effect():  # pylint: disable=E0211
         - name: device
           in: query
           type: string
-          required: true
-          description: ID of device
+          required: false
+          description: ID of `device` to return active effect from\n
+                       Return active effects for all devices if not specified
     responses:
         200:
             description: OK
@@ -28,8 +29,13 @@ def get_active_effect():  # pylint: disable=E0211
                 type: object,
                 example:
                     {
-                        device: str,
-                        effect: str
+                        devices: [
+                            {
+                                device: str,
+                                effect: str
+                            },
+                            ...
+                        ]
                     }
         403:
             description: Input data are wrong
@@ -47,6 +53,16 @@ def get_active_effect():  # pylint: disable=E0211
 
         if active_effect is None:
             return "Could not find active effect: ", 403
+        else:
+            return jsonify(data_out)
+    elif not request.args:
+        # Retrieve the active effect for all devices.
+        active_effects = Executer.instance.effect_executer.get_active_effects()
+        data_out = dict()
+        data_out["devices"] = active_effects
+
+        if active_effects is None:
+            return "Could not find active effects: ", 403
         else:
             return jsonify(data_out)
 
