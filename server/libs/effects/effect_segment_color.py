@@ -9,8 +9,8 @@ class EffectSegmentColor(Effect):
         Show one single color.
         """
         # Get the config of the current effect.
-        effect_config = self._device.device_config["effects"]["effect_segment_color"]
-        led_count = self._device.device_config["LED_Count"]
+        effect_config = self.get_effect_config("effect_segment_color")
+        led_count = self._device.device_config["led_count"]
         # Build an empty array.
         output_array = np.zeros((3, led_count))
 

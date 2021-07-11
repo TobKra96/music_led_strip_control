@@ -13,8 +13,8 @@ class EffectWiggle(Effect):
         self.bool_lr = 0
 
     def run(self):
-        effect_config = self._device.device_config["effects"]["effect_wiggle"]
-        led_count = self._device.device_config["LED_Count"]
+        effect_config = self.get_effect_config("effect_wiggle")
+        led_count = self._device.device_config["led_count"]
 
         audio_data = self.get_audio_data()
         y = self.get_mel(audio_data)
@@ -32,9 +32,6 @@ class EffectWiggle(Effect):
 
         max_bar_count = led_count // effect_config["bar_length"]
 
-        # myIterator = cycle(range(2))
-
-        """Effect that flashes to the beat"""
         if self.current_freq_detects["beat"]:
             output = np.zeros((3, led_count))
             output[0][:] = self._color_service.colour(effect_config["beat_color"])[0]
@@ -59,6 +56,5 @@ class EffectWiggle(Effect):
             output = np.copy(self.prev_output)
             output = np.multiply(self.prev_output, effect_config["decay"])
 
-        self.queue_output_array_noneblocking(output)
-
         self.prev_output = output
+        self.queue_output_array_noneblocking(output)

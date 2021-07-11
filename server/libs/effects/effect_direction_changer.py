@@ -11,8 +11,8 @@ class EffectDirectionChanger(Effect):
         self.gradient_position = 0
 
         # Example
-        # LED_Count = 7
-        # LED_Mid = 3
+        # led_count = 7
+        # led_mid = 3
 
         #                 <---  |  --->
         # --------------------------------------------------------
@@ -44,11 +44,11 @@ class EffectDirectionChanger(Effect):
         #
         #
 
-        self.output_left_length = self._device.device_config["LED_Mid"]
+        self.output_left_length = self._device.device_config["led_mid"]
         self.output_left_min_index = 0
         self.output_left_max_index = self.output_left_length
 
-        self.output_right_length = self._device.device_config["LED_Count"] - self._device.device_config["LED_Mid"]
+        self.output_right_length = self._device.device_config["led_count"] - self._device.device_config["led_mid"]
         self.output_right_min_index = self.output_left_max_index
         self.output_right_max_index = self.output_right_min_index + self.output_right_length
 
@@ -76,8 +76,8 @@ class EffectDirectionChanger(Effect):
         self.current_bar_length_right = 0
 
     def run(self):
-        effect_config = self._device.device_config["effects"]["effect_direction_changer"]
-        led_count = self._device.device_config["LED_Count"]
+        effect_config = self.get_effect_config("effect_direction_changer")
+        led_count = self._device.device_config["led_count"]
 
         current_gradient = effect_config["gradient"]
         use_random_color = effect_config["random_color"]

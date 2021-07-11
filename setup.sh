@@ -9,6 +9,10 @@ PROJ_DIR="music_led_strip_control" # Project location
 PROJ_NAME="MLSC" # Project abbreviation
 ASOUND_DIR="/etc/asound.conf" # Asound config location
 ALSA_DIR="/usr/share/alsa/alsa.conf" # Alsa config location
+SERVICE_DIR="/etc/systemd/system/mlsc.service" # MLSC systemd service location
+SERVICE_NAME="mlsc.service" # MLSC systemd service name
+GIT_BRANCH="master"
+GIT_OWNER="TobKra96"
 
 
 # Colors
@@ -58,6 +62,47 @@ function confirm {
 }
 
 
+# Output help information.
+function usage {
+    if [ -n "$1" ]; then
+        echo -e "${CRER}$1${CDEF}\n";
+    fi
+    prompt -i "Usage:"
+    prompt -i "  sudo bash $0 [options]"
+    echo ""
+    prompt -i "OPTIONS"
+    prompt -i "  -b, --branch        git branch to use (master, dev_2.2)"
+    prompt -i "  -d, --developer     repository of a developer to use (TobKra96, Teraskull)"
+    prompt -i "  -h, --help          show this list of command-line options"
+    echo ""
+    prompt -i "Example:"
+    prompt -i "  sudo bash $0 --branch dev_2.2 --developer TobKra96"
+    if [ -n "$1" ]; then
+        exit 1
+    fi
+    exit 0
+}
+
+# Parse arguments.
+while [[ "$#" > 0 ]]; do case $1 in
+    -b|--branch) GIT_BRANCH="$2"; shift;shift;;
+    -d|--developer) GIT_OWNER="$2";shift;shift;;
+    -h|--help) usage;shift;;
+    *) usage "Unknown argument passed: $1";shift;shift;;
+esac; done
+
+
+case $GIT_BRANCH in
+    master|dev_2.2);;
+    *) GIT_BRANCH="master";;
+esac
+
+case $GIT_OWNER in
+    TobKra96|Teraskull);;
+    *) GIT_OWNER="TobKra96";;
+esac
+
+
 echo
 prompt -s "\t          *********************"
 prompt -s "\t          *  Installing $PROJ_NAME  *"
@@ -65,7 +110,7 @@ prompt -s "\t          *********************"
 echo
 
 # Update packages:
-prompt -i "\n[1/3] Updating and installing required packages..."
+prompt -i "\n[1/4] Updating and installing required packages..."
 sudo apt-get update
 sudo apt-get -y upgrade
 
@@ -85,7 +130,7 @@ prompt -s "\nPackages updated and installed."
 
 
 # Install MLSC:
-prompt -i "\n[2/3] Installing $PROJ_NAME..."
+prompt -i "\n[2/4] Installing $PROJ_NAME..."
 if [[ ! -d $INST_DIR ]]; then
 	sudo mkdir $INST_DIR
 fi
@@ -94,17 +139,32 @@ cd $INST_DIR
 if [[ -d $PROJ_DIR ]]; then
     confirm "${PROJ_NAME} is already installed. Do you want to reinstall it"
     if [[ $? -eq 0 ]]; then
+        if [[ -f $SERVICE_DIR ]]; then
+            systemctl_status=$(sudo systemctl is-active $SERVICE_NAME)
+            if [[ $systemctl_status == 'active' ]]; then
+                sudo systemctl stop ${SERVICE_NAME}
+                prompt -s "\nAutostart for ${PROJ_NAME} stopped."
+            fi
+        fi
         if [[ -d "${PROJ_DIR}_bak" ]]; then
             sudo rm -r "${PROJ_DIR}_bak"
             prompt -s "\nPrevious ${PROJ_NAME} backup deleted."
         fi
 	    sudo mv -T $PROJ_DIR "${PROJ_DIR}_bak"
         prompt -s "\nNew backup of ${PROJ_NAME} created."
-        sudo git clone https://github.com/TobKra96/music_led_strip_control.git
+        sudo git clone https://github.com/${GIT_OWNER}/music_led_strip_control.git
+        git checkout $GIT_BRANCH
         prompt -s "\nConfig is stored in .mlsc, in the same directory as the MLSC installation."
+        if [[ -f $SERVICE_DIR ]]; then
+            if [[ $systemctl_status == 'active' ]]; then
+                sudo systemctl start ${SERVICE_NAME}
+                prompt -s "\nAutostart for ${PROJ_NAME} restarted."
+            fi
+        fi
     fi
 else
-    sudo git clone https://github.com/TobKra96/music_led_strip_control.git
+    sudo git clone https://github.com/${GIT_OWNER}/music_led_strip_control.git
+    git checkout $GIT_BRANCH
 fi
 
 # Install modules from requirements.txt.
@@ -112,7 +172,7 @@ sudo pip3 install --no-input -r ${PROJ_DIR}/requirements.txt
 
 
 # Setup microphone:
-prompt -i "\n[3/3] Configuring microphone settings..."
+prompt -i "\n[3/4] Configuring microphone settings..."
 if [[ ! -f $ASOUND_DIR ]]; then
     sudo touch $ASOUND_DIR
     prompt -s "\n$ASOUND_DIR created."
@@ -152,6 +212,44 @@ sudo sed -e '/pcm.modem cards.pcm.modem/ s/^#*/#/' -i $ALSA_DIR
 sudo sed -e '/pcm.phoneline cards.pcm.phoneline/ s/^#*/#/' -i $ALSA_DIR
 
 prompt -s "\nNew configuration for $ALSA_DIR saved."
+
+
+# Create systemd service:
+prompt -i "\n[4/4] Creating autostart service for ${PROJ_NAME}..."
+if [[ ! -f $SERVICE_DIR ]]; then
+    sudo touch ${SERVICE_DIR}
+echo "[Unit]
+Description=Music LED Strip Control
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/share/music_led_strip_control/server
+ExecStart=python3 main.py
+Restart=on-abnormal
+RestartSec=10
+KillMode=control-group
+
+[Install]
+WantedBy=multi-user.target" | sudo tee -a ${SERVICE_DIR} > /dev/null
+    prompt -s "\nAutostart script for ${PROJ_NAME} created in '${SERVICE_DIR}'."
+else
+    prompt -s "\nAutostart script for ${PROJ_NAME} already exists in '${SERVICE_DIR}'."
+fi
+
+
+# Enable systemd service:
+if [[ -f $SERVICE_DIR ]]; then
+    systemctl_status=$(sudo systemctl is-enabled $SERVICE_NAME)
+    if [[ $systemctl_status == 'disabled' ]]; then
+        confirm "Do you want to enable autostart for ${PROJ_NAME}"
+        if [[ $? -eq 0 ]]; then
+            sudo systemctl enable ${SERVICE_NAME}
+            prompt -s "\nAutostart for ${PROJ_NAME} enabled."
+        fi
+    fi
+fi
 
 
 echo

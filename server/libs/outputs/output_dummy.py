@@ -1,5 +1,7 @@
 from libs.outputs.output import Output  # pylint: disable=E0611, E0401
+
 import logging
+
 
 class OutputDummy(Output):
     def __init__(self, device):

@@ -14,8 +14,8 @@ class EffectVuMeter(Effect):
         self.vol_history = np.zeros(300)
 
     def run(self):
-        effect_config = self._device.device_config["effects"]["effect_vu_meter"]
-        led_count = self._device.device_config["LED_Count"]
+        effect_config = self.get_effect_config("effect_vu_meter")
+        led_count = self._device.device_config["led_count"]
 
         audio_data = self.get_audio_data()
         vol = self.get_vol(audio_data)

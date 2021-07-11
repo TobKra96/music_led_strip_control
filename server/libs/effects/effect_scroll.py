@@ -15,9 +15,9 @@ class EffectScroll(Effect):
         self.output_scroll_low = np.array([[0 for i in range(self.led_count)] for i in range(3)])
 
     def run(self):
-        effect_config = self._device.device_config["effects"]["effect_scroll"]
-        led_count = self._device.device_config["LED_Count"]
-        led_mid = self._device.device_config["LED_Mid"]
+        effect_config = self.get_effect_config("effect_scroll")
+        led_count = self._device.device_config["led_count"]
+        led_mid = self._device.device_config["led_mid"]
 
         audio_data = self.get_audio_data()
         y = self.get_mel(audio_data)
@@ -80,24 +80,18 @@ class EffectScroll(Effect):
         self.output[1] = self.output_scroll_high[1] + self.output_scroll_mid[1] + self.output_scroll_low[1]
         self.output[2] = self.output_scroll_high[2] + self.output_scroll_mid[2] + self.output_scroll_low[2]
 
-        self.output = (self.output * effect_config["decay"]).astype(int)
+        # Decay the history arrays for the next round
+        decay = effect_config["decay"] / 100
+        self.output_scroll_high = (self.output_scroll_high * decay).astype(int)
+        self.output_scroll_mid = (self.output_scroll_mid * decay).astype(int)
+        self.output_scroll_low = (self.output_scroll_low * decay).astype(int)
+
         blur_amount = effect_config["blur"]
         if blur_amount > 0:
             self.output = gaussian_filter1d(self.output, sigma=blur_amount)
 
         if effect_config["mirror"]:
-            # Calculate the real mid.
-            real_mid = led_count / 2
-            # Add some tolerance for the real mid.
-            if (real_mid >= led_mid - 2) and (real_mid <= led_mid + 2):
-                # Use the option with shrinking the array.
-                output_array = np.concatenate((self.output[:, ::-2], self.output[:, ::2]), axis=1)
-            else:
-                # Mirror the whole array. After this the array has the double size than led_count.
-                big_mirrored_array = np.concatenate((self.output[:, ::-1], self.output[:, ::1]), axis=1)
-                start_of_array = led_count - led_mid
-                end_of_array = start_of_array + led_count
-                output_array = big_mirrored_array[:, start_of_array:end_of_array]
+            output_array = self.mirror_array(self.output, led_mid, led_count)
         else:
             output_array = self.output
 

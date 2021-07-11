@@ -1,0 +1,289 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} General Settings {% endblock %}
+
+<!-- Specific CSS goes HERE -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+<div class="pcoded-content">
+    <div class="pcoded-inner-content">
+        <!-- [ breadcrumb ] start -->
+        <div class="page-header">
+            <div class="page-block">
+                <div class="row align-items-center">
+                    <div class="col-md-12">
+                        <div class="page-header-title">
+                            <h5 class="m-b-10">General Settings</h5>
+                        </div>
+                        <ul class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="/"><i class="feather icon-home"></i></a></li>
+                            <li class="breadcrumb-item"><a href="javascript:">Settings</a></li>
+                            <li class="breadcrumb-item"><a href="javascript:">General Settings</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- [ breadcrumb ] end -->
+        <div class="main-body">
+            <div class="page-wrapper">
+                <!-- [ Main Content ] start -->
+
+                <div class="row mt-4">
+                    <div class="col-md-12 col-lg-8">
+                        <form id="settingsForm" action method="post" novalidate>
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5>Configuration</h5>
+                                </div>
+                                <div class="card-block">
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <h5>Web Server</h5>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label class="row m-0 mb-2 p-0">
+                                                    Web Server Port
+                                                    <div id="WEBSERVER_PORT_TOOLTIP" class="pl-1" data-toggle="tooltip" data-placement="top" data-html="true">
+                                                        <i class="feather icon-help-circle"></i>
+                                                    </div>
+                                                </label>
+                                                <input id="webserver_port" class="form-control setting_input" oninput="if (this.value > 65535) this.value = 65535;" onkeypress="return event.charCode >= 48 && event.charCode <= 57" type="number" name="number" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label class="row m-0 mb-2 p-0">
+                                                    Dashboard PIN
+                                                    <div id="DASHBOARD_PIN_TOOLTIP" class="pl-1" data-toggle="tooltip" data-placement="top" data-html="true">
+                                                        <i class="feather icon-help-circle"></i>
+                                                    </div>
+                                                </label>
+                                                <div class="input-group">
+                                                    <input id="DASHBOARD_PIN" class="form-control" maxlength="8" oninput="this.value = this.value.replace(/[^0-9]/g, '').replace(/(\.*?)\.*/g, '$1');" type="password" placeholder="PIN" name="pin">
+                                                    <div class="input-group-append">
+                                                        <span id="toggle_pin_view" class="input-group-text feather icon-eye"></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="custom-control custom-checkbox my-2">
+                                                <input type="checkbox" class="custom-control-input" id="PIN_LOCK_ENABLED">
+                                                <label class="custom-control-label" for="PIN_LOCK_ENABLED">Enable PIN Lock</label>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-12">
+                                            <hr>
+                                            <h5>Audio</h5>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label class="row m-0 mb-2 p-0">
+                                                    Audio Device
+                                                    <div id="DEVICE_ID_TOOLTIP" class="pl-1" data-toggle="tooltip" data-placement="top" data-html="true">
+                                                        <i class="feather icon-help-circle"></i>
+                                                    </div>
+                                                </label>
+                                                <select id="device_id" class="form-control audio_devices setting_input">
+                                                    <option value="no_mic">No microphone available</option>
+                                                </select>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="row m-0 mb-2 p-0">
+                                                    Default Sample Rate
+                                                    <div id="DEFAULT_SAMPLE_RATE_TOOLTIP" class="pl-1" data-toggle="tooltip" data-placement="top" data-html="true">
+                                                        <i class="feather icon-help-circle"></i>
+                                                    </div>
+                                                </label>
+                                                <input id="default_sample_rate" class="form-control setting_input" onkeypress="return event.charCode >= 48 && event.charCode <= 57" type="number" name="number" required>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="row m-0 mb-2 p-0">
+                                                    Minimum Frequency
+                                                    <div id="MIN_FREQUENCY_TOOLTIP" class="pl-1" data-toggle="tooltip" data-placement="top" data-html="true">
+                                                        <i class="feather icon-help-circle"></i>
+                                                    </div>
+                                                </label>
+                                                <input id="min_frequency" class="form-control setting_input" onkeypress="return event.charCode >= 48 && event.charCode <= 57" type="number" name="number" required>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="row m-0 mb-2 p-0">
+                                                    Maximum Frequency
+                                                    <div id="MAX_FREQUENCY_TOOLTIP" class="pl-1" data-toggle="tooltip" data-placement="top" data-html="true">
+                                                        <i class="feather icon-help-circle"></i>
+                                                    </div>
+                                                </label>
+                                                <input id="max_frequency" class="form-control setting_input" onkeypress="return event.charCode >= 48 && event.charCode <= 57" type="number" name="number" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label class="row m-0 mb-2 p-0">
+                                                    Minimum Volume Threshold
+                                                    <div id="MIN_VOLUME_THRESHOLD_TOOLTIP" class="pl-1" data-toggle="tooltip" data-placement="top" data-html="true">
+                                                        <i class="feather icon-help-circle"></i>
+                                                    </div>
+                                                </label>
+                                                <input id="min_volume_threshold" class="form-control setting_input" type="number" name="number" required>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="row m-0 mb-2 p-0">
+                                                    Rolling History
+                                                    <div id="N_ROLLING_HISTORY_TOOLTIP" class="pl-1" data-toggle="tooltip" data-placement="top" data-html="true">
+                                                        <i class="feather icon-help-circle"></i>
+                                                    </div>
+                                                </label>
+                                                <input id="n_rolling_history" class="form-control setting_input" onkeypress="return event.charCode >= 48 && event.charCode <= 57" type="number" name="number" required>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="row m-0 mb-2 p-0">
+                                                    Frames Per Buffer
+                                                    <div id="FRAMES_PER_BUFFER_TOOLTIP" class="pl-1" data-toggle="tooltip" data-placement="top" data-html="true">
+                                                        <i class="feather icon-help-circle"></i>
+                                                    </div>
+                                                </label>
+                                                <input id="frames_per_buffer" class="form-control setting_input" onkeypress="return event.charCode >= 48 && event.charCode <= 57" type="number" name="number" required>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="row m-0 mb-2 p-0">
+                                                    FFT BINS
+                                                    <div id="N_FFT_BINS_TOOLTIP" class="pl-1" data-toggle="tooltip" data-placement="top" data-html="true">
+                                                        <i class="feather icon-help-circle"></i>
+                                                    </div>
+                                                </label>
+                                                <input id="n_fft_bins" class="form-control setting_input" onkeypress="return event.charCode >= 48 && event.charCode <= 57" type="number" name="number" required>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-12">
+                                            <hr>
+                                            <h5>Logging</h5>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label class="row m-0 mb-2 p-0">
+                                                    Console Logging Level
+                                                    <div id="LOG_LEVEL_CONSOLE_TOOLTIP" class="pl-1" data-toggle="tooltip" data-placement="top" data-html="true">
+                                                        <i class="feather icon-help-circle"></i>
+                                                    </div>
+                                                </label>
+                                                <select id="log_level_console" class="form-control logging_levels setting_input">
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label class="row m-0 mb-2 p-0">
+                                                    File Logging Level
+                                                    <div id="LOG_LEVEL_FILE_TOOLTIP" class="pl-1" data-toggle="tooltip" data-placement="top" data-html="true">
+                                                        <i class="feather icon-help-circle"></i>
+                                                    </div>
+                                                </label>
+                                                <select id="log_level_file" class="form-control logging_levels setting_input">
+                                                </select>
+                                            </div>
+                                            <div class="custom-control custom-checkbox my-2">
+                                                <input type="checkbox" class="custom-control-input setting_input" id="log_file_enabled">
+                                                <label class="custom-control-label" for="log_file_enabled">Enable File Logging</label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="mt-4 d-flex flex-md-row flex-column justify-content-md-end">
+                                        <button type="button" id="save_btn" class="btn btn-success m-0 mb-3 mb-md-0">Save</button>
+                                        <button type="button" id="reset_btn" class="btn btn-danger m-0 ml-md-3">Reset</button>
+                                    </div>
+                                    <div class="mt-4 text-center text-md-right">
+                                        <p class="mb-0">Changes will require a restart.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="col-md-12 col-lg-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5>Export Configuration</h5>
+                            </div>
+                            <div class="card-block">
+                                <div class="text-center">
+                                    <a href="/api/settings/configuration/file">
+                                        <button type="button" id="export_btn" class="btn btn-primary btn-block m-0">Export <span class="feather icon-download"></span></button>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header">
+                                <h5>Import Configuration</h5>
+                            </div>
+                            <div class="card-block">
+                                <iframe class="d-none" name="dummyframe" id="dummyframe"></iframe>
+                                <form method="POST" action="/api/settings/configuration/file" target="dummyframe" enctype="multipart/form-data">
+                                    {% with messages = get_flashed_messages(with_categories=true) %}
+                                    <div class="custom-file">
+                                        <input type="file" class="custom-file-input" id="configUpload" name="imported_config" accept=".json">
+                                        <label class="custom-file-label text-muted m-0 pt-2" for="configUpload">Select config file</label>
+                                    </div>
+                                    {% if messages %}
+                                    {% for category, message in messages %}
+                                    <div class="mt-1 {{'text-danger' if category == 'error' else 'text-success'}} text-left">
+                                        {{message}}
+                                    </div>
+                                    {% endfor %}
+                                    {% endif %}
+                                    <div class="text-center {{'mt-2' if messages else 'mt-4'}}">
+                                        <button type="button" id="import_btn" class="btn btn-primary btn-block m-0">Import <span class="feather icon-upload"></span></button>
+                                    </div>
+                                    {% endwith %}
+                                </form>
+                                <div class="mt-4">
+                                    <p class="mb-2">Restart MLSC for changes to take effect.</p>
+                                    <p class="mb-2 text-danger">WARNING:</p>
+                                    <p class="mb-2">This will replace your current devices and effect settings.</p>
+                                    <p class="mb-0">Make sure to export a configuration file as a backup before importing a new one.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal fade" id="modal_reset_general" tabindex="-1" role="dialog" aria-labelledby="modal_reset_general" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="modal_reset_general_title">Confirmation</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true" class="feather icon-x"></span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <p>Are you sure you want to reset the configuration to default settings?</p>
+                                <p>A restart will be required for changes to take effect.</p>
+                            </div>
+                            <div class="p-4 mt-4 d-flex flex-md-row flex-column justify-content-md-end">
+                                <button type="button" class="btn btn-secondary m-0 mb-3 mb-md-0" data-dismiss="modal">Close</button>
+                                <button type="button" class="btn btn-danger m-0 ml-md-3" id="reset_btn_modal">Reset</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- [ Main Content ] end -->
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+<script src="/static/assets/js/settings.js"></script>
+<script src="/static/assets/js/settings.general.js"></script>
+{% endblock javascripts %}

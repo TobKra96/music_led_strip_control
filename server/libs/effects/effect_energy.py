@@ -6,9 +6,9 @@ import numpy as np
 
 class EffectEnergy(Effect):
     def run(self):
-        effect_config = self._device.device_config["effects"]["effect_energy"]
-        led_count = self._device.device_config["LED_Count"]
-        led_mid = self._device.device_config["LED_Mid"]
+        effect_config = self.get_effect_config("effect_energy")
+        led_count = self._device.device_config["led_count"]
+        led_mid = self._device.device_config["led_mid"]
 
         audio_data = self.get_audio_data()
         y = self.get_mel(audio_data)
@@ -46,18 +46,7 @@ class EffectEnergy(Effect):
             self.output[2, :] = gaussian_filter1d(self.output[2, :], sigma=blur_amount)
 
         if effect_config["mirror"]:
-            # Calculate the real mid.
-            real_mid = led_count / 2
-            # Add some tolerance for the real mid.
-            if (real_mid >= led_mid - 2) and (real_mid <= led_mid + 2):
-                # Use the option with shrinking the array.
-                output_array = np.concatenate((self.output[:, ::-2], self.output[:, ::2]), axis=1)
-            else:
-                # Mirror the whole array. After this the array has a two times bigger size than led_count.
-                big_mirrored_array = np.concatenate((self.output[:, ::-1], self.output[:, ::1]), axis=1)
-                start_of_array = led_count - led_mid
-                end_of_array = start_of_array + led_count
-                output_array = big_mirrored_array[:, start_of_array:end_of_array]
+            output_array = self.mirror_array(self.output, led_mid, led_count)
         else:
             output_array = self.output
 

@@ -17,9 +17,9 @@ class EffectRods(Effect):
 
     def run(self):
         # Get the config of the current effect.
-        effect_config = self._device.device_config["effects"]["effect_rods"]
-        led_count = self._device.device_config["LED_Count"]
-        led_mid = self._device.device_config["LED_Mid"]
+        effect_config = self.get_effect_config("effect_rods")
+        led_count = self._device.device_config["led_count"]
+        led_mid = self._device.device_config["led_mid"]
 
         self.count_since_last_rod = self.count_since_last_rod + 1
 
@@ -37,7 +37,7 @@ class EffectRods(Effect):
         # Move array <--- this direction for "steps" fields
 
         # Build an empty array.
-        local_output_array = np.zeros((3, self._device.device_config["LED_Count"]))
+        local_output_array = np.zeros((3, self._device.device_config["led_count"]))
 
         if not effect_config["reverse"]:
             self.output = np.roll(self.output, steps, axis=1)
@@ -76,11 +76,7 @@ class EffectRods(Effect):
         local_output_array = self.output
 
         if effect_config["mirror"]:
-            # Mirror the whole array. After this the array has a two times bigger size than led_count.
-            big_mirrored_array = np.concatenate((self.output[:, ::-1], self.output[:, ::1]), axis=1)
-            start_of_array = led_count - led_mid
-            end_of_array = start_of_array + led_count
-            local_output_array = big_mirrored_array[:, start_of_array:end_of_array]
+            local_output_array = self.mirror_array(local_output_array, led_mid, led_count)
 
         # Add the output array to the queue.
         self.queue_output_array_blocking(local_output_array)

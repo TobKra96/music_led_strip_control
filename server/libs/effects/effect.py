@@ -14,7 +14,7 @@ class Effect:
 
         # Initial config load.
         self._config = self._device.config
-        self._config_colours = self._config["colours"]
+        self._config_colours = self._config["colors"]
         self._config_gradients = self._config["gradients"]
 
         self._device_config = self._device.device_config
@@ -36,16 +36,19 @@ class Effect:
         self._dsp = DSP(self._config, self._device_config)
 
         # Init some variables for the effects.
-        self.led_count = self._device_config["LED_Count"]
-        self.n_fft_bins = self._config["general_settings"]["N_FFT_BINS"]
+        self.led_count = self._device_config["led_count"]
+        self.n_fft_bins = self._config["general_settings"]["n_fft_bins"]
 
         self.prev_spectrum = np.array([self.led_count // 2])
         self.freq_channel_history = 40
         self.beat_count = 0
-        self.freq_channels = [deque(maxlen=self.freq_channel_history) for i in range(self.n_fft_bins)]
+        self.freq_channels = [deque(maxlen=self.freq_channel_history)
+                              for i in range(self.n_fft_bins)]
 
-        self.output = np.array([[0 for i in range(self.led_count)] for i in range(3)])
-        self.prev_output = np.array([[0 for i in range(self.led_count)] for i in range(3)])
+        self.output = np.array(
+            [[0 for i in range(self.led_count)] for i in range(3)])
+        self.prev_output = np.array(
+            [[0 for i in range(self.led_count)] for i in range(3)])
 
         self.speed_counter = 0
 
@@ -62,13 +65,13 @@ class Effect:
             "high": 0
         }
         self.detection_ranges = {
-            "beat": (0, int(self._config["general_settings"]["N_FFT_BINS"] * 0.13)),
-            "low": (int(self._config["general_settings"]["N_FFT_BINS"] * 0.13),
-                    int(self._config["general_settings"]["N_FFT_BINS"] * 0.4)),
-            "mid": (int(self._config["general_settings"]["N_FFT_BINS"] * 0.4),
-                    int(self._config["general_settings"]["N_FFT_BINS"] * 0.7)),
-            "high": (int(self._config["general_settings"]["N_FFT_BINS"] * 0.8),
-                     int(self._config["general_settings"]["N_FFT_BINS"]))
+            "beat": (0, int(self._config["general_settings"]["n_fft_bins"] * 0.13)),
+            "low": (int(self._config["general_settings"]["n_fft_bins"] * 0.13),
+                    int(self._config["general_settings"]["n_fft_bins"] * 0.4)),
+            "mid": (int(self._config["general_settings"]["n_fft_bins"] * 0.4),
+                    int(self._config["general_settings"]["n_fft_bins"] * 0.7)),
+            "high": (int(self._config["general_settings"]["n_fft_bins"] * 0.8),
+                     int(self._config["general_settings"]["n_fft_bins"]))
         }
         self.min_detect_amplitude = {
             "beat": 0.7,
@@ -102,14 +105,16 @@ class Effect:
         Function that updates current_freq_detects. Any visualisation algorithm can check if
         there is currently a beat, low, mid, or high by querying the self.current_freq_detects dict.
         """
-        n_fft_bins = self._config["general_settings"]["N_FFT_BINS"]
+        n_fft_bins = self._config["general_settings"]["n_fft_bins"]
         channel_avgs = []
         differences = []
 
         for i in range(n_fft_bins):
-            channel_avgs.append(sum(self.freq_channels[i]) / len(self.freq_channels[i]))
+            channel_avgs.append(
+                sum(self.freq_channels[i]) / len(self.freq_channels[i]))
             if channel_avgs[i] != 0:
-                differences.append(((self.freq_channels[i][0] - channel_avgs[i]) * 100) // channel_avgs[i])
+                differences.append(
+                    ((self.freq_channels[i][0] - channel_avgs[i]) * 100) // channel_avgs[i])
             else:
                 differences.append(0)
         for i in ["beat", "low", "mid", "high"]:
@@ -150,8 +155,7 @@ class Effect:
     def get_audio_data(self):
         audio_data = None
         if not self._audio_queue.empty():
-            audio_data = self._audio_queue.get()
-
+            audio_data = self._audio_queue.get_blocking()
         return audio_data
 
     def get_mel(self, audio_data):
@@ -183,10 +187,37 @@ class Effect:
         return audio_vol
 
     def queue_output_array_blocking(self, output_array):
-        self._output_queue.put(output_array)
+        self._output_queue.put_blocking(output_array)
 
     def queue_output_array_noneblocking(self, output_array):
-        if self._output_queue.full():
-            prev_output_array = self._output_queue.get()
-            del prev_output_array
-        self._output_queue.put(output_array)
+        self._output_queue.put_none_blocking(output_array)
+
+    def get_effect_config(self, effect_id):
+        # Check if we use the global "all_devices" settings or the device specific one.
+        if self._config["all_devices"]["effects"]["last_effect"] == effect_id:
+            return self._config["all_devices"]["effects"][effect_id]
+        else:
+            return self._device.device_config["effects"][effect_id]
+
+    def mirror_array(self, array, led_mid, led_count):
+        # Calculate the real mid
+        # |                   |real_mid             |
+        # |---------------------------|-------------|
+        # |                         led_mid (set in config)
+
+        real_mid = led_count / 2
+
+        # Add some tolerance for the real mid.
+        if (real_mid >= led_mid - 2) and (real_mid <= led_mid + 2):
+            # Use the option with shrinking the array.
+            mirrored_array = np.concatenate(
+                (array[:, ::-2], array[:, ::2]), axis=1)
+            return mirrored_array
+        else:
+            # Mirror the whole array. After this the array has the double size than led_count.
+            big_mirrored_array = np.concatenate(
+                (array[:, ::-1], array[:, ::1]), axis=1)
+            start_of_array = led_count - led_mid
+            end_of_array = start_of_array + led_count
+            mirrored_array = big_mirrored_array[:, start_of_array:end_of_array]
+            return mirrored_array

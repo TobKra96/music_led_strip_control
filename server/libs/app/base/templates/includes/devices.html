@@ -1,0 +1,44 @@
+<script type="text/javascript">
+    // Transfer data to JS
+    let jinja_devices = JSON.parse('{{ devices | tojson }}');
+</script>
+<div class="accordion my-3" id="accordionDevices">
+    <div class="card p-0">
+        <a class="p-0" href="#!" data-toggle="collapse" data-target="#collapseMenu" aria-expanded="false" aria-controls="collapseMenu" draggable="false">
+            <div class="card-header" id="accordionHeading">
+                <h5 class="mb-0">
+                    <span class="text-secondary">
+                        Total devices: <span class="badge badge-secondary" id="device_count">{{ devices|length }}</span>
+                    </span>
+                    <span class="text-secondary" id="selected_device_label">
+                        &ensp;|&ensp;Device: <span class="badge badge-secondary" id="selected_device_txt"></span>
+                    </span>
+                    {% if segment == "dashboard" %}
+                    <span class="text-secondary">
+                        &ensp;|&ensp;Effect: <span class="badge badge-secondary" id="selected_effect_txt"></span>
+                    </span>
+                    {% endif %}
+                </h5>
+                <i class="fa fa-chevron-down text-secondary float-right d-none d-sm-block mt-1"></i>
+            </div>
+            <div id="collapseMenu" class="card-body p-0 collapse" aria-labelledby="accordionHeading" data-parent="#accordionDevices">
+                <ul class="nav nav-pills shadow-none " id="deviceTabID" role="tablist">
+                    {% for device in devices %}
+                        {% if loop.first and not segment == "device_settings" %}
+                        <li class="nav-item device_item">
+                            <a href="#pills-{{ loop.index }}" class="nav-link" data-device_id="all_devices" role="tab" data-toggle="pill" aria-controls="pills-{{ loop.index }}" aria-selected="false">
+                                All Devices
+                            </a>
+                        </li>
+                        {% endif %}
+                        <li class="nav-item device_item">
+                            <a href="#pills-{{ loop.index+1 }}" class="{{ 'disabled' if segment in ['effect_sync_fade', 'effect_random_cycle'] }} nav-link" data-device_id={{ device.id }} role="tab" data-toggle="pill" aria-controls="pills-{{ loop.index+1 }}" aria-selected="false">
+                                {{ device.name }}
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </a>
+    </div>
+</div>

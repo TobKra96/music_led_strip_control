@@ -2,6 +2,7 @@
 #   Contains all configuration for the server.
 #   Load and save the config after every change.
 #
+from libs.config_converter.config_converter_service import ConfigConverterService  # pylint: disable=E0611, E0401
 
 from logging.handlers import RotatingFileHandler
 from shutil import copyfile, copy
@@ -61,8 +62,12 @@ class ConfigService():
         """Load the configuration file inside the self.config variable."""
         self.config_lock.acquire()
 
-        with open(self._config_path, "r") as read_file:
-            self.config = json.load(read_file)
+        try:
+            with open(self._config_path, "r") as read_file:
+                self.config = json.load(read_file)
+        except Exception as e:
+            self.logger.error(f"Could not load config due to exception: {e}")
+            self.load_backup()
 
         self.config_lock.release()
 
@@ -85,6 +90,13 @@ class ConfigService():
         # Maybe the logging updated
         self.setup_logging()
         self.config_lock.release()
+
+    def load_backup(self):
+        try:
+            with open(self._backup_path, "r") as read_file:
+                self.config = json.load(read_file)
+        except Exception as e:
+            self.logger.error(f"Could not load backup config due to exception: {e}")
 
     def save_backup(self):
         copy(self._config_path, self._backup_path)
@@ -120,6 +132,9 @@ class ConfigService():
         loaded_config = self.config
         template_config = self.load_template()
 
+        config_converter_service = ConfigConverterService()
+        loaded_config = config_converter_service.upgrade(loaded_config)
+
         # Loop through the root.
         for key, value in template_config.items():
             if key == "device_configs":
@@ -133,6 +148,7 @@ class ConfigService():
 
         self.check_devices(loaded_config["device_configs"], template_config["default_device"])
 
+        self.config = loaded_config
         self.save_config()
 
     def check_leaf(self, loaded_config_leaf, template_config_leaf):
@@ -164,19 +180,19 @@ class ConfigService():
         logging_file_enabled = False
 
         logging_level_map = {
-            "NOTSET": logging.NOTSET,
-            "DEBUG": logging.DEBUG,
-            "INFO": logging.INFO,
-            "WARNING": logging.WARNING,
-            "ERROR": logging.ERROR,
-            "CRITICAL": logging.CRITICAL
+            "notset": logging.NOTSET,
+            "debug": logging.DEBUG,
+            "info": logging.INFO,
+            "warning": logging.WARNING,
+            "error": logging.ERROR,
+            "critical": logging.CRITICAL
         }
 
         if self.config is not None:
             try:
-                logging_level_console = logging_level_map[self.config["general_settings"]["LOG_LEVEL_CONSOLE"]]
-                logging_level_file = logging_level_map[self.config["general_settings"]["LOG_LEVEL_FILE"]]
-                logging_file_enabled = self.config["general_settings"]["LOG_FILE_ENABLED"]
+                logging_level_console = logging_level_map[self.config["general_settings"]["log_level_console"]]
+                logging_level_file = logging_level_map[self.config["general_settings"]["log_level_file"]]
+                logging_file_enabled = self.config["general_settings"]["log_file_enabled"]
             except Exception as e:
                 print(f"Could not load logging settings. Exception {e}")
                 pass

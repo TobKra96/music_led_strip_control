@@ -1,6 +1,3 @@
-import logging
-from time import time
-
 from libs.notification_enum import NotificationEnum  # pylint: disable=E0611, E0401
 from libs.outputs.output_raspi import OutputRaspi  # pylint: disable=E0611, E0401
 from libs.outputs.output_dummy import OutputDummy  # pylint: disable=E0611, E0401
@@ -8,14 +5,20 @@ from libs.outputs.output_udp import OutputUDP  # pylint: disable=E0611, E0401
 from libs.output_enum import OutputsEnum  # pylint: disable=E0611, E0401
 from libs.fps_limiter import FPSLimiter  # pylint: disable=E0611, E0401
 
+from time import time
+import numpy as np
+import logging
+
 
 class OutputService():
     def start(self, device):
         self.logger = logging.getLogger(__name__)
 
         self._device = device
+        self._led_strip = self._device.device_config["led_strip"]
 
-        self.logger.info(f'Starting Output service... Device: {self._device.device_config["DEVICE_NAME"]}')
+        self.logger.info(
+            f'Starting Output service... Device: {self._device.device_config["device_name"]}')
 
         # Initial config load.
         self._config = self._device.config
@@ -29,7 +32,7 @@ class OutputService():
         self.start_time = time()
 
         # Init FPS Limiter.
-        self._fps_limiter = FPSLimiter(self._device.device_config["FPS"])
+        self._fps_limiter = FPSLimiter(self._device.device_config["fps"])
 
         self._skip_output = False
         self._cancel_token = False
@@ -40,11 +43,13 @@ class OutputService():
             OutputsEnum.output_udp: OutputUDP
         }
 
-        current_output_enum = OutputsEnum[self._device.device_config["OUTPUT_TYPE"]]
+        current_output_enum = OutputsEnum[self._device.device_config["output_type"]]
         self.logger.debug(f"Found output: {current_output_enum}")
-        self._current_output = self._available_outputs[current_output_enum](self._device)
+        self._current_output = self._available_outputs[current_output_enum](
+            self._device)
 
-        self.logger.debug(f'Output component started. Device: {self._device.device_config["DEVICE_NAME"]}')
+        self.logger.debug(
+            f'Output component started. Device: {self._device.device_config["device_name"]}')
 
         while not self._cancel_token:
             try:
@@ -58,7 +63,7 @@ class OutputService():
 
         # Check the notification queue.
         if not self._device_notification_queue_in.empty():
-            self._current_notification_in = self._device_notification_queue_in.get()
+            self._current_notification_in = self._device_notification_queue_in.get_blocking()
 
         if hasattr(self, "_current_notification_in"):
             if self._current_notification_in is NotificationEnum.config_refresh:
@@ -76,13 +81,18 @@ class OutputService():
         # Skip the output sequence, for example to "pause" the process.
         if self._skip_output:
             if not self._output_queue.empty():
-                skip_output_queue = self._output_queue.get()
+                skip_output_queue = self._output_queue.get_blocking()
                 del skip_output_queue
             return
 
         # Check if the queue is empty and stop if its empty.
         if not self._output_queue.empty():
-            current_output_array = self._output_queue.get()
+            current_output_array = self._output_queue.get_blocking()
+            # Add another Array of LEDS for White Channel
+            if "SK6812" in self._led_strip and len(current_output_array) == 3:
+                current_output_array = np.vstack(
+                    (current_output_array, np.zeros(self._device.device_config["led_count"])))
+
             self._current_output.show(current_output_array)
 
         self.end_time = time()
@@ -91,7 +101,8 @@ class OutputService():
             self.ten_seconds_counter = time()
             self.time_dif = self.end_time - self.start_time
             self.fps = 1 / self.time_dif
-            self.logger.info(f'FPS: {self.fps:.2f} | Device: {self._device.device_config["DEVICE_NAME"]}')
+            self.logger.info(
+                f'FPS: {self.fps:.2f} | Device: {self._device.device_config["device_name"]}')
 
         self.start_time = time()
 
@@ -106,6 +117,7 @@ class OutputService():
         self._config = self._device.config
 
         # Notify the master component, that I'm finished.
-        self._device_notification_queue_out.put(NotificationEnum.config_refresh_finished)
+        self._device_notification_queue_out.put_blocking(
+            NotificationEnum.config_refresh_finished)
 
         self.logger.debug("Output refreshed.")

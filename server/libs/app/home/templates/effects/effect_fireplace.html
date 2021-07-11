@@ -1,0 +1,155 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Edit Effect Fireplace {% endblock %}
+
+<!-- Specific CSS goes HERE -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+    <div class="pcoded-content">
+        <div class="pcoded-inner-content">
+            <!-- [ breadcrumb ] start -->
+            <div class="page-header">
+                <div class="page-block">
+                    <div class="row align-items-center">
+                        <div class="col-md-12">
+                            <div class="page-header-title">
+                                <h5 class="m-b-10">Fireplace</h5>
+                            </div>
+                            <ul class="breadcrumb">
+                                <li class="breadcrumb-item"><a href="/"><i class="feather icon-home"></i></a></li>
+                                <li class="breadcrumb-item"><a href="javascript:">Edit Effects</a></li>
+                                <li class="breadcrumb-item"><a href="javascript:">Fireplace</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- [ breadcrumb ] end -->
+            <div class="main-body">
+                <div class="page-wrapper">
+                    <!-- [ Main Content ] start -->
+
+                    {% include 'includes/devices.html' %}
+
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5>Fireplace Effect Settings</h5>
+                                </div>
+                                <div class="card-block">
+                                    <p>Choose the color for the fireplace effect.</p>
+                                    <input type="hidden" id="settingsIdentifier" value="effect">
+                                    <input type="hidden" id="effectIdentifier" value="effect_fireplace">
+                                    <form id="settingsForm">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <h5>Fire Base</h5>
+
+                                                <div class="form-group">
+                                                    <label>Fire Base Color</label>
+                                                    <select id="firebase_maincolor" class="form-control colors setting_input"></select>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>Fire Base Flicker Speed <span for="firebase_flicker_speed" class="mb-0 badge badge-secondary"></span></label>
+                                                    <input id="firebase_flicker_speed" type="range" class="custom-range setting_input" min="0" max="10" step="0.1" required>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>Fire Base Minimum Length <span for="firebase_area_minlength" class="mb-0 badge badge-secondary"></span></label>
+                                                    <input id="firebase_area_minlength" type="range" class="custom-range setting_input" min="1" max="1000" step="1" required>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>Fire Base Maximum Length <span for="firebase_area_maxlength" class="mb-0 badge badge-secondary"></span></label>
+                                                    <input id="firebase_area_maxlength" type="range" class="custom-range setting_input" min="1" max="1000" step="1" required>
+                                                </div>
+
+                                                <hr class="my-4">
+                                                <h5>Other Controls</h5>
+
+                                                <div class="custom-control custom-checkbox my-2">
+                                                    <input type="checkbox" class="custom-control-input setting_input" id="use_color_variation">
+                                                    <label class="custom-control-label" for="use_color_variation">Use Color Variation</label>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>Color Variation <span for="color_variation" class="mb-0 badge badge-secondary"></span></label>
+                                                    <input id="color_variation" type="range" class="custom-range setting_input" min="1" max="100" step="1" required>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>Overall Blur <span for="blur" class="mb-0 badge badge-secondary"></span></label>
+                                                    <input id="blur" type="range" class="custom-range setting_input" min="0" max="10" step="0.1" required>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>Mask Blur <span for="mask_blur" class="mb-0 badge badge-secondary"></span></label>
+                                                    <input id="mask_blur" type="range" class="custom-range setting_input" min="0" max="10" step="0.1" required>
+                                                </div>
+                                                <div class="custom-control custom-checkbox my-2">
+                                                    <input type="checkbox" class="custom-control-input setting_input" id="mirror">
+                                                    <label class="custom-control-label" for="mirror">Mirror</label>
+                                                </div>
+                                                <div class="custom-control custom-checkbox my-2">
+                                                    <input type="checkbox" class="custom-control-input setting_input" id="swap_side">
+                                                    <label class="custom-control-label" for="swap_side">Swap Side</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <h5>Sparks</h5>
+                                                <div class="form-group">
+                                                    <label>Sparks Color </label>
+                                                    <select id="sparks_maincolor" class="form-control colors setting_input"></select>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>Sparks Flicker Speed <span for="sparks_flicker_speed" class="mb-0 badge badge-secondary"></span></label>
+                                                    <input id="sparks_flicker_speed" type="range" class="custom-range setting_input" min="0" max="10" step="0.1" required>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>Sparks Fly Speed <span for="sparks_fly_speed" class="mb-0 badge badge-secondary"></span></label>
+                                                    <input id="sparks_fly_speed" type="range" class="custom-range setting_input" min="0" max="10" step="0.1" required>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>Sparks Minimum Length <span for="sparks_min_length" class="mb-0 badge badge-secondary"></span></label>
+                                                    <input id="sparks_min_length" type="range" class="custom-range setting_input" min="1" max="20" step="1" required>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>Sparks Maximum Length <span for="sparks_max_length" class="mb-0 badge badge-secondary"></span></label>
+                                                    <input id="sparks_max_length" type="range" class="custom-range setting_input" min="1" max="20" step="1" required>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>Sparks Minimum Area <span for="sparks_area_minlength" class="mb-0 badge badge-secondary"></span></label>
+                                                    <input id="sparks_area_minlength" type="range" class="custom-range setting_input" min="1" max="1000" step="1" required>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>Sparks Maximum Area <span for="sparks_area_maxlength" class="mb-0 badge badge-secondary"></span></label>
+                                                    <input id="sparks_area_maxlength" type="range" class="custom-range setting_input" min="1" max="1000" step="1" required>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>Minimum Distance between Sparks Appearing <span for="sparks_minappear_distance" class="mb-0 badge badge-secondary"></span></label>
+                                                    <input id="sparks_minappear_distance" type="range" class="custom-range setting_input" min="1" max="1000" step="1" required>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>Maximum Distance between Sparks Appearing <span for="sparks_maxappear_distance" class="mb-0 badge badge-secondary"></span></label>
+                                                    <input id="sparks_maxappear_distance" type="range" class="custom-range setting_input" min="1" max="1000" step="1" required>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="mt-4 d-flex flex-md-row flex-column justify-content-md-end">
+                                            <button type="button" id="save_btn" class="btn btn-success m-0">Save</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- [ Main Content ] end -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+<script src="/static/assets/js/settings.effect.js" type="module"></script>
+{% endblock javascripts %}

@@ -19,9 +19,9 @@ class EffectAdvancedScroll(Effect):
         self.output_scroll_brilliance = np.array([[0 for i in range(self.led_count)] for i in range(3)])
 
     def run(self):
-        effect_config = self._device.device_config["effects"]["effect_advanced_scroll"]
-        led_count = self._device.device_config["LED_Count"]
-        led_mid = self._device.device_config["LED_Mid"]
+        effect_config = self.get_effect_config("effect_advanced_scroll")
+        led_count = self._device.device_config["led_count"]
+        led_mid = self._device.device_config["led_mid"]
 
         audio_data = self.get_audio_data()
         y = self.get_mel(audio_data)
@@ -134,24 +134,22 @@ class EffectAdvancedScroll(Effect):
         self.output[1] = self.output_scroll_subbass[1] + self.output_scroll_bass[1] + self.output_scroll_lowmid[1] + self.output_scroll_mid[1] + self.output_scroll_uppermid[1] + self.output_scroll_presence[1] + self.output_scroll_brilliance[1]
         self.output[2] = self.output_scroll_subbass[2] + self.output_scroll_bass[2] + self.output_scroll_lowmid[2] + self.output_scroll_mid[2] + self.output_scroll_uppermid[2] + self.output_scroll_presence[2] + self.output_scroll_brilliance[2]
 
-        self.output = (self.output * effect_config["decay"]).astype(int)
+        # Decay the history arrays for the next round
+        decay = effect_config["decay"] / 100
+        self.output_scroll_subbass = (self.output_scroll_subbass * decay).astype(int)
+        self.output_scroll_bass = (self.output_scroll_bass * decay).astype(int)
+        self.output_scroll_lowmid = (self.output_scroll_lowmid * decay).astype(int)
+        self.output_scroll_mid = (self.output_scroll_mid * decay).astype(int)
+        self.output_scroll_uppermid = (self.output_scroll_uppermid * decay).astype(int)
+        self.output_scroll_presence = (self.output_scroll_presence * decay).astype(int)
+        self.output_scroll_brilliance = (self.output_scroll_brilliance * decay).astype(int)
+
         blur_amount = effect_config["blur"]
         if blur_amount > 0:
             self.output = gaussian_filter1d(self.output, sigma=blur_amount)
 
         if effect_config["mirror"]:
-            # Calculate the real mid.
-            real_mid = led_count / 2
-            # Add some tolerance for the real mid.
-            if (real_mid >= led_mid - 2) and (real_mid <= led_mid + 2):
-                # Use the option with shrinking the array.
-                output_array = np.concatenate((self.output[:, ::-2], self.output[:, ::2]), axis=1)
-            else:
-                # Mirror the whole array. After this the array has a two times bigger size than led_count.
-                big_mirrored_array = np.concatenate((self.output[:, ::-1], self.output[:, ::1]), axis=1)
-                start_of_array = led_count - led_mid
-                end_of_array = start_of_array + led_count
-                output_array = big_mirrored_array[:, start_of_array:end_of_array]
+            output_array = self.mirror_array(self.output, led_mid, led_count)
         else:
             output_array = self.output
 

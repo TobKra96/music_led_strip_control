@@ -40,20 +40,30 @@
 ## Features
 
 - Audio visualization in real time.
-- Fancy Web interface.
+- Modern web interface.
 - 24 effects with many configuration options.
 - Customizable colors and color schemes.
 - Multicore optimized for large LED strips (900+ LEDs).
+- Multi device support
 - Standalone and client compatible for audio processing.
 
 
 ## Installing
 
+Please check if your hardware is inside the [Compatible Hardware List](https://github.com/TobKra96/music_led_strip_control/wiki/Compatible-Hardware-List).
+
 ### Automated installation
 Run the following command in your terminal:
 ```bash
-curl -sSL https://raw.githubusercontent.com/TobKra96/music_led_strip_control/master/setup.sh | sudo bash
+curl -sSL https://raw.githubusercontent.com/TobKra96/music_led_strip_control/master/setup.sh | sudo bash -s -- -b master
 ```
+
+The script also accepts some options:
+
+* `-b`, `--branch`       git branch to use (`master`, `dev_2.2`)
+* `-d`, `--developer`    repository of a developer to use (`TobKra96`, `Teraskull`)
+* `-h`, `--help`         show this list of command-line options
+
 After the installation completes, please check the [Installation Guide](https://github.com/TobKra96/music_led_strip_control/wiki/Installation-Guide#iv-configure-music-led-strip-control) to configure the initial settings.
 
 ### Manual installation
@@ -89,8 +99,8 @@ Also, check out the tutorial video I created for the manual installation:
   <a style="text-decoration:none" href="https://youtu.be/jAL1DfeYQI8">
     <img src="https://user-images.githubusercontent.com/24798198/108499975-68eae580-72af-11eb-9115-594b11f503cf.png" alt="Version1_Github" />
   </a>
-  <a style="text-decoration:none" href="media/web_interface_mockup.png">
-    <img src="https://user-images.githubusercontent.com/24798198/107848581-dbae1980-6df4-11eb-9801-59aacf7af905.png" alt="Mockup" />
+  <a style="text-decoration:none" href="">
+    <img src="https://user-images.githubusercontent.com/24798198/112079905-48999980-8b81-11eb-846f-30a475092874.png" alt="Mockup" />
   </a>
 </p>
 
@@ -105,13 +115,13 @@ Thank you for the digital signal processing and some effects. You are the best.
 
 Awesome library for the LED output signal. Easy to use.
 
-* [gentelella by Colorlib](https://github.com/ColorlibHQ/gentelella)
+* [Flask Datta Able by CodedThemes](https://appseed.us/admin-dashboards/flask-datta-able)
 
-Bootstrap admin dashboard.
+Flask admin dashboard.
 
 Scripts included:
 
-Bootstrap, Font Awesome, jQuery-Autocomplete, Bootstrap Colorpicker, bootstrap-wysiwyg, jQuery, switchery - Turns HTML checkbox inputs into beautiful iOS style switches, jQuery Tags Input Plugin, Autosize - resizes text area to fit text, validator - HTML form validator using jQuery.
+Bootstrap, jQuery, jQuery-Scrollbar, jQuery-UI, Pickr, Font Awesome.
 
 
 ## License

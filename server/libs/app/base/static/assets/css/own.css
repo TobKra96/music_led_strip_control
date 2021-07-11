@@ -1,0 +1,149 @@
+@font-face {
+    font-family: "Quicksand";
+    src: url("../fonts/quicksand/fonts/Quicksand_Bold.otf");
+    font-weight: normal;
+    font-style: normal;
+}
+
+/* Add blur to toast body */
+@supports (-webkit-backdrop-filter: none) or (backdrop-filter: none) {
+    .toast_bg {
+        -webkit-backdrop-filter: blur(10px);
+        backdrop-filter: blur(10px);
+        background-color: rgba(255, 255, 255, 0.8);
+    }
+}
+
+/* Remove default password eye icon */
+input[type=password]::-ms-reveal,
+input[type=password]::-ms-clear {
+    display: none;
+}
+
+/* Remove arrows from number inputs */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+input[type=number] {
+    -moz-appearance: textfield;
+}
+
+/* Set text highlight color */
+::selection {
+    background: #3f4d67;
+    color: #ffffff;
+}
+::-moz-selection {
+    background: #3f4d67;
+    color: #ffffff;
+}
+
+/* Resize svg logo */
+.logo {
+    width: 200px;
+}
+
+/* Overwrite input box height */
+.form-control {
+    height: calc(2.55rem + 2px);
+}
+
+/* Overwrite file input box height */
+.custom-file-label {
+    height: calc(2.25rem + 2px);
+}
+.custom-file-label::after {
+    height: 2.25rem;
+}
+
+/* Overwrite checkbox style */
+.custom-control-label::before {
+    background-color: #dee2e6;
+    border: none;
+}
+
+/* Overwrite sidebar logo style */
+.pcoded-navbar.navbar-collapsed .header-logo img {
+    -webkit-transform: none;
+    transform: none;
+    opacity: 1;
+}
+.b-brand .b-title {
+    font-family: "Quicksand";
+    margin-left: 15px;
+    letter-spacing: 10px;
+    color: #3498db;
+    font-weight: normal;
+    font-size: 26px;
+}
+
+/* Overwrite highlight when dragging system status cards */
+.highlight {
+    padding: 0rem;
+    margin-top: 0rem;
+    margin-bottom: calc(2rem - 2px);
+    background-color: #e2eaf2;
+}
+
+/* Apply color to device name in system status */
+.device_link {
+    color: #111111;
+}
+.device_link:hover {
+    color: #3498db;
+}
+
+/* Apply color to effect buttons on hover */
+.dashboard_effect {
+    user-select: none;
+    transition: 0.2s;
+}
+.dashboard_effect:hover,
+.dashboard_effect_active {
+    background-color: #3f4d67;
+    color: white;
+    cursor: pointer;
+}
+
+/* Prevent text overflow if filename of imported config too long */
+.custom-file-label {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Align "Browse" button text */
+.custom-file-label::after {
+    padding-top: .5rem !important;
+}
+
+/* Remove text highlight from checkboxes */
+.custom-checkbox {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+/* Change tooltip color and width */
+.tooltip-inner {
+    background-color: #3f4d67 !important;
+    color: #ffffff;
+    max-width: 350px;
+}
+.tooltip .arrow::before {
+    color: #3f4d67 !important;
+}
+
+/* Fix checkboxes and file input box not dimming when hovering over collapsed navbar */
+.pcoded-navbar.mob-open ~ .pcoded-header:before,
+.pcoded-navbar.mob-open ~ .pcoded-main-container:before,
+.pcoded-navbar.navbar-collapsed:hover ~ .pcoded-header:before,
+.pcoded-navbar.navbar-collapsed:hover ~ .pcoded-main-container:before {
+	z-index: 2;
+}

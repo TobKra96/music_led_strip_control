@@ -5,8 +5,8 @@ import numpy as np
 
 class EffectWave(Effect):
     def run(self):
-        effect_config = self._device.device_config["effects"]["effect_wave"]
-        led_count = self._device.device_config["LED_Count"]
+        effect_config = self.get_effect_config("effect_wave")
+        led_count = self._device.device_config["led_count"]
 
         audio_data = self.get_audio_data()
         y = self.get_mel(audio_data)

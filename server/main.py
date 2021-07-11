@@ -4,21 +4,58 @@
 # The program will start here.
 # This file will only initialize and start the processes.
 
-from sys import version_info
+from sys import version_info, platform
 import sys
 
 if version_info < (3, 6):
-    sys.exit("Error: MLSC requires Python 3.6 or greater.")
+    sys.exit("\033[91mError: MLSC requires Python 3.6 or greater.")
 
 from libs.audio_process_service import AudioProcessService
 from libs.notification_service import NotificationService
+from libs.webserver.webserver import Webserver
 from libs.device_manager import DeviceManager
 from libs.config_service import ConfigService
-from libs.webserver import Webserver
 
 from multiprocessing import Process, Queue, Lock
 from time import sleep
+import subprocess
+import pyaudio
 import logging
+if platform == "linux":
+    import fcntl
+import os
+
+
+def instance_already_running():
+    """
+    Detect if an an instance is already running, globally
+    at the operating system level.
+
+    Using `os.open` ensures that the file pointer won't be closed
+    by Python's garbage collector after the function's scope is exited.
+
+    The lock will be released when the program exits, or could be
+    released if the file pointer were closed.
+    """
+
+    lock_path = "../default.lock"
+
+    lock_file_pointer = os.open(lock_path, os.O_WRONLY | os.O_CREAT)
+
+    try:
+        fcntl.lockf(lock_file_pointer, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        return False
+    except IOError:
+        return True
+
+
+if platform == "linux" and instance_already_running():
+    x = subprocess.Popen("systemctl is-active mlsc", stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True, text=True)
+    systemctl_status = x.communicate()[0].strip()
+    if systemctl_status == 'active':
+        sys.exit("\033[91mError: MLSC is already running as a service.\nStop the running service with 'sudo systemctl stop mlsc'.")
+    else:
+        sys.exit("\033[91mError: MLSC is already running directly.\nStop the running instance with 'CTRL+C'.")
 
 
 class Main():
@@ -43,6 +80,9 @@ class Main():
 
         # Check config compatibility
         self._config_instance.check_compatibility()
+
+        # Init pyaudio
+        self._py_audio = pyaudio.PyAudio()
 
         # Prepare the queue for the output
         self._output_queue = Queue(2)
@@ -95,7 +135,8 @@ class Main():
                 self._config_lock,
                 self._notification_queue_webserver_in,
                 self._notification_queue_webserver_out,
-                self._effects_queue
+                self._effects_queue,
+                self._py_audio
             ))
         self._webserver_process.start()
 
@@ -107,7 +148,8 @@ class Main():
                 self._config_lock,
                 self._notification_queue_audio_in,
                 self._notification_queue_audio_out,
-                self._audio_queue
+                self._audio_queue,
+                self._py_audio
             ))
         self._audio_process.start()
 
@@ -130,15 +172,6 @@ class Main():
 
 
 if __name__ == "__main__":
-
-    # logging.basicConfig(handlers=[
-    #     RotatingFileHandler(logging_path + logging_file, mode='a', maxBytes=5 * 1024 * 1024, backupCount=5, encoding='utf-8'),
-    #     logging.StreamHandler()
-    # ],
-    #     format='%(asctime)s - %(levelname)-8s - %(name)-15s - %(message)s',
-    #     datefmt='%Y.%m.%d %H:%M:%S',
-    #     level=logging.DEBUG
-    # )
 
     main = Main()
     main.start()

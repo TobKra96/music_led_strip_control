@@ -6,14 +6,14 @@ import numpy as np
 class EffectSyncFade(Effect):
     def run(self):
         # Get the config of the current effect.
-        effect_config = self._device.device_config["effects"]["effect_sync_fade"]
+        effect_config = self.get_effect_config("effect_sync_fade")
 
         # Prepare the required config inside local variables to enhance the looking of the long array functions.
         current_gradient = effect_config["gradient"]
         current_speed = effect_config["speed"]
         current_reverse = effect_config["reverse"]
 
-        led_count = self._device.device_config["LED_Count"]
+        led_count = self._device.device_config["led_count"]
 
         current_color = self._device.color_service_global.get_global_fade_color(current_speed, current_gradient, current_reverse)
 
