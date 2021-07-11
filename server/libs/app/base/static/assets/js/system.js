@@ -153,6 +153,26 @@ $(document).ready(function () {
                 `;
                 $("#services").append(service);
             }
+
+            getServicesStatus()
+                // Update service status
+                .then((data) => {
+                    const services = data["services"];
+                    for (var i = 0, len = services.length; i < len; i++) {
+                        const serviceName = services[i]["name"];
+                        const serviceStatus = services[i]["running"];
+                        let status = "Stopped";
+                        let statusColor = "bg-danger";
+                        if (serviceStatus) {
+                            status = "Running";
+                            statusColor = "theme-bg";
+                        }
+                        $("#" + serviceName).text(status).removeClass("theme-bg2").addClass(statusColor);
+                    }
+                })
+                .catch((error) => {
+                    console.log(error);
+                })
         });
     }
     getServices();
@@ -174,26 +194,6 @@ $(document).ready(function () {
             });
         });
     }
-
-    getServicesStatus()
-        // Update service status
-        .then((data) => {
-            const services = data["services"];
-            for (var i = 0, len = services.length; i < len; i++) {
-                const serviceName = services[i]["name"];
-                const serviceStatus = services[i]["running"];
-                let status = "Stopped";
-                let statusColor = "bg-danger";
-                if (serviceStatus) {
-                    status = "Running";
-                    statusColor = "theme-bg";
-                }
-                $("#" + serviceName).text(status).removeClass("theme-bg2").addClass(statusColor);
-            }
-        })
-        .catch((error) => {
-            console.log(error);
-        })
 
     function getDevices() {
         // Preload devices
@@ -223,9 +223,27 @@ $(document).ready(function () {
                     $("#devices").append(device);
                 }
             }
+            getDevicesStatus()
+                // Update device status
+                .then((data) => {
+                    const devices = data["devices"];
+                    for (var i = 0, len = devices.length; i < len; i++) {
+                        const deviceId = devices[i]["id"];
+                        let status = "Offline";
+                        let statusColor = "bg-danger";
+                        if (devices[i]["connected"]) {
+                            status = "Online";
+                            statusColor = "theme-bg";
+                        }
+                        $("#" + deviceId).text(status).removeClass("theme-bg2").addClass(statusColor);
+                    }
+                })
+                .catch((error) => {
+                    console.log(error);
+                })
         });
     }
-    getDevices();
+    getDevices()
 
     function getDevicesStatus() {
         // Called every 10 seconds
@@ -245,25 +263,6 @@ $(document).ready(function () {
             setTimeout(getDevicesStatus, 10000);
         });
     }
-
-    getDevicesStatus()
-        // Update device status
-        .then((data) => {
-            const devices = data["devices"];
-            for (var i = 0, len = devices.length; i < len; i++) {
-                const deviceId = devices[i]["id"];
-                let status = "Offline";
-                let statusColor = "bg-danger";
-                if (devices[i]["connected"]) {
-                    status = "Online";
-                    statusColor = "theme-bg";
-                }
-                $("#" + deviceId).text(status).removeClass("theme-bg2").addClass(statusColor);
-            }
-        })
-        .catch((error) => {
-            console.log(error);
-        })
 
     function getVersion() {
         $.ajax("/api/system/version").done((data) => {

@@ -10,6 +10,15 @@ class EffectExecuter(ExecuterBase):
         else:
             return self._config["device_configs"][device]["effects"]["last_effect"]
 
+    def get_active_effects(self):
+        devices = []
+        for device_key in self._config["device_configs"]:
+            current_device = dict()
+            current_device["device"] = device_key
+            current_device["effect"] = self._config["device_configs"][device_key]["effects"]["last_effect"]
+            devices.append(current_device)
+        return devices
+
     def set_active_effect(self, device, effect, for_all=False):
         if device == self.all_devices_id:
             self.set_active_effect_for_all(effect)
