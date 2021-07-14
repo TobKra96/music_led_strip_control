@@ -283,6 +283,12 @@ def effects():  # pylint: disable=E0211
                             effect_slide: str,
                             effect_sync_fade: str,
                             effect_twinkle: str
+                        },
+                        special: {
+                            effect_off: str,
+                            effect_random_cycle: str,
+                            effect_random_non_music: str,
+                            effect_random_music: str
                         }
                     }
         403:
