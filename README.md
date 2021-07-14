@@ -7,8 +7,8 @@
 </p>
 
 <p align="center">
-  <a style="text-decoration:none" href="https://www.python.org/downloads/release/python-3613/">
-    <img src="https://img.shields.io/badge/python-3.6+-blue.svg?color=3498DB&style=flat-square" alt="Python Version" />
+  <a style="text-decoration:none" href="https://www.python.org/downloads/release/python-3711/">
+    <img src="https://img.shields.io/badge/python-3.7+-blue.svg?color=3498DB&style=flat-square" alt="Python Version" />
   </a>
   <a style="text-decoration:none" href="https://discord.gg/bMmWYGcz/">
     <img src="https://img.shields.io/discord/774182494277992478?color=3498DB&style=flat-square&label=discord" alt="Discord" />
@@ -27,7 +27,6 @@
       <a href="#installing">Installing</a>
       <ul>
         <li><a href="#automated-installation">Automated installation</a></li>
-        <li><a href="#manual-installation">Manual installation</a></li>
       </ul>
     </li>
     <li><a href="#demo">Demo</a></li>
@@ -41,16 +40,16 @@
 
 - Audio visualization in real time.
 - Modern web interface.
-- 24 effects with many configuration options.
+- 25 effects with many configuration options.
 - Customizable colors and color schemes.
 - Multicore optimized for large LED strips (900+ LEDs).
-- Multi device support
+- Multi-device support.
 - Standalone and client compatible for audio processing.
 
 
 ## Installing
 
-Please check if your hardware is inside the [Compatible Hardware List](https://github.com/TobKra96/music_led_strip_control/wiki/Compatible-Hardware-List).
+Please check if your hardware is listed inside the [Compatible Hardware List](https://github.com/TobKra96/music_led_strip_control/wiki/Compatible-Hardware-List).
 
 ### Automated installation
 Run the following command in your terminal:
