@@ -9,7 +9,7 @@ import os
 import re
 
 
-__version__ = "2.2 Stable"
+__version__ = "2.3 Dev"
 
 
 class SystemInfoExecuter(ExecuterBase):
