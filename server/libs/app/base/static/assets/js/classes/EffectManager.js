@@ -1,7 +1,6 @@
 import Toast from "./Toast.js";
 
 let intervalSec;
-let selectedEffects = [];
 
 // classes/EffectManager.js
 export default class EffectManager {
@@ -31,12 +30,6 @@ export default class EffectManager {
                 }
             }).done((data) => {
                 intervalSec = data.settings.interval;
-                // Insert only selected effects into array
-                $.each(data.settings, function(key, value) {
-                    if (key != "interval" && value) {
-                        selectedEffects.push(key);
-                    }
-                });
                 initTimerWorker();
             }),
 
@@ -62,8 +55,6 @@ export default class EffectManager {
             pool = this.nonMusicEffects;
         } else if (type == 'effect_random_music') {
             pool = this.musicEffects;
-        } else if (type == 'effect_random_cycle' && selectedEffects.length > 1 ) {
-            pool = selectedEffects;
         } else {
             pool = this.allLightEffects;
         }
@@ -101,7 +92,7 @@ export default class EffectManager {
             }
 
             // pick random effect based on type
-            if (effect == "effect_random_cycle" || effect == "effect_random_non_music" || effect == "effect_random_music") {
+            if (effect == "effect_random_non_music" || effect == "effect_random_music") {
                 effect = this.getRandomEffect(effect, this.currentDevice._activeEffect);
             }
 
@@ -113,11 +104,10 @@ export default class EffectManager {
             }).done((data) => {
                 // UI and State Updates should be here
                 // this could cause Problems later
+                this.currentDevice.setActiveEffect(data.effect);
             }).fail((data) => {
                 new Toast('Unable to set effect. Error: ' + JSON.stringify(data, null, '\t')).error();
             });
-            // update UI without waiting for a response
-            this.currentDevice.setActiveEffect(effect);
         }
     }
 
