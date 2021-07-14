@@ -5,18 +5,20 @@ let intervalSec;
 // classes/EffectManager.js
 export default class EffectManager {
     constructor(currentDevice) {
-        // todo: refactor server-side
-        this.nonMusicEffects = $("#dashboard-list-none-music > div > div").map(function () { return this.id }).toArray();
-        this.musicEffects = $("#dashboard-list-music > div > div").map(function () { return this.id }).toArray();
-        this.specialEffects = $("#dashboard-list-special > div > div").map(function () { return this.id }).toArray();
         this.currentDevice = currentDevice ? currentDevice : undefined;
 
-        // Listen for effect change on click
-        this.allEffects.forEach(effect => {
-            $("#" + effect).on('click', () => {
-                this.switchEffect(effect);
+        $.ajax({
+            url: "/api/resources/effects",
+            data: {}
+        }).done((data) => {
+            this.allEffects = Object.keys(data.special).concat(Object.keys(data.music), Object.keys(data.non_music))
+            // Listen for effect change on click
+            this.allEffects.forEach(effect => {
+                $("#" + effect).on('click', () => {
+                    this.switchEffect(effect);
+                });
             });
-        });
+        })
 
         // Hardcoded all_devices for now. Timer.js is unstable with multiple devices.
         // This is still buggy because if you manually select a different device,
@@ -38,31 +40,6 @@ export default class EffectManager {
         }).catch((response) => {
             new Toast(JSON.stringify(response, null, '\t')).error();
         });
-    }
-
-    get allEffects() {
-        return this.nonMusicEffects.concat(this.musicEffects, this.specialEffects)
-    }
-
-    get allLightEffects() {
-        return this.nonMusicEffects.concat(this.musicEffects)
-    }
-
-    getRandomEffect(type, activeEffect) {
-        let pool, randomEffect;
-
-        if (type == 'effect_random_non_music') {
-            pool = this.nonMusicEffects;
-        } else if (type == 'effect_random_music') {
-            pool = this.musicEffects;
-        } else {
-            pool = this.allLightEffects;
-        }
-
-        do {
-            randomEffect = pool[Math.floor(Math.random() * pool.length)];
-        } while (randomEffect === activeEffect)
-        return randomEffect;
     }
 
     switchEffect(effect) {
@@ -89,11 +66,6 @@ export default class EffectManager {
                 }
                 $("#effect_random_cycle > div > p").text("Random Cycle");
                 $("#effect_random_cycle").css("box-shadow", "none")
-            }
-
-            // pick random effect based on type
-            if (effect == "effect_random_non_music" || effect == "effect_random_music") {
-                effect = this.getRandomEffect(effect, this.currentDevice._activeEffect);
             }
 
             $.ajax({

@@ -33,6 +33,10 @@ class EffectExecuter(ExecuterBase):
         return enabled_effects
 
     def get_random_effect(self, effect_list, device):
+        """
+        Return a random effect from effect list.
+        Device is required to prevent repeating effects twice.
+        """
         active_effect = self.get_active_effect(device)
         if len(effect_list) < 2:
             return effect_list[0]
@@ -42,11 +46,24 @@ class EffectExecuter(ExecuterBase):
                 break
         return effect
 
-    def set_active_effect(self, device, effect, for_all=False):
+    def parse_special_effects(self, effect, effect_dict, device=None):
+        """Return random effect based on selected special effect."""
+        if not device:
+            device = self.all_devices_id
+
         if effect == "effect_random_cycle":
             effect_list = self.get_enabled_effects()
-            effect = self.get_random_effect(effect_list, device)
+        elif effect == "effect_random_non_music":
+            effect_list = [k for k in effect_dict["non_music"].keys()]
+        elif effect == "effect_random_music":
+            effect_list = [k for k in effect_dict["music"].keys()]
+        else:
+            return effect
 
+        effect = self.get_random_effect(effect_list, device)
+        return effect
+
+    def set_active_effect(self, device, effect, for_all=False):
         if device == self.all_devices_id:
             self.set_active_effect_for_all(effect)
             return {"effect": effect}
@@ -58,10 +75,6 @@ class EffectExecuter(ExecuterBase):
         return {"device": device, "effect": effect}
 
     def set_active_effect_for_all(self, effect):
-        if effect == "effect_random_cycle":
-            effect_list = self.get_enabled_effects()
-            effect = self.get_random_effect(effect_list, device)
-
         self._config[self.all_devices_id]["effects"]["last_effect"] = effect
         self.save_config()
         self.refresh_device(self.all_devices_id)

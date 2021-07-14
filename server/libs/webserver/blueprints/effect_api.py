@@ -110,6 +110,10 @@ def set_active_effect():  # pylint: disable=E0211
         if not Executer.instance.effect_executer.validate_data_in(data_in, ("device", "effect",)):
             return "Input data are wrong.", 403
 
+        effect_dict = Executer.instance.general_executer.get_effects()
+        if data_in["effect"] in effect_dict["special"]:
+            data_in["effect"] = Executer.instance.effect_executer.parse_special_effects(data_in["effect"], effect_dict, data_in["device"])
+
         data_out = Executer.instance.effect_executer.set_active_effect(data_in["device"], data_in["effect"])
 
         return jsonify(data_out)
@@ -118,6 +122,10 @@ def set_active_effect():  # pylint: disable=E0211
         # Save the active effect for all devices.
         if not Executer.instance.effect_executer.validate_data_in(data_in, ("effect",)):
             return "Input data is wrong.", 403
+
+        effect_dict = Executer.instance.general_executer.get_effects()
+        if data_in["effect"] in effect_dict["special"]:
+            data_in["effect"] = Executer.instance.effect_executer.parse_special_effects(data_in["effect"], effect_dict)
 
         data_out = Executer.instance.effect_executer.set_active_effect_for_all(data_in["effect"])
 
