@@ -134,6 +134,10 @@ class SystemInfoExecuter(ExecuterBase):
                 "version": __version__
             },
             {
+                "name": "python",
+                "version": platform.python_version()
+            },
+            {
                 "name": "flask",
                 "version": flask_version
             }
