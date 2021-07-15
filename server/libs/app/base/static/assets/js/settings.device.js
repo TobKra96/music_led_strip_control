@@ -96,12 +96,10 @@ function SetLocalSettings() {
             case "range":
             case "number":
                 if (!element.val()) {
-                    if (setting_key == "led_count") {
-                        // https://github.com/rpi-ws281x/rpi-ws281x-python/issues/70
-                        setting_value = 7
-                    } else {
-                        setting_value = 1
-                    }
+                    setting_value = 1
+                } else if (setting_key == "led_count" && element.val() < 7) {
+                    // https://github.com/rpi-ws281x/rpi-ws281x-python/issues/70
+                    setting_value = 7
                 } else {
                     setting_value = parseFloat(element.val());
                 }
