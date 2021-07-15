@@ -45,10 +45,15 @@ class EffectDirectionChanger(Effect):
         #
 
         self.output_left_length = self._device.device_config["led_mid"]
+
+        # Set effect middle to center if value is outside the led_count range.
+        if not 0 < self.output_left_length < self._device.device_config["led_count"]:
+            self.output_left_length = self._device.device_config["led_count"] // 2
+
         self.output_left_min_index = 0
         self.output_left_max_index = self.output_left_length
 
-        self.output_right_length = self._device.device_config["led_count"] - self._device.device_config["led_mid"]
+        self.output_right_length = self._device.device_config["led_count"] - self.output_left_length
         self.output_right_min_index = self.output_left_max_index
         self.output_right_max_index = self.output_right_min_index + self.output_right_length
 

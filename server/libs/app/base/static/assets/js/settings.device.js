@@ -94,7 +94,11 @@ function SetLocalSettings() {
                 setting_value = element.is(':checked');
                 break;
             case "number":
-                setting_value = parseFloat(element.val());
+                if (!element.val()) {
+                    setting_value = 1
+                } else {
+                    setting_value = parseFloat(element.val());
+                }
                 break;
             default:
                 setting_value = element.val();
