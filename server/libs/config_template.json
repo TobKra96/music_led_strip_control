@@ -231,7 +231,7 @@
                     0,
                     255
                 ],
-                "use_custom_color": "false",
+                "use_custom_color": false,
                 "white": 0
             },
             "effect_slide": {
@@ -264,7 +264,7 @@
                 "gradient": "spectral",
                 "max_vol_color": "red",
                 "speed": 50,
-                "use_gradient": "true"
+                "use_gradient": true
             },
             "effect_wave": {
                 "color_flash": "white",
@@ -530,7 +530,7 @@
                     0,
                     255
                 ],
-                "use_custom_color": "false",
+                "use_custom_color": false,
                 "white": 0
             },
             "effect_slide": {
@@ -563,7 +563,7 @@
                 "gradient": "spectral",
                 "max_vol_color": "red",
                 "speed": 50,
-                "use_gradient": "true"
+                "use_gradient": true
             },
             "effect_wave": {
                 "color_flash": "white",
