@@ -154,9 +154,6 @@
                 "reverse": false,
                 "speed": 1
             },
-            "effect_music": {
-                "color": "blue"
-            },
             "effect_pendulum": {
                 "change_color": false,
                 "color": "blue",
@@ -170,34 +167,6 @@
                 "mirror": true,
                 "s_color": "white",
                 "s_count": 20
-            },
-            "effect_random_cycle": {
-                "effect_advanced_scroll": false,
-                "effect_bars": false,
-                "effect_beat": false,
-                "effect_beat_slide": false,
-                "effect_beat_twinkle": false,
-                "effect_bubble": false,
-                "effect_direction_changer": false,
-                "effect_energy": false,
-                "effect_fade": false,
-                "effect_fireplace": false,
-                "effect_gradient": false,
-                "effect_pendulum": false,
-                "effect_power": false,
-                "effect_rods": false,
-                "effect_scroll": false,
-                "effect_segment_color": false,
-                "effect_single": false,
-                "effect_slide": false,
-                "effect_spectrum_analyzer": false,
-                "effect_sync_fade": false,
-                "effect_twinkle": false,
-                "effect_vu_meter": false,
-                "effect_wave": false,
-                "effect_wavelength": false,
-                "effect_wiggle": false,
-                "interval": 10
             },
             "effect_rods": {
                 "change_color": true,
@@ -270,11 +239,6 @@
                 "mirror": false,
                 "reverse": false,
                 "speed": 2
-            },
-            "effect_spectrum": {
-                "b_multiplier": 1,
-                "g_multiplier": 1,
-                "r_multiplier": 1
             },
             "effect_spectrum_analyzer": {
                 "color": "blue",
@@ -461,9 +425,6 @@
                 "reverse": false,
                 "speed": 1
             },
-            "effect_music": {
-                "color": "blue"
-            },
             "effect_pendulum": {
                 "change_color": false,
                 "color": "blue",
@@ -577,11 +538,6 @@
                 "mirror": false,
                 "reverse": false,
                 "speed": 2
-            },
-            "effect_spectrum": {
-                "b_multiplier": 1,
-                "g_multiplier": 1,
-                "r_multiplier": 1
             },
             "effect_spectrum_analyzer": {
                 "color": "blue",
