@@ -93,6 +93,7 @@ function SetLocalSettings() {
             case "checkbox":
                 setting_value = element.is(':checked');
                 break;
+            case "range":
             case "number":
                 if (!element.val()) {
                     if (setting_key == "led_count") {
