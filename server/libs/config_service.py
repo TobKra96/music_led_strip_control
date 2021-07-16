@@ -3,7 +3,9 @@
 #   Load and save the config after every change.
 #
 from libs.config_converter.config_converter_service import ConfigConverterService  # pylint: disable=E0611, E0401
+from libs.config_converter.config_validator_service import ConfigValidatorService  # pylint: disable=E0611, E0401
 
+from jsonschema.exceptions import ValidationError
 from logging.handlers import RotatingFileHandler
 from shutil import copyfile, copy
 from pathlib import Path
@@ -22,6 +24,8 @@ class ConfigService():
         self.setup_logging()
 
         self.logger = logging.getLogger(__name__)
+
+        self.config_validator_service = ConfigValidatorService()
 
         config_file = "config.json"
         config_backup_file = "config_backup.json"
@@ -149,6 +153,13 @@ class ConfigService():
         self.check_devices(loaded_config["device_configs"], template_config["default_device"])
 
         self.config = loaded_config
+        try:
+            self.config_validator_service.validate_config(self.config)
+        except ValidationError as e:
+            # Todo: Handle validation errors.
+            # https://python-jsonschema.readthedocs.io/en/stable/errors/
+            self.logger.error(f"Could not validate config settings: {e}")
+            # self.load_backup()
         self.save_config()
 
     def check_leaf(self, loaded_config_leaf, template_config_leaf):
