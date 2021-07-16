@@ -49,12 +49,11 @@ export default class EffectManager {
                 const effectCycleActive = sessionStorage.getItem('effect_cycle_active');
                 if (!effectCycleActive) {
                     timer.postMessage({
-                        seconds: intervalSec - 1,
+                        seconds: intervalSec,
                         status: 'start'
                     });
                     sessionStorage.setItem('effect_cycle_active', true);
                     $("#effect_random_cycle").css("box-shadow", "inset 0 0 0 3px #3f4d67")
-                    $("#effect_random_cycle > div > p").text(`Random Cycle (${formatTimer(intervalSec)})`);
                 }
             } else {
                 const effectCycleActive = sessionStorage.getItem('effect_cycle_active');
