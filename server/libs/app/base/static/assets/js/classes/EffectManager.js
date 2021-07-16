@@ -32,7 +32,7 @@ export default class EffectManager {
                 }
             }).done((data) => {
                 intervalSec = data.settings.interval;
-                initTimerWorker();
+                this.timer = this.initTimerWorker();
             }),
 
         ]).then(response => {
@@ -48,7 +48,7 @@ export default class EffectManager {
             if (effect == 'effect_random_cycle') {
                 const effectCycleActive = sessionStorage.getItem('effect_cycle_active');
                 if (!effectCycleActive) {
-                    timer.postMessage({
+                    this.timer.postMessage({
                         seconds: intervalSec,
                         status: 'start'
                     });
@@ -58,7 +58,7 @@ export default class EffectManager {
             } else {
                 const effectCycleActive = sessionStorage.getItem('effect_cycle_active');
                 if (effectCycleActive) {
-                    timer.postMessage({
+                    this.timer.postMessage({
                         seconds: 0,
                         status: 'stop'
                     });
@@ -83,38 +83,37 @@ export default class EffectManager {
         }
     }
 
-}
+    initTimerWorker() {
+        let timer = new Worker('/static/assets/js/timer.js');
 
-let timer;
-
-function initTimerWorker() {
-    timer = new Worker('/static/assets/js/timer.js');
-
-    // Get messages from timer worker
-    timer.onmessage = (event) => {
-        var sec = event.data;
-        sessionStorage.setItem('seconds', sec);
-        $("#effect_random_cycle > div > p").text(`Random Cycle (${formatTimer(sec)})`);
-        if (sec <= 0) {
-            sessionStorage.clear();
-            $("#effect_random_cycle")[0].click();
-        }
-    };
-
-    // Restore timer if it was running while page reloaded
-    var effectCycleActive = sessionStorage.getItem('effect_cycle_active');
-    if (effectCycleActive) {
-        $("#effect_random_cycle").css("box-shadow", "inset 0 0 0 3px #3f4d67")
-        var sec = sessionStorage.getItem('seconds');
-        if (sec <= 0 || sec == null) {
-            sec = intervalSec;
+        // Get messages from timer worker
+        timer.onmessage = (event) => {
+            var sec = event.data;
             sessionStorage.setItem('seconds', sec);
+            $("#effect_random_cycle > div > p").text(`Random Cycle (${formatTimer(sec)})`);
+            if (sec <= 0) {
+                sessionStorage.clear();
+                $("#effect_random_cycle")[0].click();
+            }
+        };
+
+        // Restore timer if it was running while page reloaded
+        var effectCycleActive = sessionStorage.getItem('effect_cycle_active');
+        if (effectCycleActive) {
+            $("#effect_random_cycle").css("box-shadow", "inset 0 0 0 3px #3f4d67")
+            var sec = sessionStorage.getItem('seconds');
+            if (sec <= 0 || sec == null) {
+                sec = intervalSec;
+                sessionStorage.setItem('seconds', sec);
+            }
+            timer.postMessage({
+                seconds: sec,
+                status: 'start'
+            });
         }
-        timer.postMessage({
-            seconds: sec,
-            status: 'start'
-        });
+        return timer;
     }
+
 }
 
 function formatTimer(time) {
