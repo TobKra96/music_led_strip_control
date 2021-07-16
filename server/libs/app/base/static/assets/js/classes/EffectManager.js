@@ -93,7 +93,7 @@ export default class EffectManager {
             $("#effect_random_cycle > div > p").text(`Random Cycle (${formatTimer(sec)})`);
             if (sec <= 0) {
                 sessionStorage.clear();
-                $("#effect_random_cycle")[0].click();
+                this.switchEffect("effect_random_cycle");
             }
         };
 
