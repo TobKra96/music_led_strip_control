@@ -6,7 +6,6 @@ class ConfigValidatorService():
         # Regexes
         device_id_regex = r"^(device_)(?:0|[1-9]\d{0,1})$"  # Allow device IDs 0-99 without leading zeros.
 
-
         # Enums
         effect_enum = [
             "effect_advanced_scroll",
@@ -91,7 +90,6 @@ class ConfigValidatorService():
             "error",
             "critical"
         ]
-
 
         # Schemas
         effect_schema = {
@@ -1947,7 +1945,6 @@ class ConfigValidatorService():
             "const": 2
         }
 
-
         # Config schema
         schema = {
             "type": "object",
@@ -1979,7 +1976,6 @@ class ConfigValidatorService():
                 "version": version_schema
             }
         }
-
 
         # Validate will raise exception if given json is not
         # what is described in schema.
