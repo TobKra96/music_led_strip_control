@@ -4,7 +4,7 @@ from jsonschema import validate
 class ConfigValidatorService():
     def validate_config(self, config):
         # Regexes
-        device_id_regex = r"^(device_)(?:[1-9]\d*|0)$"
+        device_id_regex = r"^(device_)(?:0|[1-9]\d{0,1})$"  # Allow device IDs 0-99 without leading zeros.
 
 
         # Enums
