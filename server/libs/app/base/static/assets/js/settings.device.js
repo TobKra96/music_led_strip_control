@@ -93,8 +93,16 @@ function SetLocalSettings() {
             case "checkbox":
                 setting_value = element.is(':checked');
                 break;
+            case "range":
             case "number":
-                setting_value = parseFloat(element.val());
+                if (!element.val()) {
+                    setting_value = 1
+                } else if (setting_key == "led_count" && element.val() < 7) {
+                    // https://github.com/rpi-ws281x/rpi-ws281x-python/issues/70
+                    setting_value = 7
+                } else {
+                    setting_value = parseFloat(element.val());
+                }
                 break;
             default:
                 setting_value = element.val();

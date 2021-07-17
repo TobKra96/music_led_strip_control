@@ -9,7 +9,7 @@ import os
 import re
 
 
-__version__ = "2.2 Stable"
+__version__ = "2.3 Dev"
 
 
 class SystemInfoExecuter(ExecuterBase):
@@ -132,6 +132,10 @@ class SystemInfoExecuter(ExecuterBase):
             {
                 "name": "mlsc",
                 "version": __version__
+            },
+            {
+                "name": "python",
+                "version": platform.python_version()
             },
             {
                 "name": "flask",

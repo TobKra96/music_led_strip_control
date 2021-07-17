@@ -79,5 +79,11 @@ class GeneralExecuter(ExecuterBase):
             "effect_spectrum_analyzer": "Spectrum Analyzer",
             "effect_direction_changer": "Direction Changer"
         }
+        effects["special"] = {
+            "effect_off": "Off",
+            "effect_random_cycle": "Random Cycle",
+            "effect_random_non_music": "Random Non-Music",
+            "effect_random_music": "Random Music"
+        }
 
         return effects
