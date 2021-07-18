@@ -261,15 +261,15 @@ function ResetPinSettings() {
     });
 }
 
-document.getElementById("save_btn").addEventListener("click", function (e) {
+$("#save_btn").on("click", function () {
     SetLocalSettings();
 });
 
-document.getElementById("reset_btn").addEventListener("click", function (e) {
+$("#reset_btn").on("click", function () {
     $('#modal_reset_general').modal('show')
 });
 
-document.getElementById("reset_btn_modal").addEventListener("click", function (e) {
+$("#reset_btn_modal").on("click", function () {
     $('#modal_reset_general').modal('hide')
     ResetPinSettings();
     ResetSettings(currentDevice);
@@ -279,7 +279,7 @@ $("#export_btn").on("click", function () {
     new Toast("Configuration file exported.").success();
 });
 
-document.getElementById("import_btn").addEventListener("click", function (e) {
+$("#import_btn").on("click", function () {
     ImportSettings();
 });
 
