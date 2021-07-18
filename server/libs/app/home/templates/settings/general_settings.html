@@ -9,6 +9,9 @@
 
 <div class="pcoded-content">
     <div class="pcoded-inner-content">
+
+        {% include 'includes/toasts.html' %}
+
         <!-- [ breadcrumb ] start -->
         <div class="page-header">
             <div class="page-block">
@@ -285,5 +288,5 @@
 <!-- Specific Page JS goes HERE  -->
 {% block javascripts %}
 <script src="/static/assets/js/settings.js"></script>
-<script src="/static/assets/js/settings.general.js"></script>
+<script src="/static/assets/js/settings.general.js" type="module"></script>
 {% endblock javascripts %}
