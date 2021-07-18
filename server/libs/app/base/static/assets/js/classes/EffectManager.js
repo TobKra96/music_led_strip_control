@@ -78,7 +78,8 @@ export default class EffectManager {
                 // this could cause Problems later
                 this.currentDevice.setActiveEffect(data.effect);
             }).fail((data) => {
-                new Toast('Unable to set effect. Error: ' + JSON.stringify(data, null, '\t')).error();
+                console.log(JSON.stringify(data, null, '\t'))
+                new Toast("Error while setting effect.").error();
             });
         }
     }

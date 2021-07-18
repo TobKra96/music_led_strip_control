@@ -183,11 +183,11 @@ $("#save_btn").on("click", function () {
         data: JSON.stringify(data, null, '\t'),
         contentType: 'application/json;charset=UTF-8'
     }).done(response => {
-        // todo toasts
         console.log("Effect settings set successfully. Response:\n\n" + JSON.stringify(response, null, '\t'));
+        new Toast("Effect settings saved.").success();
     }).fail(response => {
-        // todo toasts
         console.log("Error while setting effect settings. Error: " + response.responseText);
+        new Toast("Error while saving effect settings.").error();
     });
 });
 
