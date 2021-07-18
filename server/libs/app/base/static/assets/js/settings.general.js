@@ -275,6 +275,10 @@ document.getElementById("reset_btn_modal").addEventListener("click", function (e
     ResetSettings(currentDevice);
 });
 
+$("#export_btn").on("click", function () {
+    new Toast("Configuration file exported.").success();
+});
+
 document.getElementById("import_btn").addEventListener("click", function (e) {
     ImportSettings();
 });
