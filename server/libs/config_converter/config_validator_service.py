@@ -1617,16 +1617,9 @@ class ConfigValidatorService():
                     ]
                 },
                 "device_id": {
-                    "oneOf": [
-                        {
-                            "const": "no_mic"
-                        },
-                        {
-                            "type": "integer",
-                            "minimum": 0,
-                            "maximum": 100
-                        }
-                    ],
+                    "type": "integer",
+                    "minimum": -1,
+                    "maximum": 100
                 },
                 "frames_per_buffer": {
                     "type": "integer",
