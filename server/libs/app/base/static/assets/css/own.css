@@ -144,6 +144,7 @@ select#gradient {
 }
 .tooltip .arrow::before {
     color: #3f4d67 !important;
+    pointer-events: none;
 }
 
 /* Fix checkboxes and file input box not dimming when hovering over collapsed navbar */
