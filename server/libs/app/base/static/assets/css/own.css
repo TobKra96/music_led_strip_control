@@ -107,6 +107,12 @@ input[type=number] {
     cursor: pointer;
 }
 
+/* Capitalize dropdown items */
+select#color,
+select#gradient {
+    text-transform: capitalize;
+}
+
 /* Prevent text overflow if filename of imported config too long */
 .custom-file-label {
     display: block;
