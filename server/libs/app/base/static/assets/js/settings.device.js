@@ -232,6 +232,27 @@ const createDevice = function () {
     });
 }
 
+$("#device_group_dropdown").on("click", ".dropdown-item", function () {
+    $("#device_group").val(this.text);
+});
+
+// Add new device group to dropdown on "+" click
+$("#add_device_group").on("click", function () {
+    let device_group = $("#device_group").val().trim();
+    if (!/^\s*$/.test(device_group)) {
+        let exists = 0 != $('#device_group_dropdown option[value="' + device_group + '"]').length;
+        if (!exists) {
+            const option = new Option(device_group, device_group);
+            option.setAttribute("class", "dropdown-item");
+            $("#device_group_dropdown").append(option);
+            let group_count = $("#device_group_dropdown option").length
+            $("#group_count").text(group_count);
+        }
+    } else {
+        $("#device_group").val('');
+    }
+});
+
 $("#save_btn").on("click", function () {
     SetLocalSettings();
 });

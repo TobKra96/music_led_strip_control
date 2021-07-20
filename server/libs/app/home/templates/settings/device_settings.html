@@ -102,6 +102,31 @@
                                                 </div>
                                                 <div class="col-lg-12">
                                                     <div class="form-group">
+                                                        <label class="row m-0 mb-2 p-0">
+                                                            [WIP] Device Group
+                                                            <div id="DEVICE_GROUP_TOOLTIP" class="pl-1" data-toggle="tooltip" data-placement="top" data-html="true">
+                                                                <i class="feather icon-help-circle"></i>
+                                                            </div>
+                                                        </label>
+                                                        <div class="input-group">
+                                                            <input type="text" id="device_group" class="form-control" required>
+                                                            <div class="input-group-append">
+                                                                <button type="button" id="add_device_group" class="btn btn-outline-secondary px-3">
+                                                                    <span class="feather icon-plus"></span>
+                                                                </button>
+                                                                <button type="button" class="btn btn-outline-secondary dropdown-toggle dropdown-toggle-split"
+                                                                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                                </button>
+                                                                <div id="device_group_dropdown" class="dropdown-menu dropdown-menu-right">
+                                                                    <h6 class="dropdown-header">
+                                                                        Saved groups: <span class="badge badge-secondary" id="group_count">0</span>
+                                                                    </h6>
+                                                                    <div role="separator" class="dropdown-divider"></div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
                                                         <label>LED Brightness <span for="led_brightness" class="mb-0 badge badge-secondary"></span></label>
                                                         <input id="led_brightness" type="range" class="custom-range device_setting_input" min="0" max="100" step="1" required>
                                                     </div>

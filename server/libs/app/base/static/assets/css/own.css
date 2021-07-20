@@ -87,6 +87,11 @@ input[type=number] {
     background-color: #e2eaf2;
 }
 
+/* Overwrite bootstrap dropdown active color */
+.dropdown-item:active {
+    background-color: #3f4d67;
+}
+
 /* Apply color to device name in system status */
 .device_link {
     color: #111111;

@@ -73,4 +73,5 @@ $(document).ready(function () {
     $('#LED_Invert_TOOLTIP').attr('data-original-title', 'The parameter for inverting the LED signal. It can be useful if you want to use an inverted logic level shifter.<br><br>Default value: Off');
     $('#UDP_Client_IP_TOOLTIP').attr('data-original-title', 'The IP address of the client.');
     $('#UDP_Client_Port_TOOLTIP').attr('data-original-title', 'The port used for the communication between the server and client.<br><br>Default setting: 7777');
+    $('#DEVICE_GROUP_TOOLTIP').attr('data-original-title', 'The device group allows you to organize devices and change effects for all devices in a selected group.');
 });
