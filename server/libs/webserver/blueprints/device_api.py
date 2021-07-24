@@ -110,3 +110,38 @@ def delete_device():  # pylint: disable=E0211
     Executer.instance.device_executer.delete_device(data_in["device"])
 
     return jsonify(data_out)
+
+
+@device_api.get('/api/system/groups')
+@login_required
+def get_groups():  # pylint: disable=E0211
+    """
+    Groups
+    ---
+    tags:
+        - System
+    responses:
+        200:
+            description: OK
+            schema:
+                type: object,
+                example:
+                    [
+                        {
+                            id: str,
+                            name: str
+                        },
+                        ...
+                    ]
+        403:
+            description: Could not find groups
+    """
+    data_out = dict()
+
+    groups = Executer.instance.device_executer.get_groups()
+    data_out = groups
+
+    if groups is None:
+        return "Could not find devices: ", 403
+    else:
+        return jsonify(data_out)

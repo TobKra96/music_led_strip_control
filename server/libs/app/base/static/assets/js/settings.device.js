@@ -70,6 +70,13 @@ $(document).ready(function () {
             });
         });
 
+        currentDevice.groups.forEach(function (group, _) {
+            let option = `<option class="dropdown-item" value="${group}">${group}</option>`
+            $("#device_groups").append(option)
+        });
+        let group_count = $("#device_groups option").length
+        $("#group_count").text(group_count);
+
     }).catch((response) => {
         if (devices.length === 0) {
             return;
@@ -104,6 +111,13 @@ function SetLocalSettings() {
                     setting_value = parseFloat(element.val());
                 }
                 break;
+            case "option":
+                let groups = [];
+                element.children().each(function () {
+                    groups.push(this.value);
+                });
+                setting_value = groups
+                break
             default:
                 setting_value = element.val();
         }
@@ -244,13 +258,25 @@ $("#add_device_group").on("click", function () {
         if (!exists) {
             const option = new Option(device_group, device_group);
             option.setAttribute("class", "dropdown-item");
-            $("#device_group_dropdown").append(option);
-            let group_count = $("#device_group_dropdown option").length
+            $("#device_groups").append(option);
+            let group_count = $("#device_groups option").length
             $("#group_count").text(group_count);
         }
     } else {
         $("#device_group").val('');
     }
+});
+
+// Only allow letters, digits, spaces and underscores in device and group names
+$('#device_name, #device_group').on('input', function() {
+    let position = this.selectionStart,
+        regex = /[^a-z0-9_ ]/gi,
+        textVal = $(this).val();
+    if(regex.test(textVal)) {
+        $(this).val(textVal.replace(regex, ''));
+        position--;
+    }
+    this.setSelectionRange(position, position);
 });
 
 $("#save_btn").on("click", function () {

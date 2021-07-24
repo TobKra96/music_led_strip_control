@@ -52,10 +52,24 @@ class DeviceExecuter(ExecuterBase):
             current_device = dict()
             current_device["name"] = self._config["device_configs"][device_key]["device_name"]
             current_device["id"] = device_key
+            current_device["groups"] = self._config["device_configs"][device_key]["device_groups"]
 
             devices.append(current_device)
 
         return devices
+
+    # Todo: Allow removing from group list.
+    def get_groups(self):
+        groups = []
+
+        for group_key in self._config["device_groups"]:
+            current_group = dict()
+            current_group["name"] = self._config["device_groups"][group_key]
+            current_group["id"] = group_key
+
+            groups.append(current_group)
+
+        return groups
 
     def create_new_device(self):
         i = 0
