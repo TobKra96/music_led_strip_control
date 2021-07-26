@@ -267,10 +267,10 @@ $("#add_device_group").on("click", function () {
     }
 });
 
-// Only allow letters, digits, spaces and underscores in device and group names
+// Do not allow special symbols except for [-_.] in device and group names
 $('#device_name, #device_group').on('input', function() {
     let position = this.selectionStart,
-        regex = /[^a-z0-9_ ]/gi,
+        regex = /[!$%^&*()+|~=`{}\[\]:";'<>?,\/]/gi,
         textVal = $(this).val();
     if(regex.test(textVal)) {
         $(this).val(textVal.replace(regex, ''));
