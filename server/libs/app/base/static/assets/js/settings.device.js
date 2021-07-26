@@ -103,10 +103,10 @@ function SetLocalSettings() {
             case "range":
             case "number":
                 if (!element.val()) {
-                    setting_value = 1
+                    setting_value = 1;
                 } else if (setting_key == "led_count" && element.val() < 7) {
                     // https://github.com/rpi-ws281x/rpi-ws281x-python/issues/70
-                    setting_value = 7
+                    setting_value = 7;
                 } else {
                     setting_value = parseFloat(element.val());
                 }
@@ -116,10 +116,11 @@ function SetLocalSettings() {
                 element.children().each(function () {
                     groups.push(this.value);
                 });
-                setting_value = groups
-                break
+                setting_value = groups;
+                break;
             default:
-                setting_value = element.val();
+                setting_value = element.val().trim();
+                element.val(setting_value);
         }
         settings_device[setting_key] = setting_value;
     });
