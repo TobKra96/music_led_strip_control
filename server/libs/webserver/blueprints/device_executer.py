@@ -58,7 +58,6 @@ class DeviceExecuter(ExecuterBase):
 
         return devices
 
-    # Todo: Allow removing from group list.
     def get_groups(self):
         groups = []
 
@@ -70,6 +69,34 @@ class DeviceExecuter(ExecuterBase):
             groups.append(current_group)
 
         return groups
+
+    def create_new_group(self, new_group_name):
+        """
+        Return the created group if does not exist.
+        Otherwise, return all groups.
+        """
+        device_groups = self._config["device_groups"]
+
+        i = 0
+        while i < 100:
+            new_group_id = f"group_{i}"
+            if new_group_id not in device_groups and new_group_name not in device_groups.values():
+                device_groups[new_group_id] = new_group_name
+                self.save_config()
+
+                self.refresh_device("all_devices")
+                return [self.get_groups()[i]]
+
+            i += 1
+
+        return self.get_groups()
+
+    def delete_group(self, group):
+        if group in self._config["device_groups"]:
+            del self._config["device_groups"][group]
+            self.save_config()
+            self.refresh_device("all_devices")
+        return self.get_groups()
 
     def create_new_device(self):
         i = 0

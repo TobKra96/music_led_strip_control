@@ -145,3 +145,97 @@ def get_groups():  # pylint: disable=E0211
         return "Could not find devices: ", 403
     else:
         return jsonify(data_out)
+
+
+@device_api.post('/api/system/groups')
+@login_required
+def create_group():  # pylint: disable=E0211
+    """
+    Add new group
+    ---
+    tags:
+        - System
+    parameters:
+        - name: group
+          in: body
+          type: string
+          required: true
+          description: Name of `group` to create
+          schema:
+                type: object,
+                example:
+                    {
+                        group: str
+                    }
+    responses:
+        200:
+            description: OK
+            schema:
+                type: object,
+                example:
+                    [
+                        {
+                            id: str,
+                            name: str
+                        },
+                        ...
+                    ]
+        403:
+            description: Input data are wrong
+    """
+    data_in = request.get_json()
+
+    if not Executer.instance.device_executer.validate_data_in(data_in, ("group",)):
+        return "Input data are wrong.", 403
+
+    group = Executer.instance.device_executer.create_new_group(data_in["group"])
+    data_out = group
+
+    return jsonify(data_out)
+
+
+@device_api.delete('/api/system/groups')
+@login_required
+def delete_group():  # pylint: disable=E0211
+    """
+    Delete group
+    ---
+    tags:
+        - System
+    parameters:
+        - name: group
+          in: body
+          type: string
+          required: true
+          description: ID of `group` to delete
+          schema:
+                type: object,
+                example:
+                    {
+                        group: str
+                    }
+    responses:
+        200:
+            description: OK
+            schema:
+                type: object,
+                example:
+                    [
+                        {
+                            id: str,
+                            name: str
+                        },
+                        ...
+                    ]
+        403:
+            description: Input data are wrong
+    """
+    data_in = request.get_json()
+
+    if not Executer.instance.device_executer.validate_data_in(data_in, ("group",)):
+        return "Input data are wrong.", 403
+
+    groups = Executer.instance.device_executer.delete_group(data_in["group"])
+    data_out = groups
+
+    return jsonify(data_out)
