@@ -3,6 +3,7 @@
     src: url("../fonts/quicksand/fonts/Quicksand_Bold.otf");
     font-weight: normal;
     font-style: normal;
+    font-display: block;
 }
 
 /* Add blur to toast body */
