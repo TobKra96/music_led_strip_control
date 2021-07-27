@@ -92,10 +92,15 @@ class DeviceExecuter(ExecuterBase):
         return self.get_groups()
 
     def delete_group(self, group):
-        if group in self._config["device_groups"]:
+        try:
+            group_name = copy.deepcopy(self._config["device_groups"][group])
             del self._config["device_groups"][group]
-            self.save_config()
-            self.refresh_device("all_devices")
+            for device_key in self._config["device_configs"]:
+                self._config["device_configs"][device_key]["device_groups"].remove(group_name)
+        except (KeyError, ValueError):
+            pass
+        self.save_config()
+        self.refresh_device("all_devices")
         return self.get_groups()
 
     def create_new_device(self):
