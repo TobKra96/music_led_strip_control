@@ -70,13 +70,6 @@ $(document).ready(function () {
             });
         });
 
-        currentDevice.groups.forEach(function (group, _) {
-            let option = `<option class="dropdown-item" value="${group}">${group}</option>`
-            $("#device_groups").append(option)
-        });
-        let group_count = $("#device_groups option").length
-        $("#group_count").text(group_count);
-
     }).catch((response) => {
         if (devices.length === 0) {
             return;
@@ -113,8 +106,8 @@ function SetLocalSettings() {
                 break;
             case "option":
                 let groups = [];
-                element.children().each(function () {
-                    groups.push(this.value);
+                element.children("span").each(function () {
+                    groups.push($(this).attr('value'));
                 });
                 setting_value = groups;
                 break;
@@ -247,37 +240,39 @@ const createDevice = function () {
     });
 }
 
-$("#device_group_dropdown").on("click", ".dropdown-item", function () {
-    $("#device_group").val(this.text);
-});
-
-// Add new device group to dropdown on "+" click
-$("#add_device_group").on("click", function () {
-    let device_group = $("#device_group").val().trim();
-    if (!/^\s*$/.test(device_group)) {
-        let exists = 0 != $('#device_group_dropdown option[value="' + device_group + '"]').length;
-        if (!exists) {
-            const option = new Option(device_group, device_group);
-            option.setAttribute("class", "dropdown-item");
-            $("#device_groups").append(option);
-            let group_count = $("#device_groups option").length
-            $("#group_count").text(group_count);
-        }
-    } else {
-        $("#device_group").val('');
-    }
-});
-
-// Do not allow special symbols except for [-_.] in device and group names
-$('#device_name, #device_group').on('input', function() {
+// Do not allow special symbols except for [-_.] in device name
+$('#device_name').on('input', function () {
     let position = this.selectionStart,
         regex = /[!$%^&*()+|~=`{}\[\]:";'<>?,\/]/gi,
         textVal = $(this).val();
-    if(regex.test(textVal)) {
+    if (regex.test(textVal)) {
         $(this).val(textVal.replace(regex, ''));
         position--;
     }
     this.setSelectionRange(position, position);
+});
+
+// Add new group pill on "+" click
+$("#add_device_group").on("click", function () {
+    let deviceGroup = $("#device_group_dropdown").val();
+    let exists = 0 != $(`#device_groups span[value="${deviceGroup}"]`).length;
+    if (deviceGroup && !exists) {
+        addGroupPill(deviceGroup);
+        removeGroupOption(deviceGroup);
+    }
+});
+
+// Remove group pill on "x" click
+$("#device_groups").on("click", ".badge > span", function () {
+    let group = $(this).parent().attr('value');
+    addGroupOption(group);
+    removeGroupPill(group);
+});
+
+$("#device_groups").on("mouseover mouseleave", ".badge > span", function (event) {
+    event.preventDefault();
+    $(this).parent().toggleClass("badge-primary");
+    $(this).parent().toggleClass("badge-danger");
 });
 
 $("#save_btn").on("click", function () {
@@ -310,3 +305,24 @@ $("#delete_btn_modal").on("click", function () {
         new Toast(`Error while deleting device "${currentDevice.name}". Error: ${data.responseText}`).error();
     });
 })
+
+function addGroupPill(group) {
+    const pill = `<span class="badge badge-primary badge-pill" value="${group}">${group} <span class="feather icon-x"></span></span> `;
+    $("#device_groups").append(pill);
+}
+
+function removeGroupPill(group) {
+    let groupPill = $(`#device_groups span[value="${group}"]`);
+    groupPill.remove();
+}
+
+function addGroupOption(group) {
+    const option = new Option(group, group);
+    option.setAttribute('selected', 'selected');
+    $("#device_group_dropdown").prepend(option);
+}
+
+function removeGroupOption(group) {
+    let groupOption = $(`#device_group_dropdown option[value="${group}"]`);
+    groupOption.remove();
+}

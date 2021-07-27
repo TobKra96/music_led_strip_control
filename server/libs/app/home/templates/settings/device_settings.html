@@ -110,23 +110,17 @@
                                                         </label>
                                                         <!-- Todo: Reimplement adding and removing groups. -->
                                                         <div class="input-group">
-                                                            <input type="text" id="device_group" class="form-control" required>
+                                                            <select id="device_group_dropdown" class="form-control">
+                                                            </select>
                                                             <div class="input-group-append">
                                                                 <button type="button" id="add_device_group" class="btn btn-outline-secondary px-3">
                                                                     <span class="feather icon-plus"></span>
                                                                 </button>
-                                                                <button type="button" class="btn btn-outline-secondary dropdown-toggle dropdown-toggle-split"
-                                                                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                                </button>
-                                                                <div id="device_group_dropdown" class="dropdown-menu dropdown-menu-right">
-                                                                    <h6 class="dropdown-header">
-                                                                        Device groups: <span class="badge badge-secondary" id="group_count">0</span>
-                                                                    </h6>
-                                                                    <div role="separator" class="dropdown-divider"></div>
-                                                                    <div id="device_groups" type="option" class="device_setting_input">
-                                                                    </div>
-                                                                </div>
                                                             </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <div id="device_groups" type="option" class="h6 device_setting_input">
                                                         </div>
                                                     </div>
                                                     <div class="form-group">

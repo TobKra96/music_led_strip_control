@@ -131,14 +131,16 @@ select#gradient {
     padding-top: .5rem !important;
 }
 
-/* Remove text highlight from checkboxes */
-.custom-checkbox {
+/* Remove text highlight from checkboxes and device group pills */
+.custom-checkbox,
+#device_groups span {
     -webkit-touch-callout: none;
     -webkit-user-select: none;
     -khtml-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
+    cursor: default;
 }
 
 /* Change tooltip color and width */
