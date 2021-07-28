@@ -144,6 +144,11 @@ select#gradient {
     cursor: default;
 }
 
+/* Change cursor when hovering over group pill "x" */
+#device_groups span span {
+    cursor: pointer;
+}
+
 /* Change tooltip color and width */
 .tooltip-inner {
     background-color: #3f4d67 !important;
