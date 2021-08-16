@@ -58,6 +58,36 @@ class DeviceExecuter(ExecuterBase):
 
         return devices
 
+    def create_new_device(self):
+        i = 0
+        while i < 100:
+            new_device_id = f"device_{i}"
+            if new_device_id not in self._config["device_configs"]:
+                default_name = index_default_devices(self._config["device_configs"], self._config["default_device"]["device_name"])
+
+                new_device_config = copy.deepcopy(self._config["default_device"])
+                new_device_config["device_name"] = default_name
+
+                # If a device already exists with "output_raspi" output, set new device to "output_udp".
+                for device in self._config["device_configs"].values():
+                    if device["output_type"] == "output_raspi":
+                        new_device_config["output_type"] = "output_udp"
+                        break
+
+                self._config["device_configs"][new_device_id] = new_device_config
+                self.save_config()
+
+                self.refresh_device("all_devices")
+                break
+
+            i += 1
+        return i
+
+    def delete_device(self, device):
+        del self._config["device_configs"][device]
+        self.save_config()
+        self.refresh_device("all_devices")
+
     def get_groups(self):
         groups = []
 
@@ -102,27 +132,3 @@ class DeviceExecuter(ExecuterBase):
         self.save_config()
         self.refresh_device("all_devices")
         return self.get_groups()
-
-    def create_new_device(self):
-        i = 0
-        while i < 100:
-            new_device_id = f"device_{i}"
-            if new_device_id not in self._config["device_configs"]:
-                default_name = index_default_devices(self._config["device_configs"], self._config["default_device"]["device_name"])
-
-                new_device_config = copy.deepcopy(self._config["default_device"])
-                new_device_config["device_name"] = default_name
-
-                self._config["device_configs"][new_device_id] = new_device_config
-                self.save_config()
-
-                self.refresh_device("all_devices")
-                break
-
-            i += 1
-        return i
-
-    def delete_device(self, device):
-        del self._config["device_configs"][device]
-        self.save_config()
-        self.refresh_device("all_devices")
