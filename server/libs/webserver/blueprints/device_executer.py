@@ -19,7 +19,7 @@ def index_default_devices(device_configs, default_name):
     for d in device_configs.values():
         if default_name in d.values():
             index_list.append(1)  # If 'Default Device' exists, append the first index as it is not specified in the name.
-        if default_name in list(d.values())[0]:
+        if default_name in d["device_name"]:
             try:
                 pattern = re.compile(r"\((\d+)\)")
                 index = pattern.findall(d["device_name"])[0]  # Get all indices from "Default Device (X)" names.
