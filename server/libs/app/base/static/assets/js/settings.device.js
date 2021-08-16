@@ -305,6 +305,13 @@ $("#delete_btn_modal").on("click", function () {
 function reloadDeviceTab(devices) {
     // Remove every pill in the navigation and recreate
     const tabs = document.getElementById("deviceTabID");
+    // tabs.innerHTML = `
+    //     <li class="nav-item">
+    //         <a class="nav-link">
+    //             <span class="badge badge-secondary" id="">Devices</span>
+    //         </a>
+    //     </li>
+    // `;
     tabs.innerHTML = "";
 
     // Build Device Tab
