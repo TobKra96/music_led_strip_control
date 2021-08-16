@@ -205,29 +205,9 @@ const createDevice = function () {
             // $(`a[data-device_id=${currentDevice.id}`).addClass("active");
             currentDevice.refreshConfig(output_types);
 
-            // Remove every pill in the navigation and recreate
-            const tabs = document.getElementById("deviceTabID");
-            tabs.innerHTML = "";
+            reloadDeviceTab(devices);
 
-            // Build Device Tab
-            devices.forEach(device => {
-                device.getPill(currentDevice.id);
-
-                device.link.addEventListener('click', () => {
-                    currentDevice = device;
-                    $("#selected_device_txt").text(currentDevice.name);
-                    device.refreshConfig(output_types);
-                });
-
-                const li = document.createElement("li");
-                li.className = "nav-item device_item";
-                li.appendChild(device.link);
-                tabs.appendChild(li);
-            });
-
-            $('#device_count').text(devices.length);
             $("#selected_device_label").removeClass('d-none');
-            $("#selected_device_txt").text(currentDevice.name);
             $("#deviceFound").removeClass('d-none');
             $("#noDeviceFound").addClass('d-none');
 
@@ -298,13 +278,54 @@ $("#delete_btn_modal").on("click", function () {
     }).done(data => {
         localStorage.removeItem('lastDevice');
         console.log("Device deleted successfully. Response:\n\n" + JSON.stringify(data, null, '\t'));
-        // Todo: Delete device without reloading
-        // Todo: Add toast on success
-        location.reload();
+
+        new Toast(`Device "${currentDevice.name}" deleted.`).success();
+
+        devices = $.grep(devices, function (e) {
+            return e.id != data.device;
+        });
+
+        if (devices.length) {
+            currentDevice = devices[[devices.length - 1]];
+            localStorage.setItem('lastDevice', currentDevice.id);
+            currentDevice.refreshConfig(output_types);
+        } else {
+            $("#deviceFound").addClass('d-none');
+            $("#noDeviceFound").removeClass('d-none');
+            $("#selected_device_label").addClass('d-none');
+        }
+
+        reloadDeviceTab(devices);
+
     }).fail(data => {
         new Toast(`Error while deleting device "${currentDevice.name}". Error: ${data.responseText}`).error();
     });
 })
+
+function reloadDeviceTab(devices) {
+    // Remove every pill in the navigation and recreate
+    const tabs = document.getElementById("deviceTabID");
+    tabs.innerHTML = "";
+
+    // Build Device Tab
+    devices.forEach(device => {
+        device.getPill(currentDevice.id);
+
+        device.link.addEventListener('click', () => {
+            currentDevice = device;
+            $("#selected_device_txt").text(currentDevice.name);
+            device.refreshConfig(output_types);
+        });
+
+        const li = document.createElement("li");
+        li.className = "nav-item device_item";
+        li.appendChild(device.link);
+        tabs.appendChild(li);
+    });
+
+    $('#device_count').text(devices.length);
+    $("#selected_device_txt").text(currentDevice.name);
+}
 
 function addGroupPill(group) {
     const pill = `<span class="badge badge-primary badge-pill" value="${group}">${group} <span class="feather icon-x"></span></span> `;
