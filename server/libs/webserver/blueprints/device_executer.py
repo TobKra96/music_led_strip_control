@@ -59,6 +59,13 @@ class DeviceExecuter(ExecuterBase):
         return devices
 
     def create_new_device(self):
+        # If a device already exists with "output_raspi" output, set new device to "output_udp".
+        output_raspi_exists = False
+        for device in self._config["device_configs"].values():
+            if device["output_type"] == "output_raspi":
+                output_raspi_exists = True
+                break
+
         i = 0
         while i < 100:
             new_device_id = f"device_{i}"
@@ -67,12 +74,8 @@ class DeviceExecuter(ExecuterBase):
 
                 new_device_config = copy.deepcopy(self._config["default_device"])
                 new_device_config["device_name"] = default_name
-
-                # If a device already exists with "output_raspi" output, set new device to "output_udp".
-                for device in self._config["device_configs"].values():
-                    if device["output_type"] == "output_raspi":
-                        new_device_config["output_type"] = "output_udp"
-                        break
+                if output_raspi_exists:
+                    new_device_config["output_type"] = "output_udp"
 
                 self._config["device_configs"][new_device_id] = new_device_config
                 self.save_config()
