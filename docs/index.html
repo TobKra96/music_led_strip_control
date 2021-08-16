@@ -1,9 +1,182 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <title>Basic Web Page</title>
-    </head>
-    <body>
-        Hello World!
-    </body>
+<html lang="en" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="LED strip control and audio visualization with a modern web interface.">
+    <meta name="keywords" content="LED, audio, visualization, web interface, raspberry pi">
+    <title>MLSC</title>
+    <link rel="icon" href="static/images/favicon.ico" type="image/x-icon">
+
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.1/dist/tailwind.min.css" rel="stylesheet" type="text/css" />
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@1.11.0/dist/full.css" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="static/css/style.css">
+</head>
+
+<body>
+    <!-- Hero segment -->
+    <div class="container h-screen mx-auto p-5">
+        <div class="hero h-full w-auto rounded-box bg_image">
+            <div class="hero-overlay rounded-box"></div>
+            <div class="text-center hero-content text-neutral-content">
+                <div class="max-w-xl">
+                    <div class="grid justify-items-center mb-5">
+                        <img class="w-28 sm:w-36" src="static/images/mlsc_icon.svg" alt="MLSC logo">
+                    </div>
+                    <h1 class="mb-5 text-5xl sm:text-7xl font-bold logo_text">
+                        MLSC
+                    </h1>
+                    <p class="mb-5 mx-5 sm:mx-0 text-lg">
+                        LED strip control and audio visualization with a modern web interface.
+                    </p>
+                    <div id="hero_buttons"
+                        class="grid grid-flow-row sm:grid-flow-col grid-cols-1 sm:grid-cols-2 gap-3 mx-5 sm:mx-20">
+                        <a href="#get-started" id="get_started" class="btn btn-primary">Get Started</a>
+                        <a href="https://github.com/TobKra96/music_led_strip_control" class="btn btn-outline">View on
+                            GitHub</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End Hero segment -->
+
+    <!-- Content segment -->
+    <div class="container mx-auto px-5 pb-5">
+
+        <!-- Alert segment -->
+        <div id="update_alert" class="mb-5 hidden">
+            <div class="alert alert-info">
+                <div class="flex-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="#2196f3"
+                        class="w-6 h-6 mx-2">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <label><span class="badge badge-info font-bold">Version 2.2</span> with a completely new web
+                        interface is now available on GitHub!</label>
+                </div>
+                <div class="flex-none">
+                    <button id="cancel_alert" class="btn btn-sm btn-ghost mr-2">Cancel</button>
+                    <a href="https://github.com/TobKra96/music_led_strip_control" class="btn btn-sm btn-info">Visit</a>
+                </div>
+            </div>
+        </div>
+        <!-- End Alert segment -->
+
+        <!-- Stats segment -->
+        <div class="space-y-5 md:space-y-0 md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-x-5 md:gap-y-5">
+            <div class="stats w-full md:w-auto">
+                <div class="stat bg-base-200">
+                    <div class="stat-title">Available Light Effects</div>
+                    <div class="stat-value">26+</div>
+                    <div class="stat-desc">Customizable colors and animations</div>
+                </div>
+            </div>
+            <div class="stats w-full md:w-auto">
+                <div class="stat bg-base-200">
+                    <div class="stat-title">Maximum Connected Devices</div>
+                    <div class="stat-value">100</div>
+                    <div class="stat-desc">Controlled by a single Raspberry Pi</div>
+                </div>
+            </div>
+            <div class="stats w-full md:w-auto">
+                <div class="stat bg-base-200">
+                    <div class="stat-title">Supported count of LEDs</div>
+                    <div class="stat-value">900+</div>
+                    <div class="stat-desc">Optimized for large LED strips</div>
+                </div>
+            </div>
+        </div>
+        <!-- End Stats segment -->
+
+        <!-- Instructions segment -->
+        <div id="get-started" class="divider"></div>
+
+        <div class="mt-10">
+            <ul class="w-full steps">
+                <li class="step step-primary">Install</li>
+                <li class="step text-gray-400">Reboot</li>
+                <li class="step text-gray-400">Setup</li>
+            </ul>
+        </div>
+
+        <div class="mt-5 mb-10">
+            <div class="mockup-code">
+                <pre
+                    data-prefix="$"><code>curl -sSL https://raw.githubusercontent.com/TobKra96/music_led_strip_control/master/setup.sh | sudo bash -s -- -b master</code></pre>
+            </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="mt-10">
+            <ul class="w-full steps">
+                <li class="step step-primary">Install</li>
+                <li class="step step-primary">Reboot</li>
+                <li class="step text-gray-400">Setup</li>
+            </ul>
+        </div>
+
+        <div class="mt-5 mb-10">
+            <div class="mockup-code">
+                <pre data-prefix="$"><code>sudo reboot</code></pre>
+            </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="mt-10">
+            <ul class="w-full steps">
+                <li class="step step-primary">Install</li>
+                <li class="step step-primary">Reboot</li>
+                <li class="step step-primary">Setup</li>
+            </ul>
+        </div>
+
+        <div class="mt-5 mb-10">
+            <div class="card lg:card-side bg-base-200">
+                <div class="card-body">
+                    <h2 class="card-title">Setup</h2>
+                    <p>Open <span class="badge badge-primary font-mono">http://192.168.X.X:8080</span> (Your Raspberry
+                        Pi
+                        local IP address) to access the web interface.</p>
+                    <p>Click the button below to open initial configuration instructions.</p>
+                    <div class="card-actions">
+                        <a href="https://github.com/TobKra96/music_led_strip_control/wiki/Installation-Guide#configure-music-led-strip-control"
+                            class="btn btn-primary">Continue Setup</a>
+                        <a href="https://github.com/TobKra96/music_led_strip_control/wiki/" class="btn btn-ghost">Visit
+                            Wiki</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="divider"></div>
+        <!-- End Instructions segment -->
+
+        <!-- Footer segment -->
+        <div class="mt-10">
+            <div class="navbar shadow-lg bg-neutral text-neutral-content rounded-box">
+                <div class="navbar-start"></div>
+                <div class="flex-none">
+                    <div class="navbar-center flex">
+                        <span id="copyright"></span>
+                    </div>
+                </div>
+                <div class="navbar-end"></div>
+            </div>
+        </div>
+        <!-- End Footer segment -->
+
+    </div>
+    <!-- End Content segment -->
+
+    <!-- Scripts -->
+    <script src="static/js/vanillajs-scrollspy.min.js"></script>
+    <script src="static/js/script.js"></script>
+    <!-- End Scripts -->
+</body>
+
 </html>
