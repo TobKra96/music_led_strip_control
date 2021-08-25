@@ -1,8 +1,13 @@
-from jsonschema import validate
+from jsonschema import validate, Draft7Validator
+import logging
 
 
 class ConfigValidatorService():
-    def validate_config(self, config):
+    def __init__(self):
+        self.schema = self._get_schema()
+        self.logger = logging.getLogger(__name__)
+
+    def _get_schema(self):
         # Regexes
         device_id_regex = r"^(device_)(?:0|[1-9]\d{0,1})$"  # Allow device IDs 0-99 without leading zeros.
 
@@ -1612,16 +1617,9 @@ class ConfigValidatorService():
                     ]
                 },
                 "device_id": {
-                    "oneOf": [
-                        {
-                            "const": "no_mic"
-                        },
-                        {
-                            "type": "integer",
-                            "minimum": 0,
-                            "maximum": 100
-                        }
-                    ],
+                    "type": "integer",
+                    "minimum": -1,
+                    "maximum": 100
                 },
                 "frames_per_buffer": {
                     "type": "integer",
@@ -1977,6 +1975,14 @@ class ConfigValidatorService():
             }
         }
 
+        return schema
+
+    def validate_config(self, config):
+        v = Draft7Validator(self.schema)
+        errors = sorted(v.iter_errors(config), key=lambda e: e.path)
+        for error in errors:
+            self.logger.error(error.message)
+
         # Validate will raise exception if given json is not
         # what is described in schema.
-        validate(instance=config, schema=schema)
+        validate(instance=config, schema=self.schema)

@@ -1,11 +1,9 @@
+import Toast from "./classes/Toast.js";
+
 var settingsIdentifier;
-var effectIdentifier;
 var localSettings = {};
 var currentDevice;
-var colors = {};
-var gradients = {};
 
-var devicesLoading = true;
 var loggingLevelsLoading = true;
 var audioDevicesLoading = true;
 
@@ -42,11 +40,9 @@ function GetLoggingLevels() {
 }
 
 function ParseGetLoggingLevels(response) {
-    var context = this;
-    this.logging_levels = response;
+    let logging_levels = response;
 
     $('.logging_levels').each(function () {
-        var logging_levels = context.logging_levels;
         for (var currentKey in logging_levels) {
             var newOption = new Option(logging_levels[currentKey], currentKey);
             $(newOption).html(logging_levels[currentKey]);
@@ -76,11 +72,9 @@ function GetAudioDevices() {
 }
 
 function ParseGetAudioDevices(response) {
-    var context = this;
-    this.audio_devices = response;
+    let audio_devices = response;
 
     $('.audio_devices').each(function () {
-        var audio_devices = context.audio_devices;
         for (var currentKey in audio_devices) {
             var newOption = new Option(audio_devices[currentKey], currentKey);
             $(newOption).html(audio_devices[currentKey]);
@@ -176,9 +170,11 @@ function SetGeneralSetting(settings) {
         contentType: 'application/json;charset=UTF-8',
         success: function (response) {
             console.log("General settings set successfully. Response:\n\n" + JSON.stringify(response, null, '\t'));
+            new Toast("General settings saved.").success();
         },
         error: function (xhr) {
             console.log("Error while setting general settings. Error: " + xhr.responseText);
+            new Toast("Error while saving general settings.").error();
         }
     });
 }
@@ -209,7 +205,7 @@ function SetPinSetting() {
 
 function SetLocalSettings() {
     var all_setting_keys = GetAllSettingKeys();
-    settings = {};
+    let settings = {};
 
     Object.keys(all_setting_keys).forEach(setting_id => {
         var setting_key = all_setting_keys[setting_id];
@@ -265,21 +261,25 @@ function ResetPinSettings() {
     });
 }
 
-document.getElementById("save_btn").addEventListener("click", function (e) {
+$("#save_btn").on("click", function () {
     SetLocalSettings();
 });
 
-document.getElementById("reset_btn").addEventListener("click", function (e) {
+$("#reset_btn").on("click", function () {
     $('#modal_reset_general').modal('show')
 });
 
-document.getElementById("reset_btn_modal").addEventListener("click", function (e) {
+$("#reset_btn_modal").on("click", function () {
     $('#modal_reset_general').modal('hide')
     ResetPinSettings();
     ResetSettings(currentDevice);
 });
 
-document.getElementById("import_btn").addEventListener("click", function (e) {
+$("#export_btn").on("click", function () {
+    new Toast("Configuration file exported.").success();
+});
+
+$("#import_btn").on("click", function () {
     ImportSettings();
 });
 

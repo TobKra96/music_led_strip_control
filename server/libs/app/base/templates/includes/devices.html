@@ -1,6 +1,7 @@
 <script type="text/javascript">
     // Transfer data to JS
     let jinja_devices = JSON.parse('{{ devices | tojson }}');
+    let jinja_groups = JSON.parse('{{ groups | tojson }}');
 </script>
 <div class="accordion my-3" id="accordionDevices">
     <div class="card p-0">
@@ -22,7 +23,12 @@
                 <i class="fa fa-chevron-down text-secondary float-right d-none d-sm-block mt-1"></i>
             </div>
             <div id="collapseMenu" class="card-body p-0 collapse" aria-labelledby="accordionHeading" data-parent="#accordionDevices">
-                <ul class="nav nav-pills shadow-none " id="deviceTabID" role="tablist">
+                <ul class="nav nav-pills shadow-none" id="deviceTabID" role="tablist">
+                    <!-- <li class="nav-item">
+                        <a class="nav-link">
+                            <span class="badge badge-secondary" id="">Devices</span>
+                        </a>
+                    </li> -->
                     {% for device in devices %}
                         {% if loop.first and not segment == "device_settings" %}
                         <li class="nav-item device_item">
@@ -38,6 +44,25 @@
                         </li>
                     {% endfor %}
                 </ul>
+
+                <!-- {% if segment in ["dashboard"]  %}
+                <div role="separator" class="dropdown-divider m-0"></div>
+
+                <ul class="nav nav-pills shadow-none" id="groupTabID" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link">
+                            <span class="badge badge-secondary" id="">Groups</span>
+                        </a>
+                    </li>
+                    {% for group in groups %}
+                        <li class="nav-item device_item">
+                            <a href="#pills-{{ loop.index+1 }}" class="nav-link" data-device_id={{ group.id }} role="tab" data-toggle="pill" aria-controls="pills-{{ loop.index+1 }}" aria-selected="false">
+                                {{ group.name }}
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+                {% endif %} -->
             </div>
         </a>
     </div>

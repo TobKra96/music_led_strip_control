@@ -15,20 +15,22 @@ from libs.webserver.executer import Executer
 @login_required
 def index():
     devices = Executer.instance.device_executer.get_devices()
+    groups = Executer.instance.device_executer.get_groups()
     # active_effect = Executer.instance.effect_executer.get_active_effect(data_in["device"])
-    return render_template('dashboard.html', segment='dashboard', devices=devices)
+    return render_template('dashboard.html', segment='dashboard', devices=devices, groups=groups)
 
 
 @blueprint.route('/<page>/<template>', methods=['GET', 'POST'])
 @login_required
 def route_pages(page, template):
     devices = Executer.instance.device_executer.get_devices()
+    groups = Executer.instance.device_executer.get_groups()
 
     try:
         if not template.endswith('.html'):
             template += '.html'
         segment = get_segment(request)
-        return render_template(f"/{page}/{template}", segment=segment, devices=devices)
+        return render_template(f"/{page}/{template}", segment=segment, devices=devices, groups=groups)
     except TemplateNotFound:
         return render_template('page-404.html'), 404
     except Exception:
@@ -39,12 +41,13 @@ def route_pages(page, template):
 @login_required
 def route_template(template):
     devices = Executer.instance.device_executer.get_devices()
+    groups = Executer.instance.device_executer.get_groups()
 
     try:
         if not template.endswith('.html'):
             template += '.html'
         segment = get_segment(request)
-        return render_template(template, segment=segment, devices=devices)
+        return render_template(template, segment=segment, devices=devices, groups=groups)
     except TemplateNotFound:
         return render_template('page-404.html'), 404
     except Exception:

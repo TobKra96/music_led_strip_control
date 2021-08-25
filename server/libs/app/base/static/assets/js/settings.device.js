@@ -96,16 +96,24 @@ function SetLocalSettings() {
             case "range":
             case "number":
                 if (!element.val()) {
-                    setting_value = 1
+                    setting_value = 1;
                 } else if (setting_key == "led_count" && element.val() < 7) {
                     // https://github.com/rpi-ws281x/rpi-ws281x-python/issues/70
-                    setting_value = 7
+                    setting_value = 7;
                 } else {
                     setting_value = parseFloat(element.val());
                 }
                 break;
+            case "option":
+                let groups = [];
+                element.children("span").each(function () {
+                    groups.push($(this).attr('value'));
+                });
+                setting_value = groups;
+                break;
             default:
-                setting_value = element.val();
+                setting_value = element.val().trim();
+                element.val(setting_value);
         }
         settings_device[setting_key] = setting_value;
     });
@@ -197,29 +205,9 @@ const createDevice = function () {
             // $(`a[data-device_id=${currentDevice.id}`).addClass("active");
             currentDevice.refreshConfig(output_types);
 
-            // Remove every pill in the navigation and recreate
-            const tabs = document.getElementById("deviceTabID");
-            tabs.innerHTML = "";
+            reloadDeviceTab(devices);
 
-            // Build Device Tab
-            devices.forEach(device => {
-                device.getPill(currentDevice.id);
-
-                device.link.addEventListener('click', () => {
-                    currentDevice = device;
-                    $("#selected_device_txt").text(currentDevice.name);
-                    device.refreshConfig(output_types);
-                });
-
-                const li = document.createElement("li");
-                li.className = "nav-item device_item";
-                li.appendChild(device.link);
-                tabs.appendChild(li);
-            });
-
-            $('#device_count').text(devices.length);
             $("#selected_device_label").removeClass('d-none');
-            $("#selected_device_txt").text(currentDevice.name);
             $("#deviceFound").removeClass('d-none');
             $("#noDeviceFound").addClass('d-none');
 
@@ -231,6 +219,41 @@ const createDevice = function () {
         console.log("Error while creating new device. Error: " + data.responseText);
     });
 }
+
+// Do not allow special symbols except for [-_.] in device name
+$('#device_name').on('input', function () {
+    let position = this.selectionStart,
+        regex = /[!$%^&*()+|~=`{}\[\]:";'<>?,\/]/gi,
+        textVal = $(this).val();
+    if (regex.test(textVal)) {
+        $(this).val(textVal.replace(regex, ''));
+        position--;
+    }
+    this.setSelectionRange(position, position);
+});
+
+// Add new group pill on "+" click
+$("#add_device_group").on("click", function () {
+    let deviceGroup = $("#device_group_dropdown").val();
+    let exists = 0 != $(`#device_groups span[value="${deviceGroup}"]`).length;
+    if (deviceGroup && !exists) {
+        addGroupPill(deviceGroup);
+        removeGroupOption(deviceGroup);
+    }
+});
+
+// Remove group pill on "x" click
+$("#device_groups").on("click", ".badge > span", function () {
+    let group = $(this).parent().attr('value');
+    addGroupOption(group);
+    removeGroupPill(group);
+});
+
+$("#device_groups").on("mouseover mouseleave", ".badge > span", function (event) {
+    event.preventDefault();
+    $(this).parent().toggleClass("badge-primary");
+    $(this).parent().toggleClass("badge-danger");
+});
 
 $("#save_btn").on("click", function () {
     SetLocalSettings();
@@ -255,10 +278,79 @@ $("#delete_btn_modal").on("click", function () {
     }).done(data => {
         localStorage.removeItem('lastDevice');
         console.log("Device deleted successfully. Response:\n\n" + JSON.stringify(data, null, '\t'));
-        // Todo: Delete device without reloading
-        // Todo: Add toast on success
-        location.reload();
+
+        new Toast(`Device "${currentDevice.name}" deleted.`).success();
+
+        devices = $.grep(devices, function (e) {
+            return e.id != data.device;
+        });
+
+        if (devices.length) {
+            currentDevice = devices[[devices.length - 1]];
+            localStorage.setItem('lastDevice', currentDevice.id);
+            currentDevice.refreshConfig(output_types);
+        } else {
+            $("#deviceFound").addClass('d-none');
+            $("#noDeviceFound").removeClass('d-none');
+            $("#selected_device_label").addClass('d-none');
+        }
+
+        reloadDeviceTab(devices);
+
     }).fail(data => {
         new Toast(`Error while deleting device "${currentDevice.name}". Error: ${data.responseText}`).error();
     });
 })
+
+function reloadDeviceTab(devices) {
+    // Remove every pill in the navigation and recreate
+    const tabs = document.getElementById("deviceTabID");
+    // tabs.innerHTML = `
+    //     <li class="nav-item">
+    //         <a class="nav-link">
+    //             <span class="badge badge-secondary" id="">Devices</span>
+    //         </a>
+    //     </li>
+    // `;
+    tabs.innerHTML = "";
+
+    // Build Device Tab
+    devices.forEach(device => {
+        device.getPill(currentDevice.id);
+
+        device.link.addEventListener('click', () => {
+            currentDevice = device;
+            $("#selected_device_txt").text(currentDevice.name);
+            device.refreshConfig(output_types);
+        });
+
+        const li = document.createElement("li");
+        li.className = "nav-item device_item";
+        li.appendChild(device.link);
+        tabs.appendChild(li);
+    });
+
+    $('#device_count').text(devices.length);
+    $("#selected_device_txt").text(currentDevice.name);
+}
+
+function addGroupPill(group) {
+    const pill = `<span class="badge badge-primary badge-pill" value="${group}">${group} <span class="feather icon-x"></span></span> `;
+    $("#device_groups").append(pill);
+}
+
+function removeGroupPill(group) {
+    let groupPill = $(`#device_groups span[value="${group}"]`);
+    groupPill.remove();
+}
+
+function addGroupOption(group) {
+    const option = new Option(group, group);
+    option.setAttribute('selected', 'selected');
+    $("#device_group_dropdown").prepend(option);
+}
+
+function removeGroupOption(group) {
+    let groupOption = $(`#device_group_dropdown option[value="${group}"]`);
+    groupOption.remove();
+}

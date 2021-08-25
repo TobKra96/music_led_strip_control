@@ -144,6 +144,25 @@ export default class Device {
 
                     if ($(`#${setting_key}`).attr('type') == 'checkbox') {
                         $(`#${setting_key}`).prop('checked', setting_value);
+                    } else if ($(`#${setting_key}`).attr('type') == 'option') {
+                        // Clear all group pills
+                        $("#device_groups").empty();
+                        // Add device group pills
+                        setting_value.forEach(group => {
+                            const pill = `<span class="badge badge-primary badge-pill" value="${group}">${group} <span class="feather icon-x"></span></span> `;
+                            $("#device_groups").append(pill);
+                        });
+                        // Clear all dropdown group options
+                        $("#device_group_dropdown").empty();
+                        // Populate dropdown with all available groups
+                        jinja_groups.forEach(group => {
+                            let exists = 0 != $(`#device_groups span[value="${group.name}"]`).length;
+                            if (!exists) {
+                                const option = new Option(group.name, group.name);
+                                option.setAttribute('selected', 'selected');
+                                $("#device_group_dropdown").prepend(option);
+                            }
+                        });
                     } else {
                         $(`#${setting_key}`).val(setting_value);
                     }

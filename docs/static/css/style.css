@@ -1,0 +1,22 @@
+@font-face {
+    font-family: "Quicksand";
+    src: url("../fonts/quicksand/fonts/Quicksand_Bold.otf");
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+.logo_text {
+    font-family: "Quicksand";
+    color: #3498db;
+    letter-spacing: .3em;
+}
+
+.bg_image {
+    background-image: url("../images/led-strip-blurred.jpg");
+}
+
+.hero-overlay {
+    --tw-bg-opacity: 0.6;
+    background-color: rgba(10, 10, 20, var(--tw-bg-opacity));
+}

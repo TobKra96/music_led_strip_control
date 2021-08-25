@@ -19,7 +19,7 @@ def index_default_devices(device_configs, default_name):
     for d in device_configs.values():
         if default_name in d.values():
             index_list.append(1)  # If 'Default Device' exists, append the first index as it is not specified in the name.
-        if default_name in list(d.values())[0]:
+        if default_name in d["device_name"]:
             try:
                 pattern = re.compile(r"\((\d+)\)")
                 index = pattern.findall(d["device_name"])[0]  # Get all indices from "Default Device (X)" names.
@@ -52,12 +52,20 @@ class DeviceExecuter(ExecuterBase):
             current_device = dict()
             current_device["name"] = self._config["device_configs"][device_key]["device_name"]
             current_device["id"] = device_key
+            current_device["groups"] = self._config["device_configs"][device_key]["device_groups"]
 
             devices.append(current_device)
 
         return devices
 
     def create_new_device(self):
+        # If a device already exists with "output_raspi" output, set new device to "output_udp".
+        output_raspi_exists = False
+        for device in self._config["device_configs"].values():
+            if device["output_type"] == "output_raspi":
+                output_raspi_exists = True
+                break
+
         i = 0
         while i < 100:
             new_device_id = f"device_{i}"
@@ -66,6 +74,8 @@ class DeviceExecuter(ExecuterBase):
 
                 new_device_config = copy.deepcopy(self._config["default_device"])
                 new_device_config["device_name"] = default_name
+                if output_raspi_exists:
+                    new_device_config["output_type"] = "output_udp"
 
                 self._config["device_configs"][new_device_id] = new_device_config
                 self.save_config()
@@ -80,3 +90,48 @@ class DeviceExecuter(ExecuterBase):
         del self._config["device_configs"][device]
         self.save_config()
         self.refresh_device("all_devices")
+
+    def get_groups(self):
+        groups = []
+
+        for group_key in self._config["device_groups"]:
+            current_group = dict()
+            current_group["name"] = self._config["device_groups"][group_key]
+            current_group["id"] = group_key
+
+            groups.append(current_group)
+
+        return groups
+
+    def create_new_group(self, new_group_name):
+        """
+        Return the created group if does not exist.
+        Otherwise, return all groups.
+        """
+        device_groups = self._config["device_groups"]
+
+        i = 0
+        while i < 100:
+            new_group_id = f"group_{i}"
+            if new_group_id not in device_groups and new_group_name not in device_groups.values():
+                device_groups[new_group_id] = new_group_name
+                self.save_config()
+
+                self.refresh_device("all_devices")
+                return [self.get_groups()[i]]
+
+            i += 1
+
+        return self.get_groups()
+
+    def delete_group(self, group):
+        try:
+            group_name = copy.deepcopy(self._config["device_groups"][group])
+            del self._config["device_groups"][group]
+            for device_key in self._config["device_configs"]:
+                self._config["device_configs"][device_key]["device_groups"].remove(group_name)
+        except (KeyError, ValueError):
+            pass
+        self.save_config()
+        self.refresh_device("all_devices")
+        return self.get_groups()

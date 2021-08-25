@@ -3,6 +3,7 @@
     src: url("../fonts/quicksand/fonts/Quicksand_Bold.otf");
     font-weight: normal;
     font-style: normal;
+    font-display: block;
 }
 
 /* Add blur to toast body */
@@ -87,6 +88,11 @@ input[type=number] {
     background-color: #e2eaf2;
 }
 
+/* Overwrite bootstrap dropdown active color */
+.dropdown-item:active {
+    background-color: #3f4d67;
+}
+
 /* Apply color to device name in system status */
 .device_link {
     color: #111111;
@@ -107,6 +113,12 @@ input[type=number] {
     cursor: pointer;
 }
 
+/* Capitalize dropdown items */
+select#color,
+select#gradient {
+    text-transform: capitalize;
+}
+
 /* Prevent text overflow if filename of imported config too long */
 .custom-file-label {
     display: block;
@@ -120,14 +132,21 @@ input[type=number] {
     padding-top: .5rem !important;
 }
 
-/* Remove text highlight from checkboxes */
-.custom-checkbox {
+/* Remove text highlight from checkboxes and device group pills */
+.custom-checkbox,
+#device_groups span {
     -webkit-touch-callout: none;
     -webkit-user-select: none;
     -khtml-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
+    cursor: default;
+}
+
+/* Change cursor when hovering over group pill "x" */
+#device_groups span span {
+    cursor: pointer;
 }
 
 /* Change tooltip color and width */
@@ -138,6 +157,7 @@ input[type=number] {
 }
 .tooltip .arrow::before {
     color: #3f4d67 !important;
+    pointer-events: none;
 }
 
 /* Fix checkboxes and file input box not dimming when hovering over collapsed navbar */

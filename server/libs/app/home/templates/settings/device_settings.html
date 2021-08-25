@@ -102,6 +102,28 @@
                                                 </div>
                                                 <div class="col-lg-12">
                                                     <div class="form-group">
+                                                        <label class="row m-0 mb-2 p-0">
+                                                            [WIP] Device Groups
+                                                            <div id="DEVICE_GROUP_TOOLTIP" class="pl-1" data-toggle="tooltip" data-placement="top" data-html="true">
+                                                                <i class="feather icon-help-circle"></i>
+                                                            </div>
+                                                        </label>
+                                                        <!-- Todo: Reimplement adding and removing groups. -->
+                                                        <div class="input-group">
+                                                            <select id="device_group_dropdown" class="form-control">
+                                                            </select>
+                                                            <div class="input-group-append">
+                                                                <button type="button" id="add_device_group" class="btn btn-outline-secondary px-3">
+                                                                    <span class="feather icon-plus"></span>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <div id="device_groups" type="option" class="h6 device_setting_input">
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
                                                         <label>LED Brightness <span for="led_brightness" class="mb-0 badge badge-secondary"></span></label>
                                                         <input id="led_brightness" type="range" class="custom-range device_setting_input" min="0" max="100" step="1" required>
                                                     </div>
