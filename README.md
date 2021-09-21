@@ -40,6 +40,8 @@
 
 - Audio visualization in real time.
 - Modern web interface.
+- Optional dashboard PIN lock.
+- System status dashboard.
 - 25 effects with many configuration options.
 - Customizable colors and color schemes.
 - Multicore optimized for large LED strips (900+ LEDs).
@@ -59,7 +61,7 @@ curl -sSL https://raw.githubusercontent.com/TobKra96/music_led_strip_control/mas
 
 The script also accepts some options:
 
-* `-b`, `--branch`       git branch to use (`master`, `dev_2.2`)
+* `-b`, `--branch`       git branch to use (`master`, `dev_2.3`)
 * `-d`, `--developer`    repository of a developer to use (`TobKra96`, `Teraskull`)
 * `-h`, `--help`         show this list of command-line options
 
