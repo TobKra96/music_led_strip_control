@@ -7,7 +7,8 @@ import random
 class EffectBeatTwinkle(Effect):
     def __init__(self, device):
         # Call the constructor of the base class.
-        super(EffectBeatTwinkle, self).__init__(device)
+        super().__init__(device)
+        self.gradient_position = 0
 
     def run(self):
         effect_config = self.get_effect_config("effect_beat_twinkle")
