@@ -70,7 +70,8 @@ class GeneralExecuter(ExecuterBase):
             "effect_wiggle": "Wiggle",
             "effect_vu_meter": "VU Meter",
             "effect_spectrum_analyzer": "Spectrum Analyzer",
-            "effect_direction_changer": "Direction Changer"
+            "effect_direction_changer": "Direction Changer",
+            "effect_border": "Border"
         }
         effects["special"] = {
             "effect_off": "Off",

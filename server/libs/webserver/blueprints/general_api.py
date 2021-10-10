@@ -261,6 +261,7 @@ def effects():  # pylint: disable=E0211
                             effect_beat: str,
                             effect_beat_slide: str,
                             effect_beat_twinkle: str,
+                            effect_border: str,
                             effect_direction_changer: str,
                             effect_energy: str,
                             effect_power: str,

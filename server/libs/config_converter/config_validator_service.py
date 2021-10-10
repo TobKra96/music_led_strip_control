@@ -18,6 +18,7 @@ class ConfigValidatorService():
             "effect_beat",
             "effect_beat_slide",
             "effect_beat_twinkle",
+            "effect_border",
             "effect_bubble",
             "effect_direction_changer",
             "effect_energy",
@@ -372,6 +373,84 @@ class ConfigValidatorService():
                         }
                     }
                 },
+                "effect_border": {
+                    "type": "object",
+                    "additionalProperties": False,
+                    "maxProperties": 16,
+                    "minProperties": 16,
+                    "required": [
+                        "bar_count",
+                        "color",
+                        "gradient",
+                        "manually_resize_bars",
+                        "mirror",
+                        "reverse_roll",
+                        "roll_speed",
+                        "segment_01_end",
+                        "segment_01_start",
+                        "segment_02_end",
+                        "segment_02_start",
+                        "segment_03_end",
+                        "segment_03_start",
+                        "segment_04_end",
+                        "segment_04_start",
+                        "use_gradient"
+                    ],
+                    "properties": {
+                        "bar_count": {
+                            "type": "number",
+                            "minimum": 0,
+                            "maximum": 24
+                        },
+                        "color": {
+                            "enum": color_enum
+                        },
+                        "gradient": {
+                            "enum": gradient_enum
+                        },
+                        "manually_resize_bars": {"type": "boolean"},
+                        "mirror": {"type": "boolean"},
+                        "reverse_roll": {"type": "boolean"},
+                        "roll_speed": {
+                            "type": "number",
+                            "minimum": 0,
+                            "maximum": 10
+                        },
+                        "segment_01_start": {
+                            "type": "integer",
+                            "minimum": 0
+                        },
+                        "segment_01_end": {
+                            "type": "integer",
+                            "minimum": 0
+                        },
+                        "segment_02_start": {
+                            "type": "integer",
+                            "minimum": 0
+                        },
+                        "segment_02_end": {
+                            "type": "integer",
+                            "minimum": 0
+                        },
+                        "segment_03_start": {
+                            "type": "integer",
+                            "minimum": 0
+                        },
+                        "segment_03_end": {
+                            "type": "integer",
+                            "minimum": 0
+                        },
+                        "segment_04_start": {
+                            "type": "integer",
+                            "minimum": 0
+                        },
+                        "segment_04_end": {
+                            "type": "integer",
+                            "minimum": 0
+                        },
+                        "use_gradient": {"type": "boolean"},
+                    }
+                },
                 "effect_bubble": {
                     "type": "object",
                     "additionalProperties": False,
@@ -713,8 +792,8 @@ class ConfigValidatorService():
                 "effect_random_cycle": {
                     "type": "object",
                     "additionalProperties": False,
-                    "maxProperties": 26,
-                    "minProperties": 26,
+                    "maxProperties": 27,
+                    "minProperties": 27,
                     "required": effect_enum + ["interval"],
                     "properties": {
                         "effect_advanced_scroll": {"type": "boolean"},
@@ -722,6 +801,7 @@ class ConfigValidatorService():
                         "effect_beat": {"type": "boolean"},
                         "effect_beat_slide": {"type": "boolean"},
                         "effect_beat_twinkle": {"type": "boolean"},
+                        "effect_border": {"type": "boolean"},
                         "effect_bubble": {"type": "boolean"},
                         "effect_direction_changer": {"type": "boolean"},
                         "effect_energy": {"type": "boolean"},
