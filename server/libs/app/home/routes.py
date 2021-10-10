@@ -2,13 +2,12 @@
 """
 Copyright (c) 2019 - present AppSeed.us
 """
+from libs.webserver.executer import Executer
 from libs.app.home import blueprint
 
 from flask import render_template, request
 from flask_login import login_required
 from jinja2 import TemplateNotFound
-from libs.app.home import blueprint
-from libs.webserver.executer import Executer
 
 
 @blueprint.route('/')

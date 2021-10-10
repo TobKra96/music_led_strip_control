@@ -71,12 +71,12 @@ function usage {
     prompt -i "  sudo bash $0 [options]"
     echo ""
     prompt -i "OPTIONS"
-    prompt -i "  -b, --branch        git branch to use (master, dev_2.2)"
+    prompt -i "  -b, --branch        git branch to use (master, dev_2.3)"
     prompt -i "  -d, --developer     repository of a developer to use (TobKra96, Teraskull)"
     prompt -i "  -h, --help          show this list of command-line options"
     echo ""
     prompt -i "Example:"
-    prompt -i "  sudo bash $0 --branch dev_2.2 --developer TobKra96"
+    prompt -i "  sudo bash $0 --branch dev_2.3 --developer TobKra96"
     if [ -n "$1" ]; then
         exit 1
     fi
@@ -93,7 +93,7 @@ esac; done
 
 
 case $GIT_BRANCH in
-    master|dev_2.2);;
+    master|dev_2.3);;
     *) GIT_BRANCH="master";;
 esac
 

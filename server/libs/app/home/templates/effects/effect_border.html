@@ -1,0 +1,155 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Edit Effect Border {% endblock %}
+
+<!-- Specific CSS goes HERE -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+    <div class="pcoded-content">
+        <div class="pcoded-inner-content">
+
+            {% include 'includes/toasts.html' %}
+
+            <!-- [ breadcrumb ] start -->
+            <div class="page-header">
+                <div class="page-block">
+                    <div class="row align-items-center">
+                        <div class="col-md-12">
+                            <div class="page-header-title">
+                                <h5 class="m-b-10">Border</h5>
+                            </div>
+                            <ul class="breadcrumb">
+                                <li class="breadcrumb-item"><a href="/"><i class="feather icon-home"></i></a></li>
+                                <li class="breadcrumb-item"><a href="javascript:">Edit Effects</a></li>
+                                <li class="breadcrumb-item"><a href="javascript:">Border</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- [ breadcrumb ] end -->
+            <div class="main-body">
+                <div class="page-wrapper">
+                    <!-- [ Main Content ] start -->
+
+                    {% include 'includes/devices.html' %}
+
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5>Border Effect Settings</h5>
+                                </div>
+                                <div class="card-block">
+                                    <p>Edit the Border effect. If "Manually resize bars" is checked, only 4 bars are available (For each wall side).</p>
+                                    <input type="hidden" id="settingsIdentifier" value="effect">
+                                    <input type="hidden" id="effectIdentifier" value="effect_border">
+                                    <form id="settingsForm" action method="post" novalidate>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label>Single Color</label>
+                                                    <select id="color" class="form-control colors setting_input"></select>
+                                                </div>
+                                                <div class="custom-control custom-checkbox my-2">
+                                                    <input type="checkbox" class="custom-control-input setting_input" id="manually_resize_bars">
+                                                    <label class="custom-control-label" for="manually_resize_bars">Manually resize bars</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label>Gradient</label>
+                                                    <select id="gradient" class="form-control gradients setting_input"></select>
+                                                </div>
+                                                <div class="custom-control custom-checkbox my-2">
+                                                    <input type="checkbox" class="custom-control-input setting_input" id="use_gradient">
+                                                    <label class="custom-control-label" for="use_gradient">Use Gradient</label>
+                                                </div>
+                                                <div class="custom-control custom-checkbox my-2">
+                                                    <input type="checkbox" class="custom-control-input setting_input" id="mirror">
+                                                    <label class="custom-control-label" for="mirror">Mirror</label>
+                                                </div>
+                                                <div class="custom-control custom-checkbox my-2">
+                                                    <input type="checkbox" class="custom-control-input setting_input" id="reverse_roll">
+                                                    <label class="custom-control-label" for="reverse_roll">Reverse Roll</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label>Bar Count <span for="bar_count" class="mb-0 badge badge-secondary"></span></label>
+                                                    <input id="bar_count" type="range" class="custom-range setting_input" min="0" max="24" step="1" required>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label>Roll Speed <span for="roll_speed" class="mb-0 badge badge-secondary"></span></label>
+                                                    <input id="roll_speed" type="range" class="custom-range setting_input" min="0" max="10" step="0.1" required>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label>Segment 01 Start</label>
+                                                    <input id="segment_01_start" class="form-control setting_input" type="number" name="number" disabled required>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>Segment 01 End</label>
+                                                    <input id="segment_01_end" class="form-control setting_input" type="number" name="number" disabled required>
+                                                </div>
+
+                                                <hr class="my-4">
+
+                                                <div class="form-group">
+                                                    <label>Segment 02 Start</label>
+                                                    <input id="segment_02_start" class="form-control setting_input" type="number" name="number" disabled required>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>Segment 02 End</label>
+                                                    <input id="segment_02_end" class="form-control setting_input" type="number" name="number" disabled required>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label>Segment 03 Start</label>
+                                                    <input id="segment_03_start" class="form-control setting_input" type="number" name="number" disabled required>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>Segment 03 End</label>
+                                                    <input id="segment_03_end" class="form-control setting_input" type="number" name="number" disabled required>
+                                                </div>
+
+                                                <hr class="my-4">
+
+                                                <div class="form-group">
+                                                    <label>Segment 04 Start</label>
+                                                    <input id="segment_04_start" class="form-control setting_input" type="number" name="number" disabled required>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>Segment 04 End</label>
+                                                    <input id="segment_04_end" class="form-control setting_input" type="number" name="number" disabled required>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="mt-4 d-flex flex-md-row flex-column justify-content-md-end">
+                                            <button type="button" id="save_btn" class="btn btn-success m-0">Save</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- [ Main Content ] end -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+<script src="/static/assets/js/settings.effect.js" type="module"></script>
+{% endblock javascripts %}

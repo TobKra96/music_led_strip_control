@@ -107,9 +107,36 @@ function generateEffectCheckboxes(parentId, effects) {
                 <label class="custom-control-label" for="${effectId}">${effectName}</label>
             </div>
         `;
-        $(parentId).append(checkbox)
+        $(parentId).append(checkbox);
     }
 }
+
+
+$(':input[type="number"]').change(function (input) {
+    if (input.target.value == '') {
+        input.target.value = 0
+    }
+})
+
+$("#manually_resize_bars").change(function () {
+    const segments = [
+        "segment_01_start", "segment_01_end",
+        "segment_02_start", "segment_02_end",
+        "segment_03_start", "segment_03_end",
+        "segment_04_start", "segment_04_end"
+    ];
+    if (this.checked) {
+        for (const segment of segments) {
+            $(`#${segment}`).prop("disabled", false);
+        }
+        $("#bar_count").prop("disabled", true);
+    } else {
+        for (const segment of segments) {
+            $(`#${segment}`).prop("disabled", true);
+        }
+        $("#bar_count").prop("disabled", false);
+    }
+});
 
 
 function GetAllSettingKeys() {

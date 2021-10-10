@@ -161,7 +161,11 @@ $(document).ready(function () {
                     for (var i = 0, len = services.length; i < len; i++) {
                         const serviceName = services[i]["name"];
                         const serviceStatus = services[i]["running"];
+                        const serviceNotFound = services[i]["not_found"];
                         let status = "Stopped";
+                        if (serviceNotFound) {
+                            status = "Not Found";
+                        }
                         let statusColor = "bg-danger";
                         if (serviceStatus) {
                             status = "Running";

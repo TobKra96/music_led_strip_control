@@ -42,13 +42,6 @@ class GeneralExecuter(ExecuterBase):
         return output_types
 
     def get_effects(self):
-        # Hardcoded effects for now.
-        # Todo: Sort effects in json config by type.
-
-        # Unused effects found in config:
-        # effect_music
-        # effect_spectrum
-
         effects = dict()
         effects["non_music"] = {
             "effect_single": "Single",
@@ -77,7 +70,8 @@ class GeneralExecuter(ExecuterBase):
             "effect_wiggle": "Wiggle",
             "effect_vu_meter": "VU Meter",
             "effect_spectrum_analyzer": "Spectrum Analyzer",
-            "effect_direction_changer": "Direction Changer"
+            "effect_direction_changer": "Direction Changer",
+            "effect_border": "Border"
         }
         effects["special"] = {
             "effect_off": "Off",

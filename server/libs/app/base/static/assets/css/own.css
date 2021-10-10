@@ -114,8 +114,8 @@ input[type=number] {
 }
 
 /* Capitalize dropdown items */
-select#color,
-select#gradient {
+select.colors,
+select.gradients {
     text-transform: capitalize;
 }
 

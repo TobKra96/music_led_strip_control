@@ -11,6 +11,7 @@ from libs.effects.effect_gradient import EffectGradient  # pylint: disable=E0611
 from libs.effects.effect_pendulum import EffectPendulum  # pylint: disable=E0611, E0401
 from libs.effects.effect_vu_meter import EffectVuMeter  # pylint: disable=E0611, E0401
 from libs.effects.effect_twinkle import EffectTwinkle  # pylint: disable=E0611, E0401
+from libs.effects.effect_border import EffectBorder  # pylint: disable=E0611, E0401
 from libs.notification_enum import NotificationEnum  # pylint: disable=E0611, E0401
 from libs.effects.effect_bubble import EffectBubble  # pylint: disable=E0611, E0401
 from libs.effects.effect_energy import EffectEnergy  # pylint: disable=E0611, E0401
@@ -78,7 +79,8 @@ class EffectService():
             EffectsEnum.effect_direction_changer: EffectDirectionChanger,
             EffectsEnum.effect_beat_twinkle: EffectBeatTwinkle,
             EffectsEnum.effect_segment_color: EffectSegmentColor,
-            EffectsEnum.effect_fireplace: EffectFireplace
+            EffectsEnum.effect_fireplace: EffectFireplace,
+            EffectsEnum.effect_border: EffectBorder
         }
 
         self._initialized_effects = {}
