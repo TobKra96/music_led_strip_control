@@ -244,7 +244,7 @@ def output_types():  # pylint: disable=E0211
 @login_required
 def effects():  # pylint: disable=E0211
     """
-    Return effects
+    Return effects and their order
     ---
     tags:
         - Resources
@@ -256,40 +256,16 @@ def effects():  # pylint: disable=E0211
                 example:
                     {
                         music: {
-                            effect_advanced_scroll: str,
-                            effect_bars: str,
-                            effect_beat: str,
-                            effect_beat_slide: str,
-                            effect_beat_twinkle: str,
-                            effect_border: str,
-                            effect_direction_changer: str,
-                            effect_energy: str,
-                            effect_power: str,
-                            effect_scroll: str,
-                            effect_spectrum_analyzer: str,
-                            effect_vu_meter: str,
-                            effect_wave: str,
-                            effect_wavelength: str,
-                            effect_wiggle: str
+                            effect_name: str,
                         },
                         non_music: {
-                            effect_bubble: str,
-                            effect_fade: str,
-                            effect_fireplace: str,
-                            effect_gradient: str,
-                            effect_pendulum: str,
-                            effect_rods: str,
-                            effect_segment_color: str,
-                            effect_single: str,
-                            effect_slide: str,
-                            effect_sync_fade: str,
-                            effect_twinkle: str
+                            effect_name: str,
+                        },
+                        order: {
+                            effect_name: int,
                         },
                         special: {
-                            effect_off: str,
-                            effect_random_cycle: str,
-                            effect_random_non_music: str,
-                            effect_random_music: str
+                            effect_name: str,
                         }
                     }
         403:

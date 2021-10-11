@@ -1,3 +1,4 @@
+from libs.effects_enum import EffectsEnum, EffectNames  # pylint: disable=E0611, E0401
 from libs.webserver.executer_base import ExecuterBase
 from libs.audio_info import AudioInfo  # pylint: disable=E0611, E0401
 
@@ -43,41 +44,9 @@ class GeneralExecuter(ExecuterBase):
 
     def get_effects(self):
         effects = dict()
-        effects["non_music"] = {
-            "effect_single": "Single",
-            "effect_gradient": "Gradient",
-            "effect_fade": "Fade",
-            "effect_sync_fade": "Sync Fade",
-            "effect_slide": "Slide",
-            "effect_bubble": "Bubble",
-            "effect_twinkle": "Twinkle",
-            "effect_pendulum": "Pendulum",
-            "effect_rods": "Rods",
-            "effect_segment_color": "Segment Color",
-            "effect_fireplace": "Fireplace"
-        }
-        effects["music"] = {
-            "effect_scroll": "Scroll",
-            "effect_advanced_scroll": "Advanced Scroll",
-            "effect_energy": "Energy",
-            "effect_wavelength": "Wavelength",
-            "effect_bars": "Bars",
-            "effect_power": "Power",
-            "effect_beat": "Beat",
-            "effect_beat_twinkle": "Beat Twinkle",
-            "effect_beat_slide": "Beat Slide",
-            "effect_wave": "Wave",
-            "effect_wiggle": "Wiggle",
-            "effect_vu_meter": "VU Meter",
-            "effect_spectrum_analyzer": "Spectrum Analyzer",
-            "effect_direction_changer": "Direction Changer",
-            "effect_border": "Border"
-        }
-        effects["special"] = {
-            "effect_off": "Off",
-            "effect_random_cycle": "Random Cycle",
-            "effect_random_non_music": "Random Non-Music",
-            "effect_random_music": "Random Music"
-        }
+        effects["non_music"] = EffectNames.non_music
+        effects["music"] = EffectNames.music
+        effects["special"] = EffectNames.special
+        effects["order"] = {effect.name: effect.value for effect in EffectsEnum}
 
         return effects
