@@ -84,23 +84,28 @@ class SystemInfoExecuter(ExecuterBase):
     def get_service_status(self, service_name):
         service_info = dict()
         service_info["name"] = service_name
-        try:
-            # If service is running (0), it should return b'', else caught as exception.
-            subprocess.check_output(f"systemctl status {service_name} >/dev/null 2>&1", shell=True)
-            service_info["status"] = 0
-            service_info["running"] = True
-            service_info["not_found"] = False
-        except subprocess.CalledProcessError as grepexc:
-            # Catch error code if service is stopped (3), or not found (4).
-            service_info["status"] = grepexc.returncode
-            if grepexc.returncode == 3:
+        if platform.system().lower() == "linux":
+            try:
+                # If service is running (0), it should return b'', else caught as exception.
+                subprocess.check_output(f"systemctl status {service_name} >/dev/null 2>&1", shell=True)
+                service_info["status"] = 0
+                service_info["running"] = True
                 service_info["not_found"] = False
-            elif grepexc.returncode == 4:
+            except subprocess.CalledProcessError as grepexc:
+                # Catch error code if service is stopped (3), or not found (4).
+                service_info["status"] = grepexc.returncode
+                if grepexc.returncode == 3:
+                    service_info["not_found"] = False
+                elif grepexc.returncode == 4:
+                    service_info["not_found"] = True
+                service_info["running"] = False
+            except Exception as e:
+                self.logger.debug(f"Could not get service status: {service_name}")
+                service_info["status"] = 9999
+                service_info["running"] = False
                 service_info["not_found"] = True
-            service_info["running"] = False
-        except Exception as e:
-            self.logger.debug(f"Could not get service status: {service_name}")
-            service_info["status"] = 9999
+        else:
+            service_info["status"] = 3
             service_info["running"] = False
             service_info["not_found"] = True
         return service_info
