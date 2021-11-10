@@ -6,7 +6,7 @@ from libs.fps_limiter import FPSLimiter  # pylint: disable=E0611, E0401
 from libs.audio_info import AudioInfo  # pylint: disable=E0611, E0401
 from libs.dsp import DSP  # pylint: disable=E0611, E0401
 
-from multiprocessing import Queue
+from multiprocess import Queue
 from time import time
 import numpy as np
 import pyaudio

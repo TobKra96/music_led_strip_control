@@ -2,7 +2,7 @@ from libs.effect_service import EffectService
 from libs.output_service import OutputService
 from libs.queue_wrapper import QueueWrapper  # pylint: disable=E0611, E0401
 
-from multiprocessing import Process, Queue
+from multiprocess import Process, Queue
 import logging
 
 
