@@ -25,6 +25,8 @@ class AudioInfo:
                     logger.debug("Could not get device infos.")
                     logger.exception(f"Unexpected error in AudioInfo: {e}")
 
+        except OSError as e:
+            logger.error(e)
         except Exception as e:
             logger.exception(f"Unexpected error in AudioInfo: {e}")
 
@@ -38,6 +40,8 @@ class AudioInfo:
             raw_default_device = py_audio.get_default_input_device_info()
             default_device = AudioInfo.parse_raw_audio_device_to_audio_device(raw_default_device)
 
+        except OSError as e:
+            logger.error(e)
         except Exception as e:
             logger.exception(f"Unexpected error in AudioInfo get_default_audio_device: {e}")
 
