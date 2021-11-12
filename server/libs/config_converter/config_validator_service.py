@@ -101,8 +101,8 @@ class ConfigValidatorService():
         effect_schema = {
             "type": "object",
             "additionalProperties": False,
-            "maxProperties": 27,
-            "minProperties": 26,
+            "maxProperties": 28,
+            "minProperties": 27,
             "required": effect_enum + ["last_effect"],
             "properties": {
                 "effect_advanced_scroll": {
@@ -1404,9 +1404,10 @@ class ConfigValidatorService():
         device_schema = {
             "type": "object",
             "additionalProperties": False,
-            "maxProperties": 9,
-            "minProperties": 9,
+            "maxProperties": 10,
+            "minProperties": 10,
             "required": [
+                "device_groups",
                 "device_name",
                 "effects",
                 "fps",
@@ -1418,6 +1419,12 @@ class ConfigValidatorService():
                 "output_type"
             ],
             "properties": {
+                "device_groups": {
+                    "type": "array",
+                    "minItems": 0,
+                    "maxItems": 100,
+                    "uniqueItems": True
+                },
                 "device_name": {
                     "anyOf": [
                         {
@@ -1673,10 +1680,11 @@ class ConfigValidatorService():
         general_settings_schema = {
             "type": "object",
             "additionalProperties": False,
-            "maxProperties": 12,
-            "minProperties": 12,
+            "maxProperties": 13,
+            "minProperties": 13,
             "required": [
                 "default_sample_rate",
+                "device_groups",
                 "device_id",
                 "frames_per_buffer",
                 "log_file_enabled",
@@ -1695,6 +1703,12 @@ class ConfigValidatorService():
                         44100,
                         48000
                     ]
+                },
+                "device_groups": {
+                    "type": "array",
+                    "minItems": 0,
+                    "maxItems": 100,
+                    "uniqueItems": True
                 },
                 "device_id": {
                     "type": "integer",
