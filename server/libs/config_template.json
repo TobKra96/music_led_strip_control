@@ -656,7 +656,15 @@
     "device_configs": {},
     "general_settings": {
         "default_sample_rate": 48000,
-        "device_groups": {},
+        "device_groups": [
+            "Attic",
+            "Bathroom",
+            "Bedroom",
+            "Garage",
+            "Hall",
+            "Kitchen",
+            "Living Room"
+        ],
         "device_id": -1,
         "frames_per_buffer": 512,
         "log_file_enabled": false,
