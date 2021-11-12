@@ -154,15 +154,15 @@ export default class Device {
                         });
                         // Clear all dropdown group options
                         $("#device_group_dropdown").empty();
-                        // Populate dropdown with all available groups
-                        jinja_groups.forEach(group => {
-                            let exists = 0 != $(`#device_groups span[value="${group.name}"]`).length;
+                        // Populate device group dropdown with all available groups
+                        jinja_groups.groups.forEach(group => {
+                            let exists = 0 != $(`#device_groups span[value="${group}"]`).length;
+                            const option = new Option(group, group);
                             if (!exists) {
-                                const option = new Option(group.name, group.name);
-                                option.setAttribute('selected', 'selected');
                                 $("#device_group_dropdown").prepend(option);
                             }
                         });
+                        $("#device_group_dropdown")[0].selectedIndex = 0;
                     } else {
                         $(`#${setting_key}`).val(setting_value);
                     }

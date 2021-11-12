@@ -126,11 +126,8 @@ def get_groups():  # pylint: disable=E0211
             schema:
                 type: object,
                 example:
-                    [
-                        {
-                            id: str,
-                            name: str
-                        },
+                    "groups": [
+                        str,
                         ...
                     ]
         403:
@@ -173,15 +170,14 @@ def create_group():  # pylint: disable=E0211
             schema:
                 type: object,
                 example:
-                    [
-                        {
-                            id: str,
-                            name: str
-                        },
+                    "groups": [
+                        str,
                         ...
                     ]
         403:
             description: Input data are wrong
+        409:
+            description: Group name is empty, already exists or maximum group amount exceeded
     """
     data_in = request.get_json()
 
@@ -189,6 +185,10 @@ def create_group():  # pylint: disable=E0211
         return "Input data are wrong.", 403
 
     group = Executer.instance.device_executer.create_new_group(data_in["group"])
+
+    if not group:
+        return "Group name is empty, already exists or maximum group amount exceeded.", 409
+
     data_out = group
 
     return jsonify(data_out)
@@ -207,7 +207,7 @@ def delete_group():  # pylint: disable=E0211
           in: body
           type: string
           required: true
-          description: ID of `group` to delete
+          description: Name of `group` to delete
           schema:
                 type: object,
                 example:
@@ -220,15 +220,14 @@ def delete_group():  # pylint: disable=E0211
             schema:
                 type: object,
                 example:
-                    [
-                        {
-                            id: str,
-                            name: str
-                        },
+                    "groups": [
+                        str,
                         ...
                     ]
         403:
             description: Input data are wrong
+        409:
+            description: Group name is empty or does not exist
     """
     data_in = request.get_json()
 
@@ -236,6 +235,43 @@ def delete_group():  # pylint: disable=E0211
         return "Input data are wrong.", 403
 
     groups = Executer.instance.device_executer.delete_group(data_in["group"])
+
+    if not groups:
+        return "Group name is empty or does not exist.", 409
+
     data_out = groups
+
+    return jsonify(data_out)
+
+
+@device_api.patch('/api/system/groups')
+@login_required
+def remove_invalid_device_groups():  # pylint: disable=E0211
+    """
+    Remove invalid device groups
+    ---
+    tags:
+        - System
+    responses:
+        200:
+            description: OK
+            schema:
+                type: object,
+                example:
+                    "removed_groups": [
+                        str,
+                        ...
+                    ]
+        202:
+            description: No invalid groups found
+    """
+    data_out = dict()
+
+    removed_groups = Executer.instance.device_executer.remove_invalid_device_groups()
+
+    if not removed_groups["removed_groups"]:
+        return "No invalid groups found.", 202
+
+    data_out = removed_groups
 
     return jsonify(data_out)
