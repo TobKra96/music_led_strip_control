@@ -173,25 +173,21 @@ function SetGeneralSetting(settings) {
         url: "/api/settings/general",
         type: "POST",
         data: JSON.stringify(data, null, '\t'),
-        contentType: 'application/json;charset=UTF-8',
-        success: function (response) {
-            console.log("General settings set successfully. Response:\n\n" + JSON.stringify(response, null, '\t'));
-            new Toast("General settings saved.").success();
-        },
-        error: function (xhr) {
-            console.log("Error while setting general settings. Error: " + xhr.responseText);
-            new Toast("Error while saving general settings.").error();
-        }
-    });
-
-    $.ajax({
-        url: "/api/system/groups",
-        type: "PATCH",
-        data: {},
-        contentType: 'application/json;charset=UTF-8',
-        success: function (response) {
+        contentType: 'application/json;charset=UTF-8'
+    }).done(function (response) {
+        console.log("General settings set successfully. Response:\n\n" + JSON.stringify(response, null, '\t'));
+        new Toast("General settings saved.").success();
+        $.ajax({
+            url: "/api/system/groups",
+            type: "PATCH",
+            data: {},
+            contentType: 'application/json;charset=UTF-8'
+        }).done(function (response) {
             console.log(JSON.stringify(response));
-        },
+        });
+    }).fail(function (xhr) {
+        console.log("Error while setting general settings. Error: " + xhr.responseText);
+        new Toast("Error while saving general settings.").error();
     });
 }
 
