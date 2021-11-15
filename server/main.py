@@ -16,7 +16,7 @@ from libs.webserver.webserver import Webserver
 from libs.device_manager import DeviceManager
 from libs.config_service import ConfigService
 
-from multiprocess import Process, Queue, Lock
+from multiprocessing import Process, Queue, Lock
 from time import sleep
 import subprocess
 import pyaudio

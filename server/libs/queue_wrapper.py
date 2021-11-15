@@ -1,4 +1,4 @@
-from multiprocess import Queue
+from multiprocessing import Queue
 import logging
 
 
