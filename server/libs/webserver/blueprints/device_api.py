@@ -23,6 +23,10 @@ def get_devices():  # pylint: disable=E0211
                 example:
                     [
                         {
+                            "groups": [
+                                str,
+                                ...
+                            ],
                             id: str,
                             name: str
                         },

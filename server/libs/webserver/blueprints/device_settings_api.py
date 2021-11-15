@@ -25,7 +25,7 @@ def get_device_setting():  # pylint: disable=E0211
           in: query
           type: string
           required: false
-          enum: ['device_name', 'effects', 'fps', 'led_brightness', 'led_count',
+          enum: ['device_groups', 'device_name', 'effects', 'fps', 'led_brightness', 'led_count',
                  'led_mid', 'led_strip', 'output', 'output_type']
           description: Specific `setting_key` to return from device
     responses:
