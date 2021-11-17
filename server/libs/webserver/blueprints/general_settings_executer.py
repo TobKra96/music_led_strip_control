@@ -1,30 +1,31 @@
-from libs.webserver.executer_base import ExecuterBase
+from libs.webserver.executer_base import ExecuterBase, handle_config_errors
 
 
 class GeneralSettingsExecuter(ExecuterBase):
 
+    @handle_config_errors
     def get_general_setting(self, setting_key):
         return self._config["general_settings"][setting_key]
 
+    @handle_config_errors
     def get_general_settings(self):
         general_settings = dict()
         for setting_key in self._config["general_settings"]:
             general_settings[setting_key] = self._config["general_settings"][setting_key]
-
         return general_settings
 
+    @handle_config_errors
     def set_general_setting(self, settings):
         for setting_key in settings:
             self._config["general_settings"][setting_key] = settings[setting_key]
         self.save_config()
-
         self.refresh_device("all_devices")
+        return self._config["general_settings"][setting_key]
 
     def get_webserver_port(self):
         webserver_port = 8080
         if 'webserver_port' in self._config["general_settings"]:
             webserver_port = self._config["general_settings"]["webserver_port"]
-
         return webserver_port
 
     def reset_settings(self):

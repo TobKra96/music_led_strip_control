@@ -34,16 +34,18 @@ def get_devices():  # pylint: disable=E0211
                     ]
         403:
             description: Could not find devices
+        422:
+            description: Unprocessable Entity
     """
-    data_out = dict()
+    data_out = Executer.instance.device_executer.get_devices()
 
-    devices = Executer.instance.device_executer.get_devices()
-    data_out = devices
+    if data_out is None:
+        return "Unprocessable Entity.", 422
 
-    if devices is None:
-        return "Could not find devices: ", 403
-    else:
-        return jsonify(data_out)
+    if not data_out:
+        return "Could not find devices.", 403
+
+    return jsonify(data_out)
 
 
 @device_api.post('/api/system/devices')
@@ -63,11 +65,16 @@ def create_device():  # pylint: disable=E0211
                     {
                         index: int
                     }
+        422:
+            description: Unprocessable Entity
     """
-    index = Executer.instance.device_executer.create_new_device()
+    result = Executer.instance.device_executer.create_new_device()
+
+    if result is None:
+        return "Unprocessable Entity.", 422
 
     data_out = {
-        "index": index
+        "index": result
     }
 
     return jsonify(data_out)
@@ -104,15 +111,20 @@ def delete_device():  # pylint: disable=E0211
                     }
         403:
             description: Input data are wrong
+        422:
+            description: Unprocessable Entity
     """
     data_in = request.get_json()
-    data_out = copy.deepcopy(data_in)
 
     if not Executer.instance.device_executer.validate_data_in(data_in, ("device",)):
         return "Input data are wrong.", 403
 
-    Executer.instance.device_executer.delete_device(data_in["device"])
+    result = Executer.instance.device_executer.delete_device(data_in["device"])
 
+    if result is None:
+        return "Unprocessable Entity.", 422
+
+    data_out = copy.deepcopy(data_in)
     return jsonify(data_out)
 
 
@@ -136,14 +148,16 @@ def get_groups():  # pylint: disable=E0211
                     ]
         403:
             description: Could not find groups
+        422:
+            description: Unprocessable Entity
     """
-    data_out = dict()
+    data_out = Executer.instance.device_executer.get_groups()
 
-    groups = Executer.instance.device_executer.get_groups()
-    data_out = groups
+    if data_out is None:
+        return "Unprocessable Entity.", 422
 
-    if groups is None:
-        return "Could not find devices: ", 403
+    if not data_out["groups"]:
+        return "Could not find groups.", 403
     else:
         return jsonify(data_out)
 
@@ -180,20 +194,18 @@ def create_group():  # pylint: disable=E0211
                     ]
         403:
             description: Input data are wrong
-        409:
-            description: Group name is empty, already exists or maximum group amount exceeded
+        422:
+            description: Unprocessable Entity
     """
     data_in = request.get_json()
 
     if not Executer.instance.device_executer.validate_data_in(data_in, ("group",)):
         return "Input data are wrong.", 403
 
-    group = Executer.instance.device_executer.create_new_group(data_in["group"])
+    data_out = Executer.instance.device_executer.create_new_group(data_in["group"])
 
-    if not group:
-        return "Group name is empty, already exists or maximum group amount exceeded.", 409
-
-    data_out = group
+    if data_out is None:
+        return "Unprocessable Entity.", 422
 
     return jsonify(data_out)
 
@@ -230,20 +242,18 @@ def delete_group():  # pylint: disable=E0211
                     ]
         403:
             description: Input data are wrong
-        409:
-            description: Group name is empty or does not exist
+        422:
+            description: Unprocessable Entity
     """
     data_in = request.get_json()
 
     if not Executer.instance.device_executer.validate_data_in(data_in, ("group",)):
         return "Input data are wrong.", 403
 
-    groups = Executer.instance.device_executer.delete_group(data_in["group"])
+    data_out = Executer.instance.device_executer.delete_group(data_in["group"])
 
-    if not groups:
-        return "Group name is empty or does not exist.", 409
-
-    data_out = groups
+    if data_out is None:
+        return "Unprocessable Entity.", 422
 
     return jsonify(data_out)
 
@@ -269,13 +279,12 @@ def remove_invalid_device_groups():  # pylint: disable=E0211
         202:
             description: No invalid groups found
     """
-    data_out = dict()
+    data_out = Executer.instance.device_executer.remove_invalid_device_groups()
 
-    removed_groups = Executer.instance.device_executer.remove_invalid_device_groups()
+    if data_out is None:
+        return "Unprocessable Entity.", 422
 
-    if not removed_groups["removed_groups"]:
+    if not data_out["removed_groups"]:
         return "No invalid groups found.", 202
-
-    data_out = removed_groups
 
     return jsonify(data_out)

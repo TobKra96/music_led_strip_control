@@ -34,16 +34,18 @@ def colors():  # pylint: disable=E0211
                     }
         403:
             description: Could not find colors
+        422:
+            description: Unprocessable Entity
     """
-    data_out = dict()
+    data_out = Executer.instance.general_executer.get_colors()
 
-    colors = Executer.instance.general_executer.get_colors()
-    data_out = colors
+    if data_out is None:
+        return "Unprocessable Entity.", 422
 
     if data_out is None:
         return "Could not find colors.", 403
-    else:
-        return jsonify(data_out)
+
+    return jsonify(data_out)
 
 
 @general_api.get('/api/resources/gradients')

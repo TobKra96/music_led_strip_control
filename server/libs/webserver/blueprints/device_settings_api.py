@@ -41,36 +41,38 @@ def get_device_setting():  # pylint: disable=E0211
                     }
         403:
             description: Input data are wrong
+        422:
+            description: Unprocessable Entity
     """
     if len(request.args) == 2:  # Get one specific device setting of one device.
         data_in = request.args.to_dict()
-        data_out = copy.deepcopy(data_in)
 
         if not Executer.instance.device_settings_executer.validate_data_in(data_in, ("device", "setting_key",)):
             return "Input data are wrong.", 403
 
-        setting_value = Executer.instance.device_settings_executer.get_device_setting(data_in["device"], data_in["setting_key"])
-        data_out["setting_value"] = setting_value
+        result = Executer.instance.device_settings_executer.get_device_setting(data_in["device"], data_in["setting_key"])
 
-        if setting_value is None:
-            return "Could not find settings value: ", 403
-        else:
-            return jsonify(data_out)
+        if result is None:
+            return "Unprocessable Entity", 422
+
+        data_out = copy.deepcopy(data_in)
+        data_out["setting_value"] = result
+        return jsonify(data_out)
 
     elif len(request.args) == 1:  # Get all device settings of a specific device.
         data_in = request.args.to_dict()
-        data_out = copy.deepcopy(data_in)
 
         if not Executer.instance.device_settings_executer.validate_data_in(data_in, ("device",)):
-            return "test.", 403
+            return "Input data are wrong.", 403
 
-        setting_values = Executer.instance.device_settings_executer.get_device_settings(data_in["device"])
-        data_out["settings"] = setting_values
+        result = Executer.instance.device_settings_executer.get_device_settings(data_in["device"])
 
-        if setting_values is None:
-            return "Could not find settings value: ", 403
-        else:
-            return jsonify(data_out)
+        if result is None:
+            return "Unprocessable Entity.", 422
+
+        data_out = copy.deepcopy(data_in)
+        data_out["settings"] = result
+        return jsonify(data_out)
 
     return "Input data are wrong.", 403
 
@@ -124,15 +126,20 @@ def set_device_settings():  # pylint: disable=E0211
                     }
         403:
             description: Input data are wrong
+        422:
+            description: Unprocessable Entity
     """
     data_in = request.get_json()
-    data_out = copy.deepcopy(data_in)
 
     if not Executer.instance.device_settings_executer.validate_data_in(data_in, ("device", "settings", )):
         return "Input data are wrong.", 403
 
-    Executer.instance.device_settings_executer.set_device_setting(data_in["device"], data_in["settings"])
+    result = Executer.instance.device_settings_executer.set_device_setting(data_in["device"], data_in["settings"])
 
+    if result is None:
+        return "Unprocessable Entity.", 422
+
+    data_out = copy.deepcopy(data_in)
     return jsonify(data_out)
 
 
@@ -160,7 +167,11 @@ def get_output_type_device_settings():  # pylint: disable=E0211
           in: query
           type: string
           required: true
-          description: The `setting_key` for a specified `device` to get the value from
+          description: The `setting_key` for a specified `device` to get the value from\n\n
+                       If `output_type_key` is output_raspi, the following `setting_key` keys\n
+                       are allowed - led_channel, led_dma, led_freq_hz, led_invert, led_pin\n\n
+                       If `output_type_key` is output_udp, the following `setting_key` keys\n
+                       are allowed - udp_client_ip, udp_client_port
     responses:
         200:
             description: OK
@@ -175,20 +186,22 @@ def get_output_type_device_settings():  # pylint: disable=E0211
                     }
         403:
             description: Input data are wrong
+        422:
+            description: Unprocessable Entity
     """
     data_in = request.args.to_dict()
-    data_out = copy.deepcopy(data_in)
 
     if not Executer.instance.device_settings_executer.validate_data_in(data_in, ("device", "output_type_key", "setting_key",)):
         return "Input data are wrong.", 403
 
-    setting_value = Executer.instance.device_settings_executer.get_output_type_device_setting(data_in["device"], data_in["output_type_key"], data_in["setting_key"])
-    data_out["setting_value"] = setting_value
+    result = Executer.instance.device_settings_executer.get_output_type_device_setting(data_in["device"], data_in["output_type_key"], data_in["setting_key"])
 
-    if setting_value is None:
-        return "Could not find settings value: ", 403
-    else:
-        return jsonify(data_out)
+    if result is None:
+        return "Unprocessable Entity.", 422
+
+    data_out = copy.deepcopy(data_in)
+    data_out["setting_value"] = result
+    return jsonify(data_out)
 
 
 @device_settings_api.post('/api/settings/device/output-type')
@@ -245,13 +258,18 @@ def set_output_type_device_settings():  # pylint: disable=E0211
                     }
         403:
             description: Input data are wrong
+        422:
+            description: Unprocessable Entity
     """
     data_in = request.get_json()
-    data_out = copy.deepcopy(data_in)
 
     if not Executer.instance.device_settings_executer.validate_data_in(data_in, ("device", "output_type_key", "settings", )):
         return "Input data are wrong.", 403
 
-    Executer.instance.device_settings_executer.set_output_type_device_setting(data_in["device"], data_in["output_type_key"], data_in["settings"])
+    result = Executer.instance.device_settings_executer.set_output_type_device_setting(data_in["device"], data_in["output_type_key"], data_in["settings"])
 
+    if result is None:
+        return "Unprocessable Entity.", 422
+
+    data_out = copy.deepcopy(data_in)
     return jsonify(data_out)

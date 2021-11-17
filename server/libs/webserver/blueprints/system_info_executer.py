@@ -12,6 +12,21 @@ import re
 __version__ = "2.3 Dev"
 
 
+class BuildServiceInfo():
+    """Clean way to assign system service information."""
+    def __init__(self, name, status=9999, running=False, not_found=True):
+        self.name = name
+        self.status = status
+        self.running = running
+        self.not_found = not_found
+
+    def update(self, **kwargs):
+        self.__dict__.update(kwargs)
+
+    def as_dict(self):
+        return self.__dict__
+
+
 class SystemInfoExecuter(ExecuterBase):
 
     def get_system_info_performance(self):
@@ -82,33 +97,25 @@ class SystemInfoExecuter(ExecuterBase):
         return data
 
     def get_service_status(self, service_name):
-        service_info = dict()
-        service_info["name"] = service_name
+        service_info = BuildServiceInfo(service_name)
         if platform.system().lower() == "linux":
             try:
                 # If service is running (0), it should return b'', else caught as exception.
                 subprocess.check_output(f"systemctl status {service_name} >/dev/null 2>&1", shell=True)
-                service_info["status"] = 0
-                service_info["running"] = True
-                service_info["not_found"] = False
+                service_info.update(status=0, running=True, not_found=False)
             except subprocess.CalledProcessError as grepexc:
                 # Catch error code if service is stopped (3), or not found (4).
-                service_info["status"] = grepexc.returncode
+                service_info.update(status=grepexc.returncode)
                 if grepexc.returncode == 3:
-                    service_info["not_found"] = False
+                    service_info.update(not_found=False)
                 elif grepexc.returncode == 4:
-                    service_info["not_found"] = True
-                service_info["running"] = False
-            except Exception as e:
+                    service_info.update(not_found=True)
+                service_info.update(running=False)
+            except Exception:
                 self.logger.debug(f"Could not get service status: {service_name}")
-                service_info["status"] = 9999
-                service_info["running"] = False
-                service_info["not_found"] = True
         else:
-            service_info["status"] = 3
-            service_info["running"] = False
-            service_info["not_found"] = True
-        return service_info
+            service_info.update(status=3, running=False, not_found=True)
+        return service_info.as_dict()
 
     def get_system_info_device_status(self):
         devices = []
