@@ -1,33 +1,39 @@
-from libs.webserver.executer_base import ExecuterBase
+from libs.webserver.executer_base import ExecuterBase, handle_config_errors
+from libs.effects_enum import EffectsEnum, EffectNames  # pylint: disable=E0611, E0401
 from libs.audio_info import AudioInfo  # pylint: disable=E0611, E0401
 
 
 class GeneralExecuter(ExecuterBase):
 
+    @handle_config_errors
     def get_colors(self):
         colors = dict()
         for colorID in self._config["colors"]:
             colors[colorID] = colorID
         return colors
 
+    @handle_config_errors
     def get_gradients(self):
         gradients = dict()
         for gradientID in self._config["gradients"]:
             gradients[gradientID] = gradientID
         return gradients
 
+    @handle_config_errors
     def get_led_strips(self):
         led_strips = dict()
         for led_strip_ID in self._config["led_strips"]:
             led_strips[led_strip_ID] = self._config["led_strips"][led_strip_ID]
         return led_strips
 
+    @handle_config_errors
     def get_logging_levels(self):
         logging_levels = dict()
         for logging_level_ID in self._config["logging_levels"]:
             logging_levels[logging_level_ID] = self._config["logging_levels"][logging_level_ID]
         return logging_levels
 
+    @handle_config_errors
     def get_audio_devices(self):
         audio_devices_dict = dict()
         audio_devices = AudioInfo.get_audio_devices(self._py_audio)
@@ -35,49 +41,18 @@ class GeneralExecuter(ExecuterBase):
             audio_devices_dict[current_audio_device.id] = current_audio_device.to_string()
         return audio_devices_dict
 
+    @handle_config_errors
     def get_output_types(self):
         output_types = dict()
         output_types["output_raspi"] = "Output Raspberry Pi"
         output_types["output_udp"] = "Output Network via UDP"
         return output_types
 
+    @handle_config_errors
     def get_effects(self):
         effects = dict()
-        effects["non_music"] = {
-            "effect_single": "Single",
-            "effect_gradient": "Gradient",
-            "effect_fade": "Fade",
-            "effect_sync_fade": "Sync Fade",
-            "effect_slide": "Slide",
-            "effect_bubble": "Bubble",
-            "effect_twinkle": "Twinkle",
-            "effect_pendulum": "Pendulum",
-            "effect_rods": "Rods",
-            "effect_segment_color": "Segment Color",
-            "effect_fireplace": "Fireplace"
-        }
-        effects["music"] = {
-            "effect_scroll": "Scroll",
-            "effect_advanced_scroll": "Advanced Scroll",
-            "effect_energy": "Energy",
-            "effect_wavelength": "Wavelength",
-            "effect_bars": "Bars",
-            "effect_power": "Power",
-            "effect_beat": "Beat",
-            "effect_beat_twinkle": "Beat Twinkle",
-            "effect_beat_slide": "Beat Slide",
-            "effect_wave": "Wave",
-            "effect_wiggle": "Wiggle",
-            "effect_vu_meter": "VU Meter",
-            "effect_spectrum_analyzer": "Spectrum Analyzer",
-            "effect_direction_changer": "Direction Changer",
-            "effect_border": "Border"
-        }
-        effects["special"] = {
-            "effect_off": "Off",
-            "effect_random_cycle": "Random Cycle",
-            "effect_random_non_music": "Random Non-Music",
-            "effect_random_music": "Random Music"
-        }
-
+        effects["non_music"] = EffectNames.non_music
+        effects["music"] = EffectNames.music
+        effects["special"] = EffectNames.special
+        effects["order"] = {effect.name: effect.value for effect in EffectsEnum}
         return effects

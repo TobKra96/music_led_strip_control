@@ -4,7 +4,22 @@ from libs.config_service import ConfigService  # pylint: disable=E0611, E0401
 from libs.effects_enum import EffectsEnum  # pylint: disable=E0611, E0401
 from libs.effect_item import EffectItem  # pylint: disable=E0611, E0401
 
+from functools import wraps
 import logging
+
+
+def handle_config_errors(func):
+    """
+    Decorator for catching any `Key` or `Value` errors in the config when calling API endpoints.
+    In case of error, `None` is returned and the respective Flask Blueprint will show `422 Unprocessable Entity`.
+    """
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except (KeyError, ValueError):
+            return None
+    return wrapper
 
 
 class ExecuterBase():

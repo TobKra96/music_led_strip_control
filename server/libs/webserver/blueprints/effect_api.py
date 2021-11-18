@@ -26,7 +26,7 @@ def get_active_effect():  # pylint: disable=E0211
         200:
             description: OK
             schema:
-                type: object,
+                type: object
                 example:
                     {
                         devices: [
@@ -39,32 +39,35 @@ def get_active_effect():  # pylint: disable=E0211
                     }
         403:
             description: Input data are wrong
+        422:
+            description: Unprocessable Entity
     """
     if len(request.args) == 1:
         # Retrieve the active effect for specific device.
         data_in = request.args.to_dict()
-        data_out = copy.deepcopy(data_in)
 
         if not Executer.instance.effect_executer.validate_data_in(data_in, ("device",)):
             return "Input data are wrong.", 403
 
-        active_effect = Executer.instance.effect_executer.get_active_effect(data_in["device"])
-        data_out["effect"] = active_effect
+        result = Executer.instance.effect_executer.get_active_effect(data_in["device"])
 
-        if active_effect is None:
-            return "Could not find active effect: ", 403
-        else:
-            return jsonify(data_out)
+        if result is None:
+            return "Unprocessable Entity.", 422
+
+        data_out = copy.deepcopy(data_in)
+        data_out["effect"] = result
+        return jsonify(data_out)
+
     elif not request.args:
         # Retrieve the active effect for all devices.
-        active_effects = Executer.instance.effect_executer.get_active_effects()
-        data_out = dict()
-        data_out["devices"] = active_effects
+        result = Executer.instance.effect_executer.get_active_effects()
 
-        if active_effects is None:
-            return "Could not find active effects: ", 403
-        else:
-            return jsonify(data_out)
+        if result is None:
+            return "Unprocessable Entity.", 422
+
+        data_out = dict()
+        data_out["devices"] = result
+        return jsonify(data_out)
 
     return "Input data are wrong.", 403
 
@@ -85,7 +88,7 @@ def set_active_effect():  # pylint: disable=E0211
           description: The `effect` which to set for the specified `device`\n
                     Remove `device` to apply effect to all devices (Not implemented yet)
           schema:
-            type: object,
+            type: object
             example:
                 {
                     device: str,
@@ -95,7 +98,7 @@ def set_active_effect():  # pylint: disable=E0211
         200:
             description: OK
             schema:
-                type: object,
+                type: object
                 example:
                     {
                         device: str,
@@ -103,31 +106,36 @@ def set_active_effect():  # pylint: disable=E0211
                     }
         403:
             description: Input data are wrong
+        422:
+            description: Unprocessable Entity
     """
     data_in = request.get_json()
-    if data_in and all(key in data_in for key in ("device", "effect")):
-        # Save the active effect for specific device.
-        if not Executer.instance.effect_executer.validate_data_in(data_in, ("device", "effect",)):
-            return "Input data are wrong.", 403
-
+    data_out = None
+    if data_in:
         effect_dict = Executer.instance.general_executer.get_effects()
-        if data_in["effect"] in effect_dict["special"]:
-            data_in["effect"] = Executer.instance.effect_executer.parse_special_effects(data_in["effect"], effect_dict, data_in["device"])
+        # Set effect for 1 device.
+        if all(key in data_in for key in ("device", "effect")):
+            if not Executer.instance.effect_executer.validate_data_in(data_in, ("device", "effect",)):
+                return "Input data are wrong.", 403
 
-        data_out = Executer.instance.effect_executer.set_active_effect(data_in["device"], data_in["effect"])
+            data_out = Executer.instance.effect_executer.set_active_effect(data_in["device"], data_in["effect"], effect_dict)
 
-        return jsonify(data_out)
+        # Set effect for multiple devices.
+        elif "devices" in data_in:
+            if not Executer.instance.effect_executer.validate_data_in(data_in, ("devices",)):
+                return "Input data are wrong.", 403
 
-    elif data_in and "effect" in data_in:
-        # Save the active effect for all devices.
-        if not Executer.instance.effect_executer.validate_data_in(data_in, ("effect",)):
-            return "Input data is wrong.", 403
+            data_out = Executer.instance.effect_executer.set_active_effect_for_multiple(data_in["devices"], effect_dict)
 
-        effect_dict = Executer.instance.general_executer.get_effects()
-        if data_in["effect"] in effect_dict["special"]:
-            data_in["effect"] = Executer.instance.effect_executer.parse_special_effects(data_in["effect"], effect_dict)
+        # Set effect for all devices.
+        elif "effect" in data_in:
+            if not Executer.instance.effect_executer.validate_data_in(data_in, ("effect",)):
+                return "Input data is wrong.", 403
 
-        data_out = Executer.instance.effect_executer.set_active_effect_for_all(data_in["effect"])
+            data_out = Executer.instance.effect_executer.set_active_effect_for_all(data_in["effect"], effect_dict)
+
+        if data_out is None:
+            return "Unprocessable Entity.", 422
 
         return jsonify(data_out)
 

@@ -1,4 +1,4 @@
-from libs.webserver.executer_base import ExecuterBase
+from libs.webserver.executer_base import ExecuterBase, handle_config_errors
 
 from random import choice
 
@@ -6,12 +6,13 @@ from random import choice
 class EffectExecuter(ExecuterBase):
 
     # Return active effect.
+    @handle_config_errors
     def get_active_effect(self, device):
         if device == self.all_devices_id:
             return self._config[self.all_devices_id]["effects"]["last_effect"]
-        else:
-            return self._config["device_configs"][device]["effects"]["last_effect"]
+        return self._config["device_configs"][device]["effects"]["last_effect"]
 
+    @handle_config_errors
     def get_active_effects(self):
         devices = []
         for device_key in self._config["device_configs"]:
@@ -51,6 +52,9 @@ class EffectExecuter(ExecuterBase):
         if not device:
             device = self.all_devices_id
 
+        if effect not in ({*effect_dict["non_music"], *effect_dict["music"], *effect_dict["special"]}):
+            return None
+
         if effect == "effect_random_cycle":
             effect_list = self.get_enabled_effects()
         elif effect == "effect_random_non_music":
@@ -63,9 +67,13 @@ class EffectExecuter(ExecuterBase):
         effect = self.get_random_effect(effect_list, device)
         return effect
 
-    def set_active_effect(self, device, effect, for_all=False):
+    @handle_config_errors
+    def set_active_effect(self, device, effect, effect_dict, for_all=False):
+        effect = self.parse_special_effects(effect, effect_dict, device)
+        if effect is None:
+            return None
         if device == self.all_devices_id:
-            self.set_active_effect_for_all(effect)
+            self.set_active_effect_for_all(effect, effect_dict)
             return {"effect": effect}
         else:
             self._config["device_configs"][device]["effects"]["last_effect"] = effect
@@ -74,10 +82,26 @@ class EffectExecuter(ExecuterBase):
         self.put_into_effect_queue(device, effect, put_all=for_all)
         return {"device": device, "effect": effect}
 
-    def set_active_effect_for_all(self, effect):
+    def set_active_effect_for_multiple(self, devices, effect_dict):
+        parsed = dict()
+        result_list = []
+        for item in devices:
+            result = self.set_active_effect(item["device"], item["effect"], effect_dict)
+            if result is None:
+                return None
+            result_list.append(result)
+
+        parsed["devices"] = result_list
+        return parsed
+
+    @handle_config_errors
+    def set_active_effect_for_all(self, effect, effect_dict):
+        effect = self.parse_special_effects(effect, effect_dict)
+        if effect is None:
+            return None
         self._config[self.all_devices_id]["effects"]["last_effect"] = effect
         self.save_config()
         self.refresh_device(self.all_devices_id)
         for device_key in self._config["device_configs"]:
-            self.set_active_effect(device_key, effect, for_all=True)
+            self.set_active_effect(device_key, effect, effect_dict, for_all=True)
         return {"effect": effect}

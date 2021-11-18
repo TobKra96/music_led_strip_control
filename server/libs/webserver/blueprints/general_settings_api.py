@@ -29,7 +29,7 @@ def get_general_settings():  # pylint: disable=E0211
         200:
             description: OK
             schema:
-                type: object,
+                type: object
                 example:
                     {
                         setting_key: str,
@@ -37,33 +37,34 @@ def get_general_settings():  # pylint: disable=E0211
                     }
         403:
             description: Input data are wrong
+        422:
+            description: Unprocessable Entity
     """
     if len(request.args) == 1:
         data_in = request.args.to_dict()
-        data_out = copy.deepcopy(data_in)
 
         if not Executer.instance.general_settings_executer.validate_data_in(data_in, ("setting_key",)):
             return "Input data are wrong.", 403
 
-        setting_value = Executer.instance.general_settings_executer.get_general_setting(data_in["setting_key"])
-        data_out["setting_value"] = setting_value
+        result = Executer.instance.general_settings_executer.get_general_setting(data_in["setting_key"])
 
-        if setting_value is None:
-            return "Could not find settings value: ", 403
-        else:
-            return jsonify(data_out)
+        if result is None:
+            return "Unprocessable Entity.", 422
+
+        data_out = copy.deepcopy(data_in)
+        data_out["setting_value"] = result
+        return jsonify(data_out)
 
     elif len(request.args) == 0:
         # If no queries passed, return all settings.
+        result = Executer.instance.general_settings_executer.get_general_settings()
+
+        if result is None:
+            return "Unprocessable Entity.", 422
+
         data_out = dict()
-
-        settings = Executer.instance.general_settings_executer.get_general_settings()
-        data_out["setting_value"] = settings
-
-        if settings is None:
-            return "Could not find settings value: ", 403
-        else:
-            return jsonify(data_out)
+        data_out["setting_value"] = result
+        return jsonify(data_out)
 
     return "Input data are wrong.", 403
 
@@ -83,7 +84,7 @@ def set_general_settings():  # pylint: disable=E0211
           required: true
           description: The general settings which to set\n
           schema:
-                type: object,
+                type: object
                 example:
                     {
                         settings: {
@@ -105,7 +106,7 @@ def set_general_settings():  # pylint: disable=E0211
         200:
             description: OK
             schema:
-                type: object,
+                type: object
                 example:
                     {
                         settings: {
@@ -125,15 +126,20 @@ def set_general_settings():  # pylint: disable=E0211
                     }
         403:
             description: Input data are wrong
+        422:
+            description: Unprocessable Entity
     """
     data_in = request.get_json()
-    data_out = copy.deepcopy(data_in)
 
     if not Executer.instance.general_settings_executer.validate_data_in(data_in, ("settings", )):
         return "Input data are wrong.", 403
 
-    Executer.instance.general_settings_executer.set_general_setting(data_in["settings"])
+    result = Executer.instance.general_settings_executer.set_general_setting(data_in["settings"])
 
+    if result is None:
+        return "Unprocessable Entity.", 422
+
+    data_out = copy.deepcopy(data_in)
     return jsonify(data_out)
 
 
@@ -149,16 +155,15 @@ def reset_general_settings():  # pylint: disable=E0211
         200:
             description: OK
             schema:
-                type: object,
+                type: object
                 example:
                     {}
         403:
             description: Input data are wrong
     """
-    data_out = dict()
-
     Executer.instance.general_settings_executer.reset_settings()
 
+    data_out = dict()
     return jsonify(data_out)
 
 
@@ -201,12 +206,14 @@ def import_config():  # pylint: disable=E0211
             description: Could not import file
         404:
             description: No config file selected
+        415:
+            description: Unsupported media type
     """
     Executer.instance.logger.debug("Import Config Request received.")
     if 'imported_config' not in request.files:
         Executer.instance.logger.error("Could not find the file key.")
         flash('No config file selected', 'error')
-        return "Could not import file.", 404
+        return "No config file selected.", 404
     imported_config = request.files['imported_config']
     content = imported_config.read()
     if content:
@@ -220,7 +227,7 @@ def import_config():  # pylint: disable=E0211
                 return "Could not import file.", 400
         except (json.decoder.JSONDecodeError, UnicodeDecodeError):
             flash('Not a valid config file', 'error')
-            return "File is not valid JSON.", 400
+            return "Unsupported media type.", 415
     else:
         flash('No config file selected', 'error')
-        return "No config file selected.", 400
+        return "No config file selected.", 404

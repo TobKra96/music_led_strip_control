@@ -142,6 +142,12 @@ function GetLocalSettings() {
 function SetLocalInput(setting_key, setting_value) {
     if ($("#" + setting_key).attr('type') == 'checkbox') {
         $("#" + setting_key).prop('checked', setting_value);
+    } else if (setting_key == "device_groups") {
+        setting_value.forEach(function (item, _) {
+            var newOption = new Option(item, item);
+            $("#device_groups").prepend(newOption);
+        });
+        $("#device_groups")[0].selectedIndex = 0;
     } else {
         $("#" + setting_key).val(setting_value);
     }
@@ -167,15 +173,21 @@ function SetGeneralSetting(settings) {
         url: "/api/settings/general",
         type: "POST",
         data: JSON.stringify(data, null, '\t'),
-        contentType: 'application/json;charset=UTF-8',
-        success: function (response) {
-            console.log("General settings set successfully. Response:\n\n" + JSON.stringify(response, null, '\t'));
-            new Toast("General settings saved.").success();
-        },
-        error: function (xhr) {
-            console.log("Error while setting general settings. Error: " + xhr.responseText);
-            new Toast("Error while saving general settings.").error();
-        }
+        contentType: 'application/json;charset=UTF-8'
+    }).done(function (response) {
+        console.log("General settings set successfully. Response:\n\n" + JSON.stringify(response, null, '\t'));
+        new Toast("General settings saved.").success();
+        $.ajax({
+            url: "/api/system/groups",
+            type: "PATCH",
+            data: {},
+            contentType: 'application/json;charset=UTF-8'
+        }).done(function (response) {
+            console.log(JSON.stringify(response));
+        });
+    }).fail(function (xhr) {
+        console.log("Error while setting general settings. Error: " + xhr.responseText);
+        new Toast("Error while saving general settings.").error();
     });
 }
 
@@ -219,6 +231,12 @@ function SetLocalSettings() {
                 if (setting_key == "webserver_port" && isNaN(setting_value)) {
                     setting_value = 8080;
                 }
+            } else if (setting_key == "device_groups") {
+                let items = [];
+                $("#device_groups option").each(function () {
+                    items.push($(this).val());
+                });
+                setting_value = items;
             } else {
                 setting_value = $("#" + setting_key).val();
             }
@@ -261,6 +279,27 @@ function ResetPinSettings() {
     });
 }
 
+$("#add_global_group").on("click", function () {
+    let group_name = $("#new_global_group_name").val()
+    if (group_name == "") {
+        new Toast("Please enter a name for the new group.").warning();
+        return;
+    } else if ($(`#device_groups option[value='${group_name}']`).length > 0) {
+        new Toast(`Group "${group_name}" already exists.`).warning();
+    } else {
+        var newOption = new Option(group_name, group_name);
+        $("#device_groups").prepend(newOption);
+        $("#device_groups")[0].selectedIndex = 0;
+    }
+    $("#new_global_group_name").val("");
+})
+
+$("#delete_global_group").on("click", function () {
+    const group = $("#device_groups").val();
+    const option = $(`#device_groups option[value="${group}"]`);
+    option.remove();
+})
+
 $("#save_btn").on("click", function () {
     SetLocalSettings();
 });
@@ -272,7 +311,7 @@ $("#reset_btn").on("click", function () {
 $("#reset_btn_modal").on("click", function () {
     $('#modal_reset_general').modal('hide')
     ResetPinSettings();
-    ResetSettings(currentDevice);
+    ResetSettings();
 });
 
 $("#export_btn").on("click", function () {

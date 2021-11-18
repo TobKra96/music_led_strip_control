@@ -1,4 +1,4 @@
-from libs.webserver.executer_base import ExecuterBase
+from libs.webserver.executer_base import ExecuterBase, handle_config_errors
 
 import copy
 import re
@@ -45,9 +45,9 @@ def index_default_devices(device_configs, default_name):
 
 class DeviceExecuter(ExecuterBase):
 
+    @handle_config_errors
     def get_devices(self):
         devices = []
-
         for device_key in self._config["device_configs"]:
             current_device = dict()
             current_device["name"] = self._config["device_configs"][device_key]["device_name"]
@@ -55,9 +55,9 @@ class DeviceExecuter(ExecuterBase):
             current_device["groups"] = self._config["device_configs"][device_key]["device_groups"]
 
             devices.append(current_device)
-
         return devices
 
+    @handle_config_errors
     def create_new_device(self):
         # If a device already exists with "output_raspi" output, set new device to "output_udp".
         output_raspi_exists = False
@@ -86,52 +86,66 @@ class DeviceExecuter(ExecuterBase):
             i += 1
         return i
 
+    @handle_config_errors
     def delete_device(self, device):
         del self._config["device_configs"][device]
         self.save_config()
         self.refresh_device("all_devices")
+        return self._config["device_configs"]
 
+    @handle_config_errors
     def get_groups(self):
-        groups = []
+        global_groups = dict()
+        global_groups["groups"] = self._config["general_settings"]["device_groups"]
+        return global_groups
 
-        for group_key in self._config["device_groups"]:
-            current_group = dict()
-            current_group["name"] = self._config["device_groups"][group_key]
-            current_group["id"] = group_key
-
-            groups.append(current_group)
-
-        return groups
-
+    @handle_config_errors
     def create_new_group(self, new_group_name):
         """
-        Return the created group if does not exist.
-        Otherwise, return all groups.
+        Return all groups if successfully created.
+        Otherwise, return None.
         """
-        device_groups = self._config["device_groups"]
+        device_groups = self._config["general_settings"]["device_groups"]
 
-        i = 0
-        while i < 100:
-            new_group_id = f"group_{i}"
-            if new_group_id not in device_groups and new_group_name not in device_groups.values():
-                device_groups[new_group_id] = new_group_name
+        if len(device_groups) < 100:
+            if new_group_name and new_group_name not in device_groups:
+                device_groups.append(new_group_name)
+
                 self.save_config()
-
                 self.refresh_device("all_devices")
-                return [self.get_groups()[i]]
+                return self.get_groups()
+        return None
 
-            i += 1
-
-        return self.get_groups()
-
-    def delete_group(self, group):
-        try:
-            group_name = copy.deepcopy(self._config["device_groups"][group])
-            del self._config["device_groups"][group]
-            for device_key in self._config["device_configs"]:
+    @handle_config_errors
+    def delete_group(self, group_name):
+        # Delete group from each device.
+        for device_key in self._config["device_configs"]:
+            if group_name in self._config["device_configs"][device_key]["device_groups"][:]:
                 self._config["device_configs"][device_key]["device_groups"].remove(group_name)
-        except (KeyError, ValueError):
-            pass
+        # Delete global group.
+        self._config["general_settings"]["device_groups"].remove(group_name)
+
         self.save_config()
         self.refresh_device("all_devices")
         return self.get_groups()
+
+    @handle_config_errors
+    def remove_invalid_device_groups(self):
+        """
+        Compare device groups with global groups and remove any that do not exist.
+        Used when global groups are saved from general settings.
+        This prevents deleted groups from still displaying on devices.
+        """
+        removed_groups = {}
+        groups_to_remove = []
+        for device_key in self._config["device_configs"]:
+            for device_group in self._config["device_configs"][device_key]["device_groups"][:]:
+                if device_group not in self._config["general_settings"]["device_groups"]:
+                    groups_to_remove.append(device_group)
+                    self._config["device_configs"][device_key]["device_groups"].remove(device_group)
+
+        removed_groups["removed_groups"] = groups_to_remove
+
+        self.save_config()
+        self.refresh_device("all_devices")
+        return removed_groups

@@ -18,7 +18,7 @@ def colors():  # pylint: disable=E0211
         200:
             description: OK
             schema:
-                type: object,
+                type: object
                 example:
                     {
                         black: str,
@@ -34,16 +34,18 @@ def colors():  # pylint: disable=E0211
                     }
         403:
             description: Could not find colors
+        422:
+            description: Unprocessable Entity
     """
-    data_out = dict()
+    data_out = Executer.instance.general_executer.get_colors()
 
-    colors = Executer.instance.general_executer.get_colors()
-    data_out = colors
+    if data_out is None:
+        return "Unprocessable Entity.", 422
 
     if data_out is None:
         return "Could not find colors.", 403
-    else:
-        return jsonify(data_out)
+
+    return jsonify(data_out)
 
 
 @general_api.get('/api/resources/gradients')
@@ -58,7 +60,7 @@ def gradients():  # pylint: disable=E0211
         200:
             description: OK
             schema:
-                type: object,
+                type: object
                 example:
                     {
                         dancefloor: str,
@@ -100,7 +102,7 @@ def led_strips():  # pylint: disable=E0211
         200:
             description: OK
             schema:
-                type: object,
+                type: object
                 example:
                     {
                         sk6812_shift_wmask: str,
@@ -152,7 +154,7 @@ def logging_levels():  # pylint: disable=E0211
         200:
             description: OK
             schema:
-                type: object,
+                type: object
                 example:
                     {
                         critical: str,
@@ -188,7 +190,7 @@ def audio_devices():  # pylint: disable=E0211
         200:
             description: OK
             schema:
-                type: object,
+                type: object
                 example:
                     {
                         1: str,
@@ -220,7 +222,7 @@ def output_types():  # pylint: disable=E0211
         200:
             description: OK
             schema:
-                type: object,
+                type: object
                 example:
                     {
                         output_raspi: str,
@@ -244,7 +246,7 @@ def output_types():  # pylint: disable=E0211
 @login_required
 def effects():  # pylint: disable=E0211
     """
-    Return effects
+    Return effects and their order
     ---
     tags:
         - Resources
@@ -252,44 +254,20 @@ def effects():  # pylint: disable=E0211
         200:
             description: OK
             schema:
-                type: object,
+                type: object
                 example:
                     {
                         music: {
-                            effect_advanced_scroll: str,
-                            effect_bars: str,
-                            effect_beat: str,
-                            effect_beat_slide: str,
-                            effect_beat_twinkle: str,
-                            effect_border: str,
-                            effect_direction_changer: str,
-                            effect_energy: str,
-                            effect_power: str,
-                            effect_scroll: str,
-                            effect_spectrum_analyzer: str,
-                            effect_vu_meter: str,
-                            effect_wave: str,
-                            effect_wavelength: str,
-                            effect_wiggle: str
+                            effect_name: str,
                         },
                         non_music: {
-                            effect_bubble: str,
-                            effect_fade: str,
-                            effect_fireplace: str,
-                            effect_gradient: str,
-                            effect_pendulum: str,
-                            effect_rods: str,
-                            effect_segment_color: str,
-                            effect_single: str,
-                            effect_slide: str,
-                            effect_sync_fade: str,
-                            effect_twinkle: str
+                            effect_name: str,
+                        },
+                        order: {
+                            effect_name: int,
                         },
                         special: {
-                            effect_off: str,
-                            effect_random_cycle: str,
-                            effect_random_non_music: str,
-                            effect_random_music: str
+                            effect_name: str,
                         }
                     }
         403:

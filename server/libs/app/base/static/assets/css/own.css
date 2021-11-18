@@ -15,6 +15,11 @@
     }
 }
 
+/* Make all card corners rounded */
+.card {
+    border-radius: 15px;
+}
+
 /* Remove default password eye icon */
 input[type=password]::-ms-reveal,
 input[type=password]::-ms-clear {

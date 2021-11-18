@@ -1,7 +1,7 @@
 from libs.webserver.executer import Executer
 
-from flask import Blueprint, request, jsonify
 from flask_login import login_required
+from flask import Blueprint, jsonify
 
 system_info_api = Blueprint('system_info_api', __name__)
 
@@ -18,7 +18,7 @@ def get_performance():  # pylint: disable=E0211
         200:
             description: OK
             schema:
-                type: object,
+                type: object
                 example:
                     {
                         system: {
@@ -54,15 +54,14 @@ def get_performance():  # pylint: disable=E0211
         403:
             description: Could not find data value
     """
+    result = Executer.instance.system_info_executer.get_system_info_performance()
+
+    if result is None:
+        return "Could not find data value.", 403
+
     data_out = dict()
-
-    data = Executer.instance.system_info_executer.get_system_info_performance()
-    data_out["system"] = data
-
-    if data is None:
-        return "Could not find data value: data", 403
-    else:
-        return jsonify(data_out)
+    data_out["system"] = result
+    return jsonify(data_out)
 
 
 @system_info_api.get('/api/system/temperature')
@@ -77,7 +76,7 @@ def get_temperature():  # pylint: disable=E0211
         200:
             description: OK
             schema:
-                type: object,
+                type: object
                 example:
                     {
                         system: {
@@ -90,15 +89,14 @@ def get_temperature():  # pylint: disable=E0211
         403:
             description: Could not find data value
     """
+    result = Executer.instance.system_info_executer.get_system_info_temperature()
+
+    if result is None:
+        return "Could not find data value.", 403
+
     data_out = dict()
-
-    data = Executer.instance.system_info_executer.get_system_info_temperature()
-    data_out["system"] = data
-
-    if data is None:
-        return "Could not find data value: data", 403
-    else:
-        return jsonify(data_out)
+    data_out["system"] = result
+    return jsonify(data_out)
 
 
 @system_info_api.get('/api/system/services')
@@ -113,7 +111,7 @@ def get_services():  # pylint: disable=E0211
         200:
             description: OK
             schema:
-                type: object,
+                type: object
                 example:
                     {
                         services: [
@@ -124,15 +122,14 @@ def get_services():  # pylint: disable=E0211
         403:
             description: Could not find data value
     """
+    result = Executer.instance.system_info_executer.get_services()
+
+    if result is None:
+        return "Could not find data value.", 403
+
     data_out = dict()
-
-    data = Executer.instance.system_info_executer.get_services()
-    data_out["services"] = data
-
-    if data is None:
-        return "Could not find data value: data", 403
-    else:
-        return jsonify(data_out)
+    data_out["services"] = result
+    return jsonify(data_out)
 
 
 @system_info_api.get('/api/system/services/status')
@@ -147,7 +144,7 @@ def get_services_status():  # pylint: disable=E0211
         200:
             description: OK
             schema:
-                type: object,
+                type: object
                 example:
                     {
                         services: [
@@ -163,15 +160,14 @@ def get_services_status():  # pylint: disable=E0211
         403:
             description: Could not find data value
     """
+    result = Executer.instance.system_info_executer.get_system_info_services()
+
+    if result is None:
+        return "Could not find data value.", 403
+
     data_out = dict()
-
-    data = Executer.instance.system_info_executer.get_system_info_services()
-    data_out["services"] = data
-
-    if data is None:
-        return "Could not find data value: data", 403
-    else:
-        return jsonify(data_out)
+    data_out["services"] = result
+    return jsonify(data_out)
 
 
 @system_info_api.get('/api/system/devices/status')
@@ -186,7 +182,7 @@ def get_devices_status():  # pylint: disable=E0211
         200:
             description: OK
             schema:
-                type: object,
+                type: object
                 example:
                     {
                         devices: [
@@ -201,14 +197,14 @@ def get_devices_status():  # pylint: disable=E0211
         403:
             description: Could not find data value
     """
-    data_out = dict()
-    data = Executer.instance.system_info_executer.get_system_info_device_status()
-    data_out["devices"] = data
+    result = Executer.instance.system_info_executer.get_system_info_device_status()
 
-    if data is None:
-        return "Could not find data value: data", 403
-    else:
-        return jsonify(data_out)
+    if result is None:
+        return "Could not find data value.", 403
+
+    data_out = dict()
+    data_out["devices"] = result
+    return jsonify(data_out)
 
 
 @system_info_api.get('/api/system/version')
@@ -223,7 +219,7 @@ def get_version():  # pylint: disable=E0211
         200:
             description: OK
             schema:
-                type: object,
+                type: object
                 example:
                     {
                         versions: [
@@ -237,11 +233,11 @@ def get_version():  # pylint: disable=E0211
         403:
             description: Could not find data value
     """
-    data_out = dict()
-    data = Executer.instance.system_info_executer.get_system_version()
-    data_out["versions"] = data
+    result = Executer.instance.system_info_executer.get_system_version()
 
-    if data is None:
-        return "Could not find data value: data", 403
-    else:
-        return jsonify(data_out)
+    if result is None:
+        return "Could not find data value.", 403
+
+    data_out = dict()
+    data_out["versions"] = result
+    return jsonify(data_out)

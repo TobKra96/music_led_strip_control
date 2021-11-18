@@ -19,10 +19,14 @@ def get_devices():  # pylint: disable=E0211
         200:
             description: OK
             schema:
-                type: object,
+                type: object
                 example:
                     [
                         {
+                            "groups": [
+                                str,
+                                ...
+                            ],
                             id: str,
                             name: str
                         },
@@ -30,16 +34,18 @@ def get_devices():  # pylint: disable=E0211
                     ]
         403:
             description: Could not find devices
+        422:
+            description: Unprocessable Entity
     """
-    data_out = dict()
+    data_out = Executer.instance.device_executer.get_devices()
 
-    devices = Executer.instance.device_executer.get_devices()
-    data_out = devices
+    if data_out is None:
+        return "Unprocessable Entity.", 422
 
-    if devices is None:
-        return "Could not find devices: ", 403
-    else:
-        return jsonify(data_out)
+    if not data_out:
+        return "Could not find devices.", 403
+
+    return jsonify(data_out)
 
 
 @device_api.post('/api/system/devices')
@@ -54,16 +60,21 @@ def create_device():  # pylint: disable=E0211
         200:
             description: OK
             schema:
-                type: object,
+                type: object
                 example:
                     {
                         index: int
                     }
+        422:
+            description: Unprocessable Entity
     """
-    index = Executer.instance.device_executer.create_new_device()
+    result = Executer.instance.device_executer.create_new_device()
+
+    if result is None:
+        return "Unprocessable Entity.", 422
 
     data_out = {
-        "index": index
+        "index": result
     }
 
     return jsonify(data_out)
@@ -84,7 +95,7 @@ def delete_device():  # pylint: disable=E0211
           required: true
           description: ID of `device` to delete
           schema:
-                type: object,
+                type: object
                 example:
                     {
                         device: str
@@ -93,22 +104,27 @@ def delete_device():  # pylint: disable=E0211
         200:
             description: OK
             schema:
-                type: object,
+                type: object
                 example:
                     {
                         device: str
                     }
         403:
             description: Input data are wrong
+        422:
+            description: Unprocessable Entity
     """
     data_in = request.get_json()
-    data_out = copy.deepcopy(data_in)
 
     if not Executer.instance.device_executer.validate_data_in(data_in, ("device",)):
         return "Input data are wrong.", 403
 
-    Executer.instance.device_executer.delete_device(data_in["device"])
+    result = Executer.instance.device_executer.delete_device(data_in["device"])
 
+    if result is None:
+        return "Unprocessable Entity.", 422
+
+    data_out = copy.deepcopy(data_in)
     return jsonify(data_out)
 
 
@@ -124,25 +140,24 @@ def get_groups():  # pylint: disable=E0211
         200:
             description: OK
             schema:
-                type: object,
+                type: object
                 example:
-                    [
-                        {
-                            id: str,
-                            name: str
-                        },
+                    "groups": [
+                        str,
                         ...
                     ]
         403:
             description: Could not find groups
+        422:
+            description: Unprocessable Entity
     """
-    data_out = dict()
+    data_out = Executer.instance.device_executer.get_groups()
 
-    groups = Executer.instance.device_executer.get_groups()
-    data_out = groups
+    if data_out is None:
+        return "Unprocessable Entity.", 422
 
-    if groups is None:
-        return "Could not find devices: ", 403
+    if not data_out["groups"]:
+        return "Could not find groups.", 403
     else:
         return jsonify(data_out)
 
@@ -162,7 +177,7 @@ def create_group():  # pylint: disable=E0211
           required: true
           description: Name of `group` to create
           schema:
-                type: object,
+                type: object
                 example:
                     {
                         group: str
@@ -171,25 +186,26 @@ def create_group():  # pylint: disable=E0211
         200:
             description: OK
             schema:
-                type: object,
+                type: object
                 example:
-                    [
-                        {
-                            id: str,
-                            name: str
-                        },
+                    "groups": [
+                        str,
                         ...
                     ]
         403:
             description: Input data are wrong
+        422:
+            description: Unprocessable Entity
     """
     data_in = request.get_json()
 
     if not Executer.instance.device_executer.validate_data_in(data_in, ("group",)):
         return "Input data are wrong.", 403
 
-    group = Executer.instance.device_executer.create_new_group(data_in["group"])
-    data_out = group
+    data_out = Executer.instance.device_executer.create_new_group(data_in["group"])
+
+    if data_out is None:
+        return "Unprocessable Entity.", 422
 
     return jsonify(data_out)
 
@@ -207,9 +223,9 @@ def delete_group():  # pylint: disable=E0211
           in: body
           type: string
           required: true
-          description: ID of `group` to delete
+          description: Name of `group` to delete
           schema:
-                type: object,
+                type: object
                 example:
                     {
                         group: str
@@ -218,24 +234,57 @@ def delete_group():  # pylint: disable=E0211
         200:
             description: OK
             schema:
-                type: object,
+                type: object
                 example:
-                    [
-                        {
-                            id: str,
-                            name: str
-                        },
+                    "groups": [
+                        str,
                         ...
                     ]
         403:
             description: Input data are wrong
+        422:
+            description: Unprocessable Entity
     """
     data_in = request.get_json()
 
     if not Executer.instance.device_executer.validate_data_in(data_in, ("group",)):
         return "Input data are wrong.", 403
 
-    groups = Executer.instance.device_executer.delete_group(data_in["group"])
-    data_out = groups
+    data_out = Executer.instance.device_executer.delete_group(data_in["group"])
+
+    if data_out is None:
+        return "Unprocessable Entity.", 422
+
+    return jsonify(data_out)
+
+
+@device_api.patch('/api/system/groups')
+@login_required
+def remove_invalid_device_groups():  # pylint: disable=E0211
+    """
+    Remove invalid device groups
+    ---
+    tags:
+        - System
+    responses:
+        200:
+            description: OK
+            schema:
+                type: object
+                example:
+                    "removed_groups": [
+                        str,
+                        ...
+                    ]
+        202:
+            description: No invalid groups found
+    """
+    data_out = Executer.instance.device_executer.remove_invalid_device_groups()
+
+    if data_out is None:
+        return "Unprocessable Entity.", 422
+
+    if not data_out["removed_groups"]:
+        return "No invalid groups found.", 202
 
     return jsonify(data_out)

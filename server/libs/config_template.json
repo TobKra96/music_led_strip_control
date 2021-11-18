@@ -654,10 +654,18 @@
         "test": "first"
     },
     "device_configs": {},
-    "device_groups": {},
     "general_settings": {
         "default_sample_rate": 48000,
-        "device_id": 0,
+        "device_groups": [
+            "Attic",
+            "Bathroom",
+            "Bedroom",
+            "Garage",
+            "Hall",
+            "Kitchen",
+            "Living Room"
+        ],
+        "device_id": -1,
         "frames_per_buffer": 512,
         "log_file_enabled": false,
         "log_level_console": "info",

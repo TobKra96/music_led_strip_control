@@ -10,7 +10,10 @@ class OutputRaspi(Output):
         super(OutputRaspi, self).__init__(device)
         self.logger = logging.getLogger(__name__)
 
-        import _rpi_ws281x as ws  # pylint: disable=import-error
+        try:
+            import _rpi_ws281x as ws  # pylint: disable=import-error
+        except (ImportError, ModuleNotFoundError):
+            from rpi_ws281x import ws
 
         output_id = "output_raspi"
 
@@ -80,7 +83,10 @@ class OutputRaspi(Output):
             raise RuntimeError(f'ws2811_init failed with code {resp} ({message})')
 
     def show(self, output_array):
-        import _rpi_ws281x as ws  # pylint: disable=import-error
+        try:
+            import _rpi_ws281x as ws  # pylint: disable=import-error
+        except (ImportError, ModuleNotFoundError):
+            from rpi_ws281x import ws
 
         # Typecast the array to int.
         output_array = output_array.clip(0, 255).astype(int)

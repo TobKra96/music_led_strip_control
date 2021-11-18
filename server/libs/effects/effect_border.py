@@ -24,25 +24,25 @@ class EffectBorder(Effect):
 
         y = np.clip(y, 0, 1)
 
-        spec_array = y[0: len(y) // bar_count]
+        spec_array = y[0: len(y) // bar_count] if bar_count > 0 else 0
         bass_output = float(np.max(spec_array))
 
         if effect_config["manually_resize_bars"]:
             bar_count = 4
 
         for i in range(bar_count):
-            for led in range(3):
-                if effect_config["manually_resize_bars"]:
-                    start = effect_config[f"segment_0{i + 1}_start"]
-                    if start < 0:
-                        start = 0
-                    end = start + int(bass_output * (effect_config[f"segment_0{i + 1}_end"] - start))
-                    if end > led_count:
-                        end = led_count
-                else:
-                    start = i * (led_count // bar_count)
-                    end = start + int(bass_output * (led_count // bar_count))
+            if effect_config["manually_resize_bars"]:
+                start = effect_config[f"segment_0{i + 1}_start"]
+                if start < 0:
+                    start = 0
+                end = start + int(bass_output * (effect_config[f"segment_0{i + 1}_end"] - start))
+                if end > led_count:
+                    end = led_count
+            else:
+                start = i * (led_count // bar_count)
+                end = start + int(bass_output * (led_count // bar_count))
 
+            for led in range(3):
                 if effect_config["use_gradient"]:
                     gradient = self._color_service.full_gradients[effect_config["gradient"]][led][start: end]
                     output[led][start: end] = np.vstack([gradient])

@@ -1,13 +1,12 @@
 from libs.notification_item import NotificationItem  # pylint: disable=E0611, E0401
 from libs.notification_enum import NotificationEnum  # pylint: disable=E0611, E0401
 from libs.config_service import ConfigService  # pylint: disable=E0611, E0401
+from libs.queue_wrapper import QueueWrapper  # pylint: disable=E0611, E0401
 from libs.fps_limiter import FPSLimiter  # pylint: disable=E0611, E0401
 from libs.audio_info import AudioInfo  # pylint: disable=E0611, E0401
 from libs.dsp import DSP  # pylint: disable=E0611, E0401
-from libs.queue_wrapper import QueueWrapper
 
 from multiprocessing import Queue
-from queue import Empty
 from time import time
 import numpy as np
 import pyaudio
@@ -82,7 +81,10 @@ class AudioProcessService:
                                 "Using the first mic as fallback.")
                 self.log_output(show_output, logging.ERROR,
                                 "Please change the id of the mic inside the config.")
-                self.selected_device = self._devices[0]
+                try:
+                    self.selected_device = self._devices[0]
+                except IndexError:
+                    self.selected_device = AudioInfo.get_default_audio_device(self._py_audio)
 
             self._device_rate = self._config["general_settings"]["default_sample_rate"]
             self._frames_per_buffer = self._config["general_settings"]["frames_per_buffer"]

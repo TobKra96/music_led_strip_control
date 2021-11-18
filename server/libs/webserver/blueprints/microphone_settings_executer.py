@@ -25,8 +25,7 @@ class MicrophoneSettingsExecuter(ExecuterBase):
             result["error"] = "Could not change set mic volume."
             result["returncode"] = 1
 
-        finally:
-            return result
+        return result
 
     def microphone_set_volume(self, level):
         result = dict()
@@ -44,8 +43,7 @@ class MicrophoneSettingsExecuter(ExecuterBase):
             result["error"] = "Could not change set mic volume."
             result["returncode"] = 1
 
-        finally:
-            return result
+        return result
 
     def get_level_form_output(self, output):
         if output is None or not output:
