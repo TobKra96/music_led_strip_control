@@ -109,34 +109,30 @@ def set_active_effect():  # pylint: disable=E0211
         422:
             description: Unprocessable Entity
     """
-    # TODO: Support multiple devices at once.
     data_in = request.get_json()
-    if data_in and all(key in data_in for key in ("device", "effect")):
-        # Save the active effect for specific device.
-        if not Executer.instance.effect_executer.validate_data_in(data_in, ("device", "effect",)):
-            return "Input data are wrong.", 403
-
+    data_out = None
+    if data_in:
         effect_dict = Executer.instance.general_executer.get_effects()
-        if data_in["effect"] in effect_dict["special"]:
-            data_in["effect"] = Executer.instance.effect_executer.parse_special_effects(data_in["effect"], effect_dict, data_in["device"])
+        # Set effect for 1 device.
+        if all(key in data_in for key in ("device", "effect")):
+            if not Executer.instance.effect_executer.validate_data_in(data_in, ("device", "effect",)):
+                return "Input data are wrong.", 403
 
-        data_out = Executer.instance.effect_executer.set_active_effect(data_in["device"], data_in["effect"])
+            data_out = Executer.instance.effect_executer.set_active_effect(data_in["device"], data_in["effect"], effect_dict)
 
-        if data_out is None:
-            return "Unprocessable Entity.", 422
+        # Set effect for multiple devices.
+        elif "devices" in data_in:
+            if not Executer.instance.effect_executer.validate_data_in(data_in, ("devices",)):
+                return "Input data are wrong.", 403
 
-        return jsonify(data_out)
+            data_out = Executer.instance.effect_executer.set_active_effect_for_multiple(data_in["devices"], effect_dict)
 
-    elif data_in and "effect" in data_in:
-        # Save the active effect for all devices.
-        if not Executer.instance.effect_executer.validate_data_in(data_in, ("effect",)):
-            return "Input data is wrong.", 403
+        # Set effect for all devices.
+        elif "effect" in data_in:
+            if not Executer.instance.effect_executer.validate_data_in(data_in, ("effect",)):
+                return "Input data is wrong.", 403
 
-        effect_dict = Executer.instance.general_executer.get_effects()
-        if data_in["effect"] in effect_dict["special"]:
-            data_in["effect"] = Executer.instance.effect_executer.parse_special_effects(data_in["effect"], effect_dict)
-
-        data_out = Executer.instance.effect_executer.set_active_effect_for_all(data_in["effect"])
+            data_out = Executer.instance.effect_executer.set_active_effect_for_all(data_in["effect"], effect_dict)
 
         if data_out is None:
             return "Unprocessable Entity.", 422
