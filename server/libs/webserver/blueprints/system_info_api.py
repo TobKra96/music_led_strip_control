@@ -18,7 +18,7 @@ def get_performance():  # pylint: disable=E0211
         200:
             description: OK
             schema:
-                type: object,
+                type: object
                 example:
                     {
                         system: {
@@ -76,7 +76,7 @@ def get_temperature():  # pylint: disable=E0211
         200:
             description: OK
             schema:
-                type: object,
+                type: object
                 example:
                     {
                         system: {
@@ -111,7 +111,7 @@ def get_services():  # pylint: disable=E0211
         200:
             description: OK
             schema:
-                type: object,
+                type: object
                 example:
                     {
                         services: [
@@ -144,7 +144,7 @@ def get_services_status():  # pylint: disable=E0211
         200:
             description: OK
             schema:
-                type: object,
+                type: object
                 example:
                     {
                         services: [
@@ -182,7 +182,7 @@ def get_devices_status():  # pylint: disable=E0211
         200:
             description: OK
             schema:
-                type: object,
+                type: object
                 example:
                     {
                         devices: [
@@ -219,7 +219,7 @@ def get_version():  # pylint: disable=E0211
         200:
             description: OK
             schema:
-                type: object,
+                type: object
                 example:
                     {
                         versions: [

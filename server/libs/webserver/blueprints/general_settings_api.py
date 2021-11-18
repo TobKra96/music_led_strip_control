@@ -29,7 +29,7 @@ def get_general_settings():  # pylint: disable=E0211
         200:
             description: OK
             schema:
-                type: object,
+                type: object
                 example:
                     {
                         setting_key: str,
@@ -84,7 +84,7 @@ def set_general_settings():  # pylint: disable=E0211
           required: true
           description: The general settings which to set\n
           schema:
-                type: object,
+                type: object
                 example:
                     {
                         settings: {
@@ -106,7 +106,7 @@ def set_general_settings():  # pylint: disable=E0211
         200:
             description: OK
             schema:
-                type: object,
+                type: object
                 example:
                     {
                         settings: {
@@ -155,7 +155,7 @@ def reset_general_settings():  # pylint: disable=E0211
         200:
             description: OK
             schema:
-                type: object,
+                type: object
                 example:
                     {}
         403:

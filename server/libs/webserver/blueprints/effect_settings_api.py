@@ -36,7 +36,7 @@ def get_effect_settings():  # pylint: disable=E0211
         200:
             description: OK
             schema:
-                type: object,
+                type: object
                 example:
                     {
                         device: str,
@@ -105,7 +105,7 @@ def set_effect_settings():  # pylint: disable=E0211
           required: true
           description: The effect settings which to set\n
           schema:
-                type: object,
+                type: object
                 example:
                     {
                         device: str,
@@ -116,7 +116,7 @@ def set_effect_settings():  # pylint: disable=E0211
         200:
             description: OK
             schema:
-                type: object,
+                type: object
                 example:
                     {
                         device: str,

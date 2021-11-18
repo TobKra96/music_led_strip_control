@@ -18,7 +18,7 @@ def colors():  # pylint: disable=E0211
         200:
             description: OK
             schema:
-                type: object,
+                type: object
                 example:
                     {
                         black: str,
@@ -60,7 +60,7 @@ def gradients():  # pylint: disable=E0211
         200:
             description: OK
             schema:
-                type: object,
+                type: object
                 example:
                     {
                         dancefloor: str,
@@ -102,7 +102,7 @@ def led_strips():  # pylint: disable=E0211
         200:
             description: OK
             schema:
-                type: object,
+                type: object
                 example:
                     {
                         sk6812_shift_wmask: str,
@@ -154,7 +154,7 @@ def logging_levels():  # pylint: disable=E0211
         200:
             description: OK
             schema:
-                type: object,
+                type: object
                 example:
                     {
                         critical: str,
@@ -190,7 +190,7 @@ def audio_devices():  # pylint: disable=E0211
         200:
             description: OK
             schema:
-                type: object,
+                type: object
                 example:
                     {
                         1: str,
@@ -222,7 +222,7 @@ def output_types():  # pylint: disable=E0211
         200:
             description: OK
             schema:
-                type: object,
+                type: object
                 example:
                     {
                         output_raspi: str,
@@ -254,7 +254,7 @@ def effects():  # pylint: disable=E0211
         200:
             description: OK
             schema:
-                type: object,
+                type: object
                 example:
                     {
                         music: {

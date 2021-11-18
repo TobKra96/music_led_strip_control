@@ -20,7 +20,7 @@ def microphone_get_volume():  # pylint: disable=E0211
         200:
             description: OK
             schema:
-                type: object,
+                type: object
                 example:
                     {
                         error: str,
@@ -55,7 +55,7 @@ def microphone_set_volume():  # pylint: disable=E0211
           required: true
           description: Volume level to set
           schema:
-                type: object,
+                type: object
                 example:
                     {
                         level: int
@@ -64,7 +64,7 @@ def microphone_set_volume():  # pylint: disable=E0211
         200:
             description: OK
             schema:
-                type: object,
+                type: object
                 example:
                     {
                         error: str,

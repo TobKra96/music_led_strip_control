@@ -32,7 +32,7 @@ def get_device_setting():  # pylint: disable=E0211
         200:
             description: OK
             schema:
-                type: object,
+                type: object
                 example:
                     {
                         device: str,
@@ -92,7 +92,7 @@ def set_device_settings():  # pylint: disable=E0211
           required: true
           description: The `settings` which to set for the specified `device`
           schema:
-                type: object,
+                type: object
                 example:
                     {
                         device: str,
@@ -110,7 +110,7 @@ def set_device_settings():  # pylint: disable=E0211
         200:
             description: OK
             schema:
-                type: object,
+                type: object
                 example:
                     {
                         device: str,
@@ -176,7 +176,7 @@ def get_output_type_device_settings():  # pylint: disable=E0211
         200:
             description: OK
             schema:
-                type: object,
+                type: object
                 example:
                     {
                         device: str,
@@ -226,7 +226,7 @@ def set_output_type_device_settings():  # pylint: disable=E0211
                        It is not required to include all above keys inside `settings`
 
           schema:
-                type: object,
+                type: object
                 example:
                     {
                         device: str,
@@ -243,7 +243,7 @@ def set_output_type_device_settings():  # pylint: disable=E0211
         200:
             description: OK
             schema:
-                type: object,
+                type: object
                 example:
                     {
                         device: str,

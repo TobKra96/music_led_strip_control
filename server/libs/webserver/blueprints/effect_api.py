@@ -26,7 +26,7 @@ def get_active_effect():  # pylint: disable=E0211
         200:
             description: OK
             schema:
-                type: object,
+                type: object
                 example:
                     {
                         devices: [
@@ -88,7 +88,7 @@ def set_active_effect():  # pylint: disable=E0211
           description: The `effect` which to set for the specified `device`\n
                     Remove `device` to apply effect to all devices (Not implemented yet)
           schema:
-            type: object,
+            type: object
             example:
                 {
                     device: str,
@@ -98,7 +98,7 @@ def set_active_effect():  # pylint: disable=E0211
         200:
             description: OK
             schema:
-                type: object,
+                type: object
                 example:
                     {
                         device: str,

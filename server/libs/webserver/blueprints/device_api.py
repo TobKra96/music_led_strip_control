@@ -19,7 +19,7 @@ def get_devices():  # pylint: disable=E0211
         200:
             description: OK
             schema:
-                type: object,
+                type: object
                 example:
                     [
                         {
@@ -60,7 +60,7 @@ def create_device():  # pylint: disable=E0211
         200:
             description: OK
             schema:
-                type: object,
+                type: object
                 example:
                     {
                         index: int
@@ -95,7 +95,7 @@ def delete_device():  # pylint: disable=E0211
           required: true
           description: ID of `device` to delete
           schema:
-                type: object,
+                type: object
                 example:
                     {
                         device: str
@@ -104,7 +104,7 @@ def delete_device():  # pylint: disable=E0211
         200:
             description: OK
             schema:
-                type: object,
+                type: object
                 example:
                     {
                         device: str
@@ -140,7 +140,7 @@ def get_groups():  # pylint: disable=E0211
         200:
             description: OK
             schema:
-                type: object,
+                type: object
                 example:
                     "groups": [
                         str,
@@ -177,7 +177,7 @@ def create_group():  # pylint: disable=E0211
           required: true
           description: Name of `group` to create
           schema:
-                type: object,
+                type: object
                 example:
                     {
                         group: str
@@ -186,7 +186,7 @@ def create_group():  # pylint: disable=E0211
         200:
             description: OK
             schema:
-                type: object,
+                type: object
                 example:
                     "groups": [
                         str,
@@ -225,7 +225,7 @@ def delete_group():  # pylint: disable=E0211
           required: true
           description: Name of `group` to delete
           schema:
-                type: object,
+                type: object
                 example:
                     {
                         group: str
@@ -234,7 +234,7 @@ def delete_group():  # pylint: disable=E0211
         200:
             description: OK
             schema:
-                type: object,
+                type: object
                 example:
                     "groups": [
                         str,
@@ -270,7 +270,7 @@ def remove_invalid_device_groups():  # pylint: disable=E0211
         200:
             description: OK
             schema:
-                type: object,
+                type: object
                 example:
                     "removed_groups": [
                         str,

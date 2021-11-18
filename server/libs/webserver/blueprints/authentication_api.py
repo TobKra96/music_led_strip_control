@@ -99,7 +99,7 @@ def get_pin_setting():  # pylint: disable=E0211
         200:
             description: OK
             schema:
-                type: object,
+                type: object
                 example:
                     {
                         DEFAULT_PIN: str,
@@ -137,7 +137,7 @@ def set_pin_setting():  # pylint: disable=E0211
           required: true
           description: 4-8 digit PIN code and active lock state
           schema:
-                type: object,
+                type: object
                 example:
                     {
                         DEFAULT_PIN: str,
@@ -147,7 +147,7 @@ def set_pin_setting():  # pylint: disable=E0211
         200:
             description: OK
             schema:
-                type: object,
+                type: object
                 example:
                     {
                         DEFAULT_PIN: str,
@@ -184,7 +184,7 @@ def reset_pin_setting():  # pylint: disable=E0211
         200:
             description: OK
             schema:
-                type: object,
+                type: object
                 example:
                     {
                         DEFAULT_PIN: str,
