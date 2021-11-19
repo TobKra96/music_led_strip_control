@@ -10,5 +10,4 @@ rpi_ws281x==4.3.1
 icmplib==3.0.2
 flasgger==0.9.5
 jsonschema==4.2.1
-multiprocess==0.70.12.2
 psutil
