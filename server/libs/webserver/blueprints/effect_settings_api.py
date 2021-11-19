@@ -14,40 +14,94 @@ def get_effect_settings():  # pylint: disable=E0211
     Return effect settings
     ---
     tags:
-        - Settings
+      - Settings
     parameters:
-        - name: device
-          in: query
+      - description: Device for which to get the effect settings from
+        in: query
+        name: device
+        required: true
+        schema:
           type: string
-          required: true
-          description: Device for which to get the effect settings from
-        - name: effect
-          in: query
+        examples:
+          example1:
+            value: device_0
+            summary: device ID
+      - description:
+          "Specific effect for a selected device\n\n
+          __Note:__ `effect_random_cycle` can only be retrieved using `all_devices` device ID."
+        in: query
+        name: effect
+        required: true
+        schema:
           type: string
-          required: true
-          description: Specific effect for a selected device
-        - name: setting_key
-          in: query
+          enum:
+            - effect_single
+            - effect_gradient
+            - effect_fade
+            - effect_sync_fade
+            - effect_slide
+            - effect_bubble
+            - effect_twinkle
+            - effect_pendulum
+            - effect_rods
+            - effect_segment_color
+            - effect_fireplace
+            - effect_scroll
+            - effect_advanced_scroll
+            - effect_energy
+            - effect_wavelength
+            - effect_bars
+            - effect_power
+            - effect_beat
+            - effect_beat_twinkle
+            - effect_beat_slide
+            - effect_wave
+            - effect_wiggle
+            - effect_vu_meter
+            - effect_spectrum_analyzer
+            - effect_direction_changer
+            - effect_border
+            - effect_random_cycle
+      - description:
+          Specific `setting_key` to return from selected effect\n\n
+          Return all settings if not specified
+        in: query
+        name: setting_key
+        required: false
+        schema:
           type: string
-          required: false
-          description: Specific `setting_key` to return from selected effect\n
-                       Return all settings if not specified
+        examples:
+          example1:
+            value: color
+            summary: color Setting Key
+          example2:
+            value: gradient
+            summary: gradient Setting Key
     responses:
-        200:
-            description: OK
+      "200":
+        description: OK
+        content:
+          application/json:
             schema:
-                type: object
-                example:
-                    {
-                        device: str,
-                        effect: str,
-                        setting_key: str,
-                        setting_value: str
-                    }
-        403:
-            description: Input data are wrong
-        422:
-            description: Unprocessable Entity
+              type: object
+            examples:
+              example1:
+                value:
+                  device: str
+                  effect: str
+                  setting_key: str
+                  setting_value: str/int/array/bool/num
+                summary: With specified setting_key
+              example2:
+                value:
+                  device: str
+                  effect: str
+                  settings: object
+                summary: Without specified setting_key
+      "403":
+        description: Input data are wrong
+      "422":
+        description: Unprocessable Entity
     """
     if len(request.args) == 3:
         # Retrieve a specific setting for one effect from config.
@@ -97,36 +151,43 @@ def set_effect_settings():  # pylint: disable=E0211
     Set effect settings
     ---
     tags:
-        - Settings
-    parameters:
-        - name: data
-          in: body
-          type: string
-          required: true
-          description: The effect settings which to set\n
+      - Settings
+    requestBody:
+      content:
+        application/json:
           schema:
-                type: object
-                example:
-                    {
-                        device: str,
-                        effect: str,
-                        settings: object
-                    }
+            type: string
+          examples:
+            example1:
+              value:
+                device: device_0
+                effect: effect_single
+                settings:
+                  color: blue
+                  custom_color:
+                    - 0
+                    - 0
+                    - 255
+                  use_custom_color: false
+                  white: 0
+              summary: Default effect_single settings
+      description: The effect settings which to set
+      required: true
     responses:
-        200:
-            description: OK
+      "200":
+        description: OK
+        content:
+          application/json:
             schema:
-                type: object
-                example:
-                    {
-                        device: str,
-                        effect: str,
-                        settings: object
-                    }
-        403:
-            description: Input data are wrong
-        422:
-            description: Unprocessable Entity
+              example:
+                device: str
+                effect: str
+                settings: object
+              type: object
+      "403":
+        description: Input data are wrong
+      "422":
+        description: Unprocessable Entity
     """
     data_in = request.get_json()
     if all(key in data_in for key in ("device", "effect", "settings")):

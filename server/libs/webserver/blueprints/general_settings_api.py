@@ -15,30 +15,64 @@ def get_general_settings():  # pylint: disable=E0211
     Return general settings
     ---
     tags:
-        - Settings
+      - Settings
     parameters:
-        - name: setting_key
-          in: query
+      - description:
+          Specific `setting_key` to return from general settings\n\n
+          Return all settings if not specified
+        in: query
+        name: setting_key
+        required: false
+        schema:
           type: string
-          required: false
-          enum: ['default_sample_rate', 'device_id', 'frames_per_buffer', 'log_file_enabled', 'log_level_console', 'log_level_file',
-                 'max_frequency', 'min_frequency', 'min_volume_threshold', 'n_fft_bins', 'n_rolling_history', webserver_port]
-          description: Specific `setting_key` to return from general settings\n
-                       Return all settings if not specified
+          enum:
+            - default_sample_rate
+            - device_groups
+            - device_id
+            - frames_per_buffer
+            - log_file_enabled
+            - log_level_console
+            - log_level_file
+            - max_frequency
+            - min_frequency
+            - min_volume_threshold
+            - n_fft_bins
+            - n_rolling_history
+            - webserver_port
     responses:
-        200:
-            description: OK
+      "200":
+        description: OK
+        content:
+          application/json:
             schema:
-                type: object
-                example:
-                    {
-                        setting_key: str,
-                        setting_value: str
-                    }
-        403:
-            description: Input data are wrong
-        422:
-            description: Unprocessable Entity
+              type: object
+            examples:
+              example1:
+                value:
+                  setting_key: str
+                  setting_value: str/num/int/array/bool
+                summary: With specified setting_key
+              example2:
+                value:
+                  setting_value:
+                    default_sample_rate: int
+                    device_groups: array
+                    device_id: int
+                    frames_per_buffer: int
+                    log_file_enabled: bool
+                    log_level_console: str
+                    log_level_file: str
+                    max_frequency: int
+                    min_frequency: int
+                    min_volume_threshold: num
+                    n_fft_bins: int
+                    n_rolling_history: int
+                    webserver_port: int
+                summary: Without specified setting_key
+      "403":
+        description: Input data are wrong
+      "422":
+        description: Unprocessable Entity
     """
     if len(request.args) == 1:
         data_in = request.args.to_dict()
@@ -76,58 +110,57 @@ def set_general_settings():  # pylint: disable=E0211
     Set general settings
     ---
     tags:
-        - Settings
-    parameters:
-        - name: data
-          in: body
-          type: string
-          required: true
-          description: The general settings which to set\n
+      - Settings
+    requestBody:
+      content:
+        application/json:
           schema:
-                type: object
-                example:
-                    {
-                        settings: {
-                            default_sample_rate: int,
-                            device_id: str,
-                            frames_per_buffer: int,
-                            log_file_enabled: bool,
-                            log_level_console: str,
-                            log_level_file: str,
-                            max_frequency: int,
-                            min_frequency: int,
-                            min_volume_threshold: float,
-                            n_fft_bins: int,
-                            n_rolling_history: int,
-                            webserver_port: int
-                        }
-                    }
+            type: object
+          examples:
+            example1:
+              value:
+                settings:
+                  default_sample_rate: 48000
+                  device_groups: []
+                  device_id: -1
+                  frames_per_buffer: 512
+                  log_file_enabled: false
+                  log_level_console: info
+                  log_level_file: info
+                  max_frequency: 16000
+                  min_frequency: 50
+                  min_volume_threshold: 0.001
+                  n_fft_bins: 24
+                  n_rolling_history: 4
+                  webserver_port: 8080
+              summary: Default general settings
+      description: The general settings which to set
+      required: true
     responses:
-        200:
-            description: OK
+      "200":
+        description: OK
+        content:
+          application/json:
             schema:
-                type: object
-                example:
-                    {
-                        settings: {
-                            default_sample_rate: int,
-                            device_id: str,
-                            frames_per_buffer: int,
-                            log_file_enabled: bool,
-                            log_level_console: str,
-                            log_level_file: str,
-                            max_frequency: int,
-                            min_frequency: int,
-                            min_volume_threshold: float,
-                            n_fft_bins: int,
-                            n_rolling_history: int,
-                            webserver_port: int
-                        }
-                    }
-        403:
-            description: Input data are wrong
-        422:
-            description: Unprocessable Entity
+              example:
+                settings:
+                  default_sample_rate: int
+                  device_id: str
+                  frames_per_buffer: int
+                  log_file_enabled: bool
+                  log_level_console: str
+                  log_level_file: str
+                  max_frequency: int
+                  min_frequency: int
+                  min_volume_threshold: num
+                  n_fft_bins: int
+                  n_rolling_history: int
+                  webserver_port: int
+              type: object
+      "403":
+        description: Input data are wrong
+      "422":
+        description: Unprocessable Entity
     """
     data_in = request.get_json()
 
@@ -150,16 +183,16 @@ def reset_general_settings():  # pylint: disable=E0211
     Reset general settings
     ---
     tags:
-        - Settings
+      - Settings
     responses:
-        200:
-            description: OK
+      "200":
+        description: OK
+        content:
+          application/json:
             schema:
-                type: object
-                example:
-                    {}
-        403:
-            description: Input data are wrong
+              type: object
+      "403":
+        description: Input data are wrong
     """
     Executer.instance.general_settings_executer.reset_settings()
 
@@ -174,10 +207,14 @@ def export_config():  # pylint: disable=E0211
     Export configuration file
     ---
     tags:
-        - Settings
+      - Settings
     responses:
-        200:
-            description: OK
+        "200":
+          description: OK
+          content:
+            multipart/form-data:
+              schema:
+                type: string
     """
     Executer.instance.logger.debug(f"Send file: {Executer.instance.general_settings_executer.export_config_path}")
     return send_file(Executer.instance.general_settings_executer.export_config_path, as_attachment=True, cache_timeout=-1, mimetype="text/html")
@@ -190,24 +227,32 @@ def import_config():  # pylint: disable=E0211
     Import configuration file
     ---
     tags:
-        - Settings
-    consumes:
-        - multipart/form-data
-    parameters:
-        - name: imported_config
-          in: formData
-          type: file
-          required: true
-          description: Upload config file.
+      - Settings
+    requestBody:
+      content:
+        multipart/form-data:
+          schema:
+            type: object
+            properties:
+              imported_config:
+                description: Upload config file.
+                type: string
+                format: binary
+            required:
+              - imported_config
     responses:
-        200:
-            description: OK
-        400:
-            description: Could not import file
-        404:
-            description: No config file selected
-        415:
-            description: Unsupported media type
+      "200":
+        description: OK
+        content:
+          application/json:
+            schema:
+              type: string
+      "400":
+        description: Could not import file
+      "404":
+        description: No config file selected
+      "415":
+        description: Unsupported media type
     """
     Executer.instance.logger.debug("Import Config Request received.")
     if 'imported_config' not in request.files:

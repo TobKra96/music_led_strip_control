@@ -58,15 +58,15 @@ class Webserver():
                     "route": '/openapi.json'
                 }
             ],
-            "specs_route": "/api/"
+            "specs_route": "/api/",
+            'openapi': '3.0.3'
         }
 
         swagger_template = {
-            "swagger": "2.0",
             "info": {
                 "title": "MLSC API",
                 "description": "API for communicating with the MLSC server.",
-                "version": "2.2.0",
+                "version": "2.3.0",
                 "license": {
                     "name": 'MIT',
                     "url": 'https://github.com/TobKra96/music_led_strip_control/blob/master/LICENSE'
