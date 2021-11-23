@@ -76,7 +76,7 @@ class SystemInfoExecuter(ExecuterBase):
         cpu_temp_dict = dict()
         if platform.system().lower() == "linux":
             temp = subprocess.check_output(["/usr/bin/vcgencmd", "measure_temp"], stderr=subprocess.STDOUT)
-            cpu_temp_c = float(re.findall(r"\d+\.\d+", temp)[0])
+            cpu_temp_c = float(re.findall(r"\d+\.\d+", temp.decode('utf-8'))[0])
             cpu_temp_f = float(f"{(cpu_temp_c * 1.8 + 32):0.1f}")
             cpu_temp_dict["celsius"] = cpu_temp_c
             cpu_temp_dict["fahrenheit"] = cpu_temp_f

@@ -38,7 +38,7 @@ class GeneralExecuter(ExecuterBase):
         audio_devices_dict = dict()
         audio_devices = AudioInfo.get_audio_devices(self._py_audio)
         for current_audio_device in audio_devices:
-            audio_devices_dict[current_audio_device.id] = current_audio_device.to_string()
+            audio_devices_dict[current_audio_device.device_id] = current_audio_device.to_string()
         return audio_devices_dict
 
     @handle_config_errors

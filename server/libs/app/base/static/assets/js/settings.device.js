@@ -256,7 +256,13 @@ $("#device_groups").on("mouseover mouseleave", ".badge > span", function (event)
 });
 
 $("#save_btn").on("click", function () {
-    SetLocalSettings();
+    // Do not save device settings if device name already exists
+    let deviceNameExists = devices.some( device => $("#device_name").val() === device._name && currentDevice.id !== device.id );
+    if (deviceNameExists) {
+        new Toast(`Device "${$("#device_name").val()}" already exists.`).warning();
+    } else {
+        SetLocalSettings();
+    }
 });
 
 $("#create1_btn, #create2_btn").on("click", function () {
