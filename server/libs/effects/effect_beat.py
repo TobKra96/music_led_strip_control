@@ -8,7 +8,7 @@ class EffectBeat(Effect):
 
     def __init__(self, device):
         # Call the constructor of the base class.
-        super(EffectBeat, self).__init__(device)
+        super().__init__(device)
         # Setup for "EffectBeat" (don't change this).
         self.gradient_position = 0
 

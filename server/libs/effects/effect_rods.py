@@ -8,7 +8,7 @@ class EffectRods(Effect):
     def __init__(self, device):
 
         # Call the constructor of the base class.
-        super(EffectRods, self).__init__(device)
+        super().__init__(device)
 
         # Rods Variables.
         self.count_since_last_rod = 0

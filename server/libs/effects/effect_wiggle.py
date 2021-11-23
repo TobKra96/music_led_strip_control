@@ -7,7 +7,7 @@ class EffectWiggle(Effect):
     def __init__(self, device):
 
         # Call the constructor of the base class.
-        super(EffectWiggle, self).__init__(device)
+        super().__init__(device)
 
         # Setup for "Wiggle" (don't change this).
         self.bool_lr = 0

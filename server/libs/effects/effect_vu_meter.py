@@ -7,7 +7,7 @@ class EffectVuMeter(Effect):
     def __init__(self, device):
 
         # Call the constructor of the base class.
-        super(EffectVuMeter, self).__init__(device)
+        super().__init__(device)
 
         # Setup for "VU Meter" (don't change these).
         self.max_vol = 0

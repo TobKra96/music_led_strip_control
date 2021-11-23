@@ -10,7 +10,7 @@ class EffectTwinkle(Effect):
     def __init__(self, device):
 
         # Call the constructor of the base class.
-        super(EffectTwinkle, self).__init__(device)
+        super().__init__(device)
 
         # Twinkle Variables.
         self.rising_stars = []

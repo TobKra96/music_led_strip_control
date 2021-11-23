@@ -30,8 +30,7 @@ def unauthorized():
 
 class AuthenticationExecuter(ExecuterBase):
     def __init__(self, config_lock, notification_queue_in, notification_queue_out, effects_queue, py_audio):
-        super(AuthenticationExecuter, self).__init__(
-            config_lock, notification_queue_in, notification_queue_out, effects_queue, py_audio)
+        super().__init__(config_lock, notification_queue_in, notification_queue_out, effects_queue, py_audio)
 
         AuthenticationExecuter.instance = self
 

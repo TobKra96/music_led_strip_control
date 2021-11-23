@@ -7,7 +7,7 @@ import random
 class EffectDirectionChanger(Effect):
     def __init__(self, device):
         # Call the constructor of the base class.
-        super(EffectDirectionChanger, self).__init__(device)
+        super().__init__(device)
         self.gradient_position = 0
 
         # Example

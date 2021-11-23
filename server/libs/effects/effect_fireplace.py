@@ -9,7 +9,7 @@ class EffectFireplace(Effect):
 
     def __init__(self, device):
         # Call the constructor of the base class.
-        super(EffectFireplace, self).__init__(device)
+        super().__init__(device)
         # Setup for "EffectFireplace" (don't change this).
 
         self.sparks_area_current_length = 0

@@ -6,7 +6,7 @@ import numpy as np
 class EffectBeatSlide(Effect):
     def __init__(self, device):
         # Call the constructor of the base class.
-        super(EffectBeatSlide, self).__init__(device)
+        super().__init__(device)
         self.current_position = 0
 
     def run(self):

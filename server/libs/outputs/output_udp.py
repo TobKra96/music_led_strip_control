@@ -8,7 +8,7 @@ import socket
 class OutputUDP(Output):
     def __init__(self, device):
         # Call the constructor of the base class.
-        super(OutputUDP, self).__init__(device)
+        super().__init__(device)
         self.logger = logging.getLogger(__name__)
 
         output_id = "output_udp"

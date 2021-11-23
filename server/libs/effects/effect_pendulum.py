@@ -8,7 +8,7 @@ class EffectPendulum(Effect):
     def __init__(self, device):
 
         # Call the constructor of the base class.
-        super(EffectPendulum, self).__init__(device)
+        super().__init__(device)
 
         # Pendulum Variables.
         self.current_direction = True
