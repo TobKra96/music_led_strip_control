@@ -104,9 +104,8 @@ class ColorServiceGlobal():
         """
         if colour in self._config["colors"]:
             return self._config["colors"][colour]
-        else:
-            self.logger.error(f"Color '{colour}' has not been defined.")
-            return (0, 0, 0)
+        self.logger.error(f"Color '{colour}' has not been defined.")
+        return (0, 0, 0)
 
     def get_global_fade_color(self, fade_speed, fade_gradient, fade_reverse):
         current_time = int(round(time() * 1000))

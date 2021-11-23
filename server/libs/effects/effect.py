@@ -97,7 +97,7 @@ class Effect:
         raise NotImplementedError
 
     def update_freq_channels(self, y):
-        for i in range(len(y)):
+        for i, _ in enumerate(y):
             self.freq_channels[i].appendleft(y[i])
 
     def detect_freqs(self):
@@ -196,8 +196,7 @@ class Effect:
         # Check if we use the global "all_devices" settings or the device specific one.
         if self._config["all_devices"]["effects"]["last_effect"] == effect_id:
             return self._config["all_devices"]["effects"][effect_id]
-        else:
-            return self._device.device_config["effects"][effect_id]
+        return self._device.device_config["effects"][effect_id]
 
     def mirror_array(self, array, led_mid, led_count):
         # Calculate the real mid
@@ -213,11 +212,10 @@ class Effect:
             mirrored_array = np.concatenate(
                 (array[:, ::-2], array[:, ::2]), axis=1)
             return mirrored_array
-        else:
-            # Mirror the whole array. After this the array has the double size than led_count.
-            big_mirrored_array = np.concatenate(
-                (array[:, ::-1], array[:, ::1]), axis=1)
-            start_of_array = led_count - led_mid
-            end_of_array = start_of_array + led_count
-            mirrored_array = big_mirrored_array[:, start_of_array:end_of_array]
-            return mirrored_array
+        # Mirror the whole array. After this the array has the double size than led_count.
+        big_mirrored_array = np.concatenate(
+            (array[:, ::-1], array[:, ::1]), axis=1)
+        start_of_array = led_count - led_mid
+        end_of_array = start_of_array + led_count
+        mirrored_array = big_mirrored_array[:, start_of_array:end_of_array]
+        return mirrored_array

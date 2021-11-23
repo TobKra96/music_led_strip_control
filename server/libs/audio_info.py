@@ -49,7 +49,7 @@ class AudioInfo:
 
     def parse_raw_audio_device_to_audio_device(raw_audio_device):
         logger = logging.getLogger(__name__)
-        id = raw_audio_device["index"]
+        device_id = raw_audio_device["index"]
         name = raw_audio_device["name"]
         defaultSampleRate = raw_audio_device["defaultSampleRate"]
-        return AudioDevice(id, name, defaultSampleRate)
+        return AudioDevice(device_id, name, defaultSampleRate)

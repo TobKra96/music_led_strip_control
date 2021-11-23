@@ -13,6 +13,7 @@ class EffectBeat(Effect):
         self.gradient_position = 0
 
     def run(self):
+        """Effect that flashes to the beat"""
         effect_config = self.get_effect_config("effect_beat")
         led_count = self._device.device_config["led_count"]
         current_gradient = effect_config["gradient"]
@@ -30,7 +31,6 @@ class EffectBeat(Effect):
 
         output = np.zeros((3, led_count))
 
-        """Effect that flashes to the beat"""
         if self.current_freq_detects["beat"]:
             if colorful_mode:
                 full_gradient_ref = self._color_service.full_gradients

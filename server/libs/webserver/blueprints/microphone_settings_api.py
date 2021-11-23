@@ -14,22 +14,22 @@ def microphone_get_volume():  # pylint: disable=E0211
     Return microphone volume
     ---
     tags:
-        - Settings
+      - Settings
     deprecated: true
     responses:
-        200:
-            description: OK
+      "200":
+        description: OK
+        content:
+          application/json:
             schema:
-                type: object
-                example:
-                    {
-                        error: str,
-                        level: int,
-                        output: str,
-                        returncode: int
-                    }
-        403:
-            description: Could not find settings value
+              example:
+                error: str
+                level: int
+                output: str
+                returncode: int
+              type: object
+      "403":
+        description: Could not find settings value
     """
     data_out = Executer.instance.microphone_settings_executer.microphone_get_volume()
 
@@ -46,33 +46,33 @@ def microphone_set_volume():  # pylint: disable=E0211
     Set microphone volume
     ---
     tags:
-        - Settings
+      - Settings
     deprecated: true
-    parameters:
-        - name: group
-          in: body
-          type: string
-          required: true
-          description: Volume level to set
+    requestBody:
+      content:
+        application/json:
           schema:
-                type: object
-                example:
-                    {
-                        level: int
-                    }
+            type: string
+          examples:
+            example1:
+              value:
+                level: 50
+              summary: Set volume to 50
+      description: Volume level to set
+      required: true
     responses:
-        200:
-            description: OK
+      "200":
+        description: OK
+        content:
+          application/json:
             schema:
-                type: object
-                example:
-                    {
-                        error: str,
-                        output: str,
-                        returncode: int
-                    }
-        403:
-            description: Input data are wrong
+              example:
+                error: str
+                output: str
+                returncode: int
+              type: object
+      "403":
+        description: Input data are wrong
     """
     data_in = request.get_json()
 

@@ -11,6 +11,7 @@ class EffectBeatTwinkle(Effect):
         self.gradient_position = 0
 
     def run(self):
+        """Effect that flashes parts of strip to the beat"""
         effect_config = self.get_effect_config("effect_beat_twinkle")
         led_count = self._device.device_config["led_count"]
         current_gradient = effect_config["gradient"]
@@ -36,7 +37,6 @@ class EffectBeatTwinkle(Effect):
         output = np.copy(self.prev_output)
         output = np.multiply(self.prev_output, decay)
 
-        """Effect that flashes to the beat"""
         if self.current_freq_detects["beat"]:
 
             endIndex = led_count - star_length

@@ -75,10 +75,9 @@ class EffectExecuter(ExecuterBase):
         if device == self.all_devices_id:
             self.set_active_effect_for_all(effect, effect_dict)
             return {"effect": effect}
-        else:
-            self._config["device_configs"][device]["effects"]["last_effect"] = effect
-            self.save_config()
 
+        self._config["device_configs"][device]["effects"]["last_effect"] = effect
+        self.save_config()
         self.put_into_effect_queue(device, effect, put_all=for_all)
         return {"device": device, "effect": effect}
 

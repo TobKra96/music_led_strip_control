@@ -28,18 +28,21 @@ def login():
     Log in user
     ---
     tags:
-        - Auth
-    produces:
-        - text/html
-    parameters:
-        - name: pin
-          in: formData
-          type: string
-          required: true
-          description: Redirects to next page if login successful
-    responses:
-        200:
-            description: OK
+      - Auth
+    requestBody:
+      content:
+        application/x-www-form-urlencoded:
+          schema:
+            type: object
+            properties:
+              pin:
+                description: Redirects to next page if login successful
+                type: string
+            required:
+              - pin
+      responses:
+        "200":
+          description: OK
     """
     pin = request.form.get('pin')
     if 'next' in request.args:
@@ -58,7 +61,7 @@ def login():
     if pin != Executer.instance.authentication_executer.DEFAULT_PIN:
         flash('Invalid PIN')
         return redirect(url_for('authentication_api.login', next=session['next']))
-    elif pin == Executer.instance.authentication_executer.DEFAULT_PIN:
+    if pin == Executer.instance.authentication_executer.DEFAULT_PIN:
         Executer.instance.authentication_executer.login()
         if session['next'] is not None:
             if Executer.instance.authentication_executer.is_safe_url(session['next']):
@@ -73,14 +76,17 @@ def logout():
     Log out user
     ---
     tags:
-        - Auth
-    produces:
-        - text/html
-    description: Redirects to login page if PIN code is enabled\n
-                 Else, redirects to dashboard
+      - Auth
+    description:
+      Redirects to login page if PIN code is enabled\n\n
+      Else, redirects to dashboard
     responses:
-        200:
-            description: OK
+      "200":
+        description: OK
+        content:
+          text/html:
+            schema:
+              type: string
     """
     if current_user.is_authenticated:
         logout_user()
@@ -93,20 +99,20 @@ def get_pin_setting():  # pylint: disable=E0211
     Return PIN code
     ---
     tags:
-        - Auth
+      - Auth
     description: Returning PIN is allowed only when logged in or when PIN lock is disabled
     responses:
-        200:
-            description: OK
+      "200":
+        description: OK
+        content:
+          application/json:
             schema:
-                type: object
-                example:
-                    {
-                        DEFAULT_PIN: str,
-                        USE_PIN_LOCK: bool
-                    }
-        401:
-            description: Unauthorized
+              example:
+                DEFAULT_PIN: str
+                USE_PIN_LOCK: bool
+              type: object
+      "401":
+        description: Unauthorized
     """
     use_pin_lock = Executer.instance.authentication_executer.get_use_pin_lock()
     is_authenticated = current_user.is_authenticated
@@ -118,8 +124,8 @@ def get_pin_setting():  # pylint: disable=E0211
             "USE_PIN_LOCK": data_in["USE_PIN_LOCK"]
         }
         return jsonify(data_out)
-    else:
-        return "Unauthorized", 401
+
+    return "Unauthorized", 401
 
 
 @authentication_api.post('/api/auth/pin')
@@ -128,33 +134,33 @@ def set_pin_setting():  # pylint: disable=E0211
     Set PIN code
     ---
     tags:
-        - Auth
+      - Auth
     description: Setting PIN is allowed only when logged in or when PIN lock is disabled
-    parameters:
-        - name: data
-          in: body
-          type: string
-          required: true
-          description: 4-8 digit PIN code and active lock state
+    requestBody:
+      content:
+        application/json:
           schema:
-                type: object
-                example:
-                    {
-                        DEFAULT_PIN: str,
-                        USE_PIN_LOCK: bool
-                    }
+            type: string
+          examples:
+            example1:
+              value:
+                DEFAULT_PIN: 1111
+                USE_PIN_LOCK: true
+              summary: 4 digit active PIN
+      description: 4-8 digit PIN code and active lock state
+      required: true
     responses:
-        200:
-            description: OK
+      "200":
+        description: OK
+        content:
+          application/json:
             schema:
-                type: object
-                example:
-                    {
-                        DEFAULT_PIN: str,
-                        USE_PIN_LOCK: bool
-                    }
-        401:
-            description: Unauthorized
+              example:
+                DEFAULT_PIN: str
+                USE_PIN_LOCK: bool
+              type: object
+      "401":
+        description: Unauthorized
     """
     use_pin_lock = Executer.instance.authentication_executer.get_use_pin_lock()
     is_authenticated = current_user.is_authenticated
@@ -168,8 +174,8 @@ def set_pin_setting():  # pylint: disable=E0211
         }
         Executer.instance.authentication_executer.set_pin_setting(data_out)
         return jsonify(data_out)
-    else:
-        return "Unauthorized", 401
+
+    return "Unauthorized", 401
 
 
 @authentication_api.delete('/api/auth/pin')
@@ -178,20 +184,20 @@ def reset_pin_setting():  # pylint: disable=E0211
     Reset PIN code
     ---
     tags:
-        - Auth
+      - Auth
     description: Resetting PIN is allowed only when logged in or when PIN lock is disabled
     responses:
-        200:
-            description: OK
+      "200":
+        description: OK
+        content:
+          application/json:
             schema:
-                type: object
-                example:
-                    {
-                        DEFAULT_PIN: str,
-                        USE_PIN_LOCK: bool
-                    }
-        401:
-            description: Unauthorized
+              example:
+                DEFAULT_PIN: str
+                USE_PIN_LOCK: bool
+              type: object
+      "401":
+        description: Unauthorized
     """
     use_pin_lock = Executer.instance.authentication_executer.get_use_pin_lock()
     is_authenticated = current_user.is_authenticated
@@ -199,5 +205,5 @@ def reset_pin_setting():  # pylint: disable=E0211
     if not use_pin_lock or is_authenticated:
         data_out = Executer.instance.authentication_executer.reset_pin_settings()
         return jsonify(data_out)
-    else:
-        return "Unauthorized", 401
+
+    return "Unauthorized", 401

@@ -34,7 +34,7 @@ class EffectBars(Effect):
         chunks = np.array_split(output[0], effect_config["resolution"])
         n = 0
         # Assign blocks with heights corresponding to max_values and colors from color_sets.
-        for i in range(len(chunks)):
+        for i, _ in enumerate(chunks):
             m = len(chunks[i])
             for j in range(3):
                 output[j][n:n + m] = color_sets[i][j] * max_values[i]

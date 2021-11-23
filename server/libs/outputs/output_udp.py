@@ -39,10 +39,8 @@ class OutputUDP(Output):
         if "SK6812" in self._led_strip:
             if len(output_array_in[:]) == 4:
                 return self.map_four_channels_sk(output_array_in)
-            else:
-                return self.map_three_channels_sk(output_array_in)
-        else:
-            return self.map_three_channels_ws(output_array_in)
+            return self.map_three_channels_sk(output_array_in)
+        return self.map_three_channels_ws(output_array_in)
 
     def map_three_channels_ws(self, output_array_in):
         r = output_array_in[0]
@@ -56,28 +54,28 @@ class OutputUDP(Output):
             output_array_out[1] = g
             output_array_out[2] = r
             return output_array_out
-        elif self._led_strip == "ws2811_strip_brg":
+        if self._led_strip == "ws2811_strip_brg":
             output_array_out[0] = b
             output_array_out[1] = r
             output_array_out[2] = g
             return output_array_out
-        elif self._led_strip == "ws2811_strip_gbr":
+        if self._led_strip == "ws2811_strip_gbr":
             output_array_out[0] = g
             output_array_out[1] = b
             output_array_out[2] = r
             return output_array_out
-        elif self._led_strip == "ws2811_strip_grb":
+        if self._led_strip == "ws2811_strip_grb":
             output_array_out[0] = g
             output_array_out[1] = r
             output_array_out[2] = b
             return output_array_out
-        elif self._led_strip == "ws2811_strip_rbg":
+        if self._led_strip == "ws2811_strip_rbg":
             output_array_out[0] = r
             output_array_out[1] = b
             output_array_out[2] = g
             return output_array_out
-        else:
-            return output_array_in
+
+        return output_array_in
 
     def map_three_channels_sk(self, output_array_in):
         r = output_array_in[0]
@@ -91,28 +89,28 @@ class OutputUDP(Output):
             output_array_out[1] = g
             output_array_out[2] = r
             return output_array_out
-        elif self._led_strip == "sk6812_strip_brgw":
+        if self._led_strip == "sk6812_strip_brgw":
             output_array_out[0] = b
             output_array_out[1] = r
             output_array_out[2] = g
             return output_array_out
-        elif self._led_strip == "sk6812_strip_gbrw":
+        if self._led_strip == "sk6812_strip_gbrw":
             output_array_out[0] = g
             output_array_out[1] = b
             output_array_out[2] = r
             return output_array_out
-        elif self._led_strip == "sk6812_strip_grbw":
+        if self._led_strip == "sk6812_strip_grbw":
             output_array_out[0] = g
             output_array_out[1] = r
             output_array_out[2] = b
             return output_array_out
-        elif self._led_strip == "sk6812_strip_rbgw":
+        if self._led_strip == "sk6812_strip_rbgw":
             output_array_out[0] = r
             output_array_out[1] = b
             output_array_out[2] = g
             return output_array_out
-        else:
-            return output_array_in
+
+        return output_array_in
 
     def map_four_channels_sk(self, output_array_in):
         r = output_array_in[0]
@@ -128,29 +126,29 @@ class OutputUDP(Output):
             output_array_out[2] = r
             output_array_out[3] = w
             return output_array_out
-        elif self._led_strip == "sk6812_strip_brgw":
+        if self._led_strip == "sk6812_strip_brgw":
             output_array_out[0] = b
             output_array_out[1] = r
             output_array_out[2] = g
             output_array_out[3] = w
             return output_array_out
-        elif self._led_strip == "sk6812_strip_gbrw":
+        if self._led_strip == "sk6812_strip_gbrw":
             output_array_out[0] = g
             output_array_out[1] = b
             output_array_out[2] = r
             output_array_out[3] = w
             return output_array_out
-        elif self._led_strip == "sk6812_strip_grbw":
+        if self._led_strip == "sk6812_strip_grbw":
             output_array_out[0] = g
             output_array_out[1] = r
             output_array_out[2] = b
             output_array_out[3] = w
             return output_array_out
-        elif self._led_strip == "sk6812_strip_rbgw":
+        if self._led_strip == "sk6812_strip_rbgw":
             output_array_out[0] = r
             output_array_out[1] = b
             output_array_out[2] = g
             output_array_out[3] = w
             return output_array_out
-        else:
-            return output_array_in
+
+        return output_array_in

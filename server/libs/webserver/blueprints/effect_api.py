@@ -14,33 +14,47 @@ def get_active_effect():  # pylint: disable=E0211
     Return active effect
     ---
     tags:
-        - Effect
+      - Effect
     parameters:
-        - name: device
-          in: query
+      - description:
+          ID of `device` to return active effect from\n\n
+          Return active effects for all devices if not specified
+        name: device
+        in: query
+        required: false
+        schema:
           type: string
-          required: false
-          description: ID of `device` to return active effect from\n
-                       Return active effects for all devices if not specified
+        examples:
+          example1:
+            value: device_0
+            summary: device ID
     responses:
-        200:
-            description: OK
+      "200":
+        description: OK
+        content:
+          application/json:
             schema:
-                type: object
-                example:
-                    {
-                        devices: [
-                            {
-                                device: str,
-                                effect: str
-                            },
-                            ...
-                        ]
-                    }
-        403:
-            description: Input data are wrong
-        422:
-            description: Unprocessable Entity
+              example:
+                devices:
+                  - device: str
+                    effect: str
+              type: object
+            examples:
+              example1:
+                value:
+                  device: str
+                  effect: str
+                summary: With specified device
+              example2:
+                value:
+                  devices:
+                    - device: str
+                      effect: str
+                summary: Without specified device
+      "403":
+        description: Input data are wrong
+      "422":
+        description: Unprocessable Entity
     """
     if len(request.args) == 1:
         # Retrieve the active effect for specific device.
@@ -58,7 +72,7 @@ def get_active_effect():  # pylint: disable=E0211
         data_out["effect"] = result
         return jsonify(data_out)
 
-    elif not request.args:
+    if not request.args:
         # Retrieve the active effect for all devices.
         result = Executer.instance.effect_executer.get_active_effects()
 
@@ -79,35 +93,62 @@ def set_active_effect():  # pylint: disable=E0211
     Set active effect
     ---
     tags:
-        - Effect
-    parameters:
-        - name: data
-          in: body
-          type: string
-          required: true
-          description: The `effect` which to set for the specified `device`\n
-                    Remove `device` to apply effect to all devices (Not implemented yet)
+      - Effect
+    requestBody:
+      description:
+        The `effect` which to set for the specified `device`\n\n
+        Remove `device` to apply effect to all devices
+      content:
+        application/json:
           schema:
-            type: object
-            example:
-                {
-                    device: str,
-                    effect: str
-                }
+            type: string
+          examples:
+            example1:
+              value:
+                device: device_0
+                effect: effect_off
+              summary: Set for one device
+            example2:
+              value:
+                devices:
+                  - device: device_0
+                    effect: effect_off
+              summary: Set for multiple devices
+            example3:
+              value:
+                effect: effect_off
+              summary: Set for all devices
+      required: true
     responses:
-        200:
-            description: OK
+      "200":
+        description: OK
+        content:
+          application/json:
             schema:
-                type: object
-                example:
-                    {
-                        device: str,
-                        effect: str
-                    }
-        403:
-            description: Input data are wrong
-        422:
-            description: Unprocessable Entity
+              example:
+                device: str
+                effect: str
+              type: object
+            examples:
+              example1:
+                value:
+                  device: str
+                  effect: str
+                summary: With one device
+              example2:
+                value:
+                  devices:
+                    - device: str
+                      effect: str
+                summary: With multiple devices
+              example3:
+                value:
+                  effect: str
+                summary: With all devices
+      "403":
+        description: Input data are wrong
+      "422":
+        description: Unprocessable Entity
     """
     data_in = request.get_json()
     data_out = None

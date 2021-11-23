@@ -14,6 +14,7 @@ class EffectVuMeter(Effect):
         self.vol_history = np.zeros(300)
 
     def run(self):
+        """Effect that lights up more leds when volume gets higher"""
         effect_config = self.get_effect_config("effect_vu_meter")
         led_count = self._device.device_config["led_count"]
 
@@ -28,8 +29,6 @@ class EffectVuMeter(Effect):
 
         # Build an empty array.
         output = np.zeros((3, led_count))
-
-        """Effect that lights up more leds when volume gets higher"""
 
         use_gradient = effect_config["use_gradient"]
         current_gradient = effect_config["gradient"]
@@ -51,7 +50,7 @@ class EffectVuMeter(Effect):
         if normalized_vol > self.max_vol:
             self.max_vol = normalized_vol
 
-        """Effect that shows the max. volume"""
+        # Show the max. volume
         output[0][int(self.max_vol * led_count) - effect_config["bar_length"]: int(self.max_vol * led_count)] = self._color_service.colour(effect_config["max_vol_color"])[0]
         output[1][int(self.max_vol * led_count) - effect_config["bar_length"]: int(self.max_vol * led_count)] = self._color_service.colour(effect_config["max_vol_color"])[1]
         output[2][int(self.max_vol * led_count) - effect_config["bar_length"]: int(self.max_vol * led_count)] = self._color_service.colour(effect_config["max_vol_color"])[2]

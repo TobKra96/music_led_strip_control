@@ -13,46 +13,38 @@ def get_performance():  # pylint: disable=E0211
     System performance
     ---
     tags:
-        - System
+      - System
     responses:
-        200:
-            description: OK
+      "200":
+        description: OK
+        content:
+          application/json:
             schema:
-                type: object
-                example:
-                    {
-                        system: {
-                            cpu_info: {
-                                frequency: float,
-                                percent: float
-                            },
-                            disk_info: {
-                                free: int,
-                                percent: float,
-                                total: int,
-                                used: int
-                            },
-                            memory_info: {
-                                available: int,
-                                free: int,
-                                percent: float,
-                                total: int,
-                                used: int
-                            },
-                            network_info: [
-                                {
-                                    address: str,
-                                    bytes_recv: int,
-                                    bytes_sent: int,
-                                    name: str,
-                                    netmask: str
-                                },
-                                ...
-                            ]
-                        }
-                    }
-        403:
-            description: Could not find data value
+              example:
+                system:
+                  cpu_info:
+                    frequency: num
+                    percent: num
+                  disk_info:
+                    free: int
+                    percent: num
+                    total: int
+                    used: int
+                  memory_info:
+                    available: int
+                    free: int
+                    percent: num
+                    total: int
+                    used: int
+                  network_info:
+                    - address: str
+                      bytes_recv: int
+                      bytes_sent: int
+                      name: str
+                      netmask: str
+              type: object
+      "403":
+        description: Could not find data value
     """
     result = Executer.instance.system_info_executer.get_system_info_performance()
 
@@ -71,23 +63,21 @@ def get_temperature():  # pylint: disable=E0211
     Raspberry Pi temperature
     ---
     tags:
-        - System
+      - System
     responses:
-        200:
-            description: OK
+      "200":
+        description: OK
+        content:
+          application/json:
             schema:
-                type: object
-                example:
-                    {
-                        system: {
-                            raspi: {
-                                celsius: float,
-                                fahrenheit: float
-                            }
-                        }
-                    }
-        403:
-            description: Could not find data value
+              example:
+                system:
+                  raspi:
+                    celsius: num
+                    fahrenheit: num
+              type: object
+      "403":
+        description: Could not find data value
     """
     result = Executer.instance.system_info_executer.get_system_info_temperature()
 
@@ -106,21 +96,19 @@ def get_services():  # pylint: disable=E0211
     System services
     ---
     tags:
-        - System
+      - System
     responses:
-        200:
-            description: OK
+      "200":
+        description: OK
+        content:
+          application/json:
             schema:
-                type: object
-                example:
-                    {
-                        services: [
-                            str,
-                            ...
-                        ]
-                    }
-        403:
-            description: Could not find data value
+              example:
+                services:
+                  - str
+              type: object
+      "403":
+        description: Could not find data value
     """
     result = Executer.instance.system_info_executer.get_services()
 
@@ -139,26 +127,22 @@ def get_services_status():  # pylint: disable=E0211
     System services status
     ---
     tags:
-        - System
+      - System
     responses:
-        200:
-            description: OK
+      "200":
+        description: OK
+        content:
+          application/json:
             schema:
-                type: object
-                example:
-                    {
-                        services: [
-                            {
-                                name: str,
-                                not_found: bool,
-                                running: bool,
-                                status: int
-                            },
-                            ...
-                        ]
-                    }
-        403:
-            description: Could not find data value
+              example:
+                services:
+                  - name: str
+                    not_found: bool
+                    running: bool
+                    status: int
+              type: object
+      "403":
+        description: Could not find data value
     """
     result = Executer.instance.system_info_executer.get_system_info_services()
 
@@ -177,25 +161,21 @@ def get_devices_status():  # pylint: disable=E0211
     Devices status
     ---
     tags:
-        - System
+      - System
     responses:
-        200:
-            description: OK
+      "200":
+        description: OK
+        content:
+          application/json:
             schema:
-                type: object
-                example:
-                    {
-                        devices: [
-                            {
-                                connected: bool,
-                                id: str,
-                                name: str
-                            },
-                            ...
-                        ]
-                    }
-        403:
-            description: Could not find data value
+              example:
+                devices:
+                  - connected: bool
+                    id: str
+                    name: str
+              type: object
+      "403":
+        description: Could not find data value
     """
     result = Executer.instance.system_info_executer.get_system_info_device_status()
 
@@ -214,24 +194,20 @@ def get_version():  # pylint: disable=E0211
     System version
     ---
     tags:
-        - System
+      - System
     responses:
-        200:
-            description: OK
+      "200":
+        description: OK
+        content:
+          application/json:
             schema:
-                type: object
-                example:
-                    {
-                        versions: [
-                            {
-                            name: str,
-                            version: str
-                            },
-                            ...
-                        ]
-                    }
-        403:
-            description: Could not find data value
+              example:
+                versions:
+                  - name: str
+                    version: str
+              type: object
+      "403":
+        description: Could not find data value
     """
     result = Executer.instance.system_info_executer.get_system_version()
 

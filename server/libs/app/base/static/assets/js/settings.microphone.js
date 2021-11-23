@@ -1,11 +1,7 @@
-var settingsIdentifier;
-
-
-
 // Init and load all settings
 $(document).ready(function () {
     $("#device_dropdown").hide();
-    settingsIdentifier = $("#settingsIdentifier").val();
+    var settingsIdentifier = $("#settingsIdentifier").val();
 
     Promise.all([
 
@@ -16,9 +12,7 @@ $(document).ready(function () {
             $("span[for='level']").text(response["level"]);
         })
 
-    ]).then(response => {
-
-
+    ]).then(() => {
     }).catch((response) => {
         // all requests finished but one or more failed
         new Toast(JSON.stringify(response, null, '\t')).error();
@@ -44,7 +38,7 @@ function setMicrophoneLevel(level) {
     });
 }
 
-document.getElementById("save_btn").addEventListener("click", function (e) {
+document.getElementById("save_btn").addEventListener("click", function () {
     level = $('#level').val();
     setMicrophoneLevel(level);
 

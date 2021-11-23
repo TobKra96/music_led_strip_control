@@ -5,7 +5,6 @@ from icmplib import ping
 import subprocess
 import platform
 import psutil
-import os
 import re
 
 
@@ -76,7 +75,7 @@ class SystemInfoExecuter(ExecuterBase):
     def get_raspi_temp(self):
         cpu_temp_dict = dict()
         if platform.system().lower() == "linux":
-            temp = os.popen("vcgencmd measure_temp").readline()
+            temp = subprocess.check_output(["/usr/bin/vcgencmd", "measure_temp"], stderr=subprocess.STDOUT)
             cpu_temp_c = float(re.findall(r"\d+\.\d+", temp)[0])
             cpu_temp_f = float(f"{(cpu_temp_c * 1.8 + 32):0.1f}")
             cpu_temp_dict["celsius"] = cpu_temp_c

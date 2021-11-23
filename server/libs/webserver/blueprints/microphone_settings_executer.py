@@ -10,7 +10,7 @@ class MicrophoneSettingsExecuter(ExecuterBase):
         result = dict()
         try:
             process = subprocess.run(
-                ["amixer", "get", "Mic"], universal_newlines=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                ["/usr/bin/amixer", "get", "Mic"], universal_newlines=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
             result["output"] = process.stdout
             result["error"] = process.stderr
@@ -31,7 +31,7 @@ class MicrophoneSettingsExecuter(ExecuterBase):
         result = dict()
         try:
             process = subprocess.run(
-                ["amixer", "set", "Mic", f"{level}%"], universal_newlines=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                ["/usr/bin/amixer", "set", "Mic", f"{level}%"], universal_newlines=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
             result["output"] = process.stdout
             result["error"] = process.stderr

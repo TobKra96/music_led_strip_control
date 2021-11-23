@@ -1,9 +1,9 @@
 class AudioDevice:
 
-    def __init__(self, id, name, default_sample_rate):
-        self.id = id
+    def __init__(self, device_id, name, default_sample_rate):
+        self.device_id = device_id
         self.name = name
         self.default_sample_rate = default_sample_rate
 
     def to_string(self):
-        return f"{self.id} - {self.name} - {self.default_sample_rate} Hz"
+        return f"{self.device_id} - {self.name} - {self.default_sample_rate} Hz"

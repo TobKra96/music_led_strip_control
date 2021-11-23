@@ -37,10 +37,9 @@ def memoize(function):
     def wrapper(*args):
         if args in memo:
             return memo[args]
-        else:
-            rv = function(*args)
-            memo[args] = rv
-            return rv
+        rv = function(*args)
+        memo[args] = rv
+        return rv
     return wrapper
 
 
