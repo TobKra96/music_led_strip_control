@@ -89,7 +89,7 @@ def get_general_settings():  # pylint: disable=E0211
         data_out["setting_value"] = result
         return jsonify(data_out)
 
-    elif len(request.args) == 0:
+    if len(request.args) == 0:
         # If no queries passed, return all settings.
         result = Executer.instance.general_settings_executer.get_general_settings()
 
@@ -267,9 +267,8 @@ def import_config():  # pylint: disable=E0211
             if Executer.instance.general_settings_executer.import_config(json.loads(content, encoding='utf-8')):
                 flash('Config file imported', 'success')
                 return "File imported.", 200
-            else:
-                flash('Could not import config file', 'error')
-                return "Could not import file.", 400
+            flash('Could not import config file', 'error')
+            return "Could not import file.", 400
         except (json.decoder.JSONDecodeError, UnicodeDecodeError):
             flash('Not a valid config file', 'error')
             return "Unsupported media type.", 415

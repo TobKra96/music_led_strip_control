@@ -62,7 +62,7 @@ class AudioProcessService:
             # For each audio device, add to list of devices.
             for current_audio_device in self._devices:
 
-                if current_audio_device.id == selected_device_list_index:
+                if current_audio_device.device_id == selected_device_list_index:
                     self.selected_device = current_audio_device
 
             self.logger.debug(f"Selected Device: {self.selected_device}")
@@ -131,7 +131,7 @@ class AudioProcessService:
                 channels=1,
                 rate=self._device_rate,
                 input=True,
-                input_device_index=self.selected_device.id,
+                input_device_index=self.selected_device.device_id,
                 frames_per_buffer=self._frames_per_buffer,
                 stream_callback=callback
             )
@@ -205,9 +205,7 @@ class AudioProcessService:
             self.start_time_2 = time()
 
         except IOError:
-            self.logger.exception(
-                "IOError while reading the Microphone Stream.")
-            pass
+            self.logger.exception("IOError while reading the Microphone Stream.")
         except Exception as e:
             self.logger.error("Could not run AudioService routine.")
             self.logger.exception(f"Unexpected error in routine: {e}")

@@ -153,8 +153,8 @@ def get_groups():  # pylint: disable=E0211
 
     if not data_out["groups"]:
         return "Could not find groups.", 403
-    else:
-        return jsonify(data_out)
+
+    return jsonify(data_out)
 
 
 @device_api.post('/api/system/groups')

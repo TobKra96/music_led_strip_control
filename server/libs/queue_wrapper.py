@@ -39,4 +39,4 @@ class QueueWrapper():
             delete_element = self.get_none_blocking()
             del delete_element
         except Exception as e:
-            pass
+            self.logger.debug(f"Could not delete element from queue: {str(e)}")

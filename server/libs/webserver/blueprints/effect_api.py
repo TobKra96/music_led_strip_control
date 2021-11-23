@@ -72,7 +72,7 @@ def get_active_effect():  # pylint: disable=E0211
         data_out["effect"] = result
         return jsonify(data_out)
 
-    elif not request.args:
+    if not request.args:
         # Retrieve the active effect for all devices.
         result = Executer.instance.effect_executer.get_active_effects()
 

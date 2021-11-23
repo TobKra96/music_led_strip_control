@@ -105,9 +105,8 @@ class ColorService():
         """
         if colour in self._config["colors"]:
             return self._config["colors"][colour]
-        else:
-            self.logger.error(f"Color '{colour}' has not been defined.")
-            return (0, 0, 0)
+        self.logger.error(f"Color '{colour}' has not been defined.")
+        return (0, 0, 0)
 
     def build_slidearrays(self):
         led_count = self._device_config["led_count"]

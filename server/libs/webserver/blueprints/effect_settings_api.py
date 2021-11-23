@@ -122,7 +122,7 @@ def get_effect_settings():  # pylint: disable=E0211
         data_out["setting_value"] = result
         return jsonify(data_out)
 
-    elif len(request.args) == 2:
+    if len(request.args) == 2:
         # Retrieve all settings for a specific effect from config.
         data_in = request.args.to_dict()
 
@@ -203,7 +203,7 @@ def set_effect_settings():  # pylint: disable=E0211
         data_out = copy.deepcopy(data_in)
         return jsonify(data_out)
 
-    elif all(key in data_in for key in ("effect", "settings")):
+    if all(key in data_in for key in ("effect", "settings")):
         # Save all settings for a specific effect to config.
         if not Executer.instance.effect_settings_executer.validate_data_in(data_in, ("effect", "settings", )):
             return "Input data are wrong.", 403

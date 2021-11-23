@@ -61,7 +61,7 @@ def login():
     if pin != Executer.instance.authentication_executer.DEFAULT_PIN:
         flash('Invalid PIN')
         return redirect(url_for('authentication_api.login', next=session['next']))
-    elif pin == Executer.instance.authentication_executer.DEFAULT_PIN:
+    if pin == Executer.instance.authentication_executer.DEFAULT_PIN:
         Executer.instance.authentication_executer.login()
         if session['next'] is not None:
             if Executer.instance.authentication_executer.is_safe_url(session['next']):
@@ -124,8 +124,8 @@ def get_pin_setting():  # pylint: disable=E0211
             "USE_PIN_LOCK": data_in["USE_PIN_LOCK"]
         }
         return jsonify(data_out)
-    else:
-        return "Unauthorized", 401
+
+    return "Unauthorized", 401
 
 
 @authentication_api.post('/api/auth/pin')
@@ -174,8 +174,8 @@ def set_pin_setting():  # pylint: disable=E0211
         }
         Executer.instance.authentication_executer.set_pin_setting(data_out)
         return jsonify(data_out)
-    else:
-        return "Unauthorized", 401
+
+    return "Unauthorized", 401
 
 
 @authentication_api.delete('/api/auth/pin')
@@ -205,5 +205,5 @@ def reset_pin_setting():  # pylint: disable=E0211
     if not use_pin_lock or is_authenticated:
         data_out = Executer.instance.authentication_executer.reset_pin_settings()
         return jsonify(data_out)
-    else:
-        return "Unauthorized", 401
+
+    return "Unauthorized", 401

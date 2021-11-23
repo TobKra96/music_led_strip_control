@@ -84,7 +84,7 @@ def get_device_setting():  # pylint: disable=E0211
         data_out["setting_value"] = result
         return jsonify(data_out)
 
-    elif len(request.args) == 1:  # Get all device settings of a specific device.
+    if len(request.args) == 1:  # Get all device settings of a specific device.
         data_in = request.args.to_dict()
 
         if not Executer.instance.device_settings_executer.validate_data_in(data_in, ("device",)):

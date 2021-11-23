@@ -5,6 +5,7 @@ import numpy as np
 
 class EffectWave(Effect):
     def run(self):
+        """Effect that flashes to the beat with scrolling coloured bits"""
         effect_config = self.get_effect_config("effect_wave")
         led_count = self._device.device_config["led_count"]
 
@@ -17,7 +18,6 @@ class EffectWave(Effect):
         self.update_freq_channels(y)
         self.detect_freqs()
 
-        """Effect that flashes to the beat with scrolling coloured bits"""
         if self.current_freq_detects["beat"]:
             output = np.zeros((3, led_count))
             output[0][:] = self._color_service.colour(effect_config["color_flash"])[0]

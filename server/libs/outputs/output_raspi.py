@@ -56,7 +56,6 @@ class OutputRaspi(Output):
                 self.logger.debug(f"Found Led Strip {self._led_strip}")
         except Exception as e:
             self.logger.exception(f"Could not find LED Strip Type. Exception: {str(e)}")
-            pass
 
         self._led_brightness_translated = int(255 * (self._led_brightness / 100))
 

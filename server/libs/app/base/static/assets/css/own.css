@@ -56,12 +56,20 @@ input[type=number] {
     height: calc(2.55rem + 2px);
 }
 
-/* Overwrite file input box height */
 .custom-file-label {
+    /* Overwrite file input box height */
     height: calc(2.25rem + 2px);
+    /* Prevent text overflow if filename of imported config too long */
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 .custom-file-label::after {
+    /* Overwrite file input box height */
     height: 2.25rem;
+    /* Align "Browse" button text */
+    padding-top: .5rem !important;
 }
 
 /* Overwrite checkbox style */
@@ -87,8 +95,8 @@ input[type=number] {
 
 /* Overwrite highlight when dragging system status cards */
 .highlight {
-    padding: 0rem;
-    margin-top: 0rem;
+    padding: 0;
+    margin-top: 0;
     margin-bottom: calc(2rem - 2px);
     background-color: #e2eaf2;
 }
@@ -122,19 +130,6 @@ input[type=number] {
 select.colors,
 select.gradients {
     text-transform: capitalize;
-}
-
-/* Prevent text overflow if filename of imported config too long */
-.custom-file-label {
-    display: block;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-/* Align "Browse" button text */
-.custom-file-label::after {
-    padding-top: .5rem !important;
 }
 
 /* Remove text highlight from checkboxes and device group pills */

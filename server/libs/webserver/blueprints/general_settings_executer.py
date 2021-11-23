@@ -48,6 +48,5 @@ class GeneralSettingsExecuter(ExecuterBase):
             self._config_instance.check_compatibility()
             self.refresh_device("all_devices")
             return True
-        else:
-            self.logger.error("Unknown Type.")
-            return False
+        self.logger.error("Unknown Type.")
+        return False

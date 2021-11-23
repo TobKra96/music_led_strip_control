@@ -14,9 +14,9 @@ class EffectSegmentColor(Effect):
         # Build an empty array.
         output_array = np.zeros((3, led_count))
 
-        max = (len(effect_config.keys()) // 3) + 1
+        max_len = (len(effect_config.keys()) // 3) + 1
 
-        for x in range(1, max):
+        for x in range(1, max_len):
             segment_number = str(x).zfill(2)
 
             colorkey = f"segment_{segment_number}_color"

@@ -1,5 +1,4 @@
 from scipy.ndimage.filters import gaussian_filter1d
-from numpy import abs, arange, linspace, zeros
 from math import log
 import numpy as np
 
@@ -229,8 +228,8 @@ class Melbank():
 
         mel_max = self.hertz_to_mel(freq_max)
         mel_min = self.hertz_to_mel(freq_min)
-        delta_mel = abs(mel_max - mel_min) / (num_bands + 1.0)
-        frequencies_mel = mel_min + delta_mel * arange(0, num_bands + 2)
+        delta_mel = np.abs(mel_max - mel_min) / (num_bands + 1.0)
+        frequencies_mel = mel_min + delta_mel * np.arange(0, num_bands + 2)
         lower_edges_mel = frequencies_mel[:-2]
         upper_edges_mel = frequencies_mel[2:]
         center_frequencies_mel = frequencies_mel[1:-1]
@@ -279,8 +278,8 @@ class Melbank():
         center_frequencies_hz = self.mel_to_hertz(center_frequencies_mel)
         lower_edges_hz = self.mel_to_hertz(lower_edges_mel)
         upper_edges_hz = self.mel_to_hertz(upper_edges_mel)
-        freqs = linspace(0.0, sample_rate / 2.0, num_fft_bands)
-        melmat = zeros((num_mel_bands, num_fft_bands))
+        freqs = np.linspace(0.0, sample_rate / 2.0, num_fft_bands)
+        melmat = np.zeros((num_mel_bands, num_fft_bands))
 
         for imelband, (center, lower, upper) in enumerate(zip(
                 center_frequencies_hz, lower_edges_hz, upper_edges_hz)):

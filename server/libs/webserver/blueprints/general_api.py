@@ -86,8 +86,8 @@ def gradients():  # pylint: disable=E0211
 
     if data_out is None:
         return "Could not find gradients.", 403
-    else:
-        return jsonify(data_out)
+
+    return jsonify(data_out)
 
 
 @general_api.get('/api/resources/led-strips')
@@ -138,8 +138,8 @@ def led_strips():  # pylint: disable=E0211
 
     if data_out is None:
         return "Could not find led_strips.", 403
-    else:
-        return jsonify(data_out)
+
+    return jsonify(data_out)
 
 
 @general_api.get('/api/resources/logging-levels')
@@ -174,8 +174,8 @@ def logging_levels():  # pylint: disable=E0211
 
     if data_out is None:
         return "Could not find logging_levels.", 403
-    else:
-        return jsonify(data_out)
+
+    return jsonify(data_out)
 
 
 @general_api.get('/api/resources/audio-devices')
@@ -206,8 +206,8 @@ def audio_devices():  # pylint: disable=E0211
 
     if data_out is None:
         return "Could not find audio_devices.", 403
-    else:
-        return jsonify(data_out)
+
+    return jsonify(data_out)
 
 
 @general_api.get('/api/resources/output-types')
@@ -238,8 +238,8 @@ def output_types():  # pylint: disable=E0211
 
     if data_out is None:
         return "Could not find output_types.", 403
-    else:
-        return jsonify(data_out)
+
+    return jsonify(data_out)
 
 
 @general_api.get('/api/resources/effects')
@@ -276,5 +276,5 @@ def effects():  # pylint: disable=E0211
 
     if data_out is None:
         return "Could not find effects.", 403
-    else:
-        return jsonify(data_out)
+
+    return jsonify(data_out)

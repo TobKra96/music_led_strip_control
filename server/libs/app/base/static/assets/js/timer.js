@@ -17,5 +17,5 @@ self.addEventListener('message', function (event) {
         case 'stop':
             clearInterval(timer);
             break;
-    };
+    }
 }, false);

@@ -50,7 +50,7 @@ def instance_already_running():
 
 
 if platform == "linux" and instance_already_running():
-    x = subprocess.Popen("systemctl is-active mlsc", stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True, text=True)
+    x = subprocess.Popen(["/usr/bin/systemctl", "is-active", "mlsc"], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=False, text=True)
     systemctl_status = x.communicate()[0].strip()
     if systemctl_status == 'active':
         sys.exit("\033[91mError: MLSC is already running as a service.\nStop the running service with 'sudo systemctl stop mlsc'.")
