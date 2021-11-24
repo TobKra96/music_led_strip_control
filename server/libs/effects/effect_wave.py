@@ -23,7 +23,7 @@ class EffectWave(Effect):
             output[0][:] = self._color_service.colour(effect_config["color_flash"])[0]
             output[1][:] = self._color_service.colour(effect_config["color_flash"])[1]
             output[2][:] = self._color_service.colour(effect_config["color_flash"])[2]
-            self.wave_wipe_count = effect_config["wipe_len"]
+            self.wave_wipe_count = effect_config["wipe_len"] if effect_config["wipe_len"] <= led_count else led_count
         else:
             output = np.copy(self.prev_output)
             # for i in range(len(self.prev_output)):
