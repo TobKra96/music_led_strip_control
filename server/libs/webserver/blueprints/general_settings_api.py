@@ -264,7 +264,7 @@ def import_config():  # pylint: disable=E0211
     if content:
         try:
             Executer.instance.logger.debug(f"File Received: {json.dumps(json.loads(content), indent=4)}")
-            if Executer.instance.general_settings_executer.import_config(json.loads(content, encoding='utf-8')):
+            if Executer.instance.general_settings_executer.import_config(json.loads(content)):
                 flash('Config file imported', 'success')
                 return "File imported.", 200
             flash('Could not import config file', 'error')
