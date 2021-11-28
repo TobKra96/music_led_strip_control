@@ -15,8 +15,9 @@
     }
 }
 
-/* Make all card corners rounded */
-.card {
+/* Make all card and alert corners rounded */
+.card,
+.alert {
     border-radius: 15px;
 }
 
