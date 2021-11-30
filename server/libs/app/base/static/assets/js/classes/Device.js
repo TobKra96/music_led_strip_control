@@ -29,6 +29,11 @@ export default class Device {
 
     _activate() {
         $("#selected_device_txt").text(this.name);
+        const effectCycleActive = sessionStorage.getItem('effect_cycle_active');
+        if (effectCycleActive && this.id !== localStorage.getItem('lastDevice')) {
+            effectManager.timer.stop();
+            sessionStorage.removeItem('effect_cycle_active');
+        }
         localStorage.setItem('lastDevice', this.id);
         effectManager.currentDevice = this;
     }
