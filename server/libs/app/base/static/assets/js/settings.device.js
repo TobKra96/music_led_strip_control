@@ -29,6 +29,7 @@ if (currentDevice) {
 
 // Init and load all settings
 $(document).ready(function () {
+    $("#settings_list").slideDown();
     // Preload
     Promise.all([
         // get Output Types
@@ -360,3 +361,45 @@ function removeGroupOption(group) {
     let groupOption = $(`#device_group_dropdown option[value="${group}"]`);
     groupOption.remove();
 }
+
+// Set LED strip brightness slider badge
+$('input[type=range]').on('input', function () {
+    $("span[for='" + $(this).attr('id') + "']").text(this.value);
+});
+
+// Hide unused output settings
+$('#output_type').on('change', () => {
+    if ($('#output_type').val() == 'output_raspi') {
+        $('#raspberrypi').removeClass('d-none');
+        $('#udp').addClass('d-none');
+    } else {
+        $('#udp').removeClass('d-none');
+        $('#raspberrypi').addClass('d-none');
+    }
+});
+
+// Limit led_mid input to be between 0 and led_count
+$('#led_mid').on('input', () => {
+    let led_mid = $('#led_mid').val()
+    let led_count = $('#led_count').val()
+    if (parseInt(led_mid) >= parseInt(led_count)) {
+        $('#led_mid').val(parseInt(led_count) - 1)
+    } else if (led_mid.startsWith('0')) {
+        $('#led_mid').val(led_mid.substring(1))
+    }
+});
+
+// Tooltip descriptions for device settings
+$('#FPS_TOOLTIP').attr('data-original-title', 'The maximum FPS you want to output with current device.<br><br>Default setting: 60');
+$('#LED_Count_TOOLTIP').attr('data-original-title', 'The amount of LEDs you want to control with current device. Value should be more than 6.');
+$('#LED_Mid_TOOLTIP').attr('data-original-title', 'The middle of the LED Strip.<br>If you have a corner setup, you can shift the middle. Value should be more than 0 and less than the Number of LEDs.');
+$('#OUTPUT_TYPE_TOOLTIP').attr('data-original-title', 'The output type for current device.<br>Raspberry Pi can be used directly, ESP can be used as a client.<br><br>Note that only one device should be set to "Output Raspberry Pi", otherwise the LED Strip will flicker.');
+$('#LED_Pin_TOOLTIP').attr('data-original-title', 'The GPIO Pin used for the signal.<br>Not all pins are compatible.<br>Use GPIO 18 (pin 12) for PWM0 and GPIO 13 (pin 33) for PWM1.<br><br>Default setting: 18');
+$('#LED_Freq_Hz_TOOLTIP').attr('data-original-title', 'The signal frequency used to communicate with the LED Strip.<br><br>Default setting: 800000');
+$('#LED_Channel_TOOLTIP').attr('data-original-title', 'The channel you want to use. PWM0 - 0 and PWM1 - 1.<br><br>Default setting: 0');
+$('#LED_Dma_TOOLTIP').attr('data-original-title', 'The direct memory access channel. Select a channel between 0-14.<br><br>Default setting: 10');
+$('#LED_Strip_TOOLTIP').attr('data-original-title', 'The LED Strip type. Check if the RGB channels are mapped correctly.<br><br>Default setting: ws281x_rgb');
+$('#LED_Invert_TOOLTIP').attr('data-original-title', 'The parameter for inverting the LED signal. It can be useful if you want to use an inverted logic level shifter.<br><br>Default value: Off');
+$('#UDP_Client_IP_TOOLTIP').attr('data-original-title', 'The IP address of the client.');
+$('#UDP_Client_Port_TOOLTIP').attr('data-original-title', 'The port used for the communication between the server and client.<br><br>Default setting: 7777');
+$('#DEVICE_GROUP_TOOLTIP').attr('data-original-title', 'Device groups allow you to organize devices with custom tags.');
