@@ -233,8 +233,8 @@ $('#device_name').on('input', function () {
     this.setSelectionRange(position, position);
 });
 
-// Add new group pill on "+" click
-$("#add_device_group").on("click", function () {
+// Add new group pill on dropdown option click
+$("#device_group_dropdown").on("change", function () {
     let deviceGroup = $("#device_group_dropdown").val();
     let exists = 0 != $(`#device_groups span[value="${deviceGroup}"]`).length;
     if (deviceGroup && !exists) {
@@ -344,22 +344,30 @@ function reloadDeviceTab(devices) {
 function addGroupPill(group) {
     const pill = `<span class="badge badge-primary badge-pill" value="${group}">${group} <span class="feather icon-x"></span></span> `;
     $("#device_groups").append(pill);
+
+    if ($('#device_groups').children().length > 0) {
+        $('#device_group_label').removeClass("d-none");
+    }
 }
 
 function removeGroupPill(group) {
     let groupPill = $(`#device_groups span[value="${group}"]`);
     groupPill.remove();
+
+    if ($('#device_groups').children().length === 0) {
+        $('#device_group_label').addClass("d-none");
+    }
 }
 
 function addGroupOption(group) {
     const option = new Option(group, group);
-    option.setAttribute('selected', 'selected');
-    $("#device_group_dropdown").prepend(option);
+    $("#device_group_dropdown").append(option);
 }
 
 function removeGroupOption(group) {
     let groupOption = $(`#device_group_dropdown option[value="${group}"]`);
     groupOption.remove();
+    $("#device_group_dropdown")[0].selectedIndex = 0;
 }
 
 // Set LED strip brightness slider badge
