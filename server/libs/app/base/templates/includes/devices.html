@@ -33,7 +33,7 @@
                         </li>
                         {% endif %}
                         <li class="nav-item device_item">
-                            <a href="#pills-{{ loop.index+1 }}" class="{{ 'disabled' if segment in ['effect_sync_fade', 'effect_random_cycle'] }} nav-link" data-device_id={{ device.id }} role="tab" data-toggle="pill" aria-controls="pills-{{ loop.index+1 }}" aria-selected="false">
+                            <a href="#pills-{{ loop.index+1 }}" class="{{ 'disabled' if segment in ['effect_sync_fade'] }} nav-link" data-device_id={{ device.id }} role="tab" data-toggle="pill" aria-controls="pills-{{ loop.index+1 }}" aria-selected="false">
                                 {{ device.name }}
                             </a>
                         </li>

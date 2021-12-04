@@ -20,32 +20,6 @@ export default class EffectManager {
                 });
             });
         })
-
-        // Hardcoded all_devices for now.
-        // If you manually select a different device,
-        // the timer will continue instead of stopping.
-        Promise.all([
-            $.ajax({
-                url: "/api/settings/effect",
-                data: {
-                    "device": "all_devices",
-                    "effect": "effect_random_cycle",
-                }
-            }).done((data) => {
-                this.intervalSec = data.settings.interval;
-                if (sessionStorage.getItem('interval') != this.intervalSec) {
-                    // If interval changed while timer was running, restart timer with new interval
-                    sessionStorage.setItem('seconds', this.intervalSec);
-                }
-                sessionStorage.setItem('interval', this.intervalSec);
-                this.initEasyTimer();
-            }),
-
-        ]).then(response => {
-
-        }).catch((response) => {
-            new Toast(JSON.stringify(response, null, '\t')).error();
-        });
     }
 
     switchEffect(effect) {
@@ -53,6 +27,8 @@ export default class EffectManager {
 
             const effectCycleActive = sessionStorage.getItem('effect_cycle_active');
             if (effect == 'effect_random_cycle') {
+                this.getTimerData()
+
                 if (!effectCycleActive) {
                     this.timer.start({ countdown: true, startValues: { seconds: this.intervalSec + 1 } });
                     sessionStorage.setItem('effect_cycle_active', true);
@@ -80,6 +56,33 @@ export default class EffectManager {
         }
     }
 
+    getTimerData() {
+        // Currently Random Cycle is broken
+        // because of the all_devices reimplementation.
+        Promise.all([
+            $.ajax({
+                url: "/api/settings/effect",
+                data: {
+                    "device": this.currentDevice.id,
+                    "effect": "effect_random_cycle",
+                }
+            }).done((data) => {
+                this.intervalSec = data.settings.interval;
+                if (sessionStorage.getItem('interval') != this.intervalSec) {
+                    // If interval changed while timer was running, restart timer with new interval
+                    sessionStorage.setItem('seconds', this.intervalSec);
+                }
+                sessionStorage.setItem('interval', this.intervalSec);
+                this.initEasyTimer();
+            }),
+
+        ]).then(response => {
+
+        }).catch((response) => {
+            new Toast(JSON.stringify(response, null, '\t')).error();
+        });
+    }
+
     initEasyTimer() {
         this.timer.on('started', () => {
             $("#effect_random_cycle").css("box-shadow", "inset 0 0 0 3px #3f4d67");
@@ -105,7 +108,6 @@ export default class EffectManager {
         const effectCycleActive = sessionStorage.getItem('effect_cycle_active');
         if (effectCycleActive) {
             let sec = parseInt(sessionStorage.getItem('seconds'));
-            console.log(sessionStorage.getItem('seconds'), sessionStorage.getItem('interval'))
             if (!Number.isInteger(sec)) {
                 sec = this.intervalSec;
                 sessionStorage.setItem('seconds', sec);
