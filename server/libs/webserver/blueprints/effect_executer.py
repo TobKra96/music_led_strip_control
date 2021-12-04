@@ -8,9 +8,10 @@ class EffectExecuter(ExecuterBase):
     # Return active effect.
     @handle_config_errors
     def get_active_effect(self, device):
+        selected_device = device
         if device == self.all_devices_id:
-            return self._config[self.all_devices_id]["effects"]["last_effect"]
-        return self._config["device_configs"][device]["effects"]["last_effect"]
+            selected_device = next(iter(self._config["device_configs"]))
+        return self._config["device_configs"][selected_device]["effects"]["last_effect"]
 
     @handle_config_errors
     def get_active_effects(self):
@@ -85,7 +86,8 @@ class EffectExecuter(ExecuterBase):
         parsed = dict()
         result_list = []
         for item in devices:
-            result = self.set_active_effect(item["device"], item["effect"], effect_dict)
+            result = self.set_active_effect(
+                item["device"], item["effect"], effect_dict)
             if result is None:
                 return None
             result_list.append(result)
@@ -98,9 +100,13 @@ class EffectExecuter(ExecuterBase):
         effect = self.parse_special_effects(effect, effect_dict)
         if effect is None:
             return None
-        self._config[self.all_devices_id]["effects"]["last_effect"] = effect
+
+        for device in self._config["device_configs"]:
+            self._config["device_configs"][device]["effects"]["last_effect"] = effect
+
         self.save_config()
         self.refresh_device(self.all_devices_id)
         for device_key in self._config["device_configs"]:
-            self.set_active_effect(device_key, effect, effect_dict, for_all=True)
+            self.set_active_effect(
+                device_key, effect, effect_dict, for_all=True)
         return {"effect": effect}

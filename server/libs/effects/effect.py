@@ -193,9 +193,6 @@ class Effect:
         self._output_queue.put_none_blocking(output_array)
 
     def get_effect_config(self, effect_id):
-        # Check if we use the global "all_devices" settings or the device specific one.
-        if self._config["all_devices"]["effects"]["last_effect"] == effect_id:
-            return self._config["all_devices"]["effects"][effect_id]
         return self._device.device_config["effects"][effect_id]
 
     def mirror_array(self, array, led_mid, led_count):

@@ -9,7 +9,8 @@ class ConfigValidatorService():
 
     def _get_schema(self):
         # Regexes
-        device_id_regex = r"^(device_)(?:0|[1-9]\d{0,1})$"  # Allow device IDs 0-99 without leading zeros.
+        # Allow device IDs 0-99 without leading zeros.
+        device_id_regex = r"^(device_)(?:0|[1-9]\d{0,1})$"
 
         # Enums
         effect_enum = [
