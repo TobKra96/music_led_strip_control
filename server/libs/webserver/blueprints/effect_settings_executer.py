@@ -33,8 +33,8 @@ class EffectSettingsExecuter(ExecuterBase):
 
     def set_effect_setting(self, device, effect, settings):
         if device == self.all_devices_id:
-            for setting_key in settings:
-                self.set_effect_setting_for_all(effect, settings)
+            return self.set_effect_setting_for_all(effect, settings)
+
         else:
             for setting_key in settings:
                 self._config["device_configs"][device]["effects"][effect][setting_key] = settings[setting_key]

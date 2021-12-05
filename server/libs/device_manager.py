@@ -23,6 +23,8 @@ class DeviceManager():
         self._effect_queue = QueueWrapper(effect_queue)
         self._audio_queue = QueueWrapper(audio_queue)
 
+        self._all_devices_ID = "all_devices"
+
         # Init FPS Limiter.
         self._fps_limiter = FPSLimiter(120)
 
@@ -41,14 +43,45 @@ class DeviceManager():
                 break
 
     def routine(self):
+        self.check_effect_changes()
+        self.check_config_changes()
+
+        # Limit the fps to decrease lags caused by 100 percent CPU.
+        self._fps_limiter.fps_limiter()
+
+        if self._skip_routine:
+            return
+
+        audio_data = self.get_audio_data()
+        self.refresh_audio_queues(audio_data)
+
+        self.end_time = time()
+
+        if time() - self.ten_seconds_counter > 10:
+            self.ten_seconds_counter = time()
+            self.time_dif = self.end_time - self.start_time
+            self.fps = 1 / self.time_dif
+            self.logger.info(f"FPS: {self.fps:.2f}")
+
+        self.start_time = time()
+
+    def check_effect_changes(self):
         # Check the effect queue.
         if not self._effect_queue.empty():
             current_effect_item = self._effect_queue.get_blocking()
             self.logger.debug(
                 f"Device Manager received new effect: {current_effect_item.effect_enum} {current_effect_item.device_id}")
-            current_device = self._devices[current_effect_item.device_id]
-            current_device.effect_queue.put_blocking(current_effect_item)
 
+            if current_effect_item.device_id == self._all_devices_ID:
+                for current_device_id in self._devices:
+                    current_device = self._devices[current_device_id]
+                    current_device.effect_queue.put_blocking(
+                        current_effect_item)
+            else:
+                current_device = self._devices[current_effect_item.device_id]
+                current_device.effect_queue.put_blocking(current_effect_item)
+
+    def check_config_changes(self):
         if not self._notification_queue_in.empty():
             current_notification_item = self._notification_queue_in.get_blocking()
             self.logger.debug(
@@ -69,7 +102,7 @@ class DeviceManager():
                 if(devices_count_before_reload != devices_count_after_reload):
                     self.reinit_devices()
 
-                if(current_notification_item.device_id == "all_devices"):
+                if(current_notification_item.device_id == self._all_devices_ID):
                     for key, value in self._devices.items():
                         self.restart_device(key)
                 else:
@@ -81,25 +114,6 @@ class DeviceManager():
                 self._skip_routine = False
             elif current_notification_item.notification_enum is NotificationEnum.process_pause:
                 self._skip_routine = True
-
-        # Limit the fps to decrease lags caused by 100 percent CPU.
-        self._fps_limiter.fps_limiter()
-
-        if self._skip_routine:
-            return
-
-        audio_data = self.get_audio_data()
-        self.refresh_audio_queues(audio_data)
-
-        self.end_time = time()
-
-        if time() - self.ten_seconds_counter > 10:
-            self.ten_seconds_counter = time()
-            self.time_dif = self.end_time - self.start_time
-            self.fps = 1 / self.time_dif
-            self.logger.info(f"FPS: {self.fps:.2f}")
-
-        self.start_time = time()
 
     def get_audio_data(self):
         audio_data = None

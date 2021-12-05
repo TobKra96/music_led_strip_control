@@ -110,7 +110,8 @@ def get_effect_settings():  # pylint: disable=E0211
         if not Executer.instance.effect_settings_executer.validate_data_in(data_in, ("device", "effect", "setting_key",)):
             return "Input data are wrong.", 403
 
-        result = Executer.instance.effect_settings_executer.get_effect_setting(data_in["device"], data_in["effect"], data_in["setting_key"])
+        result = Executer.instance.effect_settings_executer.get_effect_setting(
+            data_in["device"], data_in["effect"], data_in["setting_key"])
 
         if result is None:
             return "Unprocessable Entity.", 422
@@ -129,7 +130,8 @@ def get_effect_settings():  # pylint: disable=E0211
         if not Executer.instance.effect_settings_executer.validate_data_in(data_in, ("device", "effect",)):
             return "Input data are wrong.", 403
 
-        result = Executer.instance.effect_settings_executer.get_effect_settings(data_in["device"], data_in["effect"])
+        result = Executer.instance.effect_settings_executer.get_effect_settings(
+            data_in["device"], data_in["effect"])
 
         if result is None:
             return "Unprocessable Entity.", 422
@@ -195,7 +197,8 @@ def set_effect_settings():  # pylint: disable=E0211
         if not Executer.instance.effect_settings_executer.validate_data_in(data_in, ("device", "effect", "settings", )):
             return "Input data are wrong.", 403
 
-        result = Executer.instance.effect_settings_executer.set_effect_setting(data_in["device"], data_in["effect"], data_in["settings"])
+        result = Executer.instance.effect_settings_executer.set_effect_setting(
+            data_in["device"], data_in["effect"], data_in["settings"])
 
         if result is None:
             return "Unprocessable Entity.", 422
@@ -208,7 +211,8 @@ def set_effect_settings():  # pylint: disable=E0211
         if not Executer.instance.effect_settings_executer.validate_data_in(data_in, ("effect", "settings", )):
             return "Input data are wrong.", 403
 
-        result = Executer.instance.effect_settings_executer.set_effect_setting_for_all(data_in["effect"], data_in["settings"])
+        result = Executer.instance.effect_settings_executer.set_effect_setting_for_all(
+            data_in["effect"], data_in["settings"])
 
         if result is None:
             return "Unprocessable Entity.", 422

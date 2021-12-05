@@ -44,20 +44,13 @@ class ExecuterBase():
     def save_config(self):
         self._config_instance.save_config(self._config)
 
-    def put_into_effect_queue(self, device, effect, put_all=False):
+    def put_into_effect_queue(self, device, effect):
         self.logger.debug("Preparing new EnumItem...")
         effect_item = EffectItem(EffectsEnum[effect], device)
         self.logger.debug(
             f"EnumItem prepared: {effect_item.effect_enum} {effect_item.device_id}")
-        if put_all:
-            # If 'all_devices' is selected, wait for queue to clear.
-            # This prevents the LED strip flashing the effect from the wrong device config.
-            # There is also a noticable gap between clicking the effect button and the LED strip reacting.
-            # This is because the refresh_config() function in device.py is slow.
-            while not self.effects_queue.empty():
-                self.effects_queue.put(effect_item)
-        else:
-            self.effects_queue.put(effect_item)
+
+        self.effects_queue.put(effect_item)
         self.logger.debug("EnumItem put into queue.")
 
     def put_into_notification_queue(self, notificication, device):
