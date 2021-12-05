@@ -165,41 +165,15 @@
                                             <hr>
                                             <h5>Groups</h5>
                                         </div>
-                                        <div class="col-md-6">
+                                        <div class="col-md-12">
                                             <div class="form-group">
                                                 <label class="row m-0 mb-2 p-0">
-                                                    Add Group
-                                                    <div id="ADD_GLOBAL_GROUP_TOOLTIP" class="pl-1" data-toggle="tooltip" data-placement="top" data-html="true">
+                                                    Modify Groups
+                                                    <div id="MODIFY_GLOBAL_GROUP_TOOLTIP" class="pl-1" data-toggle="tooltip" data-placement="top" data-html="true">
                                                         <i class="feather icon-help-circle"></i>
                                                     </div>
                                                 </label>
-                                                <div class="input-group">
-                                                    <input id="new_global_group_name" class="form-control" type="text" name="text" required>
-                                                    <div class="input-group-append">
-                                                        <button type="button" id="add_global_group" class="btn btn-outline-secondary px-3">
-                                                            <span class="feather icon-plus"></span>
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label class="row m-0 mb-2 p-0">
-                                                    Delete Group
-                                                    <div id="DELETE_GLOBAL_GROUP_TOOLTIP" class="pl-1" data-toggle="tooltip" data-placement="top" data-html="true">
-                                                        <i class="feather icon-help-circle"></i>
-                                                    </div>
-                                                </label>
-                                                <div class="input-group">
-                                                    <select id="device_groups" class="form-control setting_input">
-                                                    </select>
-                                                    <div class="input-group-append">
-                                                        <button type="button" id="delete_global_group" class="btn btn-outline-secondary px-3">
-                                                            <span class="feather icon-minus"></span>
-                                                        </button>
-                                                    </div>
-                                                </div>
+                                                <input id="device_groups" type="text" name="tags" class="form-control setting_input tagin" value="" required>
                                             </div>
                                         </div>
 
@@ -329,5 +303,6 @@
 
 <!-- Specific Page JS goes HERE  -->
 {% block javascripts %}
+<script src="/static/assets/plugins/tagin/js/tagin.js" type="module"></script>
 <script src="/static/assets/js/settings.general.js" type="module"></script>
 {% endblock javascripts %}

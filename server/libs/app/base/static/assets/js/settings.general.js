@@ -1,8 +1,10 @@
 import Toast from "./classes/Toast.js";
+import Tagin from "../plugins/tagin/js/tagin.js";
 
 var settingsIdentifier;
 var localSettings = {};
 var currentDevice;
+var tagin;
 
 var loggingLevelsLoading = true;
 var audioDevicesLoading = true;
@@ -12,6 +14,14 @@ $(document).ready(function () {
     $("#settings_list").slideDown();
     $("#device_dropdown").hide();
     settingsIdentifier = $("#settingsIdentifier").val();
+    var options = {
+        separator: ',',
+        duplicate: false,
+        enter: true,
+        transform: input => input,
+        placeholder: 'Add a group...'
+    };
+    tagin = new Tagin(document.querySelector(".tagin"), options);
 
     GetLoggingLevels();
     GetAudioDevices();
@@ -144,11 +154,7 @@ function SetLocalInput(setting_key, setting_value) {
     if ($("#" + setting_key).attr('type') == 'checkbox') {
         $("#" + setting_key).prop('checked', setting_value);
     } else if (setting_key == "device_groups") {
-        setting_value.forEach(function (item, _) {
-            var newOption = new Option(item, item);
-            $("#device_groups").prepend(newOption);
-        });
-        $("#device_groups")[0].selectedIndex = 0;
+        tagin.addTag(false, setting_value.join(","))
     } else {
         $("#" + setting_key).val(setting_value);
     }
@@ -233,11 +239,7 @@ function SetLocalSettings() {
                     setting_value = 8080;
                 }
             } else if (setting_key == "device_groups") {
-                let items = [];
-                $("#device_groups option").each(function () {
-                    items.push($(this).val());
-                });
-                setting_value = items;
+                setting_value = tagin.getTags()
             } else {
                 setting_value = $("#" + setting_key).val();
             }
@@ -279,27 +281,6 @@ function ResetPinSettings() {
         },
     });
 }
-
-$("#add_global_group").on("click", function () {
-    let group_name = $("#new_global_group_name").val()
-    if (group_name == "") {
-        new Toast("Please enter a name for the new group.").warning();
-        return;
-    } else if ($(`#device_groups option[value='${group_name}']`).length > 0) {
-        new Toast(`Group "${group_name}" already exists.`).warning();
-    } else {
-        var newOption = new Option(group_name, group_name);
-        $("#device_groups").prepend(newOption);
-        $("#device_groups")[0].selectedIndex = 0;
-    }
-    $("#new_global_group_name").val("");
-})
-
-$("#delete_global_group").on("click", function () {
-    const group = $("#device_groups").val();
-    const option = $(`#device_groups option[value="${group}"]`);
-    option.remove();
-})
 
 $("#save_btn").on("click", function () {
     SetLocalSettings();
@@ -374,5 +355,4 @@ $('#FRAMES_PER_BUFFER_TOOLTIP').attr('data-original-title', 'The buffer size of 
 $('#N_FFT_BINS_TOOLTIP').attr('data-original-title', 'The amount of slices that the audio spectrum will be divided into.<br><br>Default setting: 24');
 $('#LOG_LEVEL_CONSOLE_TOOLTIP').attr('data-original-title', 'The logging verbosity level in the console.<br><br>Default setting: info');
 $('#LOG_LEVEL_FILE_TOOLTIP').attr('data-original-title', 'The logging verbosity level in a log file.<br>Enable or disable file logging using the checkbox below.<br><br>Use this only for debugging.<br>File logging for extensive periods of time could cause SD card wear-out.<br><br>Default setting: info');
-$('#ADD_GLOBAL_GROUP_TOOLTIP').attr('data-original-title', 'Add a new group tag, which can be used to organize devices.');
-$('#DELETE_GLOBAL_GROUP_TOOLTIP').attr('data-original-title', 'Delete selected group. The group tag will also be removed from all devices it is assigned to.');
+$('#MODIFY_GLOBAL_GROUP_TOOLTIP').attr('data-original-title', 'Add or remove group tags, which can be used to organize devices.');
