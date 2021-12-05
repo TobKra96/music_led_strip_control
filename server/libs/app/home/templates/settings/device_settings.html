@@ -113,12 +113,11 @@
                                                             </select>
                                                         </div>
                                                     </div>
-                                                    <div class="form-group">
-                                                        <label id="device_group_label" class="row m-0 mb-2 p-0 d-none">
+                                                    <div id="device_group_pills" class="form-group d-none">
+                                                        <label id="device_group_label" class="row m-0 mb-2 p-0">
                                                             Device Groups
                                                         </label>
-                                                        <div id="device_groups" type="option" class="h6 device_setting_input">
-                                                        </div>
+                                                        <input id="device_groups" type="option" name="tags" class="form-control device_setting_input tagin" value="" required>
                                                     </div>
                                                     <div class="form-group">
                                                         <label>LED Brightness <span for="led_brightness" class="mb-0 badge badge-secondary"></span></label>
@@ -280,5 +279,6 @@
 
 <!-- Specific Page JS goes HERE  -->
 {% block javascripts %}
+<script src="/static/assets/plugins/tagin/js/tagin.js" type="module"></script>
 <script src="/static/assets/js/settings.device.js" type="module"></script>
 {% endblock javascripts %}

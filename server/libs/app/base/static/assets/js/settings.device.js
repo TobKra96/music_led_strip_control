@@ -1,9 +1,11 @@
 import Device from "./classes/Device.js";
 import Toast from "./classes/Toast.js";
+import Tagin from "../plugins/tagin/js/tagin.js";
 
 let output_types = {};
 let devices = jinja_devices.map(d => { return new Device(d) });
 let currentDevice = devices.find(d => d.id === localStorage.getItem("lastDevice"));
+let tagin;
 // Select first device if previously "All Devices" selected or localStorage is clear
 currentDevice = currentDevice ? currentDevice : devices[0];
 if (currentDevice) {
@@ -30,6 +32,8 @@ if (currentDevice) {
 // Init and load all settings
 $(document).ready(function () {
     $("#settings_list").slideDown();
+    tagin = new Tagin(document.querySelector(".tagin"));
+    $(".tagin-input").prop('disabled', true);
     // Preload
     Promise.all([
         // get Output Types
@@ -106,11 +110,7 @@ function SetLocalSettings() {
                 }
                 break;
             case "option":
-                let groups = [];
-                element.children("span").each(function () {
-                    groups.push($(this).attr('value'));
-                });
-                setting_value = groups;
+                setting_value = tagin.getTags();
                 break;
             default:
                 setting_value = element.val().trim();
@@ -236,29 +236,29 @@ $('#device_name').on('input', function () {
 // Add new group pill on dropdown option click
 $("#device_group_dropdown").on("change", function () {
     let deviceGroup = $("#device_group_dropdown").val();
-    let exists = 0 != $(`#device_groups span[value="${deviceGroup}"]`).length;
-    if (deviceGroup && !exists) {
-        addGroupPill(deviceGroup);
-        removeGroupOption(deviceGroup);
-    }
+    removeGroupOption(deviceGroup);
+    tagin.addTag(true, deviceGroup)
 });
 
 // Remove group pill on "x" click
-$("#device_groups").on("click", ".badge > span", function () {
-    let group = $(this).parent().attr('value');
-    addGroupOption(group);
-    removeGroupPill(group);
+document.addEventListener('click', e => {
+    if (e.target.closest(".tagin-tag-remove")) {
+        let group = e.target.closest(".tagin-tag-remove").parentElement.innerText;
+        addGroupOption(group);
+    }
 });
 
-$("#device_groups").on("mouseover mouseleave", ".badge > span", function (event) {
-    event.preventDefault();
-    $(this).parent().toggleClass("badge-primary");
-    $(this).parent().toggleClass("badge-danger");
+$(".tagin").on("change", function () {
+    if (tagin.getTags().length === 0) {
+        $('#device_group_pills').addClass("d-none");
+    } else {
+        $('#device_group_pills').removeClass("d-none");
+    }
 });
 
 $("#save_btn").on("click", function () {
     // Do not save device settings if device name already exists
-    let deviceNameExists = devices.some( device => $("#device_name").val() === device._name && currentDevice.id !== device.id );
+    let deviceNameExists = devices.some(device => $("#device_name").val() === device._name && currentDevice.id !== device.id);
     if (deviceNameExists) {
         new Toast(`Device "${$("#device_name").val()}" already exists.`).warning();
     } else {
@@ -339,24 +339,6 @@ function reloadDeviceTab(devices) {
 
     $('#device_count').text(devices.length);
     $("#selected_device_txt").text(currentDevice.name);
-}
-
-function addGroupPill(group) {
-    const pill = `<span class="badge badge-primary badge-pill" value="${group}">${group} <span class="feather icon-x"></span></span> `;
-    $("#device_groups").append(pill);
-
-    if ($('#device_groups').children().length > 0) {
-        $('#device_group_label').removeClass("d-none");
-    }
-}
-
-function removeGroupPill(group) {
-    let groupPill = $(`#device_groups span[value="${group}"]`);
-    groupPill.remove();
-
-    if ($('#device_groups').children().length === 0) {
-        $('#device_group_label').addClass("d-none");
-    }
 }
 
 function addGroupOption(group) {

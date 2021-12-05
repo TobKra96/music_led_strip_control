@@ -150,43 +150,39 @@ export default class Device {
                     if ($(`#${setting_key}`).attr('type') == 'checkbox') {
                         $(`#${setting_key}`).prop('checked', setting_value);
                     } else if ($(`#${setting_key}`).attr('type') == 'option') {
-                        populateDeviceGroups(setting_value)
-                        populateGlobalGroups()
+                        populateDeviceGroups(setting_value);
+                        populateGlobalGroups(setting_value);
                     } else {
                         $(`#${setting_key}`).val(setting_value);
                     }
                     $(`#${setting_key}`).trigger('change');
 
                     // Set initial brightness slider value
-                    $(`span[for='${setting_key}']`).text(setting_value)
+                    $(`span[for='${setting_key}']`).text(setting_value);
                 })
             });
     }
 
 }
 
-function populateDeviceGroups(setting_value) {
-    // Clear all group pills
-    $("#device_groups").empty();
-    // Add device group pills
-    setting_value.forEach(group => {
-        const pill = `<span class="badge badge-primary badge-pill" value="${group}">${group} <span class="feather icon-x"></span></span> `;
-        $("#device_groups").append(pill);
-    });
-    // Show device group label if there are groups
-    if ($('#device_groups').children().length > 0) {
-        $('#device_group_label').removeClass("d-none");
+function populateDeviceGroups(deviceGroups) {
+    // Manually trigger change event to update device groups
+    const target = document.querySelector('#device_groups');
+    target.value = deviceGroups.join(",");
+    target.dispatchEvent(new Event('change'));
+    // Show device group block if there are groups
+    if (deviceGroups.length > 0) {
+        $('#device_group_pills').removeClass("d-none");
     }
 }
 
-function populateGlobalGroups() {
+function populateGlobalGroups(deviceGroups) {
     // Clear all dropdown group options
     $("#device_group_dropdown").empty();
     // Populate device group dropdown with all available groups
-    jinja_groups.groups.forEach(group => {
-        let exists = 0 != $(`#device_groups span[value="${group}"]`).length;
-        const option = new Option(group, group);
-        if (!exists) {
+    jinja_groups.groups.forEach(globalGroup => {
+        const option = new Option(globalGroup, globalGroup);
+        if (!deviceGroups.includes(globalGroup)) {
             $("#device_group_dropdown").prepend(option);
         }
     });
