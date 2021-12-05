@@ -38,14 +38,14 @@ $(function () {
             });
         }
 
-        // Only allow all_devices for sync fade and random cycle effects
-        if (["effect_sync_fade", "effect_random_cycle"].includes(effectIdentifier)) {
+        // Only allow all_devices for sync fade
+        if (["effect_sync_fade"].includes(effectIdentifier)) {
             localStorage.setItem('lastDevice', fake_device[0].id);
         }
 
         const devices = fake_device.concat(jinja_devices.map(d => { return new Device(d) }));
 
-        if (["effect_sync_fade", "effect_random_cycle"].includes(effectIdentifier)) {
+        if (["effect_sync_fade"].includes(effectIdentifier)) {
             devices[0]._activate();
             $(`a[data-device_id=${devices[0].id}`).addClass("active");
             currentDevice = devices[0];
