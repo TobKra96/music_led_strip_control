@@ -53,7 +53,7 @@ class EffectExecuter(ExecuterBase):
         if effect not in ({*effect_dict["non_music"], *effect_dict["music"], *effect_dict["special"]}):
             return None
 
-        if effect == "effect_random_cycle":
+        if effect == "effect_random_cycle":  # BUG: Random Cycle is not implemented for all_devices.
             effect_list = self.get_enabled_effects(device)
         elif effect == "effect_random_non_music":
             effect_list = [k for k in effect_dict["non_music"].keys()]
@@ -66,11 +66,9 @@ class EffectExecuter(ExecuterBase):
         return effect
 
     @handle_config_errors
-    def set_active_effect(self, device, effect, effect_dict, for_all=False):
+    def set_active_effect(self, device, effect, effect_dict):
         if device == self.all_devices_id:
-            self.set_active_effect_for_all(effect, effect_dict)
-            return {"effect": effect}  # BUG: Special effects are not parsed.
-
+            return self.set_active_effect_for_all(effect, effect_dict)
         effect = self.parse_special_effects(effect, effect_dict, device)
         if effect is None:
             return None
