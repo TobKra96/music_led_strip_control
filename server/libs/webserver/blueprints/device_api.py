@@ -11,7 +11,7 @@ device_api = Blueprint('device_api', __name__)
 @login_required
 def get_devices():  # pylint: disable=E0211
     """
-    Devices
+    Return devices
     ---
     tags:
       - System
@@ -127,7 +127,7 @@ def delete_device():  # pylint: disable=E0211
 @login_required
 def get_groups():  # pylint: disable=E0211
     """
-    Groups
+    Return global groups
     ---
     tags:
       - System
@@ -161,7 +161,7 @@ def get_groups():  # pylint: disable=E0211
 @login_required
 def create_group():  # pylint: disable=E0211
     """
-    Add new group
+    Add new global group
     ---
     tags:
       - System
@@ -209,7 +209,7 @@ def create_group():  # pylint: disable=E0211
 @login_required
 def delete_group():  # pylint: disable=E0211
     """
-    Delete group
+    Delete global group
     ---
     tags:
       - System
@@ -261,6 +261,9 @@ def remove_invalid_device_groups():  # pylint: disable=E0211
     ---
     tags:
       - System
+    description: This endpoint should be called after deleting a global group.\n\n
+                 It compares device groups with global groups and removes device groups that do not exist.\n\n
+                 This prevents deleted global groups from still displaying on devices.
     responses:
       "200":
         description: OK
