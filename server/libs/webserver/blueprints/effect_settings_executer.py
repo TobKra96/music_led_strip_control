@@ -28,16 +28,16 @@ class EffectSettingsExecuter(ExecuterBase):
         for effect_setting_key in self._config["device_configs"][selected_device]["effects"][effect]:
             settings[effect_setting_key] = self._config["device_configs"][selected_device]["effects"][effect][effect_setting_key]
 
-        self.logger.debug(f"Settings: {settings[effect_setting_key]}")
+        self.logger.debug(f"Settings: {settings}")
+
         return settings
 
     def set_effect_setting(self, device, effect, settings):
         if device == self.all_devices_id:
             return self.set_effect_setting_for_all(effect, settings)
 
-        else:
-            for setting_key in settings:
-                self._config["device_configs"][device]["effects"][effect][setting_key] = settings[setting_key]
+        for setting_key in settings:
+            self._config["device_configs"][device]["effects"][effect][setting_key] = settings[setting_key]
 
         self.save_config()
         self.refresh_device(device)
