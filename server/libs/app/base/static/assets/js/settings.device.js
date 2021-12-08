@@ -237,7 +237,7 @@ $('#device_name').on('input', function () {
 $("#device_group_dropdown").on("change", function () {
     let deviceGroup = $("#device_group_dropdown").val();
     removeGroupOption(deviceGroup);
-    tagin.addTag(true, deviceGroup)
+    tagin.addTag(deviceGroup);
 });
 
 // Remove group pill on "x" click

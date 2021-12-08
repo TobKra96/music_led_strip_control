@@ -14,7 +14,7 @@ $(document).ready(function () {
     $("#settings_list").slideDown();
     $("#device_dropdown").hide();
     settingsIdentifier = $("#settingsIdentifier").val();
-    var options = {
+    const options = {
         separator: ',',
         duplicate: false,
         enter: true,
@@ -154,7 +154,7 @@ function SetLocalInput(setting_key, setting_value) {
     if ($("#" + setting_key).attr('type') == 'checkbox') {
         $("#" + setting_key).prop('checked', setting_value);
     } else if (setting_key == "device_groups") {
-        tagin.addTag(false, setting_value.join(","))
+        tagin.addTag(setting_value)
     } else {
         $("#" + setting_key).val(setting_value);
     }
@@ -239,7 +239,7 @@ function SetLocalSettings() {
                     setting_value = 8080;
                 }
             } else if (setting_key == "device_groups") {
-                setting_value = tagin.getTags()
+                setting_value = tagin.getTags();
             } else {
                 setting_value = $("#" + setting_key).val();
             }
