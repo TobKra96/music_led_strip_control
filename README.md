@@ -120,7 +120,14 @@ Flask admin dashboard.
 
 Scripts included:
 
-Bootstrap, jQuery, jQuery-Scrollbar, jQuery-UI, Pickr, Font Awesome.
+[Bootstrap](https://getbootstrap.com/docs/4.6/),
+[jQuery](https://jquery.com/),
+[jQuery-Scrollbar](https://github.com/gromo/jquery.scrollbar/),
+[jQuery-UI](https://jqueryui.com/),
+[Pickr](https://github.com/Simonwep/pickr),
+[Font Awesome](https://fontawesome.com),
+[EasyTimer](https://github.com/albert-gonzalez/easytimer.js),
+[Tagin](https://github.com/erwinheldy/tagin)
 
 
 ## License
