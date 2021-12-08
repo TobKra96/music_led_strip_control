@@ -1,164 +1,159 @@
-export default class Tagin {
-    /**
-    * Create a new Tagin instance.
-    *
-    * @param el - Element anchor.
-    * @param option - Customization options.
-    *
-    * @example
-    * ```js
-    * var options = {
-    *     separator: ',', // default: ','
-    *     duplicate: false, // default: false
-    *     enter: true, // default: false
-    *     transform: input => input.toUpperCase(), // default: input => input
-    *     placeholder: 'Enter tags...' // default: ''
-    * };
-    * var tagin = new Tagin(document.getElementById('tagin'), options);
-    * ```
-    */
-    constructor(el, option = {}) {
-        const classElement = 'tagin';
-        const classWrapper = 'tagin-wrapper';
-        const classTag = 'tagin-tag';
-        const classRemove = 'tagin-tag-remove';
-        const classInput = 'tagin-input';
-        const classInputHidden = 'tagin-input-hidden';
-        const defaultSeparator = ',';
-        const defaultDuplicate = 'false';
-        const defaultEnter = 'false';
-        const defaultTransform = input => input;
-        const defaultPlaceholder = '';
-        const separator = el.dataset.separator || option.separator || defaultSeparator;
-        const duplicate = el.dataset.duplicate || option.duplicate || defaultDuplicate;
-        const enter = el.dataset.enter || option.enter || defaultEnter;
-        const transform = eval(el.dataset.transform) || option.transform || defaultTransform;
-        const placeholder = el.dataset.placeholder || option.placeholder || defaultPlaceholder;
-
-        const templateTag = value => `<span class="${classTag}">${value}<span class="${classRemove}"></span></span>`;
-
-        const getValue = () => el.value;
-        const getValues = () => getValue().split(separator); (function () {
-            const className = classWrapper + ' ' + el.className.replace(classElement, '').replace("setting_input", '').trim();
-            const tags = getValue().trim() === '' ? '' : getValues().map(templateTag).join('');
-            const template = `<div class="${className}">${tags}<input type="text" class="${classInput}" placeholder="${placeholder}"></div>`;
-            el.insertAdjacentHTML('afterend', template); // insert template after element
-        })();
-
-        const wrapper = el.nextElementSibling;
-        const input = wrapper.getElementsByClassName(classInput)[0];
-        const getTags = () => [...wrapper.getElementsByClassName(classTag)].map(tag => tag.textContent);
-        const getTag = () => getTags().join(separator);
-
-        const updateValue = () => { el.value = getTag(); el.dispatchEvent(new Event('change')) };
-
+/*!
+* Tagin v2.0.0 (https://tagin.netlify.app/)
+* Copyright 2020-2021 Erwin Heldy G
+* Licensed under MIT (https://github.com/erwinheldy/tagin/blob/master/LICENSE)
+*/
+class Tagin {
+    classElement = 'tagin';
+    classWrapper = 'tagin-wrapper';
+    classTag = 'tagin-tag';
+    classRemove = 'tagin-tag-remove';
+    classInput = 'tagin-input';
+    classInputHidden = 'tagin-input-hidden';
+    target;
+    wrapper;
+    input;
+    separator;
+    placeholder;
+    duplicate;
+    transform;
+    enter;
+    constructor(inputElement, options) {
+        this.target = inputElement;
+        this.separator = options?.separator || inputElement.dataset.taginSeparator || ',';
+        this.placeholder = options?.placeholder || inputElement.dataset.taginPlaceholder || '';
+        this.duplicate = options?.duplicate || inputElement.dataset.taginDuplicate !== undefined;
+        this.transform = options?.transform || inputElement.dataset.taginTransform || 'input => input';
+        this.enter = options?.enter || inputElement.dataset.taginEnter !== undefined;
+        this.createWrapper();
+        this.autowidth();
+        this.addEventListener();
+    }
+    createWrapper() {
+        const tags = this.getValue() === '' ? '' : this.getValues().map(val => this.createTag(val)).join('');
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.className = this.classInput;
+        input.placeholder = this.placeholder;
+        const wrapper = document.createElement('div');
+        // const addedTargetClasses = this.target.className;
+        const addedTargetClasses = this.target.className.replace('setting_input', '').replace(/\s+/g, ' ').trim();
+        wrapper.className = `${this.classWrapper} ${addedTargetClasses}`;
+        wrapper.classList.remove(this.classElement);
+        wrapper.insertAdjacentHTML('afterbegin', tags);
+        wrapper.insertAdjacentElement('beforeend', input);
+        this.target.insertAdjacentElement('afterend', wrapper); // insert wrapper after input
+        this.wrapper = wrapper;
+        this.input = input;
+    }
+    createTag(value) {
+        const onclick = `this.closest('div').dispatchEvent(new CustomEvent('tagin:remove', { detail: this }))`;
+        return `<span class="${this.classTag}">${value}<span onclick="${onclick}" class="${this.classRemove}"></span></span>`;
+    }
+    getValue() {
+        return this.target.value.trim();
+    }
+    getValues() {
+        return this.getValue().split(this.separator);
+    }
+    getTags() {
+        return Array.from(this.wrapper.getElementsByClassName(this.classTag)).map(tag => tag.textContent);
+    }
+    getTag() {
+        return this.getTags().join(this.separator);
+    }
+    updateValue() {
+        this.target.value = this.getTag();
+        this.target.dispatchEvent(new Event('change'));
+    }
+    autowidth() {
+        const fakeEl = document.createElement('div');
+        fakeEl.classList.add(this.classInput, this.classInputHidden);
+        const string = this.input.value || this.input.placeholder || '';
+        fakeEl.innerHTML = string.replace(/ /g, '&nbsp;');
+        document.body.appendChild(fakeEl);
+        this.input.style.setProperty('width', Math.ceil(parseInt(window.getComputedStyle(fakeEl).width.replace('px', ''))) + 1 + 'px');
+        fakeEl.remove();
+    }
+    addEventListener() {
+        const wrapper = this.wrapper;
+        const input = this.input;
         // Focus to input
         wrapper.addEventListener('click', () => input.focus());
-
         // Toggle focus class
         input.addEventListener('focus', () => wrapper.classList.add('focus'));
         input.addEventListener('blur', () => wrapper.classList.remove('focus'));
-
-        // Remove by click
-        document.addEventListener('click', e => {
-            if (e.target.closest('.' + classRemove)) {
-                e.target.closest('.' + classRemove).parentNode.remove();
-                updateValue();
-            }
+        // Add tag when input
+        input.addEventListener('input', () => {
+            this.appendTag();
+            this.autowidth();
         });
-
-        // Remove with backspace
-        input.addEventListener('keydown', e => {
-            if (input.value === '' && e.keyCode === 8 && wrapper.getElementsByClassName(classTag).length) {
-                wrapper.querySelector('.' + classTag + ':last-of-type').remove();
-                updateValue();
+        // Add tag when blur
+        input.addEventListener('blur', () => {
+            this.appendTag(true);
+            this.autowidth();
+        });
+        input.addEventListener('keydown', (e) => {
+            // Remove with backspace
+            if (input.value === '' && e.key === 'Backspace' && wrapper.getElementsByClassName(this.classTag).length) {
+                wrapper.querySelector(`.${this.classTag}:last-of-type`).remove();
+                this.updateValue();
             }
-            if (input.value !== '' && e.keyCode === 13 && (enter === "true" || enter === true)) {
-                this.addTag(true, transform(input.value.trim()));
+            // Add with Enter
+            if (input.value !== '' && e.key === 'Enter' && this.enter) {
+                this.appendTag(true);
+                this.autowidth();
                 e.preventDefault();
             }
         });
-
-        // Adding tag
-        input.addEventListener('input', () => {
-            this.addTag(false, transform(input.value.trim()));
-        })
-        input.addEventListener('blur', () => {
-            this.addTag(true, transform(input.value.trim()));
-        })
-
-        function autowidth() {
-            const fakeEl = document.createElement('div');
-            fakeEl.classList.add(classInput, classInputHidden);
-            const string = input.value || input.getAttribute('placeholder') || '';
-            fakeEl.innerHTML = string.replace(/ /g, '&nbsp;');
-            document.body.appendChild(fakeEl);
-            input.style.setProperty('width', Math.ceil(window.getComputedStyle(fakeEl).width.replace('px', '')) + 1 + 'px');
-            fakeEl.remove();
-        }
-
-        /**
-        * Adds a tag or multiple tags.
-        *
-        * @param force - Add tag even without separator (bool)
-        * @param tagName - The tag name(s) to add (string)
-        *
-        * @example
-        * Multiple tags should be a comma separated string:
-        * ```js
-        * this.addTag(true, 'NewTag')
-        * this.addTag(false, 'OneTag, TwoTag, ThreeTag')
-        * let tagArray = ['OneTag', 'TwoTag', 'ThreeTag']
-        * this.addTag(false, tagArray.join(', '))
-        * ```
-        */
-        this.addTag = (force = false, tagName = '') => {
-            if (tagName === '') { input.value = ''; }
-            if (tagName.includes(separator) || (force && tagName != '')) {
-                tagName.split(separator).filter(i => i != '').forEach(val => {
-                    if (getTags().includes(val) && (duplicate === 'false' || duplicate === false)) {
-                        alertExist(val);
-                    } else {
-                        input.insertAdjacentHTML('beforebegin', templateTag(val));
-                        updateValue();
+        wrapper.addEventListener('tagin:remove', (e) => {
+            if (e['detail'] instanceof HTMLSpanElement) {
+                e['detail'].parentElement.remove();
+                this.updateValue();
+            }
+        });
+        this.target.addEventListener('change', () => this.updateTag());
+    }
+    appendTag(force = false) {
+        const input = this.input;
+        const value = eval(this.transform)(input.value.trim());
+        if (value === '')
+            input.value = '';
+        if (input.value.includes(this.separator) || (force && input.value !== '')) {
+            value
+                .split(this.separator)
+                .filter((i) => i !== '')
+                .forEach((val) => {
+                    if (this.getTags().includes(val) && this.duplicate === false) {
+                        this.alertExist(val);
                     }
-                })
-                input.value = '';
-                input.removeAttribute('style');
-            }
-            autowidth();
+                    else {
+                        input.insertAdjacentHTML('beforebegin', this.createTag(val));
+                        this.updateValue();
+                    }
+                });
+            input.value = '';
+            input.removeAttribute('style');
         }
-
-        /**
-        * Returns an array of tags.
-        *
-        * @returns array
-        */
-        this.getTags = () => {
-            return getTags().map(s => s.trim());;
-        };
-
-        function alertExist(value) {
-            for (const el of wrapper.getElementsByClassName(classTag)) {
-                if (el.textContent === value) {
-                    el.style.transform = 'scale(1.09)';
-                    setTimeout(() => { el.removeAttribute('style') }, 150);
-                }
+    }
+    alertExist(value) {
+        for (const el of this.wrapper.getElementsByClassName(this.classTag)) {
+            if (el.textContent === value && el instanceof HTMLSpanElement) {
+                el.style.transform = 'scale(1.09)';
+                setTimeout(() => { el.removeAttribute('style'); }, 150);
             }
         }
-
-        function updateTag() {
-            if (getValue() !== getTag()) {
-                [...wrapper.getElementsByClassName(classTag)].map(tag => tag.remove());
-                getValue().trim() !== '' && input.insertAdjacentHTML('beforebegin', getValues().map(templateTag).join(''));
-            }
+    }
+    updateTag() {
+        if (this.getValue() !== this.getTag()) {
+            [...this.wrapper.getElementsByClassName(this.classTag)].map(tag => tag.remove());
+            this.getValue().trim() !== '' && this.input.insertAdjacentHTML('beforebegin', this.getValues().map(val => this.createTag(val)).join(''));
         }
-
-        autowidth();
-        el.addEventListener('change', () => updateTag());
+    }
+    addTag(tag) {
+        this.input.value = (Array.isArray(tag) ? tag.join(this.separator) : tag) + this.separator;
+        this.input.dispatchEvent(new Event('input'));
     }
 }
 
-if (typeof exports === 'object' && typeof module !== 'undefined') {
-    module.exports = Tagin;
-}
+export { Tagin as default };
