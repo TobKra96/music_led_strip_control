@@ -89,7 +89,7 @@ class OutputService():
         if not self._output_queue.empty():
             current_output_array = self._output_queue.get_blocking()
             # Add another Array of LEDS for White Channel
-            if "SK6812" in self._led_strip and len(current_output_array) == 3:
+            if "sk6812" in self._led_strip and len(current_output_array) == 3:
                 current_output_array = np.vstack(
                     (current_output_array, np.zeros(self._device.device_config["led_count"])))
 

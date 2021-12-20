@@ -36,7 +36,7 @@ class OutputUDP(Output):
             self._sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
     def map_channels(self, output_array_in):
-        if "SK6812" in self._led_strip:
+        if "sk6812" in self._led_strip:
             if len(output_array_in[:]) == 4:
                 return self.map_four_channels_sk(output_array_in)
             return self.map_three_channels_sk(output_array_in)
