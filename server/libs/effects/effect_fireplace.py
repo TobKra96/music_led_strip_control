@@ -17,7 +17,7 @@ class EffectFireplace(Effect):
         self.sparks_target_appear_distance = 0
         self.sparks_current_appear_distance = 0
 
-        self.sparks_target_new_spaks_length = 0
+        self.sparks_target_new_sparks_length = 0
         self.sparks_new_sparks_distance = 0
         self.sparks_flicker_speed_counter = 0
         self.sparks_fly_speed_counter = 0
@@ -125,7 +125,7 @@ class EffectFireplace(Effect):
 
             # Check if we need to calculate a new spark.
             if self.sparks_target_appear_distance == 0 or (self.sparks_current_appear_distance - self.sparks_target_appear_distance) >= self.sparks_target_appear_distance:
-                self.sparks_target_new_spaks_length = randint(sparks_min_length, sparks_max_length)
+                self.sparks_target_new_sparks_length = randint(sparks_min_length, sparks_max_length)
                 self.sparks_current_appear_distance = 0
                 self.sparks_target_appear_distance = randint(sparks_minappear_distance, sparks_maxappear_distance)
 
@@ -145,8 +145,8 @@ class EffectFireplace(Effect):
                 distance_diff = self.sparks_current_appear_distance - self.sparks_target_appear_distance
 
                 offset = 0
-                if distance_diff > self.sparks_target_new_spaks_length:
-                    offset = distance_diff - self.sparks_target_new_spaks_length
+                if distance_diff > self.sparks_target_new_sparks_length:
+                    offset = distance_diff - self.sparks_target_new_sparks_length
 
                 if use_color_variation:
                     self.sparks_array[0][offset:sparks_fly_steps] = self.current_variation_spark_color[0]
