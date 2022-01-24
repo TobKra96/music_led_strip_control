@@ -11,6 +11,8 @@ export default class Device {
         this.link = $(`a[data-device_id=${this.id}`)[0];
         this._isCurrent = this.id === localStorage.getItem("lastDevice");
 
+        // Insert first device ("all_devices") into localStorage if "lastDevice" does not exist yet
+        !('lastDevice' in localStorage) && localStorage.setItem("lastDevice", this.id);
         // Select last selected device if there is any
         this.id === localStorage.getItem("lastDevice") && (
             this._activate(),
