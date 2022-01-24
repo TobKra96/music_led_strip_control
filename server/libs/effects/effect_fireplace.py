@@ -62,8 +62,8 @@ class EffectFireplace(Effect):
 
         sparks_max_length = effect_config["sparks_max_length"]
         sparks_min_length = effect_config["sparks_min_length"]
-        if sparks_minappear_distance > sparks_maxappear_distance:
-            sparks_minappear_distance = sparks_maxappear_distance
+        if sparks_min_length > sparks_max_length:
+            sparks_min_length = sparks_max_length
 
         sparks_area_minlength = effect_config["sparks_area_minlength"]
         sparks_area_maxlength = effect_config["sparks_area_maxlength"]
