@@ -100,6 +100,7 @@ input[type=number] {
     margin-top: 0;
     margin-bottom: calc(2rem - 2px);
     background-color: #e2eaf2;
+    border-radius: 15px;
 }
 
 /* Overwrite bootstrap dropdown active color */
