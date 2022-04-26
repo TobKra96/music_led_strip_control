@@ -180,7 +180,7 @@ class AudioProcessService:
                 return
 
             # Convert the raw string audio stream to an array.
-            y = np.fromstring(in_data, dtype=np.int16)
+            y = np.frombuffer(in_data, dtype=np.int16)
             # Use the type float32.
             y = y.astype(np.float32)
 

@@ -1,4 +1,4 @@
-from scipy.ndimage.filters import gaussian_filter1d
+from scipy.ndimage import gaussian_filter1d
 import numpy as np
 import logging
 
