@@ -40,9 +40,6 @@ def colors():  # pylint: disable=E0211
     data_out = Executer.instance.general_executer.get_colors()
 
     if data_out is None:
-        return "Unprocessable Entity.", 422
-
-    if data_out is None:
         return "Could not find colors.", 403
 
     return jsonify(data_out)
@@ -79,10 +76,7 @@ def gradients():  # pylint: disable=E0211
       "403":
         description: Could not find gradients
     """
-    data_out = dict()
-
-    gradients = Executer.instance.general_executer.get_gradients()
-    data_out = gradients
+    data_out = Executer.instance.general_executer.get_gradients()
 
     if data_out is None:
         return "Could not find gradients.", 403
@@ -131,10 +125,7 @@ def led_strips():  # pylint: disable=E0211
       "403":
         description: Could not find led_strips
     """
-    data_out = dict()
-
-    led_strips = Executer.instance.general_executer.get_led_strips()
-    data_out = led_strips
+    data_out = Executer.instance.general_executer.get_led_strips()
 
     if data_out is None:
         return "Could not find led_strips.", 403
@@ -167,10 +158,7 @@ def logging_levels():  # pylint: disable=E0211
       "403":
         description: Could not find logging_levels
     """
-    data_out = dict()
-
-    logging_levels = Executer.instance.general_executer.get_logging_levels()
-    data_out = logging_levels
+    data_out = Executer.instance.general_executer.get_logging_levels()
 
     if data_out is None:
         return "Could not find logging_levels.", 403
@@ -199,10 +187,7 @@ def audio_devices():  # pylint: disable=E0211
       "403":
         description: Could not find audio_devices
     """
-    data_out = dict()
-
-    audio_devices = Executer.instance.general_executer.get_audio_devices()
-    data_out = audio_devices
+    data_out = Executer.instance.general_executer.get_audio_devices()
 
     if data_out is None:
         return "Could not find audio_devices.", 403
@@ -231,10 +216,7 @@ def output_types():  # pylint: disable=E0211
       "403":
         description: Could not find output_types
     """
-    data_out = dict()
-
-    output_types = Executer.instance.general_executer.get_output_types()
-    data_out = output_types
+    data_out = Executer.instance.general_executer.get_output_types()
 
     if data_out is None:
         return "Could not find output_types.", 403
@@ -269,10 +251,7 @@ def effects():  # pylint: disable=E0211
       "403":
         description: Could not find effects
     """
-    data_out = dict()
-
-    effects = Executer.instance.general_executer.get_effects()
-    data_out = effects
+    data_out = Executer.instance.general_executer.get_effects()
 
     if data_out is None:
         return "Could not find effects.", 403
