@@ -41,15 +41,13 @@ class Webserver():
         self.server.config["TEMPLATES_AUTO_RELOAD"] = True
         webserver_port = Executer.instance.general_settings_executer.get_webserver_port()
 
-        self.server.register_blueprint(authentication_api)
-        self.server.register_blueprint(device_api)
-        self.server.register_blueprint(device_settings_api)
-        self.server.register_blueprint(effect_api)
-        self.server.register_blueprint(effect_settings_api)
-        self.server.register_blueprint(general_api)
-        self.server.register_blueprint(general_settings_api)
-        self.server.register_blueprint(system_info_api)
-        self.server.register_blueprint(microphone_settings_api)
+        api_blueprints = (
+            authentication_api, device_api, device_settings_api, effect_api, effect_settings_api,
+            general_api, general_settings_api, system_info_api, microphone_settings_api
+        )
+
+        for blueprint in api_blueprints:
+            self.server.register_blueprint(blueprint)
 
         self.server.config['SWAGGER'] = {
             "specs": [
