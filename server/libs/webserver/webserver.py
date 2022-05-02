@@ -78,7 +78,7 @@ class Webserver():
             self.server.run(host='0.0.0.0', port=webserver_port,
                             load_dotenv=False, debug=True)
         else:
-            serve(self.server, host='0.0.0.0', port=webserver_port, threads=8)
+            serve(self.server, host='0.0.0.0', port=webserver_port, threads=8, clear_untrusted_proxy_headers=False)
 
         while True:
             sleep(10)
