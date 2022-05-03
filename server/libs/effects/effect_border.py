@@ -24,7 +24,7 @@ class EffectBorder(Effect):
 
         y = np.clip(y, 0, 1)
 
-        spec_array = y[0: len(y) // bar_count] if bar_count > 0 else 0
+        spec_array = y[0: len(y) // 2]
         bass_output = float(np.max(spec_array))
 
         if effect_config["manually_resize_bars"]:
@@ -48,7 +48,6 @@ class EffectBorder(Effect):
                     output[led][start: end] = np.vstack([gradient])
                 else:
                     output[led][start: end] = self._color_service.colour(effect_config["color"])[led]
-
 
         # Calculate how many steps the array will roll.
         steps = self.get_roll_steps(effect_config["roll_speed"])
