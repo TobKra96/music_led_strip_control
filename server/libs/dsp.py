@@ -70,7 +70,7 @@ class DSP():
         # Pad with zeros until the next power of two.
         y_data *= self.fft_window
         y_padded = np.pad(y_data, (0, N_zeros), mode='constant')
-        YS = np.abs(np.fft.rfft(y_padded)[:N // 2])
+        YS = np.abs(np.fft.rfft(y_padded))
         # Construct a Mel filterbank from the FFT data.
         mel = np.atleast_2d(YS).T * self.mel_y.T
         # Scale data to values more suitable for visualization.
@@ -113,7 +113,7 @@ class DSP():
         n_rolling_history = self._config["general_settings"]["n_rolling_history"]
         n_fft_bins = self._config["general_settings"]["n_fft_bins"]
 
-        samples = int(frames_per_buffer * (n_rolling_history / 2))
+        samples = (2**int(np.ceil(np.log2(frames_per_buffer * n_rolling_history)))) // 2 + 1
 
         self.mel_y, (_, self.mel_x) = self.melbank.compute_melmat(
             num_mel_bands=n_fft_bins,
