@@ -11,4 +11,5 @@ rpi_ws281x==4.3.4
 icmplib==3.0.3
 flasgger==0.9.5
 jsonschema==4.4.0
+APScheduler==3.9.1
 psutil
