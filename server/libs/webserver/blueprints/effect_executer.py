@@ -142,7 +142,6 @@ class EffectExecuter(ExecuterBase):
         for device in self._config["device_configs"]:
             self.control_cycle_job(device, effect)
             new_effect = self.parse_special_effects(effect, effect_dict, device)
-            print(device, new_effect)
             if new_effect is None:
                 return None
             self._config["device_configs"][device]["effects"]["last_effect"] = new_effect
