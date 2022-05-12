@@ -115,14 +115,14 @@ class EffectExecuter(ExecuterBase):
         if device == self.all_devices_id:
             return self.set_active_effect_for_all(effect, effect_dict)
         self.control_cycle_job(device, effect)
-        effect = self.parse_special_effects(effect, effect_dict, device)
-        if effect is None:
+        new_effect = self.parse_special_effects(effect, effect_dict, device)
+        if new_effect is None:
             return None
 
-        self._config["device_configs"][device]["effects"]["last_effect"] = effect
+        self._config["device_configs"][device]["effects"]["last_effect"] = new_effect
         self.save_config()
-        self.put_into_effect_queue(device, effect)
-        return {"device": device, "effect": effect}
+        self.put_into_effect_queue(device, new_effect)
+        return {"device": device, "effect": new_effect}
 
     def set_active_effect_for_multiple(self, devices, effect_dict):
         parsed = dict()
@@ -141,13 +141,12 @@ class EffectExecuter(ExecuterBase):
     def set_active_effect_for_all(self, effect, effect_dict):
         for device in self._config["device_configs"]:
             self.control_cycle_job(device, effect)
-
-        for device in self._config["device_configs"]:
-            effect = self.parse_special_effects(effect, effect_dict, device)
-            if effect is None:
+            new_effect = self.parse_special_effects(effect, effect_dict, device)
+            print(device, new_effect)
+            if new_effect is None:
                 return None
-            self._config["device_configs"][device]["effects"]["last_effect"] = effect
+            self._config["device_configs"][device]["effects"]["last_effect"] = new_effect
 
         self.save_config()
-        self.put_into_effect_queue(self.all_devices_id, effect)
-        return {"effect": effect}
+        self.put_into_effect_queue(self.all_devices_id, new_effect)
+        return {"effect": new_effect}
