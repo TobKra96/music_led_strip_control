@@ -4,8 +4,13 @@ from libs.config_service import ConfigService  # pylint: disable=E0611, E0401
 from libs.effects_enum import EffectsEnum  # pylint: disable=E0611, E0401
 from libs.effect_item import EffectItem  # pylint: disable=E0611, E0401
 
+from apscheduler.schedulers.background import BackgroundScheduler
 from functools import wraps
 import logging
+import atexit
+
+
+scheduler = BackgroundScheduler()
 
 
 def handle_config_errors(func):
@@ -39,6 +44,16 @@ class ExecuterBase():
         self.export_config_path = self._config_instance.get_config_path()
 
         self.all_devices_id = "all_devices"
+
+        self.scheduler = scheduler
+        if not self.scheduler.running:
+            self.scheduler.start()
+
+        atexit.register(self.shutdown_scheduler)
+
+    def shutdown_scheduler(self):
+        if self.scheduler.running:
+            self.scheduler.shutdown()
 
     # Helper
     def save_config(self):

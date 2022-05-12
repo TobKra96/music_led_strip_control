@@ -5,9 +5,11 @@ from random import choice
 
 class EffectExecuter(ExecuterBase):
 
-    # Return active effect.
     @handle_config_errors
     def get_active_effect(self, device):
+        """
+        Return active effect for a specified device.
+        """
         selected_device = device
         if device == self.all_devices_id:
             selected_device = next(iter(self._config["device_configs"]))
@@ -15,6 +17,9 @@ class EffectExecuter(ExecuterBase):
 
     @handle_config_errors
     def get_active_effects(self):
+        """
+        Return active effects for all devices.
+        """
         devices = []
         for device_key in self._config["device_configs"]:
             current_device = dict()
@@ -48,19 +53,59 @@ class EffectExecuter(ExecuterBase):
                 break
         return effect
 
+    def add_cycle_job(self, device):
+        """
+        Add new Random Cycle Effect job for a device.
+        """
+        interval = self._config["device_configs"][device]["effects"]["effect_random_cycle"]["interval"]
+        self.scheduler.add_job(
+            func=self.run_cycle_job,
+            id=device,
+            trigger="interval",
+            seconds=interval,
+            args=(device,)
+        )
+
+    def control_cycle_job(self, device, effect):
+        """
+        Toggle Random Cycle Effect job on or off.
+        """
+        if effect == "effect_random_cycle":
+            if not self.scheduler.get_job(device):
+                self.add_cycle_job(device)
+            else:
+                self.scheduler.resume_job(device)
+        else:
+            if self.scheduler.get_job(device):
+                self.scheduler.pause_job(device)
+
+    def run_cycle_job(self, device):
+        """
+        Run Random Cycle Effect as a separate Apscheduler job.
+        """
+        effect_list = self.get_enabled_effects(device)
+        effect = self.get_random_effect(effect_list, device)
+        self._config["device_configs"][device]["effects"]["last_effect"] = effect
+        self.put_into_effect_queue(device, effect)
+
     def parse_special_effects(self, effect, effect_dict, device):
-        """Return random effect based on selected special effect."""
+        """
+        Return random effect based on selected special effect.
+        """
         if effect not in ({*effect_dict["non_music"], *effect_dict["music"], *effect_dict["special"]}):
             return None
 
-        if effect == "effect_random_cycle":  # BUG: Random Cycle is not implemented for all_devices.
-            effect_list = self.get_enabled_effects(device)
-        elif effect == "effect_random_non_music":
-            effect_list = [k for k in effect_dict["non_music"].keys()]
-        elif effect == "effect_random_music":
-            effect_list = [k for k in effect_dict["music"].keys()]
-        else:
+        special_effects = ("effect_random_cycle", "effect_random_non_music", "effect_random_music")
+
+        if effect not in special_effects:
             return effect
+
+        if effect == special_effects[0]:
+            effect_list = self.get_enabled_effects(device)
+        elif effect == special_effects[1]:
+            effect_list = [k for k in effect_dict["non_music"].keys()]
+        elif effect == special_effects[2]:
+            effect_list = [k for k in effect_dict["music"].keys()]
 
         effect = self.get_random_effect(effect_list, device)
         return effect
@@ -69,6 +114,7 @@ class EffectExecuter(ExecuterBase):
     def set_active_effect(self, device, effect, effect_dict):
         if device == self.all_devices_id:
             return self.set_active_effect_for_all(effect, effect_dict)
+        self.control_cycle_job(device, effect)
         effect = self.parse_special_effects(effect, effect_dict, device)
         if effect is None:
             return None
@@ -93,6 +139,9 @@ class EffectExecuter(ExecuterBase):
 
     @handle_config_errors
     def set_active_effect_for_all(self, effect, effect_dict):
+        for device in self._config["device_configs"]:
+            self.control_cycle_job(device, effect)
+
         for device in self._config["device_configs"]:
             effect = self.parse_special_effects(effect, effect_dict, device)
             if effect is None:

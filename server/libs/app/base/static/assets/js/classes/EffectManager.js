@@ -25,20 +25,22 @@ export default class EffectManager {
     switchEffect(effect) {
         if (effect.length > 0) {
 
-            const effectCycleActive = sessionStorage.getItem('effect_cycle_active');
-            if (effect == 'effect_random_cycle') {
-                this.getTimerData()
+            // TODO: Refactor client-side timer and animations.
 
-                if (!effectCycleActive) {
-                    this.timer.start({ countdown: true, startValues: { seconds: this.intervalSec + 1 } });
-                    sessionStorage.setItem('effect_cycle_active', true);
-                }
-            } else {
-                if (effectCycleActive) {
-                    this.timer.stop();
-                    sessionStorage.removeItem('effect_cycle_active');
-                }
-            }
+            // const effectCycleActive = sessionStorage.getItem('effect_cycle_active');
+            // if (effect == 'effect_random_cycle') {
+            //     this.getTimerData()
+
+            //     if (!effectCycleActive) {
+            //         this.timer.start({ countdown: true, startValues: { seconds: this.intervalSec + 1 } });
+            //         sessionStorage.setItem('effect_cycle_active', true);
+            //     }
+            // } else {
+            //     if (effectCycleActive) {
+            //         this.timer.stop();
+            //         sessionStorage.removeItem('effect_cycle_active');
+            //     }
+            // }
 
             $.ajax({
                 url: "/api/effect/active",

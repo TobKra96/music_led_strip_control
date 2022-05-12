@@ -38,6 +38,7 @@ class EffectSettingsExecuter(ExecuterBase):
 
         for setting_key in settings:
             self._config["device_configs"][device]["effects"][effect][setting_key] = settings[setting_key]
+        self.update_cycle_job(device, effect)
 
         self.save_config()
         self.refresh_device(device)
@@ -47,7 +48,23 @@ class EffectSettingsExecuter(ExecuterBase):
         for device_key in self._config["device_configs"]:
             for setting_key in settings:
                 self._config["device_configs"][device_key]["effects"][effect][setting_key] = settings[setting_key]
+            self.update_cycle_job(device_key, effect)
 
         self.save_config()
-        self.refresh_device("all_devices")
+        self.refresh_device(self.all_devices_id)
         return self._config["device_configs"]
+
+    def update_cycle_job(self, device, effect):
+        """
+        Change the Random Cycle Effect job interval on save.
+        """
+        if effect != "effect_random_cycle":
+            return
+
+        job = self.scheduler.get_job(device)
+        if job:
+            was_running = job.next_run_time
+            interval = self._config["device_configs"][device]["effects"]["effect_random_cycle"]["interval"]
+            self.scheduler.reschedule_job(device, trigger="interval", seconds=interval)
+            if not was_running:  # Workaround flag because `reschedule_job()` unpauses jobs.
+                self.scheduler.pause_job(device)
