@@ -165,11 +165,15 @@
                 "speed": 5
             },
             "effect_strobe": {
-                "change_color": false,
-                "color": "blue",
-                "gradient": "spectral",
-                "strobe_length": 10,
-                "speed": 5
+                "color": "white",
+                "speed": 1,
+                "custom_color": [
+                    0,
+                    0,
+                    255
+                ],
+                "use_custom_color": "false",
+                "white": 0
             },
             "effect_power": {
                 "color_mode": "spectral",
@@ -402,13 +406,16 @@
                 "uppermid_speed": 4
             },
             "effect_strobe": {
-                "change_color": false,
-                "color": "blue",
-                "gradient": "spectral",
-                "strobe_length": 10,
-                "speed": 5
+                "color": "white",
+                "speed": 1,
+                "custom_color": [
+                    0,
+                    0,
+                    255
+                ],
+                "use_custom_color": "false",
+                "white": 0
             },
-
             "effect_bars": {
                 "color_mode": "spectral",
                 "flip_lr": false,
