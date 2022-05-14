@@ -164,6 +164,13 @@
                 "pendulum_length": 10,
                 "speed": 5
             },
+            "effect_strobe": {
+                "change_color": false,
+                "color": "blue",
+                "gradient": "spectral",
+                "strobe_length": 10,
+                "speed": 5
+            },
             "effect_power": {
                 "color_mode": "spectral",
                 "flip_lr": false,
@@ -394,6 +401,14 @@
                 "uppermid_multiplier": 1,
                 "uppermid_speed": 4
             },
+            "effect_strobe": {
+                "change_color": false,
+                "color": "blue",
+                "gradient": "spectral",
+                "strobe_length": 10,
+                "speed": 5
+            },
+
             "effect_bars": {
                 "color_mode": "spectral",
                 "flip_lr": false,

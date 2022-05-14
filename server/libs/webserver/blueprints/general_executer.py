@@ -61,7 +61,8 @@ class GeneralExecuter(ExecuterBase):
             "effect_pendulum": "Pendulum",
             "effect_rods": "Rods",
             "effect_segment_color": "Segment Color",
-            "effect_fireplace": "Fireplace"
+            "effect_fireplace": "Fireplace",
+            "effect_strobe": "Strobe",
         }
         effects["music"] = {
             "effect_scroll": "Scroll",

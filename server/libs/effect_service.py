@@ -27,6 +27,7 @@ from libs.effects.effect_wave import EffectWave  # pylint: disable=E0611, E0401
 from libs.effects.effect_off import EffectOff  # pylint: disable=E0611, E0401
 from libs.effects_enum import EffectsEnum  # pylint: disable=E0611, E0401
 from libs.fps_limiter import FPSLimiter  # pylint: disable=E0611, E0401
+from libs.effects.effect_strobe import EffectStrobe  # pylint: disable=E0611, E0401
 
 from time import time
 import logging
@@ -78,7 +79,8 @@ class EffectService():
             EffectsEnum.effect_direction_changer: EffectDirectionChanger,
             EffectsEnum.effect_beat_twinkle: EffectBeatTwinkle,
             EffectsEnum.effect_segment_color: EffectSegmentColor,
-            EffectsEnum.effect_fireplace: EffectFireplace
+            EffectsEnum.effect_fireplace: EffectFireplace,
+            EffectsEnum.effect_strobe: EffectStrobe
         }
 
         self._initialized_effects = {}

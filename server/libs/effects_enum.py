@@ -29,3 +29,4 @@ class EffectsEnum(Enum):
     effect_beat_twinkle = 25
     effect_segment_color = 26
     effect_fireplace = 27
+    effect_strobe = 28
