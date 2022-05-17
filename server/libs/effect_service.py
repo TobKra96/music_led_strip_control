@@ -17,6 +17,7 @@ from libs.effects.effect_bubble import EffectBubble  # pylint: disable=E0611, E0
 from libs.effects.effect_energy import EffectEnergy  # pylint: disable=E0611, E0401
 from libs.effects.effect_scroll import EffectScroll  # pylint: disable=E0611, E0401
 from libs.effects.effect_single import EffectSingle  # pylint: disable=E0611, E0401
+from libs.effects.effect_strobe import EffectStrobe  # pylint: disable=E0611, E0401
 from libs.effects.effect_wiggle import EffectWiggle  # pylint: disable=E0611, E0401
 from libs.effects.effect_power import EffectPower  # pylint: disable=E0611, E0401
 from libs.effects.effect_slide import EffectSlide  # pylint: disable=E0611, E0401
@@ -80,7 +81,8 @@ class EffectService():
             EffectsEnum.effect_vu_meter: EffectVuMeter,
             EffectsEnum.effect_spectrum_analyzer: EffectSpectrumAnalyzer,
             EffectsEnum.effect_direction_changer: EffectDirectionChanger,
-            EffectsEnum.effect_border: EffectBorder
+            EffectsEnum.effect_border: EffectBorder,
+            EffectsEnum.effect_strobe: EffectStrobe
         }
 
         self._initialized_effects = {}

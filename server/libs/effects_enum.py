@@ -32,6 +32,7 @@ class EffectsEnum(Enum):
     effect_random_cycle = 28
     effect_random_non_music = 29
     effect_random_music = 30
+    effect_strobe = 31
 
 
 class EffectNames():
@@ -46,7 +47,8 @@ class EffectNames():
         EffectsEnum(9).name: "Pendulum",
         EffectsEnum(10).name: "Rods",
         EffectsEnum(11).name: "Segment Color",
-        EffectsEnum(12).name: "Fireplace"
+        EffectsEnum(12).name: "Fireplace",
+        EffectsEnum(31).name: "Strobe"
     }
 
     music = {
