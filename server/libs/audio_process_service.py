@@ -53,6 +53,9 @@ class AudioProcessService:
             selected_device_list_index = 0
             try:
                 mic_id = self._config["general_settings"]["device_id"]
+                # -1 means no mic available, we can return now to prevent further load
+                if mic_id == -1:
+                    return
                 selected_device_list_index = int(mic_id)
             except Exception as e:
                 self.logger.exception(f"Could not parse audio id: {e}")
