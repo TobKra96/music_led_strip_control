@@ -279,17 +279,6 @@
                 "reverse": false,
                 "speed": 1
             },
-            "effect_strobe": {
-                "color": "white",
-                "speed": 1,
-                "custom_color": [
-                    0,
-                    0,
-                    255
-                ],
-                "use_custom_color": "false",
-                "white": 0
-            },
             "effect_twinkle": {
                 "blur": 1,
                 "gradient": "spectral",
