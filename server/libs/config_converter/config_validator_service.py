@@ -34,6 +34,7 @@ class ConfigValidatorService():
             "effect_single",
             "effect_slide",
             "effect_spectrum_analyzer",
+            "effect_strobe",
             "effect_sync_fade",
             "effect_twinkle",
             "effect_vu_meter",
@@ -63,6 +64,7 @@ class ConfigValidatorService():
             "jupiter",
             "ocean",
             "peach",
+            "pulse",
             "rust",
             "safari",
             "spectral",
@@ -102,8 +104,8 @@ class ConfigValidatorService():
         effect_schema = {
             "type": "object",
             "additionalProperties": False,
-            "maxProperties": 28,
-            "minProperties": 27,
+            "maxProperties": 29,
+            "minProperties": 28,
             "required": effect_enum + ["last_effect"],
             "properties": {
                 "effect_advanced_scroll": {
@@ -793,8 +795,8 @@ class ConfigValidatorService():
                 "effect_random_cycle": {
                     "type": "object",
                     "additionalProperties": False,
-                    "maxProperties": 27,
-                    "minProperties": 27,
+                    "maxProperties": 28,
+                    "minProperties": 28,
                     "required": effect_enum + ["interval"],
                     "properties": {
                         "effect_advanced_scroll": {"type": "boolean"},
@@ -817,6 +819,7 @@ class ConfigValidatorService():
                         "effect_single": {"type": "boolean"},
                         "effect_slide": {"type": "boolean"},
                         "effect_spectrum_analyzer": {"type": "boolean"},
+                        "effect_strobe": {"type": "boolean"},
                         "effect_sync_fade": {"type": "boolean"},
                         "effect_twinkle": {"type": "boolean"},
                         "effect_vu_meter": {"type": "boolean"},
@@ -1171,6 +1174,45 @@ class ConfigValidatorService():
                         }
                     }
                 },
+                "effect_strobe": {
+                    "type": "object",
+                    "additionalProperties": False,
+                    "maxProperties": 5,
+                    "minProperties": 5,
+                    "required": [
+                        "color",
+                        "custom_color",
+                        "speed",
+                        "use_custom_color",
+                        "white"
+                    ],
+                    "properties": {
+                        "color": {
+                            "enum": color_enum
+                        },
+                        "custom_color": {
+                            "type": "array",
+                            "items": {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 255
+                            },
+                            "maxItems": 3,
+                            "minItems": 3
+                        },
+                        "speed": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 100
+                        },
+                        "use_custom_color": {"type": "boolean"},
+                        "white": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 255
+                        },
+                    }
+                },
                 "effect_sync_fade": {
                     "type": "object",
                     "additionalProperties": False,
@@ -1382,23 +1424,6 @@ class ConfigValidatorService():
                 "last_effect": {
                     "enum": effect_enum + ["effect_off"]
                 }
-            }
-        }
-
-        all_devices_schema = {
-            "type": "object",
-            "additionalProperties": False,
-            "maxProperties": 2,
-            "minProperties": 2,
-            "required": [
-                "device_name",
-                "effects"
-            ],
-            "properties": {
-                "device_name": {
-                    "const": "All Devices"
-                },
-                "effects": effect_schema
             }
         }
 
@@ -1761,8 +1786,8 @@ class ConfigValidatorService():
         gradients_schema = {
             "type": "object",
             "additionalProperties": False,
-            "maxProperties": 12,
-            "minProperties": 12,
+            "maxProperties": 13,
+            "minProperties": 13,
             "required": gradient_enum,
             "properties": {
                 "dancefloor": {
@@ -1869,6 +1894,21 @@ class ConfigValidatorService():
                     },
                     "maxItems": 2,
                     "minItems": 2
+                },
+                "pulse": {
+                    "type": "array",
+                    "items": {
+                        "type": "array",
+                        "items": {
+                            "type": "integer",
+                            "maxItems": 3,
+                            "minItems": 3,
+                            "minimum": 0,
+                            "maximum": 255
+                        },
+                    },
+                    "maxItems": 3,
+                    "minItems": 3
                 },
                 "rust": {
                     "type": "array",
@@ -2042,10 +2082,9 @@ class ConfigValidatorService():
         schema = {
             "type": "object",
             "additionalProperties": False,
-            "maxProperties": 10,
-            "minProperties": 10,
+            "maxProperties": 9,
+            "minProperties": 9,
             "required": [
-                "all_devices",
                 "colors",
                 "default_device",
                 "development_config",
@@ -2057,7 +2096,6 @@ class ConfigValidatorService():
                 "version"
             ],
             "properties": {
-                "all_devices": all_devices_schema,
                 "colors": colors_schema,
                 "default_device": device_schema,
                 "development_config": development_config_schema,
