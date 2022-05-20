@@ -38,16 +38,16 @@
 
 ## Features
 
-- Audio visualization in real time.
-- Modern web interface.
-- REST API with extensive documentation using SwaggerUI.
-- Optional dashboard PIN lock.
-- System status dashboard.
-- 26 effects with many configuration options.
-- Customizable colors and color schemes.
-- Multicore optimized for large LED strips (900+ LEDs).
-- Multi-device support.
-- Standalone and client compatible for audio processing.
+- 🎵 Audio visualization in real time.
+- ✨ Modern web interface.
+- 📝 REST API with extensive documentation using SwaggerUI.
+- 🔒 Optional dashboard PIN lock.
+- 📈 System status dashboard.
+- 💡 27 effects with many configuration options.
+- 🎨 Customizable colors and color schemes.
+- ⚡ Multicore optimized for large LED strips (900+ LEDs).
+- 🖥️ Multi-device support.
+- 🎙️ Standalone and client compatible for audio processing.
 
 
 ## Installing
