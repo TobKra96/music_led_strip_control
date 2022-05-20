@@ -1112,16 +1112,7 @@ class ConfigValidatorService():
                         "color": {
                             "enum": color_enum
                         },
-                        "custom_color": {
-                            "type": "array",
-                            "items": {
-                                "type": "integer",
-                                "minimum": 0,
-                                "maximum": 255
-                            },
-                            "maxItems": 3,
-                            "minItems": 3
-                        },
+                        "custom_color": {"$ref": "#/$defs/rgb"},
                         "use_custom_color": {"type": "boolean"},
                         "white": {
                             "type": "integer",
@@ -1190,16 +1181,7 @@ class ConfigValidatorService():
                         "color": {
                             "enum": color_enum
                         },
-                        "custom_color": {
-                            "type": "array",
-                            "items": {
-                                "type": "integer",
-                                "minimum": 0,
-                                "maximum": 255
-                            },
-                            "maxItems": 3,
-                            "minItems": 3
-                        },
+                        "custom_color": {"$ref": "#/$defs/rgb"},
                         "speed": {
                             "type": "integer",
                             "minimum": 1,
@@ -1573,106 +1555,16 @@ class ConfigValidatorService():
             "minProperties": 10,
             "required": color_enum,
             "properties": {
-                "black": {
-                    "type": "array",
-                    "items": {
-                        "type": "integer",
-                        "minimum": 0,
-                        "maximum": 255
-                    },
-                    "maxItems": 3,
-                    "minItems": 3
-                },
-                "blue": {
-                    "type": "array",
-                    "items": {
-                        "type": "integer",
-                        "minimum": 0,
-                        "maximum": 255
-                    },
-                    "maxItems": 3,
-                    "minItems": 3
-                },
-                "cyan": {
-                    "type": "array",
-                    "items": {
-                        "type": "integer",
-                        "minimum": 0,
-                        "maximum": 255
-                    },
-                    "maxItems": 3,
-                    "minItems": 3
-                },
-                "green": {
-                    "type": "array",
-                    "items": {
-                        "type": "integer",
-                        "minimum": 0,
-                        "maximum": 255
-                    },
-                    "maxItems": 3,
-                    "minItems": 3
-                },
-                "orange": {
-                    "type": "array",
-                    "items": {
-                        "type": "integer",
-                        "minimum": 0,
-                        "maximum": 255
-                    },
-                    "maxItems": 3,
-                    "minItems": 3
-                },
-                "pink": {
-                    "type": "array",
-                    "items": {
-                        "type": "integer",
-                        "minimum": 0,
-                        "maximum": 255
-                    },
-                    "maxItems": 3,
-                    "minItems": 3
-                },
-                "purple": {
-                    "type": "array",
-                    "items": {
-                        "type": "integer",
-                        "minimum": 0,
-                        "maximum": 255
-                    },
-                    "maxItems": 3,
-                    "minItems": 3
-                },
-                "red": {
-                    "type": "array",
-                    "items": {
-                        "type": "integer",
-                        "minimum": 0,
-                        "maximum": 255
-                    },
-                    "maxItems": 3,
-                    "minItems": 3
-                },
-                "white": {
-                    "type": "array",
-                    "items": {
-                        "type": "integer",
-                        "minimum": 0,
-                        "maximum": 255
-                    },
-                    "maxItems": 3,
-                    "minItems": 3
-                },
-                "yellow": {
-                    "type": "array",
-                    "items": {
-                        "type": "integer",
-                        "minimum": 0,
-                        "maximum": 255
-                    },
-                    "maxItems": 3,
-                    "minItems": 3
-                }
+                "black": {"$ref": "#/$defs/rgb"},
+                "blue": {"$ref": "#/$defs/rgb"},
+                "cyan": {"$ref": "#/$defs/rgb"},
+                "green": {"$ref": "#/$defs/rgb"},
+                "orange": {"$ref": "#/$defs/rgb"},
+                "pink": {"$ref": "#/$defs/rgb"},
+                "purple": {"$ref": "#/$defs/rgb"},
+                "red": {"$ref": "#/$defs/rgb"},
+                "white": {"$ref": "#/$defs/rgb"},
+                "yellow": {"$ref": "#/$defs/rgb"}
             }
         }
 
@@ -1792,196 +1684,79 @@ class ConfigValidatorService():
             "properties": {
                 "dancefloor": {
                     "type": "array",
-                    "items": {
-                        "type": "array",
-                        "items": {
-                            "type": "integer",
-                            "maxItems": 3,
-                            "minItems": 3,
-                            "minimum": 0,
-                            "maximum": 255
-                        },
-                    },
+                    "items": {"$ref": "#/$defs/rgb"},
                     "maxItems": 4,
                     "minItems": 4
                 },
                 "fruity": {
                     "type": "array",
-                    "items": {
-                        "type": "array",
-                        "items": {
-                            "type": "integer",
-                            "maxItems": 3,
-                            "minItems": 3,
-                            "minimum": 0,
-                            "maximum": 255
-                        },
-                    },
+                    "items": {"$ref": "#/$defs/rgb"},
                     "maxItems": 2,
                     "minItems": 2
                 },
                 "jamaica": {
                     "type": "array",
-                    "items": {
-                        "type": "array",
-                        "items": {
-                            "type": "integer",
-                            "maxItems": 3,
-                            "minItems": 3,
-                            "minimum": 0,
-                            "maximum": 255
-                        },
-                    },
+                    "items": {"$ref": "#/$defs/rgb"},
                     "maxItems": 2,
                     "minItems": 2
                 },
                 "jungle": {
                     "type": "array",
-                    "items": {
-                        "type": "array",
-                        "items": {
-                            "type": "integer",
-                            "maxItems": 3,
-                            "minItems": 3,
-                            "minimum": 0,
-                            "maximum": 255
-                        },
-                    },
+                    "items": {"$ref": "#/$defs/rgb"},
                     "maxItems": 3,
                     "minItems": 3
                 },
                 "jupiter": {
                     "type": "array",
-                    "items": {
-                        "type": "array",
-                        "items": {
-                            "type": "integer",
-                            "maxItems": 3,
-                            "minItems": 3,
-                            "minimum": 0,
-                            "maximum": 255
-                        },
-                    },
+                    "items": {"$ref": "#/$defs/rgb"},
                     "maxItems": 2,
                     "minItems": 2
                 },
                 "ocean": {
                     "type": "array",
-                    "items": {
-                        "type": "array",
-                        "items": {
-                            "type": "integer",
-                            "maxItems": 3,
-                            "minItems": 3,
-                            "minimum": 0,
-                            "maximum": 255
-                        },
-                    },
+                    "items": {"$ref": "#/$defs/rgb"},
                     "maxItems": 3,
                     "minItems": 3
                 },
                 "peach": {
                     "type": "array",
-                    "items": {
-                        "type": "array",
-                        "items": {
-                            "type": "integer",
-                            "maxItems": 3,
-                            "minItems": 3,
-                            "minimum": 0,
-                            "maximum": 255
-                        },
-                    },
+                    "items": {"$ref": "#/$defs/rgb"},
                     "maxItems": 2,
                     "minItems": 2
                 },
                 "pulse": {
                     "type": "array",
-                    "items": {
-                        "type": "array",
-                        "items": {
-                            "type": "integer",
-                            "maxItems": 3,
-                            "minItems": 3,
-                            "minimum": 0,
-                            "maximum": 255
-                        },
-                    },
+                    "items": {"$ref": "#/$defs/rgb"},
                     "maxItems": 3,
                     "minItems": 3
                 },
                 "rust": {
                     "type": "array",
-                    "items": {
-                        "type": "array",
-                        "items": {
-                            "type": "integer",
-                            "maxItems": 3,
-                            "minItems": 3,
-                            "minimum": 0,
-                            "maximum": 255
-                        },
-                    },
+                    "items": {"$ref": "#/$defs/rgb"},
                     "maxItems": 2,
                     "minItems": 2
                 },
                 "safari": {
                     "type": "array",
-                    "items": {
-                        "type": "array",
-                        "items": {
-                            "type": "integer",
-                            "maxItems": 3,
-                            "minItems": 3,
-                            "minimum": 0,
-                            "maximum": 255
-                        },
-                    },
+                    "items": {"$ref": "#/$defs/rgb"},
                     "maxItems": 3,
                     "minItems": 3
                 },
                 "spectral": {
                     "type": "array",
-                    "items": {
-                        "type": "array",
-                        "items": {
-                            "type": "integer",
-                            "maxItems": 3,
-                            "minItems": 3,
-                            "minimum": 0,
-                            "maximum": 255
-                        },
-                    },
+                    "items": {"$ref": "#/$defs/rgb"},
                     "maxItems": 8,
                     "minItems": 8
                 },
                 "sunny": {
                     "type": "array",
-                    "items": {
-                        "type": "array",
-                        "items": {
-                            "type": "integer",
-                            "maxItems": 3,
-                            "minItems": 3,
-                            "minimum": 0,
-                            "maximum": 255
-                        },
-                    },
+                    "items": {"$ref": "#/$defs/rgb"},
                     "maxItems": 4,
                     "minItems": 4
                 },
                 "sunset": {
                     "type": "array",
-                    "items": {
-                        "type": "array",
-                        "items": {
-                            "type": "integer",
-                            "maxItems": 3,
-                            "minItems": 3,
-                            "minimum": 0,
-                            "maximum": 255
-                        },
-                    },
+                    "items": {"$ref": "#/$defs/rgb"},
                     "maxItems": 3,
                     "minItems": 3
                 }
@@ -2105,6 +1880,18 @@ class ConfigValidatorService():
                 "led_strips": led_strips_schema,
                 "logging_levels": logging_levels_schema,
                 "version": version_schema
+            },
+            "$defs": {
+                "rgb": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 255
+                    },
+                    "maxItems": 3,
+                    "minItems": 3
+                }
             }
         }
 
