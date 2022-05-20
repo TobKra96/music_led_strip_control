@@ -1900,9 +1900,9 @@ class ConfigValidatorService():
     def validate_config(self, config):
         v = Draft7Validator(self.schema)
         errors = sorted(v.iter_errors(config), key=lambda e: e.path)
-        for error in errors:
-            self.logger.error(error.message)
+        for e in errors:
+            self.logger.error(f"\nError text: {e.message}.\nError path: {e.json_path}\n")
 
         # Validate will raise exception if given json is not
         # what is described in schema.
-        validate(instance=config, schema=self.schema)
+        # validate(instance=config, schema=self.schema)
