@@ -12,7 +12,6 @@ ALSA_DIR="/usr/share/alsa/alsa.conf" # Alsa config location
 SERVICE_DIR="/etc/systemd/system/mlsc.service" # MLSC systemd service location
 SERVICE_NAME="mlsc.service" # MLSC systemd service name
 GIT_BRANCH="master"
-GIT_OWNER="TobKra96"
 
 
 # Colors
@@ -51,7 +50,7 @@ function prompt {
 # Confirm action before proceeding.
 function confirm {
     while true; do
-        read -p "$(prompt -w "$*? [y/N] ")" yn </dev/tty
+        read -rp "$(prompt -w "$*? [y/N] ")" yn </dev/tty
         case $yn in
             [Yy]*) prompt -s "Proceeding..."; return 0;;
             [Nn]*) prompt -i "Skipped."; return 1;;
@@ -72,11 +71,10 @@ function usage {
     echo ""
     prompt -i "OPTIONS"
     prompt -i "  -b, --branch        git branch to use (master, dev_2.3)"
-    prompt -i "  -d, --developer     repository of a developer to use (TobKra96, Teraskull)"
     prompt -i "  -h, --help          show this list of command-line options"
     echo ""
     prompt -i "Example:"
-    prompt -i "  sudo bash $0 --branch dev_2.3 --developer TobKra96"
+    prompt -i "  sudo bash $0 --branch dev_2.3"
     if [ -n "$1" ]; then
         exit 1
     fi
@@ -86,7 +84,6 @@ function usage {
 # Parse arguments.
 while [[ "$#" > 0 ]]; do case $1 in
     -b|--branch) GIT_BRANCH="$2"; shift;shift;;
-    -d|--developer) GIT_OWNER="$2";shift;shift;;
     -h|--help) usage;shift;;
     *) usage "Unknown argument passed: $1";shift;shift;;
 esac; done
@@ -95,11 +92,6 @@ esac; done
 case $GIT_BRANCH in
     master|dev_2.3);;
     *) GIT_BRANCH="master";;
-esac
-
-case $GIT_OWNER in
-    TobKra96|Teraskull);;
-    *) GIT_OWNER="TobKra96";;
 esac
 
 
@@ -147,8 +139,7 @@ if [[ -d $PROJ_DIR ]]; then
         fi
 	    sudo mv -T $PROJ_DIR "${PROJ_DIR}_bak"
         prompt -s "\nNew backup of ${PROJ_NAME} created."
-        sudo git clone https://github.com/${GIT_OWNER}/music_led_strip_control.git
-        git checkout $GIT_BRANCH
+        sudo git clone --depth 1 --branch $GIT_BRANCH https://github.com/TobKra96/music_led_strip_control.git
         prompt -s "\nConfig is stored in .mlsc, in the same directory as the MLSC installation."
         if [[ -f $SERVICE_DIR ]]; then
             if [[ $systemctl_status == 'active' ]]; then
@@ -158,12 +149,11 @@ if [[ -d $PROJ_DIR ]]; then
         fi
     fi
 else
-    sudo git clone https://github.com/${GIT_OWNER}/music_led_strip_control.git
-    git checkout $GIT_BRANCH
+    sudo git clone --depth 1 --branch $GIT_BRANCH https://github.com/TobKra96/music_led_strip_control.git
 fi
 
-# Install modules from requirements.txt.
-sudo pip3 install --no-cache-dir --no-input -r ${PROJ_DIR}/requirements.txt
+# Install/update modules from requirements.txt.
+sudo pip3 install --no-cache-dir --no-input --upgrade -r ${PROJ_DIR}/requirements.txt
 
 
 # Setup microphone:
@@ -219,7 +209,7 @@ After=network.target
 [Service]
 Type=simple
 User=root
-WorkingDirectory=/share/music_led_strip_control/server
+WorkingDirectory=${INST_DIR}/music_led_strip_control/server
 ExecStart=python3 main.py
 Restart=on-abnormal
 RestartSec=10
