@@ -54,5 +54,5 @@ class GeneralExecuter(ExecuterBase):
         effects["non_music"] = EffectNames.non_music
         effects["music"] = EffectNames.music
         effects["special"] = EffectNames.special
-        effects["order"] = {effect.name: effect.value for effect in EffectsEnum}
+        effects["order"] = {effect.name: index for index, effect in enumerate(EffectsEnum, 1)}
         return effects

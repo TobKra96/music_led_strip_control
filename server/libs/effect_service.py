@@ -67,6 +67,7 @@ class EffectService():
             EffectsEnum.effect_rods: EffectRods,
             EffectsEnum.effect_segment_color: EffectSegmentColor,
             EffectsEnum.effect_fireplace: EffectFireplace,
+            EffectsEnum.effect_strobe: EffectStrobe,
             EffectsEnum.effect_scroll: EffectScroll,
             EffectsEnum.effect_advanced_scroll: EffectAdvancedScroll,
             EffectsEnum.effect_energy: EffectEnergy,
@@ -81,8 +82,7 @@ class EffectService():
             EffectsEnum.effect_vu_meter: EffectVuMeter,
             EffectsEnum.effect_spectrum_analyzer: EffectSpectrumAnalyzer,
             EffectsEnum.effect_direction_changer: EffectDirectionChanger,
-            EffectsEnum.effect_border: EffectBorder,
-            EffectsEnum.effect_strobe: EffectStrobe
+            EffectsEnum.effect_border: EffectBorder
         }
 
         self._initialized_effects = {}
