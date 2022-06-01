@@ -80,7 +80,7 @@ class DeviceExecuter(ExecuterBase):
                 self._config["device_configs"][new_device_id] = new_device_config
                 self.save_config()
 
-                self.refresh_device("all_devices")
+                self.refresh_device(self.all_devices_id)
                 break
 
             i += 1
@@ -90,7 +90,7 @@ class DeviceExecuter(ExecuterBase):
     def delete_device(self, device):
         del self._config["device_configs"][device]
         self.save_config()
-        self.refresh_device("all_devices")
+        self.refresh_device(self.all_devices_id)
         return self._config["device_configs"]
 
     @handle_config_errors
@@ -112,7 +112,7 @@ class DeviceExecuter(ExecuterBase):
                 device_groups.append(new_group_name)
 
                 self.save_config()
-                self.refresh_device("all_devices")
+                self.refresh_device(self.all_devices_id)
                 return self.get_groups()
         return None
 
@@ -126,7 +126,7 @@ class DeviceExecuter(ExecuterBase):
         self._config["general_settings"]["device_groups"].remove(group_name)
 
         self.save_config()
-        self.refresh_device("all_devices")
+        self.refresh_device(self.all_devices_id)
         return self.get_groups()
 
     @handle_config_errors
@@ -147,5 +147,5 @@ class DeviceExecuter(ExecuterBase):
         removed_groups["removed_groups"] = groups_to_remove
 
         self.save_config()
-        self.refresh_device("all_devices")
+        self.refresh_device(self.all_devices_id)
         return removed_groups

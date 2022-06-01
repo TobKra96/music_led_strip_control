@@ -16,10 +16,13 @@ class GeneralSettingsExecuter(ExecuterBase):
 
     @handle_config_errors
     def set_general_setting(self, settings):
-        for setting_key in settings:
-            self._config["general_settings"][setting_key] = settings[setting_key]
+        if not isinstance(settings, dict) or not settings:
+            return None
+
+        for setting_key, setting_value in settings.items():
+            self._config["general_settings"][setting_key] = setting_value
         self.save_config()
-        self.refresh_device("all_devices")
+        self.refresh_device(self.all_devices_id)
         return self._config["general_settings"][setting_key]
 
     def get_webserver_port(self):
@@ -30,7 +33,7 @@ class GeneralSettingsExecuter(ExecuterBase):
 
     def reset_settings(self):
         self.reset_config()
-        self.refresh_device("all_devices")
+        self.refresh_device(self.all_devices_id)
 
     def reset_config(self):
         self._config_instance.reset_config()
@@ -46,7 +49,7 @@ class GeneralSettingsExecuter(ExecuterBase):
             self._config = imported_config
             self.save_config()
             self._config_instance.check_compatibility()
-            self.refresh_device("all_devices")
+            self.refresh_device(self.all_devices_id)
             return True
         self.logger.error("Unknown Type.")
         return False

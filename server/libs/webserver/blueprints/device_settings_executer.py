@@ -17,8 +17,11 @@ class DeviceSettingsExecuter(ExecuterBase):
 
     @handle_config_errors
     def set_device_setting(self, device, settings):
-        for setting_key in settings:
-            self._config["device_configs"][device][setting_key] = settings[setting_key]
+        if not isinstance(settings, dict) or not settings:
+            return None
+
+        for setting_key, setting_value in settings.items():
+            self._config["device_configs"][device][setting_key] = setting_value
         self.save_config()
 
         self.refresh_device(device)
@@ -31,8 +34,11 @@ class DeviceSettingsExecuter(ExecuterBase):
 
     @handle_config_errors
     def set_output_type_device_setting(self, device, output_type_key, settings):
-        for setting_key in settings:
-            self._config["device_configs"][device]["output"][output_type_key][setting_key] = settings[setting_key]
+        if not isinstance(settings, dict) or not settings:
+            return None
+
+        for setting_key, setting_value in settings.items():
+            self._config["device_configs"][device]["output"][output_type_key][setting_key] = setting_value
         self.save_config()
 
         self.refresh_device(device)

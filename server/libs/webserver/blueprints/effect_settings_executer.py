@@ -36,8 +36,8 @@ class EffectSettingsExecuter(ExecuterBase):
         if device == self.all_devices_id:
             return self.set_effect_setting_for_all(effect, settings)
 
-        for setting_key in settings:
-            self._config["device_configs"][device]["effects"][effect][setting_key] = settings[setting_key]
+        for setting_key, setting_value in settings.items():
+            self._config["device_configs"][device]["effects"][effect][setting_key] = setting_value
         self.update_cycle_job(device, effect)
 
         self.save_config()
@@ -46,8 +46,8 @@ class EffectSettingsExecuter(ExecuterBase):
 
     def set_effect_setting_for_all(self, effect, settings):
         for device_key in self._config["device_configs"]:
-            for setting_key in settings:
-                self._config["device_configs"][device_key]["effects"][effect][setting_key] = settings[setting_key]
+            for setting_key, setting_value in settings.items():
+                self._config["device_configs"][device_key]["effects"][effect][setting_key] = setting_value
             self.update_cycle_job(device_key, effect)
 
         self.save_config()
