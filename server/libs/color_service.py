@@ -131,6 +131,7 @@ class ColorService():
     def build_bubblearrays(self):
         led_count = self._device_config["led_count"]
         effect_config = self._device_config["effects"]["effect_bubble"]
+        repeat_count = effect_config["bubble_repeat"]
 
         self.full_bubble = {}
 
@@ -139,14 +140,14 @@ class ColorService():
             current_color = 1
 
             # Get the steps between each bubble.
-            steps_between_bubbles = int(led_count / (gradient_color_count * effect_config["bubble_repeat"]))
+            steps_between_bubbles = int(led_count / (gradient_color_count * repeat_count + 1))
 
             # First build black array:
             self.full_bubble[gradient] = np.zeros((3, led_count))
 
             for color in self._config["gradients"][gradient]:
 
-                for current_bubble_repeat in range(effect_config["bubble_repeat"]):
+                for current_bubble_repeat in range(repeat_count):
 
                     #             Find the right spot in the array for the repetition.                     Find the right spot in the repetition for the color.
                     start_index = int((current_bubble_repeat * gradient_color_count * steps_between_bubbles) + (current_color * steps_between_bubbles))
