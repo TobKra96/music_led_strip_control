@@ -12,7 +12,6 @@ ALSA_DIR="/usr/share/alsa/alsa.conf" # Alsa config location
 SERVICE_DIR="/etc/systemd/system/mlsc.service" # MLSC systemd service location
 SERVICE_NAME="mlsc.service" # MLSC systemd service name
 GIT_BRANCH="master"
-GIT_OWNER="TobKra96"
 
 
 # Colors
@@ -51,7 +50,7 @@ function prompt {
 # Confirm action before proceeding.
 function confirm {
     while true; do
-        read -p "$(prompt -w "$*? [y/N] ")" yn </dev/tty
+        read -rp "$(prompt -w "$*? [y/N] ")" yn </dev/tty
         case $yn in
             [Yy]*) prompt -s "Proceeding..."; return 0;;
             [Nn]*) prompt -i "Skipped."; return 1;;
@@ -71,12 +70,11 @@ function usage {
     prompt -i "  sudo bash $0 [options]"
     echo ""
     prompt -i "OPTIONS"
-    prompt -i "  -b, --branch        git branch to use (master, dev_2.2)"
-    prompt -i "  -d, --developer     repository of a developer to use (TobKra96, Teraskull)"
+    prompt -i "  -b, --branch        git branch to use (master, dev_2.3)"
     prompt -i "  -h, --help          show this list of command-line options"
     echo ""
     prompt -i "Example:"
-    prompt -i "  sudo bash $0 --branch dev_2.2 --developer TobKra96"
+    prompt -i "  sudo bash $0 --branch dev_2.3"
     if [ -n "$1" ]; then
         exit 1
     fi
@@ -86,20 +84,14 @@ function usage {
 # Parse arguments.
 while [[ "$#" > 0 ]]; do case $1 in
     -b|--branch) GIT_BRANCH="$2"; shift;shift;;
-    -d|--developer) GIT_OWNER="$2";shift;shift;;
     -h|--help) usage;shift;;
     *) usage "Unknown argument passed: $1";shift;shift;;
 esac; done
 
 
 case $GIT_BRANCH in
-    master|dev_2.2);;
+    master|dev_2.3);;
     *) GIT_BRANCH="master";;
-esac
-
-case $GIT_OWNER in
-    TobKra96|Teraskull);;
-    *) GIT_OWNER="TobKra96";;
 esac
 
 
@@ -111,21 +103,16 @@ echo
 
 # Update packages:
 prompt -i "\n[1/4] Updating and installing required packages..."
-sudo apt-get update
-sudo apt-get -y upgrade
+sudo apt-get update -qq && apt-get upgrade -qqy
 
-# Install Git:
-sudo apt-get -y install git
-
-# Install Audio Driver:
-sudo apt-get -y install libatlas-base-dev portaudio19-dev
-
-# Install Python and required packages for it:
-sudo apt-get -y install python3 python3-pip python3-scipy  # Fallback scipy module if the Pip module fails to install.
-
+# Install required packages:
+# git: For cloning the MLSC repository.
+# libatlas-base-dev: Required for Numpy module.
+# portaudio19-dev: Audio drivers.
+sudo apt-get -y --no-install-recommends install git libatlas-base-dev portaudio19-dev python3 python3-pip
 
 # Upgrade Pip to the latest version.
-sudo pip3 install --no-input --upgrade pip
+sudo pip3 install --no-cache-dir --no-input --upgrade pip
 prompt -s "\nPackages updated and installed."
 
 
@@ -152,8 +139,7 @@ if [[ -d $PROJ_DIR ]]; then
         fi
 	    sudo mv -T $PROJ_DIR "${PROJ_DIR}_bak"
         prompt -s "\nNew backup of ${PROJ_NAME} created."
-        sudo git clone https://github.com/${GIT_OWNER}/music_led_strip_control.git
-        git checkout $GIT_BRANCH
+        sudo git clone --depth 1 --branch $GIT_BRANCH https://github.com/TobKra96/music_led_strip_control.git
         prompt -s "\nConfig is stored in .mlsc, in the same directory as the MLSC installation."
         if [[ -f $SERVICE_DIR ]]; then
             if [[ $systemctl_status == 'active' ]]; then
@@ -163,12 +149,11 @@ if [[ -d $PROJ_DIR ]]; then
         fi
     fi
 else
-    sudo git clone https://github.com/${GIT_OWNER}/music_led_strip_control.git
-    git checkout $GIT_BRANCH
+    sudo git clone --depth 1 --branch $GIT_BRANCH https://github.com/TobKra96/music_led_strip_control.git
 fi
 
-# Install modules from requirements.txt.
-sudo pip3 install --no-input -r ${PROJ_DIR}/requirements.txt
+# Install/update modules from requirements.txt.
+sudo pip3 install --no-cache-dir --no-input --upgrade -r ${PROJ_DIR}/requirements.txt
 
 
 # Setup microphone:
@@ -180,7 +165,7 @@ else
     sudo mv $ASOUND_DIR "$ASOUND_DIR.bak"
     prompt -s "\nBackup of existing $ASOUND_DIR created."
 fi
-sudo echo -e "pcm.!default {\n    type hw\n    card 1\n}\nctl.!default {\n    type hw\n    card 1\n}" > $ASOUND_DIR
+sudo echo -e 'pcm.!default {\n    type hw\n    card 1\n}\nctl.!default {\n    type hw\n    card 1\n}' > $ASOUND_DIR
 prompt -s "\nNew configuration for $ASOUND_DIR saved."
 
 if [[ ! -f $ALSA_DIR ]]; then
@@ -190,26 +175,25 @@ else
     sudo cp $ALSA_DIR "$ALSA_DIR.bak"
     prompt -s "\nBackup of existing $ALSA_DIR created."
 fi
-sudo sed -i '/defaults.ctl.card 0/c\defaults.ctl.card 1' $ALSA_DIR
-sudo sed -i '/defaults.pcm.card 0/c\defaults.pcm.card 1' $ALSA_DIR
-
-sudo sed -e '/pcm.front cards.pcm.front/ s/^#*/#/' -i $ALSA_DIR
-sudo sed -e '/pcm.rear cards.pcm.rear/ s/^#*/#/' -i $ALSA_DIR
-sudo sed -e '/pcm.center_lfe cards.pcm.center_lfe/ s/^#*/#/' -i $ALSA_DIR
-sudo sed -e '/pcm.side cards.pcm.side/ s/^#*/#/' -i $ALSA_DIR
-sudo sed -e '/pcm.surround21 cards.pcm.surround21/ s/^#*/#/' -i $ALSA_DIR
-sudo sed -e '/pcm.surround40 cards.pcm.surround40/ s/^#*/#/' -i $ALSA_DIR
-sudo sed -e '/pcm.surround41 cards.pcm.surround41/ s/^#*/#/' -i $ALSA_DIR
-sudo sed -e '/pcm.surround50 cards.pcm.surround50/ s/^#*/#/' -i $ALSA_DIR
-sudo sed -e '/pcm.surround51 cards.pcm.surround51/ s/^#*/#/' -i $ALSA_DIR
-sudo sed -e '/pcm.surround71 cards.pcm.surround71/ s/^#*/#/' -i $ALSA_DIR
-sudo sed -e '/pcm.iec958 cards.pcm.iec958/ s/^#*/#/' -i $ALSA_DIR
-sudo sed -e '/pcm.spdif iec958/ s/^#*/#/' -i $ALSA_DIR
-sudo sed -e '/pcm.hdmi cards.pcm.hdmi/ s/^#*/#/' -i $ALSA_DIR
-sudo sed -e '/pcm.dmix cards.pcm.dmix/ s/^#*/#/' -i $ALSA_DIR
-sudo sed -e '/pcm.dsnoop cards.pcm.dsnoop/ s/^#*/#/' -i $ALSA_DIR
-sudo sed -e '/pcm.modem cards.pcm.modem/ s/^#*/#/' -i $ALSA_DIR
-sudo sed -e '/pcm.phoneline cards.pcm.phoneline/ s/^#*/#/' -i $ALSA_DIR
+sed -i -e '/defaults.ctl.card 0/c\defaults.ctl.card 1' \
+    -i -e '/defaults.pcm.card 0/c\defaults.pcm.card 1' \
+    -e '/pcm.front cards.pcm.front/ s/^#*/#/' \
+    -e '/pcm.rear cards.pcm.rear/ s/^#*/#/' \
+    -e '/pcm.center_lfe cards.pcm.center_lfe/ s/^#*/#/' \
+    -e '/pcm.side cards.pcm.side/ s/^#*/#/' \
+    -e '/pcm.surround21 cards.pcm.surround21/ s/^#*/#/' \
+    -e '/pcm.surround40 cards.pcm.surround40/ s/^#*/#/' \
+    -e '/pcm.surround41 cards.pcm.surround41/ s/^#*/#/' \
+    -e '/pcm.surround50 cards.pcm.surround50/ s/^#*/#/' \
+    -e '/pcm.surround51 cards.pcm.surround51/ s/^#*/#/' \
+    -e '/pcm.surround71 cards.pcm.surround71/ s/^#*/#/' \
+    -e '/pcm.iec958 cards.pcm.iec958/ s/^#*/#/' \
+    -e '/pcm.spdif iec958/ s/^#*/#/' \
+    -e '/pcm.hdmi cards.pcm.hdmi/ s/^#*/#/' \
+    -e '/pcm.dmix cards.pcm.dmix/ s/^#*/#/' \
+    -e '/pcm.dsnoop cards.pcm.dsnoop/ s/^#*/#/' \
+    -e '/pcm.modem cards.pcm.modem/ s/^#*/#/' \
+    -e '/pcm.phoneline cards.pcm.phoneline/ s/^#*/#/' $ALSA_DIR
 
 prompt -s "\nNew configuration for $ALSA_DIR saved."
 
@@ -225,7 +209,7 @@ After=network.target
 [Service]
 Type=simple
 User=root
-WorkingDirectory=/share/music_led_strip_control/server
+WorkingDirectory=${INST_DIR}/music_led_strip_control/server
 ExecStart=python3 main.py
 Restart=on-abnormal
 RestartSec=10
