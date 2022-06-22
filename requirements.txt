@@ -1,5 +1,5 @@
 PyAudio==0.2.11
-numpy==1.21.0
+numpy==1.22.0
 coloredlogs==15.0
 scipy==1.6.2
 Werkzeug==2.0.3
