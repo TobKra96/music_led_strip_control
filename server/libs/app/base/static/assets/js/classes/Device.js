@@ -31,11 +31,6 @@ export default class Device {
 
     _activate() {
         $("#selected_device_txt").text(this.name);
-        const effectCycleActive = sessionStorage.getItem('effect_cycle_active');
-        if (effectCycleActive && this.id !== localStorage.getItem('lastDevice')) {
-            effectManager.timer.stop();
-            sessionStorage.removeItem('effect_cycle_active');
-        }
         localStorage.setItem('lastDevice', this.id);
         effectManager.currentDevice = this;
     }
@@ -104,6 +99,25 @@ export default class Device {
         });
     }
 
+    getCycleStatus() {
+        return $.ajax({
+            url: "/api/effect/cycle-status",
+            data: {
+                "device": this.id
+            }
+        }).done((data) => {
+            this.setCycleStatus(data.random_cycle_active);
+        });
+    }
+
+    setCycleStatus(isCycleActive) {
+        if (isCycleActive) {
+            $("#effect_random_cycle").css("box-shadow", "inset 0 0 0 3px #3f4d67");
+        } else {
+            $("#effect_random_cycle").css("box-shadow", "0 1px 20px 0 rgb(69 90 100 / 8%)");
+        }
+    }
+
     getActiveEffect() {
         return $.ajax({
             url: "/api/effect/active",
@@ -112,6 +126,7 @@ export default class Device {
             }
         }).done((data) => {
             this.setActiveEffect(data["effect"]);
+            this.getCycleStatus();
             return this._activeEffect;
         });
     }
@@ -122,7 +137,7 @@ export default class Device {
         $(".dashboard_effect_active").removeClass("dashboard_effect_active");
         $("#" + this._activeEffect).addClass("dashboard_effect_active");
         if (this._activeEffect != "") {
-            const activeEffectText = $("#" + this._activeEffect).text();
+            const activeEffectText = $("#" + this._activeEffect).text().trim();
             $("#selected_effect_txt").text(activeEffectText);
         }
 
