@@ -125,7 +125,6 @@ Scripts included:
 [jQuery-UI](https://jqueryui.com/),
 [Pickr](https://github.com/Simonwep/pickr),
 [Font Awesome](https://fontawesome.com),
-[EasyTimer](https://github.com/albert-gonzalez/easytimer.js),
 [Tagin](https://github.com/erwinheldy/tagin)
 
 
