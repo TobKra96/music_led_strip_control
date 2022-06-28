@@ -181,3 +181,54 @@ def set_active_effect():  # pylint: disable=E0211
         return jsonify(data_out)
 
     return "Input data are wrong.", 403
+
+
+@effect_api.get('/api/effect/cycle-status')
+@login_required
+def get_cycle_status():  # pylint: disable=E0211
+    """
+    Return Random Cycle effect status
+    ---
+    tags:
+      - Effect
+    parameters:
+      - description:
+          ID of `device` to return Random Cycle effect status from
+        name: device
+        in: query
+        required: true
+        schema:
+          type: string
+        examples:
+          example1:
+            value: device_0
+            summary: device ID
+    responses:
+      "200":
+        description: OK
+        content:
+          application/json:
+            schema:
+              example:
+                devices:
+                  - device: str
+                    random_cycle_active: bool
+              type: object
+      "403":
+        description: Input data are wrong
+      "422":
+        description: Unprocessable Entity
+    """
+    data_in = request.args.to_dict()
+
+    if not Executer.instance.effect_executer.validate_data_in(data_in, ("device",)):
+        return "Input data are wrong.", 403
+
+    result = Executer.instance.effect_executer.is_cycle_job_running(data_in["device"])
+
+    if result is None:
+        return "Unprocessable Entity.", 422
+
+    data_out = copy.deepcopy(data_in)
+    data_out["random_cycle_active"] = result
+    return jsonify(data_out)

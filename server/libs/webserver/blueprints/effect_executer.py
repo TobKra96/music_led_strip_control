@@ -5,6 +5,21 @@ from random import choice
 
 class EffectExecuter(ExecuterBase):
 
+    def is_cycle_job_running(self, device):
+        """
+        Return True if Random Cycle effect is active for specified device.
+        """
+        if device == self.all_devices_id:
+            return False  # Does not work with "all_devices" ID yet.
+
+        if device not in self._config["device_configs"]:
+            return None
+
+        job = self.scheduler.get_job(device)
+        if job and job.next_run_time:
+            return True
+        return False
+
     @handle_config_errors
     def get_active_effect(self, device):
         """
