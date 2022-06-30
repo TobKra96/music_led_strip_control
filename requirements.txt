@@ -1,5 +1,5 @@
 PyAudio==0.2.11
-numpy==1.22.4
+numpy==1.23.0
 coloredlogs==15.0.1
 scipy==1.8.1
 Werkzeug==2.1.2
@@ -10,6 +10,6 @@ waitress==2.1.2
 rpi_ws281x==4.3.4
 icmplib==3.0.3
 flasgger==0.9.5
-jsonschema==4.6.0
+jsonschema==4.6.1
 APScheduler==3.9.1
 psutil
