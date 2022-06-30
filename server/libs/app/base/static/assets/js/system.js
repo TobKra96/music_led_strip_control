@@ -181,7 +181,7 @@ $(document).ready(function () {
 
     /**
      * Call API to get status of services.
-     * @returns {Promise}
+     * @return {Promise}
      */
     function getServicesStatus() {
         // Called once on page load
