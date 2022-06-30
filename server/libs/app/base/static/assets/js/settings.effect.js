@@ -98,7 +98,11 @@ $(function () {
 
 });
 
-
+/**
+ * Create effect checkboxes for the `Random Cycle` effect settings page.
+ * @param {string} parentId
+ * @param {array<string>} effects
+ */
 function generateEffectCheckboxes(parentId, effects) {
     for (const [effectId, effectName] of Object.entries(effects)) {
         const checkbox = `
@@ -138,12 +142,18 @@ $("#manually_resize_bars").change(function () {
     }
 });
 
-
+/**
+ * Collect all effect setting keys from the UI as an array.
+ * @return {array<string>}
+ */
 function GetAllSettingKeys() {
     return $(".setting_input").map(function () { return this.id })
         .toArray();
 }
 
+/**
+ * Update effect settings with config values.
+ */
 function SetLocalSettings() {
     const all_setting_keys = GetAllSettingKeys();
 
@@ -177,6 +187,7 @@ $("#save_btn").on("click", function () {
     const settings = {};
     const all_setting_keys = GetAllSettingKeys();
 
+    // Collect all effect settings values according to their attribute.
     all_setting_keys.map((setting_key) => {
         let setting_value = "";
 
@@ -204,6 +215,7 @@ $("#save_btn").on("click", function () {
         "settings": settings
     };
 
+    // Save effect settings to config.
     $.ajax({
         url: "/api/settings/effect",
         type: "POST",
@@ -275,13 +287,21 @@ if (parent && input) {
     });
 }
 
-/** Parse "rgb(r,g,b)" into [r,g,b] **/
+/**
+ * Parse "rgb(r,g,b)" into [r,g,b].
+ * @param {string} rgb
+ * @return {array<number>}
+ */
 function parseRGB(rgb) {
     rgb = rgb.replace(/[^\d,]/g, '').split(',');
     return [parseInt(rgb[0]), parseInt(rgb[1]), parseInt(rgb[2])];
 }
 
-/** Validate if [r,g,b] is a valid RGB value **/
+/**
+ * Validate if [r,g,b] is a valid RGB value.
+ * @param {array<number>} rgb
+ * @return {array<number>}
+ */
 function validateRGB(rgb) {
     if (rgb[0] > 255 || rgb[0] < 0 || isNaN(rgb[0])) {
         rgb[0] = 0;
@@ -295,7 +315,11 @@ function validateRGB(rgb) {
     return rgb;
 }
 
-/** Format [r,g,b] into "rgb(r,g,b)" **/
+/**
+ * Format [r,g,b] into "rgb(r,g,b)".
+ * @param {array<number>} rgb
+ * @return {string}
+ */
 function formatRGB(rgb) {
     return 'rgb(' + [rgb[0], rgb[1], rgb[2]].join(',') + ')';
 }

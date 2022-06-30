@@ -37,10 +37,21 @@ const animationEnd = (function (el) {
 })(document.createElement("div"));
 
 export default class Toast {
+    /**
+     * Create toast with custom message.
+     * @param {string} message
+     */
     constructor(message) {
+        /** @private */
         this.message = message;
     }
 
+    /**
+     * Build toast from base.
+     * @param {string} type
+     * @private
+     * @return {string}
+     */
     _base(type) {
         const style = types[type];
         const toast = `
@@ -80,18 +91,34 @@ export default class Toast {
         return toast;
     }
 
+    /**
+     * Build Success toast.
+     * @return {string}
+     */
     success() {
         return this._base("success");
     }
 
+    /**
+     * Build Warning toast.
+     * @return {string}
+     */
     warning() {
         return this._base("warning");
     }
 
+    /**
+     * Build Error toast.
+     * @return {string}
+     */
     error() {
         return this._base("error");
     }
 
+    /**
+     * Build Information toast.
+     * @return {string}
+     */
     info() {
         return this._base("info");
     }

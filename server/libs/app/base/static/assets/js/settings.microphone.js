@@ -20,6 +20,10 @@ $(document).ready(function () {
 }
 );
 
+/**
+ * Call API to set the microphone volume level.
+ * @param {number} level
+ */
 function setMicrophoneLevel(level) {
     data = {};
     data["level"] = level

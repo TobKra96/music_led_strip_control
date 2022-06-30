@@ -3,6 +3,10 @@ const effectManager = new EffectManager();
 
 // classes/Device.js
 export default class Device {
+    /**
+     * Create a device.
+     * @param {{id: string, name: string}} params
+     */
     constructor(params) {
         Object.assign(this, params);
         // this.id = id;
@@ -29,16 +33,27 @@ export default class Device {
         });
     }
 
+    /**
+     * Set active device in device bar and save it to localStorage.
+     */
     _activate() {
         $("#selected_device_txt").text(this.name);
         localStorage.setItem('lastDevice', this.id);
         effectManager.currentDevice = this;
     }
 
+    /**
+     * Getter to check if the selected device  matches `lastDevice` in the localStorage.
+     * @return {boolean}
+     */
     get isCurrent() {
         return this._isCurrent;
     }
 
+    /**
+     * Set new device name.
+     * @param {string} name
+     */
     set name(name) {
         this._name = name;
         // Update HTML elements on namechange
@@ -47,10 +62,19 @@ export default class Device {
         }
     }
 
+    /**
+     * Get device name.
+     * @return {string}
+     */
     get name() {
         return this._name;
     }
 
+    /**
+     * Get current device pill from device bar.
+     * @param {string} currentDeviceId
+     * @return {jQuery.HTMLElement}
+     */
     getPill(currentDeviceId) {
         const active = currentDeviceId === this.id ? " active" : "";
         const link = document.createElement("a");
@@ -65,6 +89,11 @@ export default class Device {
         return this.link;
     }
 
+    /**
+     * Call API to get a single setting of a device.
+     * @param {string} key
+     * @return {jQuery.jqXHR}
+     */
     getSetting(key) {
         //  returns promise
         return $.ajax({
@@ -76,6 +105,12 @@ export default class Device {
         })
     }
 
+    /**
+     * Call API to get a single output setting of a device.
+     * @param {string} key
+     * @param {string} type
+     * @return {jQuery.jqXHR}
+     */
     getOutputSetting(key, type) {
         //  returns promise
         return $.ajax({
@@ -88,6 +123,12 @@ export default class Device {
         });
     }
 
+    /**
+     * Call API to get a single setting of an effect.
+     * @param {string} effectIdentifier
+     * @param {string} key
+     * @return {jQuery.jqXHR}
+     */
     getEffectSetting(effectIdentifier, key) {
         return $.ajax({
             url: "/api/settings/effect",
@@ -99,6 +140,10 @@ export default class Device {
         });
     }
 
+    /**
+     * Call API to get the `Random Cycle` effect status.
+     * @return {jQuery.jqXHR}
+     */
     getCycleStatus() {
         return $.ajax({
             url: "/api/effect/cycle-status",
@@ -110,6 +155,10 @@ export default class Device {
         });
     }
 
+    /**
+     * Set border style for `Random Cycle` button.
+     * @param {boolean} isCycleActive
+     */
     setCycleStatus(isCycleActive) {
         if (isCycleActive) {
             $("#effect_random_cycle").css("box-shadow", "inset 0 0 0 3px #3f4d67");
@@ -118,6 +167,10 @@ export default class Device {
         }
     }
 
+    /**
+     * Call API to get the active effect for a device.
+     * @return {jQuery.jqXHR}
+     */
     getActiveEffect() {
         return $.ajax({
             url: "/api/effect/active",
@@ -131,6 +184,10 @@ export default class Device {
         });
     }
 
+    /**
+     * Set style for selected effect button and device bar.
+     * @param {string} newActiveEffect
+     */
     setActiveEffect(newActiveEffect) {
         this._activeEffect = newActiveEffect;
 
@@ -143,6 +200,10 @@ export default class Device {
 
     }
 
+    /**
+     * Populate forms with data from config.
+     * @param {{output_raspi: string, output_udp: string}} output_types
+     */
     refreshConfig(output_types) {
 
         if (!output_types) return;
@@ -182,6 +243,10 @@ export default class Device {
 
 }
 
+/**
+ * Populate selected device groups on Device Settings page.
+ * @param {Array.<string>} deviceGroups
+ */
 function populateDeviceGroups(deviceGroups) {
     // Manually trigger change event to update device groups
     const target = document.querySelector('#device_groups');
@@ -193,6 +258,10 @@ function populateDeviceGroups(deviceGroups) {
     }
 }
 
+/**
+ * Populate global device groups dropdown on Device Settings page.
+ * @param {Array.<string>} deviceGroups
+ */
 function populateGlobalGroups(deviceGroups) {
     // Clear all dropdown group options
     $("#device_group_dropdown").empty();

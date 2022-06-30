@@ -3,6 +3,10 @@ import Toast from "./Toast.js";
 
 // classes/EffectManager.js
 export default class EffectManager {
+    /**
+     * Call API to get all effect IDs and set click listener for all effect buttons.
+     * @param {Device|undefined} currentDevice
+     */
     constructor(currentDevice) {
         this.currentDevice = currentDevice ? currentDevice : undefined;
 
@@ -20,6 +24,10 @@ export default class EffectManager {
         })
     }
 
+    /**
+     * Call API to set effect.
+     * @param {string} effect
+     */
     switchEffect(effect) {
         if (!this.allEffects.includes(effect)) {
             return;

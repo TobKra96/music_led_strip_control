@@ -27,15 +27,18 @@ $(document).ready(function () {
     GetAudioDevices();
 });
 
-//Check if all initial ajax requests are finished.
+/**
+ * Check if all initial AJAX requests are finished.
+ */
 function CheckIfFinishedInitialLoading() {
     if (!loggingLevelsLoading && !audioDevicesLoading) {
         GetLocalSettings();
     }
 }
 
-// Get LED Strips   -----------------------------------------------------------
-
+/**
+ * Call API to get logging levels.
+ */
 function GetLoggingLevels() {
     $.ajax({
         url: "/api/resources/logging-levels",
@@ -50,6 +53,9 @@ function GetLoggingLevels() {
     });
 }
 
+/**
+ * Parse logging levels as dropdown options.
+ */
 function ParseGetLoggingLevels(response) {
     let logging_levels = response;
 
@@ -65,9 +71,9 @@ function ParseGetLoggingLevels(response) {
     CheckIfFinishedInitialLoading();
 }
 
-
-// Get Audio Devices  -----------------------------------------------------------
-
+/**
+ * Call API to get audio devices.
+ */
 function GetAudioDevices() {
     $.ajax({
         url: "/api/resources/audio-devices",
@@ -82,6 +88,9 @@ function GetAudioDevices() {
     });
 }
 
+/**
+ * Parse audio devices as dropdown options.
+ */
 function ParseGetAudioDevices(response) {
     let audio_devices = response;
 
@@ -97,7 +106,9 @@ function ParseGetAudioDevices(response) {
     CheckIfFinishedInitialLoading();
 }
 
-
+/**
+ * Call API to get a specific general setting.
+ */
 function GetGeneralSetting(setting_key) {
     $.ajax({
         url: "/api/settings/general",
@@ -114,6 +125,9 @@ function GetGeneralSetting(setting_key) {
     });
 }
 
+/**
+ * Prepare general settings as key-value pairs.
+ */
 function ParseGetGeneralSetting(response) {
     var setting_key = response["setting_key"];
     var setting_value = response["setting_value"];
@@ -122,6 +136,9 @@ function ParseGetGeneralSetting(response) {
     SetLocalInput(setting_key, setting_value)
 }
 
+/**
+ * Call API to get PIN settings.
+ */
 function GetPinSetting() {
     $.ajax({
         url: "/api/auth/pin",
@@ -133,6 +150,9 @@ function GetPinSetting() {
     });
 }
 
+/**
+ * Parse PIN settings and update form inputs.
+ */
 function ParseGetPinSetting(response) {
     var pin = response["DEFAULT_PIN"];
     var use_pin_lock = response["USE_PIN_LOCK"];
@@ -141,6 +161,9 @@ function ParseGetPinSetting(response) {
     $('#PIN_LOCK_ENABLED').prop('checked', use_pin_lock);
 }
 
+/**
+ * Fetch all general settings one by one.
+ */
 function GetLocalSettings() {
     var all_setting_keys = GetAllSettingKeys();
 
@@ -150,6 +173,9 @@ function GetLocalSettings() {
     GetPinSetting()
 }
 
+/**
+ * Parse general settings according to their attribute.
+ */
 function SetLocalInput(setting_key, setting_value) {
     if ($("#" + setting_key).attr('type') == 'checkbox') {
         $("#" + setting_key).prop('checked', setting_value);
@@ -162,7 +188,9 @@ function SetLocalInput(setting_key, setting_value) {
     $("#" + setting_key).trigger('change');
 }
 
-
+/**
+ * Get all general settings keys.
+ */
 function GetAllSettingKeys() {
     var all_setting_keys = $(".setting_input").map(function () {
         return this.attributes["id"].value;
@@ -171,7 +199,9 @@ function GetAllSettingKeys() {
     return all_setting_keys;
 }
 
-
+/**
+ * Call API to set general settings.
+ */
 function SetGeneralSetting(settings) {
     var data = {};
     data["settings"] = settings;
@@ -198,6 +228,9 @@ function SetGeneralSetting(settings) {
     });
 }
 
+/**
+ * Call API to set validated PIN settings.
+ */
 function SetPinSetting() {
     var pin = $('#DASHBOARD_PIN').val();
     var pinCheckbox = false;
@@ -222,6 +255,9 @@ function SetPinSetting() {
     });
 }
 
+/**
+ * Collect general settings values according to their attribute.
+ */
 function SetLocalSettings() {
     var all_setting_keys = GetAllSettingKeys();
     let settings = {};
@@ -252,6 +288,9 @@ function SetLocalSettings() {
     SetPinSetting();
 }
 
+/**
+ * Call API to reset general settings to default values.
+ */
 function ResetSettings() {
     var data = {};
 
@@ -270,6 +309,9 @@ function ResetSettings() {
     });
 }
 
+/**
+ * Call API to reset PIN settings to default values.
+ */
 function ResetPinSettings() {
     $.ajax({
         url: "/api/auth/pin",
@@ -304,6 +346,9 @@ $("#import_btn").on("click", function () {
     ImportSettings();
 });
 
+/**
+ * Call API to import new config file.
+ */
 function ImportSettings() {
     var file_data = $('#configUpload').prop('files')[0];
     let form_data = new FormData();

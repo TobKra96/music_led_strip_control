@@ -41,6 +41,9 @@ $(document).ready(function () {
         }).disableSelection();
     });
 
+    /**
+     * Call API to get performance data and update system status cards.
+     */
     function getPerformance() {
         // Called every 10 seconds
         $.ajax("/api/system/performance").done((data) => {
@@ -114,6 +117,9 @@ $(document).ready(function () {
     }
     getPerformance();
 
+    /**
+     * Call API to get temperature data and update system status cards.
+     */
     function getTemperature() {
         // Called every 20 seconds
         $.ajax("/api/system/temperature").done((data) => {
@@ -126,6 +132,9 @@ $(document).ready(function () {
     }
     getTemperature()
 
+    /**
+     * Call API to get services data and update service status card as `Checking`.
+     */
     function getServices() {
         // Preload services
         $.ajax("/api/system/services").done((data) => {
@@ -181,6 +190,10 @@ $(document).ready(function () {
     }
     getServices();
 
+    /**
+     * Call API to get status of services.
+     * @returns {Promise}
+     */
     function getServicesStatus() {
         // Called once on page load
         return new Promise((resolve, reject) => {
@@ -199,6 +212,9 @@ $(document).ready(function () {
         });
     }
 
+    /**
+     * Call API to get devices data and update device card as `Checking`.
+     */
     function getDevices() {
         // Preload devices
         $.ajax("/api/system/devices").done((devices) => {
@@ -249,6 +265,9 @@ $(document).ready(function () {
     }
     getDevices()
 
+    /**
+     * Call API to get status of devices.
+     */
     function getDevicesStatus() {
         // Called every 10 seconds
         return new Promise((resolve, reject) => {
@@ -268,6 +287,9 @@ $(document).ready(function () {
         });
     }
 
+    /**
+     * Call API to get software version data and update version card.
+     */
     function getVersion() {
         $.ajax("/api/system/version").done((data) => {
             const versions = data["versions"];
@@ -297,6 +319,11 @@ $(document).ready(function () {
     }
     getVersion()
 
+    /**
+     * Convert bytes to gigabytes.
+     * @param {number} bytes
+     * @return {number}
+     */
     function bytesToGigabytes(bytes) {
         return bytes / 1024 / 1024 / 1024;
     }

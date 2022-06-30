@@ -87,6 +87,9 @@ $(document).ready(function () {
 
 // Save Functions   -----------------------------------------------------------
 
+/**
+ * Collect device settings values according to their attribute and save to config.
+ */
 function SetLocalSettings() {
     let settings_device = {};
     $(".device_setting_input").each((i, v) => {
@@ -184,6 +187,9 @@ function SetLocalSettings() {
 
 }
 
+/**
+ * Call API to create new default device.
+ */
 const createDevice = function () {
     $.ajax({
         url: "/api/system/devices",
@@ -277,6 +283,7 @@ $("#delete_btn").on("click", function () {
 
 $("#delete_btn_modal").on("click", function () {
     $('#modal_delete_device').modal('hide');
+    // Call API to delete device.
     $.ajax({
         url: "/api/system/devices",
         type: "DELETE",
@@ -309,6 +316,9 @@ $("#delete_btn_modal").on("click", function () {
     });
 })
 
+/**
+ * Update pills in device bar with new data.
+ */
 function reloadDeviceTab(devices) {
     // Remove every pill in the navigation and recreate
     const tabs = document.getElementById("deviceTabID");
@@ -341,11 +351,19 @@ function reloadDeviceTab(devices) {
     $("#selected_device_txt").text(currentDevice.name);
 }
 
+/**
+ * Add group back to dropdown of global groups when group is removed from device.
+ * @param {string} group
+ */
 function addGroupOption(group) {
     const option = new Option(group, group);
     $("#device_group_dropdown").append(option);
 }
 
+/**
+ * Remove group from dropdown of global groups when group is added to device.
+ * @param {string} group
+ */
 function removeGroupOption(group) {
     let groupOption = $(`#device_group_dropdown option[value="${group}"]`);
     groupOption.remove();
