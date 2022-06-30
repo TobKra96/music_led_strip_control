@@ -21,23 +21,6 @@ $(function () {
         // Start with Fake Device & create Devices from Jinja output
         const fake_device = [new Device({ id: "all_devices", name: "All Devices" })];
 
-        if (effectIdentifier == "effect_random_cycle") {
-            $.ajax({
-                url: "/api/resources/effects",
-                type: "GET",
-                data: {},
-                success: function (response) {
-                    let nonMusicEffects = response.non_music;
-                    let musicEffects = response.music;
-                    generateEffectCheckboxes("#nonMusicEffectCol", nonMusicEffects);
-                    generateEffectCheckboxes("#musicEffectCol", musicEffects);
-                },
-                error: function (xhr) {
-                    // Handle error
-                }
-            });
-        }
-
         // Only allow all_devices for sync fade
         if (["effect_sync_fade"].includes(effectIdentifier)) {
             localStorage.setItem('lastDevice', fake_device[0].id);
@@ -64,6 +47,15 @@ $(function () {
             });
         });
 
+        /**
+         * Call API to get all effect names.
+         * @return {Promise}
+         */
+        const checkboxPromise = () => $.ajax("/api/resources/effects").done((response) => {
+            generateEffectCheckboxes("#nonMusicEffectCol", response.non_music);
+            generateEffectCheckboxes("#musicEffectCol", response.music);
+        })
+
         Promise.all([
 
             $.ajax("/api/resources/colors").done((response) => {
@@ -86,7 +78,10 @@ $(function () {
                         $(this).append(newOption);
                     }
                 });
-            })
+            }),
+
+            // Only generate checkboxes for Random Cycle effect page.
+            effectIdentifier == "effect_random_cycle" ? checkboxPromise() : ""
 
         ]).then(response => {
             SetLocalSettings();
@@ -104,7 +99,7 @@ $(function () {
  * @param {array<string>} effects
  */
 function generateEffectCheckboxes(parentId, effects) {
-    for (const [effectId, effectName] of Object.entries(effects)) {
+    Object.entries(effects).forEach(([effectId, effectName]) => {
         const checkbox = `
             <div class="custom-control custom-checkbox my-2">
                 <input type="checkbox" class="custom-control-input setting_input" id="${effectId}">
@@ -112,7 +107,7 @@ function generateEffectCheckboxes(parentId, effects) {
             </div>
         `;
         $(parentId).append(checkbox);
-    }
+    });
 }
 
 
