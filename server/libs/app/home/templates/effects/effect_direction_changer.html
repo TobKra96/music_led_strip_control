@@ -51,32 +51,32 @@
                                             <div class="col-md-6">
                                                 <div class="form-group">
                                                     <label>Single Color</label>
-                                                    <select id="color" class="form-control colors setting_input"></select>
+                                                    <select name="color:string" id="color" class="form-control colors setting_input"></select>
                                                 </div>
                                                 <div class="form-group">
                                                     <label>Speed <span for="bar_speed" class="mb-0 badge badge-secondary"></span></label>
-                                                    <input id="bar_speed" type="range" class="custom-range setting_input" min="0" max="20" step="1" required>
+                                                    <input name="bar_speed:number" id="bar_speed" type="range" class="custom-range setting_input" min="0" max="20" step="1" required>
                                                 </div>
                                                 <div class="form-group">
                                                     <label>Bar Length <span for="bar_length" class="mb-0 badge badge-secondary"></span></label>
-                                                    <input id="bar_length" type="range" class="custom-range setting_input" min="0" max="20" step="1" required>
+                                                    <input name="bar_length:number" id="bar_length" type="range" class="custom-range setting_input" min="0" max="20" step="1" required>
                                                 </div>
                                                 <div class="form-group">
                                                     <label>Amount of Bars in the Same Direction <span for="bars_in_same_direction" class="mb-0 badge badge-secondary"></span></label>
-                                                    <input id="bars_in_same_direction" type="range" class="custom-range setting_input" min="0" max="20" step="1" required>
+                                                    <input name="bars_in_same_direction:number" id="bars_in_same_direction" type="range" class="custom-range setting_input" min="0" max="20" step="1" required>
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
                                                 <div class="form-group">
                                                     <label>Gradient</label>
-                                                    <select id="gradient" class="form-control gradients setting_input"></select>
+                                                    <select name="gradient:string" id="gradient" class="form-control gradients setting_input"></select>
                                                 </div>
                                                 <div class="custom-control custom-checkbox my-2">
-                                                    <input type="checkbox" class="custom-control-input setting_input" id="colorful_mode">
+                                                    <input name="colorful_mode:boolean" type="checkbox" class="custom-control-input setting_input" id="colorful_mode">
                                                     <label class="custom-control-label" for="colorful_mode">Use Gradient</label>
                                                 </div>
                                                 <div class="custom-control custom-checkbox my-2">
-                                                    <input type="checkbox" class="custom-control-input setting_input" id="random_color">
+                                                    <input name="random_color:boolean" type="checkbox" class="custom-control-input setting_input" id="random_color">
                                                     <label class="custom-control-label" for="random_color">Randomly Select Gradient Color</label>
                                                 </div>
                                             </div>

@@ -1,217 +1,147 @@
 import Toast from "./classes/Toast.js";
 import Tagin from "../plugins/tagin/js/tagin.js";
 
-var settingsIdentifier;
-var localSettings = {};
-var currentDevice;
-var tagin;
-
-var loggingLevelsLoading = true;
-var audioDevicesLoading = true;
+let tagin;
 
 // Init and load all settings
-$(document).ready(function () {
+$(document).ready(() => {
     $("#settings_list").slideDown();
     $("#device_dropdown").hide();
-    settingsIdentifier = $("#settingsIdentifier").val();
-    const options = {
+
+    const taginOptions = {
         separator: ',',
         duplicate: false,
         enter: true,
         transform: input => input,
         placeholder: 'Add a group...'
     };
-    tagin = new Tagin(document.querySelector(".tagin"), options);
+    tagin = new Tagin(document.querySelector(".tagin"), taginOptions);
 
-    GetLoggingLevels();
-    GetAudioDevices();
+    // Preload dropdown values.
+    Promise.all([
+
+        $.ajax("/api/resources/logging-levels").done((response) => {
+            $('.logging_levels').each(function () {
+                Object.entries(response).forEach(([key, value]) => {
+                    $(this).append(`<option value="${key}">${value}</option>`);
+                });
+            });
+        }),
+
+        $.ajax("/api/resources/audio-devices").done((response) => {
+            $('.audio_devices').each(function () {
+                Object.entries(response).forEach(([key, value]) => {
+                    $(this).append(`<option value="${key}">${value}</option>`);
+                });
+            });
+        })
+
+    ]).then(() => {
+        getLocalSettings();
+    }).catch((response) => {
+        new Toast(JSON.stringify(response, null, '\t')).error();
+    });
+
 });
 
 /**
- * Check if all initial AJAX requests are finished.
+ * Call API to get all general settings.
  */
-function CheckIfFinishedInitialLoading() {
-    if (!loggingLevelsLoading && !audioDevicesLoading) {
-        GetLocalSettings();
-    }
+function getLocalSettings() {
+    Promise.all([
+
+        $.ajax("/api/settings/general").done((response) => {
+            populateGeneralSettings(response.setting_value);
+        }),
+
+        $.ajax("/api/auth/pin").done((response) => {
+            populatePinSettings(response);
+        })
+
+    ]).then(() => {
+    }).catch((response) => {
+        new Toast(JSON.stringify(response, null, '\t')).error();
+    });
 }
 
 /**
- * Call API to get logging levels.
+ * Populate general settings with config values.
+ * @param {Object} settings
  */
-function GetLoggingLevels() {
-    $.ajax({
-        url: "/api/resources/logging-levels",
-        type: "GET",
-        data: {},
-        success: function (response) {
-            ParseGetLoggingLevels(response);
-        },
-        error: function (xhr) {
-            // Handle error
+function populateGeneralSettings(settings) {
+    Object.entries(settings).forEach(([key, value]) => {
+        if ($("#" + key).attr('type') == 'checkbox') {
+            $("#" + key).prop('checked', value);
+        } else if ($("#" + key).prop("tagName") == "SELECT") {
+            const optionExists = $("#" + key).find(`option[value='${value}']`).length > 0;
+            if (optionExists) {
+                $("#" + key).val(value);
+            }
+        } else if (key == "device_groups") {
+            tagin.addTag(value);
+        } else {
+            $("#" + key).val(value);
         }
     });
 }
 
 /**
- * Parse logging levels as dropdown options.
+ * Populate PIN settings with `security.ini` values.
+ * @param {Object} settings
  */
-function ParseGetLoggingLevels(response) {
-    let logging_levels = response;
+function populatePinSettings(settings) {
+    $('#DASHBOARD_PIN').val(settings.DEFAULT_PIN);
+    $('#PIN_LOCK_ENABLED').prop('checked', settings.USE_PIN_LOCK);
+}
 
-    $('.logging_levels').each(function () {
-        for (var currentKey in logging_levels) {
-            var newOption = new Option(logging_levels[currentKey], currentKey);
-            $(newOption).html(logging_levels[currentKey]);
-            $(this).append(newOption);
+/**
+ * Serialize general settings as JSON.
+ */
+ function setLocalSettings() {
+    const serializedForm = $('#settingsForm .setting_input').serializeJSON({
+        checkboxUncheckedValue: "false",
+        customTypes: {
+            port: (value) => {
+                if (value === "" || value === "0" || isNaN(value)) {
+                    return 8080;
+                }
+                return parseInt(value);
+            },
+            tags: () => { return tagin.getTags(); }
         }
     });
 
-    loggingLevelsLoading = false;
-    CheckIfFinishedInitialLoading();
-}
-
-/**
- * Call API to get audio devices.
- */
-function GetAudioDevices() {
-    $.ajax({
-        url: "/api/resources/audio-devices",
-        type: "GET",
-        data: {},
-        success: function (response) {
-            ParseGetAudioDevices(response);
-        },
-        error: function (xhr) {
-            // Handle error
-        }
-    });
-}
-
-/**
- * Parse audio devices as dropdown options.
- */
-function ParseGetAudioDevices(response) {
-    let audio_devices = response;
-
-    $('.audio_devices').each(function () {
-        for (var currentKey in audio_devices) {
-            var newOption = new Option(audio_devices[currentKey], currentKey);
-            $(newOption).html(audio_devices[currentKey]);
-            $(this).append(newOption);
+    const serializedPinForm = $('#settingsForm .pin_setting').serializeJSON({
+        checkboxUncheckedValue: "false",
+        customTypes: {
+            pin: (value) => {
+                if (value.length < 4 || isNaN(value)) {
+                    return "";
+                }
+                return value;
+            }
         }
     });
 
-    audioDevicesLoading = false;
-    CheckIfFinishedInitialLoading();
-}
-
-/**
- * Call API to get a specific general setting.
- */
-function GetGeneralSetting(setting_key) {
-    $.ajax({
-        url: "/api/settings/general",
-        type: "GET",
-        data: {
-            "setting_key": setting_key,
-        },
-        success: function (response) {
-            ParseGetGeneralSetting(response);
-        },
-        error: function (xhr) {
-            // Handle error
-        }
-    });
-}
-
-/**
- * Prepare general settings as key-value pairs.
- */
-function ParseGetGeneralSetting(response) {
-    var setting_key = response["setting_key"];
-    var setting_value = response["setting_value"];
-    localSettings[setting_key] = setting_value;
-
-    SetLocalInput(setting_key, setting_value)
-}
-
-/**
- * Call API to get PIN settings.
- */
-function GetPinSetting() {
-    $.ajax({
-        url: "/api/auth/pin",
-        type: 'GET',
-        contentType: 'application/json;charset=UTF-8',
-        success: function (response) {
-            ParseGetPinSetting(response)
-        },
-    });
-}
-
-/**
- * Parse PIN settings and update form inputs.
- */
-function ParseGetPinSetting(response) {
-    var pin = response["DEFAULT_PIN"];
-    var use_pin_lock = response["USE_PIN_LOCK"];
-
-    $('#DASHBOARD_PIN').val(pin);
-    $('#PIN_LOCK_ENABLED').prop('checked', use_pin_lock);
-}
-
-/**
- * Fetch all general settings one by one.
- */
-function GetLocalSettings() {
-    var all_setting_keys = GetAllSettingKeys();
-
-    Object.keys(all_setting_keys).forEach(setting_id => {
-        GetGeneralSetting(all_setting_keys[setting_id])
-    })
-    GetPinSetting()
-}
-
-/**
- * Parse general settings according to their attribute.
- */
-function SetLocalInput(setting_key, setting_value) {
-    if ($("#" + setting_key).attr('type') == 'checkbox') {
-        $("#" + setting_key).prop('checked', setting_value);
-    } else if (setting_key == "device_groups") {
-        tagin.addTag(setting_value)
-    } else {
-        $("#" + setting_key).val(setting_value);
-    }
-
-    $("#" + setting_key).trigger('change');
-}
-
-/**
- * Get all general settings keys.
- */
-function GetAllSettingKeys() {
-    var all_setting_keys = $(".setting_input").map(function () {
-        return this.attributes["id"].value;
-    }).get();
-
-    return all_setting_keys;
+    setGeneralSettings(serializedForm);
+    setPinSettings(serializedPinForm);
 }
 
 /**
  * Call API to set general settings.
+ * @param {Object} settings
  */
-function SetGeneralSetting(settings) {
-    var data = {};
-    data["settings"] = settings;
+function setGeneralSettings(settings) {
+    let generalSettings = {
+        "settings": settings
+    };
 
     $.ajax({
         url: "/api/settings/general",
         type: "POST",
-        data: JSON.stringify(data, null, '\t'),
+        data: JSON.stringify(generalSettings, null, '\t'),
         contentType: 'application/json;charset=UTF-8'
-    }).done(function (response) {
+    }).done((response) => {
         console.log("General settings set successfully. Response:\n\n" + JSON.stringify(response, null, '\t'));
         new Toast("General settings saved.").success();
         $.ajax({
@@ -219,10 +149,10 @@ function SetGeneralSetting(settings) {
             type: "PATCH",
             data: {},
             contentType: 'application/json;charset=UTF-8'
-        }).done(function (response) {
+        }).done((response) => {
             console.log(JSON.stringify(response));
         });
-    }).fail(function (xhr) {
+    }).fail((xhr) => {
         console.log("Error while setting general settings. Error: " + xhr.responseText);
         new Toast("Error while saving general settings.").error();
     });
@@ -230,81 +160,46 @@ function SetGeneralSetting(settings) {
 
 /**
  * Call API to set validated PIN settings.
+ * @param {Object} settings
  */
-function SetPinSetting() {
-    var pin = $('#DASHBOARD_PIN').val();
-    var pinCheckbox = false;
-    if ($('#PIN_LOCK_ENABLED').is(':checked')) {
-        pinCheckbox = true;
+function setPinSettings(settings) {
+    if (!settings.DASHBOARD_PIN && settings.PIN_LOCK_ENABLED) {
+        settings.PIN_LOCK_ENABLED = false;
+        $("#PIN_LOCK_ENABLED").prop('checked', false);
+        $("#DASHBOARD_PIN").val("");
+        new Toast("PIN should be more than 4 digits long.").error();
     }
-    if (pin.length < 4) {
-        pin = ""
-        pinCheckbox = false;
-        $('#PIN_LOCK_ENABLED').prop('checked', pinCheckbox);
-        $('#DASHBOARD_PIN').val(pin);
-    }
-    var pinData = {};
-    pinData["DEFAULT_PIN"] = pin;
-    pinData["USE_PIN_LOCK"] = pinCheckbox;
+
+    const pinData = {
+        "DEFAULT_PIN": settings.DASHBOARD_PIN,
+        "USE_PIN_LOCK": settings.PIN_LOCK_ENABLED
+    };
 
     $.ajax({
         url: "/api/auth/pin",
         type: 'POST',
         data: JSON.stringify(pinData),
-        contentType: 'application/json;charset=UTF-8',
+        contentType: 'application/json;charset=UTF-8'
     });
-}
-
-/**
- * Collect general settings values according to their attribute.
- */
-function SetLocalSettings() {
-    var all_setting_keys = GetAllSettingKeys();
-    let settings = {};
-
-    Object.keys(all_setting_keys).forEach(setting_id => {
-        var setting_key = all_setting_keys[setting_id];
-        var setting_value = "";
-
-        if ($("#" + setting_key).length) {
-            if ($("#" + setting_key).attr('type') == 'checkbox') {
-                setting_value = $("#" + setting_key).is(':checked')
-            } else if ($("#" + setting_key).attr('type') == 'number') {
-                setting_value = parseFloat($("#" + setting_key).val());
-                if (setting_key == "webserver_port" && isNaN(setting_value)) {
-                    setting_value = 8080;
-                }
-            } else if (setting_key == "device_groups") {
-                setting_value = tagin.getTags();
-            } else {
-                setting_value = $("#" + setting_key).val();
-            }
-        }
-
-        settings[setting_key] = setting_value;
-    })
-
-    SetGeneralSetting(settings);
-    SetPinSetting();
 }
 
 /**
  * Call API to reset general settings to default values.
  */
-function ResetSettings() {
-    var data = {};
-
+function resetSettings() {
     $.ajax({
         url: "/api/settings/general",
         type: "DELETE",
-        data: JSON.stringify(data, null, '\t'),
+        data: {},
         contentType: 'application/json;charset=UTF-8',
-        success: function (response) {
-            console.log("Settings reset successfully. Response:\n\n" + JSON.stringify(response, null, '\t'));
-            location.reload();
+        success: () => {
+            getLocalSettings();
+            new Toast("General settings reset to default.").success();
+            console.log("Settings reset successfully.");
         },
-        error: function (xhr) {
-            console.log("Error while resetting settings. Error: " + xhr.responseText);
+        error: (xhr) => {
+            new Toast("Error while resetting settings.").error();
+            console.log(xhr.responseText);
         }
     });
 }
@@ -312,45 +207,20 @@ function ResetSettings() {
 /**
  * Call API to reset PIN settings to default values.
  */
-function ResetPinSettings() {
+function resetPinSettings() {
     $.ajax({
         url: "/api/auth/pin",
         type: "DELETE",
         data: {},
-        contentType: 'application/json;charset=UTF-8',
-        success: function (response) {
-            ParseGetPinSetting(response)
-        },
+        contentType: 'application/json;charset=UTF-8'
     });
 }
-
-$("#save_btn").on("click", function () {
-    SetLocalSettings();
-});
-
-$("#reset_btn").on("click", function () {
-    $('#modal_reset_general').modal('show')
-});
-
-$("#reset_btn_modal").on("click", function () {
-    $('#modal_reset_general').modal('hide')
-    ResetPinSettings();
-    ResetSettings();
-});
-
-$("#export_btn").on("click", function () {
-    new Toast("Configuration file exported.").success();
-});
-
-$("#import_btn").on("click", function () {
-    ImportSettings();
-});
 
 /**
  * Call API to import new config file.
  */
-function ImportSettings() {
-    var file_data = $('#configUpload').prop('files')[0];
+ function importSettings() {
+    let file_data = $('#configUpload').prop('files')[0];
     let form_data = new FormData();
     form_data.append('imported_config', file_data);
 
@@ -363,13 +233,38 @@ function ImportSettings() {
         data: form_data,
         type: 'POST',
         success: function (response) {
-            location.reload();
+            getLocalSettings();
+            new Toast("General settings imported.").success();
+            console.log(response);
         },
         error: function (xhr) {
-            location.reload();
+            new Toast("Error while importing general settings. " + xhr.responseText).error();
+            console.log(xhr.responseText);
         }
     });
 }
+
+$("#save_btn").on("click", () => {
+    setLocalSettings();
+});
+
+$("#reset_btn").on("click", () => {
+    $('#modal_reset_general').modal('show');
+});
+
+$("#reset_btn_modal").on("click", () => {
+    $('#modal_reset_general').modal('hide');
+    resetPinSettings();
+    resetSettings();
+});
+
+$("#export_btn").on("click", () => {
+    new Toast("Configuration file exported.").success();
+});
+
+$("#import_btn").on("click", () => {
+    importSettings();
+});
 
 // Insert filename of imported config
 $('.custom-file-input').on('change', (e) => {
@@ -381,8 +276,8 @@ $('.custom-file-input').on('change', (e) => {
 // Toggle PIN visibility on hover
 $("#toggle_pin_view").on("mouseover mouseleave", function (event) {
     event.preventDefault();
-    let pinField = $('#DASHBOARD_PIN')
-    pinField.attr('type') == 'text' ? pinField.attr('type', 'password') : pinField.attr('type', 'text')
+    let pinField = $('#DASHBOARD_PIN');
+    pinField.attr('type') == 'text' ? pinField.attr('type', 'password') : pinField.attr('type', 'text');
     $('#toggle_pin_view').toggleClass("icon-eye");
     $('#toggle_pin_view').toggleClass("icon-eye-off");
 });

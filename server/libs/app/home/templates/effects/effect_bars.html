@@ -51,18 +51,18 @@
                                             <div class="col-md-6">
                                                 <div class="form-group">
                                                     <label>Gradient</label>
-                                                    <select id="color_mode" class="form-control gradients setting_input"></select>
+                                                    <select name="color_mode:string" id="color_mode" class="form-control gradients setting_input"></select>
                                                 </div>
                                                 <div class="custom-control custom-checkbox my-2">
-                                                    <input type="checkbox" class="custom-control-input setting_input" id="mirror">
+                                                    <input name="mirror:boolean" type="checkbox" class="custom-control-input setting_input" id="mirror">
                                                     <label class="custom-control-label" for="mirror">Mirror</label>
                                                 </div>
                                                 <div class="custom-control custom-checkbox my-2">
-                                                    <input type="checkbox" class="custom-control-input setting_input" id="reverse_roll">
+                                                    <input name="reverse_roll:boolean"  type="checkbox" class="custom-control-input setting_input" id="reverse_roll">
                                                     <label class="custom-control-label" for="reverse_roll">Reverse Roll</label>
                                                 </div>
                                                 <div class="custom-control custom-checkbox my-2">
-                                                    <input type="checkbox" class="custom-control-input setting_input" id="flip_lr">
+                                                    <input name="flip_lr:boolean" type="checkbox" class="custom-control-input setting_input" id="flip_lr">
                                                     <label class="custom-control-label" for="flip_lr">Flip Left Right</label>
                                                 </div>
                                             </div>
@@ -70,13 +70,13 @@
                                             <div class="col-md-6">
                                                 <div class="form-group">
                                                     <label>Resolution <span for="resolution" class="mb-0 badge badge-secondary"></span></label>
-                                                    <input id="resolution" type="range" class="custom-range setting_input" min="0" max="25" step="1" required>
+                                                    <input name="resolution:number" id="resolution" type="range" class="custom-range setting_input" min="0" max="25" step="1" required>
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
                                                 <div class="form-group">
                                                     <label>Roll Speed <span for="roll_speed" class="mb-0 badge badge-secondary"></span></label>
-                                                    <input id="roll_speed" type="range" class="custom-range setting_input" min="0" max="10" step="0.1" required>
+                                                    <input name="roll_speed:number" id="roll_speed" type="range" class="custom-range setting_input" min="0" max="10" step="0.1" required>
                                                 </div>
                                             </div>
                                         </div>

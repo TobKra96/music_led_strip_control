@@ -51,11 +51,11 @@
                                             <div class="col-md-6">
                                                 <div class="form-group">
                                                     <label>Single Color</label>
-                                                    <select id="color" class="form-control colors setting_input"></select>
+                                                    <select name="color:string" id="color" class="form-control colors setting_input"></select>
                                                 </div>
                                                 <div class="form-group">
                                                     <label>Speed <span for="speed" class="mb-0 badge badge-secondary"></span></label>
-                                                    <input id="speed" type="range" class="custom-range setting_input" min="1" max="100" step="1" required>
+                                                    <input name="speed:number" id="speed" type="range" class="custom-range setting_input" min="1" max="100" step="1" required>
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
@@ -64,17 +64,17 @@
                                                     <div class="input-group-prepend">
                                                         <span class="input-group-text pr-4" id="color_picker"></span>
                                                     </div>
-                                                    <input type="text" class="form-control setting_input color_input" id="custom_color" spellcheck="false">
+                                                    <input name="custom_color:rgb" type="text" class="form-control setting_input color_input" id="custom_color" spellcheck="false">
                                                 </div>
                                                 <div class="custom-control custom-checkbox my-2">
-                                                    <input type="checkbox" class="custom-control-input setting_input" id="use_custom_color">
+                                                    <input name="use_custom_color:boolean" type="checkbox" class="custom-control-input setting_input" id="use_custom_color">
                                                     <label class="custom-control-label" for="use_custom_color">Use Custom Color</label>
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
                                                 <div class="form-group">
                                                     <label>White Channel (RGBW), only for SK6812 <span for="white" class="mb-0 badge badge-secondary"></span></label>
-                                                    <input id="white" type="range" class="custom-range setting_input" min="0" max="255" step="" required>
+                                                    <input name="white:number" id="white" type="range" class="custom-range setting_input" min="0" max="255" step="" required>
                                                 </div>
                                             </div>
                                         </div>

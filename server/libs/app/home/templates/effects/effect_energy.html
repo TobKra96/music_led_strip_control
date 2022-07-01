@@ -9,7 +9,7 @@
 
     <div class="pcoded-content">
         <div class="pcoded-inner-content">
-            
+
             {% include 'includes/toasts.html' %}
 
             <!-- [ breadcrumb ] start -->
@@ -51,28 +51,28 @@
                                             <div class="col-md-6">
                                                 <div class="form-group">
                                                     <label>Red Multiplier <span for="r_multiplier" class="mb-0 badge badge-secondary"></span></label>
-                                                    <input id="r_multiplier" type="range" class="custom-range setting_input" min="0" max="50" step="0.1" required>
+                                                    <input name="r_multiplier:number" id="r_multiplier" type="range" class="custom-range setting_input" min="0" max="50" step="0.1" required>
                                                 </div>
                                                 <div class="form-group">
                                                     <label>Green Multiplier <span for="g_multiplier" class="mb-0 badge badge-secondary"></span></label>
-                                                    <input id="g_multiplier" type="range" class="custom-range setting_input" min="0" max="50" step="0.1" required>
+                                                    <input name="g_multiplier:number" id="g_multiplier" type="range" class="custom-range setting_input" min="0" max="50" step="0.1" required>
                                                 </div>
                                                 <div class="form-group">
                                                     <label>Blue Multiplier <span for="b_multiplier" class="mb-0 badge badge-secondary"></span></label>
-                                                    <input id="b_multiplier" type="range" class="custom-range setting_input" min="0" max="50" step="0.1" required>
+                                                    <input name="b_multiplier:number" id="b_multiplier" type="range" class="custom-range setting_input" min="0" max="50" step="0.1" required>
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
                                                 <div class="form-group">
                                                     <label>Blur <span for="blur" class="mb-0 badge badge-secondary"></span></label>
-                                                    <input id="blur" type="range" class="custom-range setting_input" min="0" max="200" step="0.1" required>
+                                                    <input name="blur:number" id="blur" type="range" class="custom-range setting_input" min="0" max="200" step="0.1" required>
                                                 </div>
                                                 <div class="form-group">
                                                     <label>Scale <span for="scale" class="mb-0 badge badge-secondary"></span></label>
-                                                    <input id="scale" type="range" class="custom-range setting_input" min="0" max="3" step="0.1" required>
+                                                    <input name="scale:number" id="scale" type="range" class="custom-range setting_input" min="0" max="3" step="0.1" required>
                                                 </div>
                                                 <div class="custom-control custom-checkbox my-2">
-                                                    <input type="checkbox" class="custom-control-input setting_input" id="mirror">
+                                                    <input name="mirror:boolean" type="checkbox" class="custom-control-input setting_input" id="mirror">
                                                     <label class="custom-control-label" for="mirror">Mirror</label>
                                                 </div>
                                             </div>

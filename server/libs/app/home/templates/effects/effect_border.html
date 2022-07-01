@@ -51,85 +51,85 @@
                                             <div class="col-md-6">
                                                 <div class="form-group">
                                                     <label>Single Color</label>
-                                                    <select id="color" class="form-control colors setting_input"></select>
+                                                    <select name="color:string" id="color" class="form-control colors setting_input"></select>
                                                 </div>
                                                 <div class="custom-control custom-checkbox my-2">
-                                                    <input type="checkbox" class="custom-control-input setting_input" id="manually_resize_bars">
+                                                    <input name="manually_resize_bars:boolean" type="checkbox" class="custom-control-input setting_input" id="manually_resize_bars">
                                                     <label class="custom-control-label" for="manually_resize_bars">Manually resize bars</label>
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
                                                 <div class="form-group">
                                                     <label>Gradient</label>
-                                                    <select id="gradient" class="form-control gradients setting_input"></select>
+                                                    <select name="gradient:string" id="gradient" class="form-control gradients setting_input"></select>
                                                 </div>
                                                 <div class="custom-control custom-checkbox my-2">
-                                                    <input type="checkbox" class="custom-control-input setting_input" id="use_gradient">
+                                                    <input name="use_gradient:boolean" type="checkbox" class="custom-control-input setting_input" id="use_gradient">
                                                     <label class="custom-control-label" for="use_gradient">Use Gradient</label>
                                                 </div>
                                                 <div class="custom-control custom-checkbox my-2">
-                                                    <input type="checkbox" class="custom-control-input setting_input" id="mirror">
+                                                    <input name="mirror:boolean" type="checkbox" class="custom-control-input setting_input" id="mirror">
                                                     <label class="custom-control-label" for="mirror">Mirror</label>
                                                 </div>
                                                 <div class="custom-control custom-checkbox my-2">
-                                                    <input type="checkbox" class="custom-control-input setting_input" id="reverse_roll">
+                                                    <input name="reverse_roll:boolean" type="checkbox" class="custom-control-input setting_input" id="reverse_roll">
                                                     <label class="custom-control-label" for="reverse_roll">Reverse Roll</label>
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
                                                 <div class="form-group">
                                                     <label>Bar Count <span for="bar_count" class="mb-0 badge badge-secondary"></span></label>
-                                                    <input id="bar_count" type="range" class="custom-range setting_input" min="0" max="24" step="1" required>
+                                                    <input name="bar_count:number" id="bar_count" type="range" class="custom-range setting_input" min="0" max="24" step="1" required>
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
                                                 <div class="form-group">
                                                     <label>Roll Speed <span for="roll_speed" class="mb-0 badge badge-secondary"></span></label>
-                                                    <input id="roll_speed" type="range" class="custom-range setting_input" min="0" max="10" step="0.1" required>
+                                                    <input name="roll_speed:number" id="roll_speed" type="range" class="custom-range setting_input" min="0" max="10" step="0.1" required>
                                                 </div>
                                             </div>
 
                                             <div class="col-md-6">
                                                 <div class="form-group">
                                                     <label>Segment 01 Start</label>
-                                                    <input id="segment_01_start" class="form-control setting_input" type="number" name="number" disabled required>
+                                                    <input name="segment_01_start:number" id="segment_01_start" class="form-control setting_input" type="number" name="number" required>
                                                 </div>
                                                 <div class="form-group">
                                                     <label>Segment 01 End</label>
-                                                    <input id="segment_01_end" class="form-control setting_input" type="number" name="number" disabled required>
+                                                    <input name="segment_01_end:number" id="segment_01_end" class="form-control setting_input" type="number" name="number" required>
                                                 </div>
 
                                                 <hr class="my-4">
 
                                                 <div class="form-group">
                                                     <label>Segment 02 Start</label>
-                                                    <input id="segment_02_start" class="form-control setting_input" type="number" name="number" disabled required>
+                                                    <input name="segment_02_start:number" id="segment_02_start" class="form-control setting_input" type="number" name="number" required>
                                                 </div>
                                                 <div class="form-group">
                                                     <label>Segment 02 End</label>
-                                                    <input id="segment_02_end" class="form-control setting_input" type="number" name="number" disabled required>
+                                                    <input name="segment_02_end:number" id="segment_02_end" class="form-control setting_input" type="number" name="number" required>
                                                 </div>
                                             </div>
 
                                             <div class="col-md-6">
                                                 <div class="form-group">
                                                     <label>Segment 03 Start</label>
-                                                    <input id="segment_03_start" class="form-control setting_input" type="number" name="number" disabled required>
+                                                    <input name="segment_03_start:number" id="segment_03_start" class="form-control setting_input" type="number" name="number" required>
                                                 </div>
                                                 <div class="form-group">
                                                     <label>Segment 03 End</label>
-                                                    <input id="segment_03_end" class="form-control setting_input" type="number" name="number" disabled required>
+                                                    <input name="segment_03_end:number" id="segment_03_end" class="form-control setting_input" type="number" name="number" required>
                                                 </div>
 
                                                 <hr class="my-4">
 
                                                 <div class="form-group">
                                                     <label>Segment 04 Start</label>
-                                                    <input id="segment_04_start" class="form-control setting_input" type="number" name="number" disabled required>
+                                                    <input name="segment_04_start:number" id="segment_04_start" class="form-control setting_input" type="number" name="number" required>
                                                 </div>
                                                 <div class="form-group">
                                                     <label>Segment 04 End</label>
-                                                    <input id="segment_04_end" class="form-control setting_input" type="number" name="number" disabled required>
+                                                    <input name="segment_04_end:number" id="segment_04_end" class="form-control setting_input" type="number" name="number" required>
                                                 </div>
                                             </div>
                                         </div>

@@ -51,24 +51,24 @@
                                             <div class="col-md-6">
                                                 <div class="form-group">
                                                     <label>Gradient</label>
-                                                    <select id="color_mode" class="form-control gradients setting_input"></select>
+                                                    <select name="color_mode:string" id="color_mode" class="form-control gradients setting_input"></select>
                                                 </div>
                                                 <div class="form-group">
                                                     <label>Sparks Count <span for="s_count" class="mb-0 badge badge-secondary"></span></label>
-                                                    <input id="s_count" type="range" class="custom-range setting_input" min="0" max="200" step="1" required>
+                                                    <input name="s_count:number" id="s_count" type="range" class="custom-range setting_input" min="0" max="200" step="1" required>
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
                                                 <div class="form-group">
                                                     <label>Sparks Color</label>
-                                                    <select id="s_color" class="form-control colors setting_input"></select>
+                                                    <select name="s_color:string" id="s_color" class="form-control colors setting_input"></select>
                                                 </div>
                                                 <div class="custom-control custom-checkbox my-2">
-                                                    <input type="checkbox" class="custom-control-input setting_input" id="mirror">
+                                                    <input name="mirror:boolean" type="checkbox" class="custom-control-input setting_input" id="mirror">
                                                     <label class="custom-control-label" for="mirror">Mirror</label>
                                                 </div>
                                                 <div class="custom-control custom-checkbox my-2">
-                                                    <input type="checkbox" class="custom-control-input setting_input" id="flip_lr">
+                                                    <input name="flip_lr:boolean" type="checkbox" class="custom-control-input setting_input" id="flip_lr">
                                                     <label class="custom-control-label" for="flip_lr">Flip Left Right</label>
                                                 </div>
                                             </div>

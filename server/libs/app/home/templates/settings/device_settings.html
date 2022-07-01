@@ -50,7 +50,7 @@
                                                 <div class="col-lg-6">
                                                     <div class="form-group">
                                                         <label>Device Name</label>
-                                                        <input id="device_name" class="form-control device_setting_input" type="text" name="text" required>
+                                                        <input name="device_name:name" id="device_name" class="form-control device_setting_input" type="text" name="text" required>
                                                     </div>
                                                     <div class="form-group">
                                                         <label class="row m-0 mb-2 p-0">
@@ -59,7 +59,7 @@
                                                                 <i class="feather icon-help-circle"></i>
                                                             </div>
                                                         </label>
-                                                        <input id="fps" class="form-control device_setting_input" onkeypress="return event.charCode >= 48 && event.charCode <= 57" type="number" name="number" required>
+                                                        <input name="fps:number" id="fps" class="form-control device_setting_input" onkeypress="return event.charCode >= 48 && event.charCode <= 57" type="number"required>
                                                     </div>
                                                     <div class="form-group">
                                                         <label class="row m-0 mb-2 p-0">
@@ -68,7 +68,7 @@
                                                                 <i class="feather icon-help-circle"></i>
                                                             </div>
                                                         </label>
-                                                        <select id="output_type" class="form-control output_type device_setting_input"></select>
+                                                        <select name="output_type:string" id="output_type" class="form-control output_type device_setting_input"></select>
                                                     </div>
                                                 </div>
                                                 <div class="col-lg-6">
@@ -79,7 +79,7 @@
                                                                 <i class="feather icon-help-circle"></i>
                                                             </div>
                                                         </label>
-                                                        <input id="led_count" class="form-control device_setting_input" onkeypress="return event.charCode >= 48 && event.charCode <= 57" type="number" name="number" required>
+                                                        <input name="led_count:ledcount" id="led_count" class="form-control device_setting_input" onkeypress="return event.charCode >= 48 && event.charCode <= 57" type="number" required>
                                                     </div>
                                                     <div class="form-group">
                                                         <label class="row m-0 mb-2 p-0">
@@ -88,7 +88,7 @@
                                                                 <i class="feather icon-help-circle"></i>
                                                             </div>
                                                         </label>
-                                                        <input id="led_mid" class="form-control device_setting_input" onkeypress="return event.charCode >= 48 && event.charCode <= 57" type="number" name="number" required>
+                                                        <input name="led_mid:ledcount" id="led_mid" class="form-control device_setting_input" onkeypress="return event.charCode >= 48 && event.charCode <= 57" type="number" required>
                                                     </div>
                                                     <div class="form-group">
                                                         <label class="row m-0 mb-2 p-0">
@@ -97,7 +97,7 @@
                                                                 <i class="feather icon-help-circle"></i>
                                                             </div>
                                                         </label>
-                                                        <select id="led_strip" class="form-control led_strips device_setting_input"></select>
+                                                        <select name="led_strip:string" id="led_strip" class="form-control led_strips device_setting_input"></select>
                                                     </div>
                                                 </div>
                                                 <div class="col-lg-12">
@@ -117,11 +117,11 @@
                                                         <label id="device_group_label" class="row m-0 mb-2 p-0">
                                                             Device Groups
                                                         </label>
-                                                        <input id="device_groups" type="option" name="tags" class="form-control device_setting_input tagin" value="" required>
+                                                        <input name="device_groups:tags" id="device_groups" type="option" class="form-control device_setting_input tagin" value="" required>
                                                     </div>
                                                     <div class="form-group">
                                                         <label>LED Brightness <span for="led_brightness" class="mb-0 badge badge-secondary"></span></label>
-                                                        <input id="led_brightness" type="range" class="custom-range device_setting_input" min="0" max="100" step="1" required>
+                                                        <input name="led_brightness:number" id="led_brightness" type="range" class="custom-range device_setting_input" min="0" max="100" step="1" required>
                                                     </div>
                                                 </div>
                                             </div>
@@ -143,7 +143,7 @@
                                                                 <i class="feather icon-help-circle"></i>
                                                             </div>
                                                         </label>
-                                                        <input id="led_pin" class="form-control output_raspi" onkeypress="return event.charCode >= 48 && event.charCode <= 57" type="number" name="number" required>
+                                                        <input name="led_pin:number" id="led_pin" class="form-control output_raspi" onkeypress="return event.charCode >= 48 && event.charCode <= 57" type="number" required>
                                                     </div>
                                                     <div class="form-group">
                                                         <label class="row m-0 mb-2 p-0">
@@ -152,7 +152,7 @@
                                                                 <i class="feather icon-help-circle"></i>
                                                             </div>
                                                         </label>
-                                                        <input id="led_freq_hz" class="form-control output_raspi" onkeypress="return event.charCode >= 48 && event.charCode <= 57" type="number" name="number" required>
+                                                        <input name="led_freq_hz:number" id="led_freq_hz" class="form-control output_raspi" onkeypress="return event.charCode >= 48 && event.charCode <= 57" type="number" required>
                                                     </div>
                                                 </div>
                                                 <div class="col-lg-6">
@@ -163,7 +163,7 @@
                                                                 <i class="feather icon-help-circle"></i>
                                                             </div>
                                                         </label>
-                                                        <input id="led_channel" class="form-control output_raspi" onkeypress="return event.charCode >= 48 && event.charCode <= 57" type="number" name="number" required>
+                                                        <input name="led_channel:number" id="led_channel" class="form-control output_raspi" onkeypress="return event.charCode >= 48 && event.charCode <= 57" type="number" required>
                                                     </div>
                                                     <div class="form-group">
                                                         <label class="row m-0 mb-2 p-0">
@@ -172,12 +172,12 @@
                                                                 <i class="feather icon-help-circle"></i>
                                                             </div>
                                                         </label>
-                                                        <input id="led_dma" class="form-control output_raspi" onkeypress="return event.charCode >= 48 && event.charCode <= 57" type="number" name="number" required>
+                                                        <input name="led_dma:number" id="led_dma" class="form-control output_raspi" onkeypress="return event.charCode >= 48 && event.charCode <= 57" type="number" required>
                                                     </div>
                                                 </div>
                                                 <div class="col-md-12">
                                                     <div class="custom-control custom-checkbox my-2">
-                                                        <input type="checkbox" class="custom-control-input output_raspi" id="led_invert">
+                                                        <input name="led_invert:boolean" type="checkbox" class="custom-control-input output_raspi" id="led_invert">
                                                         <label class="custom-control-label row m-0 mb-2 p-0" for="led_invert">
                                                             Invert LED
                                                             <div id="LED_Invert_TOOLTIP" class="pl-1" data-toggle="tooltip" data-placement="top" data-html="true">
@@ -201,7 +201,7 @@
                                                         <i class="feather icon-help-circle"></i>
                                                     </div>
                                                 </label>
-                                                <input id="udp_client_ip" class="form-control output_udp" type="text" name="text" required>
+                                                <input name="udp_client_ip:string" id="udp_client_ip" class="form-control output_udp" type="text" name="text" required>
                                             </div>
                                             <div class="form-group">
                                                 <label class="row m-0 mb-2 p-0">
@@ -210,7 +210,7 @@
                                                         <i class="feather icon-help-circle"></i>
                                                     </div>
                                                 </label>
-                                                <input id="udp_client_port" class="form-control output_udp" oninput="if (this.value > 65535) this.value = 65535;" onkeypress="return event.charCode >= 48 && event.charCode <= 57" type="number" name="number" required>
+                                                <input name="udp_client_port:number" id="udp_client_port" class="form-control output_udp" oninput="if (this.value > 65535) this.value = 65535;" onkeypress="return event.charCode >= 48 && event.charCode <= 57" type="number" required>
                                             </div>
                                         </div>
                                     </div>

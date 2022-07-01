@@ -60,23 +60,17 @@ $(function () {
 
             $.ajax("/api/resources/colors").done((response) => {
                 $('.colors').each(function () {
-                    for (var currentKey in response) {
-                        var newOption = new Option(currentKey, currentKey);
-                        // jquerify the DOM object 'o' so we can use the html method
-                        $(newOption).html(currentKey);
-                        $(this).append(newOption);
-                    }
+                    Object.entries(response).forEach(([key, value]) => {
+                        $(this).append(`<option value="${key}">${value}</option>`);
+                    });
                 });
             }),
 
             $.ajax("/api/resources/gradients").done((response) => {
                 $('.gradients').each(function () {
-                    for (var currentKey in response) {
-                        var newOption = new Option(currentKey, currentKey);
-                        /// jquerify the DOM object 'o' so we can use the html method
-                        $(newOption).html(currentKey);
-                        $(this).append(newOption);
-                    }
+                    Object.entries(response).forEach(([key, value]) => {
+                        $(this).append(`<option value="${key}">${value}</option>`);
+                    });
                 });
             }),
 
@@ -102,40 +96,13 @@ function generateEffectCheckboxes(parentId, effects) {
     Object.entries(effects).forEach(([effectId, effectName]) => {
         const checkbox = `
             <div class="custom-control custom-checkbox my-2">
-                <input type="checkbox" class="custom-control-input setting_input" id="${effectId}">
+                <input name="${effectId}:boolean" type="checkbox" class="custom-control-input setting_input" id="${effectId}">
                 <label class="custom-control-label" for="${effectId}">${effectName}</label>
             </div>
         `;
         $(parentId).append(checkbox);
     });
 }
-
-
-$(':input[type="number"]').change(function (input) {
-    if (input.target.value == '') {
-        input.target.value = 0
-    }
-})
-
-$("#manually_resize_bars").change(function () {
-    const segments = [
-        "segment_01_start", "segment_01_end",
-        "segment_02_start", "segment_02_end",
-        "segment_03_start", "segment_03_end",
-        "segment_04_start", "segment_04_end"
-    ];
-    if (this.checked) {
-        for (const segment of segments) {
-            $(`#${segment}`).prop("disabled", false);
-        }
-        $("#bar_count").prop("disabled", true);
-    } else {
-        for (const segment of segments) {
-            $(`#${segment}`).prop("disabled", true);
-        }
-        $("#bar_count").prop("disabled", false);
-    }
-});
 
 /**
  * Collect all effect setting keys from the UI as an array.
@@ -147,7 +114,7 @@ function GetAllSettingKeys() {
 }
 
 /**
- * Update effect settings with config values.
+ * Populate effect settings with config values.
  */
 function SetLocalSettings() {
     const all_setting_keys = GetAllSettingKeys();
@@ -179,35 +146,18 @@ function SetLocalSettings() {
 /* Device Handling */
 
 $("#save_btn").on("click", function () {
-    const settings = {};
-    const all_setting_keys = GetAllSettingKeys();
-
-    // Collect all effect settings values according to their attribute.
-    all_setting_keys.map((setting_key) => {
-        let setting_value = "";
-
-        if ($("#" + setting_key).length) {
-            if ($("#" + setting_key).attr('type') == 'checkbox') {
-                setting_value = $("#" + setting_key).is(':checked');
-            } else if ($("#" + setting_key).attr('type') == 'number') {
-                setting_value = parseFloat($("#" + setting_key).val());
-            } else if ($("#" + setting_key).attr('type') == 'range') {
-                setting_value = parseFloat($("#" + setting_key).val());
-            } else if ($("#" + setting_key).hasClass('color_input')) {
-                // Save RGB value to config
-                setting_value = parseRGB($(".color_input").val());
-            } else {
-                setting_value = $("#" + setting_key).val();
-            }
+    // Serialize effect settings as JSON.
+    const serializedForm = $('#settingsForm .setting_input').serializeJSON({
+        checkboxUncheckedValue: "false",
+        customTypes: {
+            rgb: (value) => { return parseRGB(value); }
         }
-
-        settings[setting_key] = setting_value;
-    })
+    });
 
     const data = {
         "device": currentDevice.id,
         "effect": effectIdentifier,
-        "settings": settings
+        "settings": serializedForm
     };
 
     // Save effect settings to config.

@@ -88,46 +88,34 @@ $(document).ready(function () {
 // Save Functions   -----------------------------------------------------------
 
 /**
- * Collect device settings values according to their attribute and save to config.
+ * Serialize device settings to JSON.
  */
 function SetLocalSettings() {
-    let settings_device = {};
-    $(".device_setting_input").each((i, v) => {
-        const setting_key = v.id;
-        let setting_value = "";
-
-        const element = $(`#${setting_key}.device_setting_input`);
-        switch (element.attr("type")) {
-            case "checkbox":
-                setting_value = element.is(':checked');
-                break;
-            case "range":
-            case "number":
-                if (!element.val()) {
-                    setting_value = 1;
-                } else if (setting_key == "led_count" && element.val() < 7) {
-                    // https://github.com/rpi-ws281x/rpi-ws281x-python/issues/70
-                    setting_value = 7;
-                } else {
-                    setting_value = parseFloat(element.val());
+    const serializedDeviceForm = $('#settingsForm .device_setting_input').serializeJSON({
+        checkboxUncheckedValue: "false",
+        customTypes: {
+            name: (value) => { return value.trim() },
+            ledcount: (value) => {
+                // https://github.com/rpi-ws281x/rpi-ws281x-python/issues/70
+                if (isNaN(value) || value < 7) {
+                    return 7
                 }
-                break;
-            case "option":
-                setting_value = tagin.getTags();
-                break;
-            default:
-                setting_value = element.val().trim();
-                element.val(setting_value);
+                return parseInt(value);
+            },
+            tags: () => { return tagin.getTags(); }
         }
-        settings_device[setting_key] = setting_value;
     });
-    const data = { "device": currentDevice.id, "settings": settings_device };
+
+    const deviceSettings = {
+        "device": currentDevice.id,
+        "settings": serializedDeviceForm
+    };
 
     const saveProgress = [
         $.ajax({
             url: "/api/settings/device",
             type: "POST",
-            data: JSON.stringify(data, null, '\t'),
+            data: JSON.stringify(deviceSettings, null, '\t'),
             contentType: 'application/json;charset=UTF-8'
         }).done((data) => {
             console.log("Device settings set successfully. Response:\n\n" + JSON.stringify(data, null, '\t'));
@@ -141,34 +129,23 @@ function SetLocalSettings() {
         })
     ];
 
+    // Serialize device output settings to JSON.
     Object.keys(output_types).forEach(output_type_key => {
-        const all_output_type_setting_keys = $("." + output_type_key).map(function () { return this.id }).toArray();
-        let settings_output_type = {};
-
-        Object.keys(all_output_type_setting_keys).forEach((setting_id) => {
-            const setting_key = all_output_type_setting_keys[setting_id];
-            let setting_value = "";
-
-            const element = $(`#${setting_key}.${output_type_key}`);
-            switch (element.attr("type")) {
-                case "checkbox":
-                    setting_value = element.is(':checked');
-                    break;
-                case "number":
-                    setting_value = parseFloat(element.val());
-                    break;
-                default:
-                    setting_value = element.val();
-            }
-            settings_output_type[setting_key] = setting_value;
+        const serializedOutputForm = $(`#settingsForm .${output_type_key}`).serializeJSON({
+            checkboxUncheckedValue: "false"
         });
 
-        const data2 = { "device": currentDevice.id, "output_type_key": output_type_key, "settings": settings_output_type };
+        const outputSettings = {
+            "device": currentDevice.id,
+            "output_type_key": output_type_key,
+            "settings": serializedOutputForm
+        };
+
         saveProgress.push(
             $.ajax({
                 url: "/api/settings/device/output-type",
                 type: "POST",
-                data: JSON.stringify(data2, null, '\t'),
+                data: JSON.stringify(outputSettings, null, '\t'),
                 contentType: 'application/json;charset=UTF-8'
             }).done(data => {
                 console.log("Device settings set successfully. Response:\n\n" + JSON.stringify(data, null, '\t'));
@@ -279,7 +256,7 @@ $("#create1_btn, #create2_btn").on("click", function () {
 $("#delete_btn").on("click", function () {
     $('#modal_device_name').text(currentDevice.name);
     $('#modal_delete_device').modal('show');
-})
+});
 
 $("#delete_btn_modal").on("click", function () {
     $('#modal_delete_device').modal('hide');
@@ -318,6 +295,7 @@ $("#delete_btn_modal").on("click", function () {
 
 /**
  * Update pills in device bar with new data.
+ * @param {Array<Device>} devices
  */
 function reloadDeviceTab(devices) {
     // Remove every pill in the navigation and recreate

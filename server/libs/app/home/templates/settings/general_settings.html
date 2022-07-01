@@ -54,7 +54,7 @@
                                                         <i class="feather icon-help-circle"></i>
                                                     </div>
                                                 </label>
-                                                <input id="webserver_port" class="form-control setting_input" oninput="if (this.value > 65535) this.value = 65535;" onkeypress="return event.charCode >= 48 && event.charCode <= 57" type="number" name="number" required>
+                                                <input name="webserver_port:port" id="webserver_port" class="form-control setting_input" oninput="if (this.value > 65535) this.value = 65535;" onkeypress="return event.charCode >= 48 && event.charCode <= 57" type="number" required>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
@@ -66,14 +66,14 @@
                                                     </div>
                                                 </label>
                                                 <div class="input-group">
-                                                    <input id="DASHBOARD_PIN" class="form-control" maxlength="8" oninput="this.value = this.value.replace(/[^0-9]/g, '').replace(/(\.*?)\.*/g, '$1');" type="password" placeholder="PIN" name="pin">
+                                                    <input name="DASHBOARD_PIN:pin" id="DASHBOARD_PIN" class="form-control pin_setting" maxlength="8" oninput="this.value = this.value.replace(/[^0-9]/g, '').replace(/(\.*?)\.*/g, '$1');" type="password" placeholder="PIN">
                                                     <div class="input-group-append">
                                                         <span id="toggle_pin_view" class="input-group-text feather icon-eye"></span>
                                                     </div>
                                                 </div>
                                             </div>
                                             <div class="custom-control custom-checkbox my-2">
-                                                <input type="checkbox" class="custom-control-input" id="PIN_LOCK_ENABLED">
+                                                <input name="PIN_LOCK_ENABLED:boolean" type="checkbox" class="custom-control-input pin_setting" id="PIN_LOCK_ENABLED">
                                                 <label class="custom-control-label" for="PIN_LOCK_ENABLED">Enable PIN Lock</label>
                                             </div>
                                         </div>
@@ -90,7 +90,7 @@
                                                         <i class="feather icon-help-circle"></i>
                                                     </div>
                                                 </label>
-                                                <select id="device_id" class="form-control audio_devices setting_input" type="number" name="number">
+                                                <select name="device_id:number" id="device_id" class="form-control audio_devices setting_input" type="number">
                                                     <option value="-1">No microphone available</option>
                                                 </select>
                                             </div>
@@ -101,7 +101,7 @@
                                                         <i class="feather icon-help-circle"></i>
                                                     </div>
                                                 </label>
-                                                <input id="default_sample_rate" class="form-control setting_input" onkeypress="return event.charCode >= 48 && event.charCode <= 57" type="number" name="number" required>
+                                                <input name="default_sample_rate:number" id="default_sample_rate" class="form-control setting_input" onkeypress="return event.charCode >= 48 && event.charCode <= 57" type="number" required>
                                             </div>
                                             <div class="form-group">
                                                 <label class="row m-0 mb-2 p-0">
@@ -110,7 +110,7 @@
                                                         <i class="feather icon-help-circle"></i>
                                                     </div>
                                                 </label>
-                                                <input id="min_frequency" class="form-control setting_input" onkeypress="return event.charCode >= 48 && event.charCode <= 57" type="number" name="number" required>
+                                                <input name="min_frequency:number" id="min_frequency" class="form-control setting_input" onkeypress="return event.charCode >= 48 && event.charCode <= 57" type="number" required>
                                             </div>
                                             <div class="form-group">
                                                 <label class="row m-0 mb-2 p-0">
@@ -119,7 +119,7 @@
                                                         <i class="feather icon-help-circle"></i>
                                                     </div>
                                                 </label>
-                                                <input id="max_frequency" class="form-control setting_input" onkeypress="return event.charCode >= 48 && event.charCode <= 57" type="number" name="number" required>
+                                                <input name="max_frequency:number" id="max_frequency" class="form-control setting_input" onkeypress="return event.charCode >= 48 && event.charCode <= 57" type="number" required>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
@@ -130,7 +130,7 @@
                                                         <i class="feather icon-help-circle"></i>
                                                     </div>
                                                 </label>
-                                                <input id="min_volume_threshold" class="form-control setting_input" type="number" name="number" required>
+                                                <input name="min_volume_threshold:number" id="min_volume_threshold" class="form-control setting_input" onkeypress="return event.charCode >= 48 && event.charCode <= 57" type="number" required>
                                             </div>
                                             <div class="form-group">
                                                 <label class="row m-0 mb-2 p-0">
@@ -139,7 +139,7 @@
                                                         <i class="feather icon-help-circle"></i>
                                                     </div>
                                                 </label>
-                                                <input id="n_rolling_history" class="form-control setting_input" onkeypress="return event.charCode >= 48 && event.charCode <= 57" type="number" name="number" required>
+                                                <input name="n_rolling_history:number" id="n_rolling_history" class="form-control setting_input" onkeypress="return event.charCode >= 48 && event.charCode <= 57" type="number" required>
                                             </div>
                                             <div class="form-group">
                                                 <label class="row m-0 mb-2 p-0">
@@ -148,7 +148,7 @@
                                                         <i class="feather icon-help-circle"></i>
                                                     </div>
                                                 </label>
-                                                <input id="frames_per_buffer" class="form-control setting_input" onkeypress="return event.charCode >= 48 && event.charCode <= 57" type="number" name="number" required>
+                                                <input name="frames_per_buffer:number" id="frames_per_buffer" class="form-control setting_input" onkeypress="return event.charCode >= 48 && event.charCode <= 57" type="number" required>
                                             </div>
                                             <div class="form-group">
                                                 <label class="row m-0 mb-2 p-0">
@@ -157,7 +157,7 @@
                                                         <i class="feather icon-help-circle"></i>
                                                     </div>
                                                 </label>
-                                                <input id="n_fft_bins" class="form-control setting_input" onkeypress="return event.charCode >= 48 && event.charCode <= 57" type="number" name="number" required>
+                                                <input name="n_fft_bins:number" id="n_fft_bins" class="form-control setting_input" onkeypress="return event.charCode >= 48 && event.charCode <= 57" type="number" required>
                                             </div>
                                         </div>
 
@@ -173,7 +173,7 @@
                                                         <i class="feather icon-help-circle"></i>
                                                     </div>
                                                 </label>
-                                                <input id="device_groups" type="text" name="tags" class="form-control setting_input tagin" value="" required>
+                                                <input name="device_groups:tags" id="device_groups" type="text" class="form-control setting_input tagin" value="" required>
                                             </div>
                                         </div>
 
@@ -189,7 +189,7 @@
                                                         <i class="feather icon-help-circle"></i>
                                                     </div>
                                                 </label>
-                                                <select id="log_level_console" class="form-control logging_levels setting_input">
+                                                <select name="log_level_console:string" id="log_level_console" class="form-control logging_levels setting_input">
                                                 </select>
                                             </div>
                                         </div>
@@ -201,11 +201,11 @@
                                                         <i class="feather icon-help-circle"></i>
                                                     </div>
                                                 </label>
-                                                <select id="log_level_file" class="form-control logging_levels setting_input">
+                                                <select name="log_level_file:string" id="log_level_file" class="form-control logging_levels setting_input">
                                                 </select>
                                             </div>
                                             <div class="custom-control custom-checkbox my-2">
-                                                <input type="checkbox" class="custom-control-input setting_input" id="log_file_enabled">
+                                                <input name="log_file_enabled:boolean" type="checkbox" class="custom-control-input setting_input" id="log_file_enabled">
                                                 <label class="custom-control-label" for="log_file_enabled">Enable File Logging</label>
                                             </div>
                                         </div>

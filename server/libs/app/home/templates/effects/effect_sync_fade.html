@@ -51,17 +51,17 @@
                                             <div class="col-md-6">
                                                 <div class="form-group">
                                                     <label>Gradient</label>
-                                                    <select id="gradient" class="form-control gradients setting_input"></select>
+                                                    <select name="gradient:string" id="gradient" class="form-control gradients setting_input"></select>
                                                 </div>
                                                 <div class="custom-control custom-checkbox">
-                                                    <input type="checkbox" class="custom-control-input setting_input" id="reverse">
+                                                    <input name="reverse:boolean" type="checkbox" class="custom-control-input setting_input" id="reverse">
                                                     <label class="custom-control-label" for="reverse">Reverse</label>
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
                                                 <div class="form-group">
                                                     <label>Speed <span for="speed" class="mb-0 badge badge-secondary"></span></label>
-                                                    <input id="speed" type="range" class="custom-range mt-3 setting_input" min="0" max="200" step="0.1" required>
+                                                    <input name="speed:number" id="speed" type="range" class="custom-range mt-3 setting_input" min="0" max="200" step="0.1" required>
                                                 </div>
                                             </div>
                                         </div>
