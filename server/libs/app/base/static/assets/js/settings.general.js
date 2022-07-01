@@ -73,10 +73,8 @@ function populateGeneralSettings(settings) {
         if ($("#" + key).attr('type') == 'checkbox') {
             $("#" + key).prop('checked', value);
         } else if ($("#" + key).prop("tagName") == "SELECT") {
-            const optionExists = $("#" + key).find(`option[value='${value}']`).length > 0;
-            if (optionExists) {
-                $("#" + key).val(value);
-            }
+            // const optionExists = $("#" + key).find(`option[value='${value}']`).length > 0;
+            $("#" + key).val(value);
         } else if (key == "device_groups") {
             tagin.addTag(value);
         } else {
