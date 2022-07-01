@@ -1,6 +1,6 @@
 from libs.webserver.executer import Executer
 
-from flask import Blueprint, request, jsonify, send_file, flash
+from flask import Blueprint, request, jsonify, send_file
 from flask_login import login_required
 import copy
 import json
@@ -257,7 +257,6 @@ def import_config():  # pylint: disable=E0211
     Executer.instance.logger.debug("Import Config Request received.")
     if 'imported_config' not in request.files:
         Executer.instance.logger.error("Could not find the file key.")
-        flash('No config file selected', 'error')
         return "No config file selected.", 404
     imported_config = request.files['imported_config']
     content = imported_config.read()
@@ -265,13 +264,9 @@ def import_config():  # pylint: disable=E0211
         try:
             Executer.instance.logger.debug(f"File Received: {json.dumps(json.loads(content), indent=4)}")
             if Executer.instance.general_settings_executer.import_config(json.loads(content)):
-                flash('Config file imported', 'success')
                 return "File imported.", 200
-            flash('Could not import config file', 'error')
             return "Could not import file.", 400
         except (json.decoder.JSONDecodeError, UnicodeDecodeError):
-            flash('Not a valid config file', 'error')
             return "Unsupported media type.", 415
     else:
-        flash('No config file selected', 'error')
         return "No config file selected.", 404
