@@ -26,9 +26,7 @@ def get_effect_settings():  # pylint: disable=E0211
           example1:
             value: device_0
             summary: device ID
-      - description:
-          "Specific effect for a selected device\n\n
-          __Note:__ `effect_random_cycle` can only be retrieved using `all_devices` device ID."
+      - description: "Specific effect for a selected device"
         in: query
         name: effect
         required: true
@@ -46,6 +44,7 @@ def get_effect_settings():  # pylint: disable=E0211
             - effect_rods
             - effect_segment_color
             - effect_fireplace
+            - effect_strobe
             - effect_scroll
             - effect_advanced_scroll
             - effect_energy
