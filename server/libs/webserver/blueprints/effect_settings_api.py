@@ -115,9 +115,6 @@ def get_effect_settings():  # pylint: disable=E0211
         if result is None:
             return "Unprocessable Entity.", 422
 
-        if result is None:
-            return "Could not find settings value: ", 403
-
         data_out = copy.deepcopy(data_in)
         data_out["setting_value"] = result
         return jsonify(data_out)
@@ -134,9 +131,6 @@ def get_effect_settings():  # pylint: disable=E0211
 
         if result is None:
             return "Unprocessable Entity.", 422
-
-        if result is None:
-            return "Could not find settings value: ", 403
 
         data_out = copy.deepcopy(data_in)
         data_out["settings"] = result
