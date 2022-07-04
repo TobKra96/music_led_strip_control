@@ -228,24 +228,27 @@ def get_output_type_device_settings():  # pylint: disable=E0211
           example1:
             value: device_0
             summary: device ID
-      - description: The output type ID
+      - description:
+          The output type ID\n\n
+          Return all output settings if `output_type_key` and `setting_key` are not specified
         in: query
         name: output_type_key
-        required: true
+        required: false
         schema:
           type: string
           enum:
             - output_raspi
             - output_udp
       - description:
-          "The `setting_key` for a specified `device` to get the value from\n\n
+          "__Note:__ `setting_key` is required if `output_type_key` is specified\n\n
+          The `setting_key` for a specified `device` to get the value from\n\n
           If `output_type_key` is output_raspi, the following `setting_key` keys are allowed:\n\n
           led_channel, led_dma, led_freq_hz, led_invert, led_pin\n\n
           If `output_type_key` is output_udp, the following `setting_key` keys are allowed:\n\n
           udp_client_ip, udp_client_port"
         in: query
         name: setting_key
-        required: true
+        required: false
         schema:
           type: string
           enum:
@@ -262,12 +265,29 @@ def get_output_type_device_settings():  # pylint: disable=E0211
         content:
           application/json:
             schema:
-              example:
-                device: str,
-                output_type_key: str,
-                setting_key: str,
-                setting_value: str/int/array/bool/num
               type: object
+            examples:
+              example1:
+                value:
+                  device: str
+                  output_type_key: str
+                  setting_key: str
+                  setting_value: str/int/array/bool/num
+                summary: With specified output_type_key and setting_key
+              example2:
+                value:
+                  device: str
+                  output_settings:
+                    led_channel: int
+                    led_dma: int
+                    led_freq_hz: int
+                    led_invert: bool
+                    led_pin: int
+                    mqtt_broker: str
+                    mqtt_path: str
+                    udp_client_ip: str
+                    udp_client_port: int
+                summary: Without specified output_type_key and setting_key
       "403":
         description: Input data are wrong
       "422":
@@ -275,17 +295,37 @@ def get_output_type_device_settings():  # pylint: disable=E0211
     """
     data_in = request.args.to_dict()
 
-    if not Executer.instance.device_settings_executer.validate_data_in(data_in, ("device", "output_type_key", "setting_key",)):
-        return "Input data are wrong.", 403
+    if len(data_in) == 3:
 
-    result = Executer.instance.device_settings_executer.get_output_type_device_setting(data_in["device"], data_in["output_type_key"], data_in["setting_key"])
+        if not Executer.instance.device_settings_executer.validate_data_in(data_in, ("device", "output_type_key", "setting_key",)):
+            return "Input data are wrong.", 403
 
-    if result is None:
-        return "Unprocessable Entity.", 422
+        result = Executer.instance.device_settings_executer.get_output_type_device_setting(data_in["device"], data_in["output_type_key"], data_in["setting_key"])
 
-    data_out = copy.deepcopy(data_in)
-    data_out["setting_value"] = result
-    return jsonify(data_out)
+        if result is None:
+            return "Unprocessable Entity.", 422
+
+        data_out = copy.deepcopy(data_in)
+        data_out["setting_value"] = result
+        return jsonify(data_out)
+
+    # Get all output type settings of one device.
+    if len(data_in) == 1:
+
+        if not Executer.instance.device_settings_executer.validate_data_in(data_in, ("device",)):
+            return "Input data are wrong.", 403
+
+        result = Executer.instance.device_settings_executer.get_all_output_type_settings(data_in["device"])
+
+        if result is None:
+            return "Unprocessable Entity.", 422
+
+        data_out = copy.deepcopy(data_in)
+        data_out["output_settings"] = result
+
+        return jsonify(data_out)
+
+    return "Input data are wrong.", 403
 
 
 @device_settings_api.post('/api/settings/device/output-type')

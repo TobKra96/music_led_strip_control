@@ -33,6 +33,18 @@ class DeviceSettingsExecuter(ExecuterBase):
         return self._config["device_configs"][device]["output"][output_type_key][setting_key]
 
     @handle_config_errors
+    def get_all_output_type_settings(self, device):
+        result = dict()
+        output_types = self._config["device_configs"][device]["output"]
+        # Flatten output types to one dict.
+        for key, value in output_types.items():
+            if isinstance(value, dict):
+                result.update(value)
+            else:
+                result[key] = value
+        return result
+
+    @handle_config_errors
     def set_output_type_device_setting(self, device, output_type_key, settings):
         if not isinstance(settings, dict) or not settings:
             return None
