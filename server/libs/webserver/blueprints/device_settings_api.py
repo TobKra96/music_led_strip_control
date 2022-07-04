@@ -45,6 +45,25 @@ def get_device_setting():  # pylint: disable=E0211
             - led_strip
             - output
             - output_type
+      - description:
+          Specific `excluded_key` to exclude from returned settings\n\n
+          __Note:__ `excluded_key` is only allowed if `setting_key` is __NOT__ specified
+        in: query
+        name: excluded_key
+        required: false
+        schema:
+          type: string
+          enum:
+            - device_groups
+            - device_name
+            - effects
+            - fps
+            - led_brightness
+            - led_count
+            - led_mid
+            - led_strip
+            - output
+            - output_type
     responses:
       "200":
         description: OK
@@ -64,13 +83,21 @@ def get_device_setting():  # pylint: disable=E0211
                   device: str
                   settings: object
                 summary: Without specified setting_key
+              example3:
+                value:
+                  device: str
+                  excluded_key: str
+                  settings: str/int/array/bool/num
+                summary: With specified excluded_key
       "403":
         description: Input data are wrong
       "422":
         description: Unprocessable Entity
     """
-    if len(request.args) == 2:  # Get one specific device setting of one device.
-        data_in = request.args.to_dict()
+    data_in = request.args.to_dict()
+
+    # Get one specific device setting of one device.
+    if len(data_in) == 2 and "setting_key" in data_in:
 
         if not Executer.instance.device_settings_executer.validate_data_in(data_in, ("device", "setting_key",)):
             return "Input data are wrong.", 403
@@ -84,8 +111,7 @@ def get_device_setting():  # pylint: disable=E0211
         data_out["setting_value"] = result
         return jsonify(data_out)
 
-    if len(request.args) == 1:  # Get all device settings of a specific device.
-        data_in = request.args.to_dict()
+    if len(data_in) == 1:  # Get all device settings of one device.
 
         if not Executer.instance.device_settings_executer.validate_data_in(data_in, ("device",)):
             return "Input data are wrong.", 403
@@ -97,6 +123,23 @@ def get_device_setting():  # pylint: disable=E0211
 
         data_out = copy.deepcopy(data_in)
         data_out["settings"] = result
+        return jsonify(data_out)
+
+    # Get all device settings of one device excluding a specific setting.
+    if len(data_in) == 2 and "excluded_key" in data_in:
+
+        if not Executer.instance.device_settings_executer.validate_data_in(data_in, ("device", "excluded_key",)):
+            return "Input data are wrong.", 403
+
+        result = Executer.instance.device_settings_executer.get_device_settings(data_in["device"])
+
+        if result is None or data_in["excluded_key"] not in result:
+            return "Unprocessable Entity.", 422
+
+        data_out = copy.deepcopy(data_in)
+        result.pop(data_in["excluded_key"])
+        data_out["settings"] = result
+
         return jsonify(data_out)
 
     return "Input data are wrong.", 403
