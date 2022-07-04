@@ -162,7 +162,7 @@ function setGeneralSettings(settings) {
  * @param {Object} settings
  */
 function setPinSettings(settings) {
-    if (!settings.DASHBOARD_PIN) {
+    if (!settings.DASHBOARD_PIN && settings.PIN_LOCK_ENABLED) {
         settings.PIN_LOCK_ENABLED = false;
         $("#PIN_LOCK_ENABLED").prop('checked', false);
         $("#DASHBOARD_PIN").val("");
