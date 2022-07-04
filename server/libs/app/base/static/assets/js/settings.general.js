@@ -80,6 +80,7 @@ function populateGeneralSettings(settings) {
         } else {
             $("#" + key).val(value);
         }
+        $("#" + key).trigger('change');
     });
 }
 
@@ -95,7 +96,7 @@ function populatePinSettings(settings) {
 /**
  * Serialize general settings as JSON.
  */
- function setLocalSettings() {
+function setLocalSettings() {
     const serializedForm = $('#settingsForm .setting_input').serializeJSON({
         checkboxUncheckedValue: "false",
         customTypes: {
@@ -161,7 +162,7 @@ function setGeneralSettings(settings) {
  * @param {Object} settings
  */
 function setPinSettings(settings) {
-    if (!settings.DASHBOARD_PIN && settings.PIN_LOCK_ENABLED) {
+    if (!settings.DASHBOARD_PIN) {
         settings.PIN_LOCK_ENABLED = false;
         $("#PIN_LOCK_ENABLED").prop('checked', false);
         $("#DASHBOARD_PIN").val("");
@@ -217,7 +218,7 @@ function resetPinSettings() {
 /**
  * Call API to import new config file.
  */
- function importSettings() {
+function importSettings() {
     let file_data = $('#configUpload').prop('files')[0];
     let form_data = new FormData();
     form_data.append('imported_config', file_data);
