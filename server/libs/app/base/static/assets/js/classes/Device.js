@@ -221,7 +221,12 @@ export default class Device {
 
         this.getOutputSettings().then((response) => {
             Object.entries(response.output_settings).forEach(([key, value]) => {
-                $("#" + key).val(value);
+                if ($("#" + key).attr('type') == 'checkbox') {
+                    $("#" + key).prop('checked', value);
+                } else {
+                    $("#" + key).val(value);
+                }
+
                 $("#" + key).trigger('change');
             });
         });
