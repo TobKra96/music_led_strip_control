@@ -190,16 +190,14 @@ function resetSettings() {
         url: "/api/settings/general",
         type: "DELETE",
         data: {},
-        contentType: 'application/json;charset=UTF-8',
-        success: () => {
-            getLocalSettings();
-            new Toast("General settings reset to default.").success();
-            console.log("Settings reset successfully.");
-        },
-        error: (xhr) => {
-            new Toast("Error while resetting settings.").error();
-            console.log(xhr.responseText);
-        }
+        contentType: 'application/json;charset=UTF-8'
+    }).done(() => {
+        getLocalSettings();
+        new Toast("General settings reset to default.").success();
+        console.log("Settings reset successfully.");
+    }).fail((xhr) => {
+        new Toast("Error while resetting settings.").error();
+        console.log(xhr.responseText);
     });
 }
 
@@ -224,22 +222,20 @@ function importSettings() {
     form_data.append('imported_config', file_data);
 
     $.ajax({
-        url: '/api/settings/configuration/file',
-        dataType: 'text',
+        url: "/api/settings/configuration/file",
+        dataType: "text",
         cache: false,
         contentType: false,
         processData: false,
         data: form_data,
-        type: 'POST',
-        success: function (response) {
-            getLocalSettings();
-            new Toast("General settings imported.").success();
-            console.log(response);
-        },
-        error: function (xhr) {
-            new Toast("Error while importing general settings. " + xhr.responseText).error();
-            console.log(xhr.responseText);
-        }
+        type: "POST"
+    }).done((response) => {
+        getLocalSettings();
+        new Toast("General settings imported.").success();
+        console.log(response);
+    }).fail((xhr) => {
+        new Toast("Error while importing general settings. " + xhr.responseText).error();
+        console.log(xhr.responseText);
     });
 }
 
