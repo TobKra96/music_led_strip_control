@@ -34,27 +34,28 @@ $(document).ready(function () {
     $("#settings_list").slideDown();
     tagin = new Tagin(document.querySelector(".tagin"));
     $(".tagin-input").prop('disabled', true);
-    // Preload
+
+    // Preload dropdown values.
     Promise.all([
-        // get Output Types
-        $.ajax("/api/resources/output-types").done((data) => {
-            output_types = data;
+
+        $.ajax("/api/resources/output-types").done((response) => {
+            output_types = response;
             $('.output_type').each(function () {
-                Object.keys(data).forEach(output_type_key => {
-                    const option = new Option(data[output_type_key], output_type_key);
-                    $(this).append(option);
+                Object.entries(response).forEach(([key, value]) => {
+                    $(this).append(`<option value="${key}">${value}</option>`);
                 });
             });
         }),
-        // get LED Strips
-        $.ajax("/api/resources/led-strips").done((data) => {
+
+        $.ajax("/api/resources/led-strips").done((response) => {
             $('.led_strips').each(function () {
-                for (let key in data) {
-                    $(this).append(new Option(data[key], key));
-                }
+                Object.entries(response).forEach(([key, value]) => {
+                    $(this).append(`<option value="${key}">${value}</option>`);
+                });
             });
-        }),
-    ]).then(response => {
+        })
+
+    ]).then(() => {
         if (devices.length > 0) {
             $("#deviceFound").removeClass('d-none');
             $("#noDeviceFound").addClass('d-none');
@@ -66,12 +67,12 @@ $(document).ready(function () {
             return;
         }
 
-        currentDevice.refreshConfig(output_types);
+        currentDevice.refreshConfig();
         // Add behavior to Device Tab
         devices.forEach(device => {
             device.link.addEventListener('click', () => {
                 currentDevice = device;
-                device.refreshConfig(output_types);
+                device.refreshConfig();
             });
         });
 
@@ -148,7 +149,7 @@ function SetLocalSettings() {
                 data: JSON.stringify(outputSettings, null, '\t'),
                 contentType: 'application/json;charset=UTF-8'
             }).done(data => {
-                console.log("Device settings set successfully. Response:\n\n" + JSON.stringify(data, null, '\t'));
+                console.log("Device output settings set successfully. Response:\n\n" + JSON.stringify(data, null, '\t'));
             }).fail(data => {
                 console.log("Error while setting device settings. Error: " + data);
             })
@@ -156,8 +157,8 @@ function SetLocalSettings() {
 
     });
 
-    Promise.all(saveProgress).then(response => {
-        console.log("all saved", response);
+    Promise.all(saveProgress).then(() => {
+        console.log("all saved");
     }).catch((response) => {
         new Toast(`Error while saving device "${currentDevice.name}". Error: ` + JSON.stringify(response, null, '\t')).error();
     });
@@ -187,7 +188,7 @@ const createDevice = function () {
             localStorage.setItem('lastDevice', currentDevice.id);
 
             // $(`a[data-device_id=${currentDevice.id}`).addClass("active");
-            currentDevice.refreshConfig(output_types);
+            currentDevice.refreshConfig();
 
             reloadDeviceTab(devices);
 
@@ -279,7 +280,7 @@ $("#delete_btn_modal").on("click", function () {
         if (devices.length) {
             currentDevice = devices[[devices.length - 1]];
             localStorage.setItem('lastDevice', currentDevice.id);
-            currentDevice.refreshConfig(output_types);
+            currentDevice.refreshConfig();
         } else {
             $("#deviceFound").addClass('d-none');
             $("#noDeviceFound").removeClass('d-none');
@@ -316,7 +317,7 @@ function reloadDeviceTab(devices) {
         device.link.addEventListener('click', () => {
             currentDevice = device;
             $("#selected_device_txt").text(currentDevice.name);
-            device.refreshConfig(output_types);
+            device.refreshConfig();
         });
 
         const li = document.createElement("li");

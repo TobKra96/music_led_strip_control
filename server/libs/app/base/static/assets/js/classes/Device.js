@@ -90,35 +90,32 @@ export default class Device {
     }
 
     /**
-     * Call API to get a single setting of a device.
-     * @param {string} key
+     * Call API to get all device settings.
+     * @param {string} excludedKey
      * @return {jQuery.jqXHR}
      */
-    getSetting(key) {
-        //  returns promise
+    getSettings(excludedKey = "") {
+        let settings = {
+            "device": this.id
+        };
+        if (excludedKey !== "") {
+            settings.excluded_key = excludedKey;
+        }
         return $.ajax({
             url: "/api/settings/device",
-            data: {
-                "device": this.id,
-                "setting_key": key,
-            }
-        })
+            data: settings
+        });
     }
 
     /**
-     * Call API to get a single output setting of a device.
-     * @param {string} key
-     * @param {string} type
+     * Call API to get all device output settings.
      * @return {jQuery.jqXHR}
      */
-    getOutputSetting(key, type) {
-        //  returns promise
+    getOutputSettings() {
         return $.ajax({
             url: "/api/settings/device/output-type",
             data: {
-                "device": this.id,
-                "setting_key": key,
-                "output_type_key": type,
+                "device": this.id
             }
         });
     }
@@ -202,43 +199,32 @@ export default class Device {
 
     /**
      * Populate forms with data from config.
-     * @param {{output_raspi: string, output_udp: string}} output_types
      */
-    refreshConfig(output_types) {
+    refreshConfig() {
+        this.getSettings("effects").then((response) => {
+            Object.entries(response.settings).forEach(([key, value]) => {
+                if ($("#" + key).attr('type') == 'checkbox') {
+                    $("#" + key).prop('checked', value);
+                } else if ($("#" + key).attr('type') == 'option') {
+                    populateDeviceGroups(value);
+                    populateGlobalGroups(value);
+                } else {
+                    $("#" + key).val(value);
+                }
+                // Set initial brightness slider value
+                // because it is the only slider label on the page
+                $(`span[for='${key}']`).text(value);
 
-        if (!output_types) return;
-        // fetch Device Config data from Server and update the Form
-        const device_config_input = $(".device_setting_input").map(function () { return this.id }).toArray()
-            .map(id => this.getSetting(id));
-        const device_config_output = Object.keys(output_types).flatMap(output_type_key => {
-            return $("." + output_type_key).map(function () { return this.id }).toArray()
-                .map(key => this.getOutputSetting(key, output_type_key))
-        });
-        Promise.all(
-            device_config_input
-                .concat(device_config_output)
-        )
-            .then((response) => {
-                // response array contains ALL current device config objects
-                response.forEach(data => {
-                    const setting_key = data["setting_key"];
-                    const setting_value = data["setting_value"];
-                    $("#" + setting_key).trigger('change');
-
-                    if ($(`#${setting_key}`).attr('type') == 'checkbox') {
-                        $(`#${setting_key}`).prop('checked', setting_value);
-                    } else if ($(`#${setting_key}`).attr('type') == 'option') {
-                        populateDeviceGroups(setting_value);
-                        populateGlobalGroups(setting_value);
-                    } else {
-                        $(`#${setting_key}`).val(setting_value);
-                    }
-                    $(`#${setting_key}`).trigger('change');
-
-                    // Set initial brightness slider value
-                    $(`span[for='${setting_key}']`).text(setting_value);
-                })
+                $("#" + key).trigger('change');
             });
+        });
+
+        this.getOutputSettings().then((response) => {
+            Object.entries(response.output_settings).forEach(([key, value]) => {
+                $("#" + key).val(value);
+                $("#" + key).trigger('change');
+            });
+        });
     }
 
 }
@@ -267,9 +253,8 @@ function populateGlobalGroups(deviceGroups) {
     $("#device_group_dropdown").empty();
     // Populate device group dropdown with all available groups
     jinja_groups.groups.forEach(globalGroup => {
-        const option = new Option(globalGroup, globalGroup);
         if (!deviceGroups.includes(globalGroup)) {
-            $("#device_group_dropdown").prepend(option);
+            $("#device_group_dropdown").prepend(`<option value="${globalGroup}">${globalGroup}</option>`);
         }
     });
     // Add placeholder option on top
