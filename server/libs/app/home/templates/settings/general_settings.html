@@ -244,22 +244,13 @@
                             <div class="card-block">
                                 <iframe class="d-none" name="dummyframe" id="dummyframe"></iframe>
                                 <form method="POST" action="/api/settings/configuration/file" target="dummyframe" enctype="multipart/form-data">
-                                    {% with messages = get_flashed_messages(with_categories=true) %}
                                     <div class="custom-file">
                                         <input type="file" class="custom-file-input" id="configUpload" name="imported_config" accept=".json">
                                         <label class="custom-file-label text-muted m-0 pt-2" for="configUpload">Select config file</label>
                                     </div>
-                                    {% if messages %}
-                                    {% for category, message in messages %}
-                                    <div class="mt-1 {{'text-danger' if category == 'error' else 'text-success'}} text-left">
-                                        {{message}}
-                                    </div>
-                                    {% endfor %}
-                                    {% endif %}
-                                    <div class="text-center {{'mt-2' if messages else 'mt-4'}}">
+                                    <div class="text-center mt-4">
                                         <button type="button" id="import_btn" class="btn btn-primary btn-block m-0">Import <span class="feather icon-upload"></span></button>
                                     </div>
-                                    {% endwith %}
                                 </form>
                                 <div class="mt-4">
                                     <p class="mb-2">Restart MLSC for changes to take effect.</p>
