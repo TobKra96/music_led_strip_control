@@ -125,7 +125,7 @@ $(document).ready(function () {
         });
         setTimeout(getTemperature, 20000);
     }
-    getTemperature()
+    getTemperature();
 
     /**
      * Call API to get services data and update service status card as `Checking`.
@@ -156,49 +156,32 @@ $(document).ready(function () {
                 $("#services").append(serviceCard);
             });
 
-            getServicesStatus()
-                // Update service status
-                .then((data) => {
-                    data.services.forEach(service => {
-                        let status = "Stopped";
-                        if (service.not_found) {
-                            status = "Not Found";
-                        }
-                        let statusColor = "bg-danger";
-                        if (service.running) {
-                            status = "Running";
-                            statusColor = "theme-bg";
-                        }
-                        $("#" + service.name).text(status).removeClass("theme-bg2").addClass(statusColor);
-                    });
-                })
-                .catch((error) => {
-                    console.log(error);
-                })
+            getServicesStatus();
         });
     }
     getServices();
 
     /**
      * Call API to get status of services.
-     * @return {Promise}
      */
     function getServicesStatus() {
         // Called once on page load
-        return new Promise((resolve, reject) => {
-            $.ajax({
-                url: "/api/system/services/status",
-                type: 'GET',
-                data: {},
-                contentType: 'application/json;charset=UTF-8',
-                success: function (data) {
-                    resolve(data);
-                },
-                error: function (error) {
-                    reject(error);
+        $.ajax("/api/system/services/status").done((data) => {
+            data.services.forEach(service => {
+                let status = "Stopped";
+                if (service.not_found) {
+                    status = "Not Found";
                 }
+                let statusColor = "bg-danger";
+                if (service.running) {
+                    status = "Running";
+                    statusColor = "theme-bg";
+                }
+                $("#" + service.name).text(status).removeClass("theme-bg2").addClass(statusColor);
             });
-        });
+        }).catch((xhr) => {
+            console.log(xhr.responseText);
+        })
     }
 
     /**
@@ -230,46 +213,31 @@ $(document).ready(function () {
                     $("#devices").append(deviceCard);
                 });
             }
-            getDevicesStatus()
-                // Update device status
-                .then((data) => {
-                    data.devices.forEach(device => {
-                        let status = "Offline";
-                        let statusColor = "bg-danger";
-                        if (device.connected) {
-                            status = "Online";
-                            statusColor = "theme-bg";
-                        }
-                        $("#" + device.id).text(status).removeClass("theme-bg2").addClass(statusColor);
-                    });
-                })
-                .catch((error) => {
-                    console.log(error);
-                })
+
+            getDevicesStatus();
         });
     }
-    getDevices()
+    getDevices();
 
     /**
      * Call API to get status of devices.
      */
     function getDevicesStatus() {
         // Called every 10 seconds
-        return new Promise((resolve, reject) => {
-            $.ajax({
-                url: "/api/system/devices/status",
-                type: 'GET',
-                data: {},
-                contentType: 'application/json;charset=UTF-8',
-                success: function (data) {
-                    resolve(data);
-                },
-                error: function (error) {
-                    reject(error);
+        $.ajax("/api/system/devices/status").done((data) => {
+            data.devices.forEach(device => {
+                let status = "Offline";
+                let statusColor = "bg-danger";
+                if (device.connected) {
+                    status = "Online";
+                    statusColor = "theme-bg";
                 }
+                $("#" + device.id).text(status).removeClass("theme-bg theme-bg2").addClass(statusColor);
             });
-            setTimeout(getDevicesStatus, 10000);
+        }).catch((xhr) => {
+            console.log(xhr.responseText);
         });
+        setTimeout(getDevicesStatus, 10000);
     }
 
     /**
