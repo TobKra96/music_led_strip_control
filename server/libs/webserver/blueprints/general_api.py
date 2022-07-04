@@ -67,6 +67,7 @@ def gradients():  # pylint: disable=E0211
                 jupiter: str
                 ocean: str
                 peach: str
+                pulse: str
                 rust: str
                 safari: str
                 spectral: str

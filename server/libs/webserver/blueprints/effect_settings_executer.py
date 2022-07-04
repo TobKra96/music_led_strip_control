@@ -3,6 +3,9 @@ from libs.webserver.executer_base import ExecuterBase, handle_config_errors
 
 class EffectSettingsExecuter(ExecuterBase):
 
+    # TODO: Fix returning "all_devices" instead of actual device ID.
+    # Check if there are any API calls that ise "all_devices".
+
     # Return setting_value.
     @handle_config_errors
     def get_effect_setting(self, device, effect, setting_key):
@@ -10,6 +13,7 @@ class EffectSettingsExecuter(ExecuterBase):
         if device == self.all_devices_id:
             selected_device = next(iter(self._config["device_configs"]))
 
+        # print(selected_device)
         return self._config["device_configs"][selected_device]["effects"][effect][setting_key]
 
     @handle_config_errors
@@ -27,6 +31,12 @@ class EffectSettingsExecuter(ExecuterBase):
             settings[effect_setting_key] = self._config["device_configs"][selected_device]["effects"][effect][effect_setting_key]
 
         self.logger.debug(f"Settings: {settings}")
+
+        # result = {
+        #     "device": selected_device,
+        #     "effect": effect,
+        #     "settings": settings
+        # }
 
         return settings
 
