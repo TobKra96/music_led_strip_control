@@ -1,6 +1,9 @@
 import Device from "./classes/Device.js";
 import Toast from "./classes/Toast.js";
 
+/**
+ * @type {Device|undefined}
+ */
 let currentDevice = undefined;
 let effectIdentifier = "";
 
@@ -13,77 +16,80 @@ $(function () {
     // Open "Edit Effects" sidebar dropdown when on an effect page
     $("#effect_list").slideDown();
 
+    // Update slider labels on change
+    $('input[type=range]').on('input', function () {
+        $(`span[for='${$(this).attr('id')}']`).text(this.value);
+    });
+
     effectIdentifier = $("#effectIdentifier").val();
 
     if (!jinja_devices.length) {
-        new Toast('No device found. Create a new device in "Device Settings".').info()
-    } else {
-        // Start with Fake Device & create Devices from Jinja output
-        const fake_device = [new Device({ id: "all_devices", name: "All Devices" })];
-
-        // Only allow all_devices for sync fade
-        if (["effect_sync_fade"].includes(effectIdentifier)) {
-            localStorage.setItem('lastDevice', fake_device[0].id);
-        }
-
-        const devices = fake_device.concat(jinja_devices.map(d => { return new Device(d) }));
-
-        if (["effect_sync_fade"].includes(effectIdentifier)) {
-            devices[0]._activate();
-            $(`a[data-device_id=${devices[0].id}`).addClass("active");
-            currentDevice = devices[0];
-        } else {
-            currentDevice = devices.find(d => d.isCurrent === true);
-            currentDevice = currentDevice ? currentDevice : devices[0];
-            localStorage.setItem('lastDevice', currentDevice.id);
-            $(`a[data-device_id=${currentDevice.id}`).addClass("active");
-            $("#selected_device_txt").text(currentDevice.name);
-        }
-
-        devices.forEach(device => {
-            device.link.addEventListener('click', () => {
-                currentDevice = device;
-                SetLocalSettings();
-            });
-        });
-
-        /**
-         * Call API to get all effect names.
-         * @return {Promise}
-         */
-        const checkboxPromise = () => $.ajax("/api/resources/effects").done((response) => {
-            generateEffectCheckboxes("#nonMusicEffectCol", response.non_music);
-            generateEffectCheckboxes("#musicEffectCol", response.music);
-        })
-
-        Promise.all([
-
-            $.ajax("/api/resources/colors").done((response) => {
-                $('.colors').each(function () {
-                    Object.entries(response).forEach(([key, value]) => {
-                        $(this).append(`<option value="${key}">${value}</option>`);
-                    });
-                });
-            }),
-
-            $.ajax("/api/resources/gradients").done((response) => {
-                $('.gradients').each(function () {
-                    Object.entries(response).forEach(([key, value]) => {
-                        $(this).append(`<option value="${key}">${value}</option>`);
-                    });
-                });
-            }),
-
-            // Only generate checkboxes for Random Cycle effect page.
-            effectIdentifier == "effect_random_cycle" ? checkboxPromise() : ""
-
-        ]).then(response => {
-            SetLocalSettings();
-        }).catch((response) => {
-            // all requests finished but one or more failed
-            new Toast(JSON.stringify(response, null, '\t')).error();
-        });
+        new Toast('No device found. Create a new device in "Device Settings".').info();
+        return;
     }
+
+    // Create Base Device ("all_devices").
+    const baseDevice = new Device({ groups: [], id: "all_devices", name: "All Devices" });
+
+    // Only allow `all_devices` for sync fade.
+    if (["effect_sync_fade"].includes(effectIdentifier)) {
+        localStorage.setItem('lastDevice', baseDevice.id);
+    }
+
+    // Create Devices from Jinja output.
+    const devices = [baseDevice].concat(jinja_devices.map(d => { return new Device(d) }));
+
+    if (["effect_sync_fade"].includes(effectIdentifier)) {
+        baseDevice._activate();
+        $(`a[data-device_id=${baseDevice.id}`).addClass("active");
+        currentDevice = baseDevice;
+    } else {
+        currentDevice = devices.find(d => d.isCurrent === true) || baseDevice;
+    }
+
+    devices.forEach(device => {
+        device.link.addEventListener('click', () => {
+            currentDevice = device;
+            SetLocalSettings();
+        });
+    });
+
+    /**
+     * Call API to get all effect names.
+     * @return {Promise}
+     */
+    const checkboxPromise = () => $.ajax("/api/resources/effects").done((response) => {
+        generateEffectCheckboxes("#nonMusicEffectCol", response.non_music);
+        generateEffectCheckboxes("#musicEffectCol", response.music);
+    });
+
+    Promise.all([
+
+        $.ajax("/api/resources/colors").done((response) => {
+            $('.colors').each(function () {
+                Object.entries(response).forEach(([key, value]) => {
+                    $(this).append(`<option value="${key}">${value}</option>`);
+                });
+            });
+        }),
+
+        $.ajax("/api/resources/gradients").done((response) => {
+            $('.gradients').each(function () {
+                Object.entries(response).forEach(([key, value]) => {
+                    $(this).append(`<option value="${key}">${value}</option>`);
+                });
+            });
+        }),
+
+        // Only generate checkboxes for Random Cycle effect page.
+        effectIdentifier == "effect_random_cycle" ? checkboxPromise() : ""
+
+    ]).then(() => {
+        SetLocalSettings();
+    }).catch((response) => {
+        // all requests finished but one or more failed
+        new Toast(JSON.stringify(response, null, '\t')).error();
+    });
 
 });
 
@@ -105,47 +111,34 @@ function generateEffectCheckboxes(parentId, effects) {
 }
 
 /**
- * Collect all effect setting keys from the UI as an array.
- * @return {array<string>}
- */
-function GetAllSettingKeys() {
-    return $(".setting_input").map(function () { return this.id })
-        .toArray();
-}
-
-/**
  * Populate effect settings with config values.
  */
 function SetLocalSettings() {
-    const all_setting_keys = GetAllSettingKeys();
-
-    all_setting_keys.map((setting) => {
-        currentDevice.getEffectSetting(effectIdentifier, setting).then((response) => {
-            const setting_key = response["setting_key"];
-            const setting_value = response["setting_value"];
-
-            if ($("#" + setting_key).attr('type') == 'checkbox') {
-                $("#" + setting_key).prop('checked', setting_value);
-            } else if ($("#" + setting_key).hasClass('color_input')) {
+    currentDevice.getEffectSettings(effectIdentifier).done((response) => {
+        Object.entries(response.settings).forEach(([key, value]) => {
+            if ($("#" + key).attr('type') == 'checkbox') {
+                $("#" + key).prop('checked', value);
+            } else if ($("#" + key).hasClass('color_input')) {
                 // Set RGB color and value from config
-                const formattedRGB = formatRGB(setting_value);
+                const formattedRGB = formatRGB(value);
                 $(".color_input").val(formattedRGB);
                 pickr.setColor(formattedRGB);
             } else {
-                $("#" + setting_key).val(setting_value);
+                $("#" + key).val(value);
             }
+            // Set value for effect slider labels
+            $(`span[for='${key}']`).text(value);
 
-            $("#" + setting_key).trigger('change');
-
-            // Set initial effect slider values
-            $("span[for='" + setting_key + "']").text(setting_value);
+            $("#" + key).trigger('change');
         });
     });
 }
 
 /* Device Handling */
 
-$("#save_btn").on("click", function () {
+$("#save_btn").on("click", () => {
+    if (!currentDevice) return;
+
     // Serialize effect settings as JSON.
     const serializedForm = $('#settingsForm .setting_input').serializeJSON({
         checkboxUncheckedValue: "false",
@@ -173,11 +166,6 @@ $("#save_btn").on("click", function () {
         console.log("Error while setting effect settings. Error: " + response.responseText);
         new Toast("Error while saving effect settings.").error();
     });
-});
-
-// Set effect slider values
-$('input[type=range]').on('input', function () {
-    $("span[for='" + $(this).attr('id') + "']").text(this.value);
 });
 
 // Create color picker instance

@@ -29,9 +29,7 @@ export default class EffectManager {
      * @param {string} effect
      */
     switchEffect(effect) {
-        if (!this.allEffects.includes(effect)) {
-            return;
-        }
+        if (!this.allEffects.includes(effect) || !this.currentDevice) return;
 
         $.ajax({
             url: "/api/effect/active",

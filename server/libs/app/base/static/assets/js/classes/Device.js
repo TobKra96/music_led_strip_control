@@ -5,7 +5,7 @@ const effectManager = new EffectManager();
 export default class Device {
     /**
      * Create a device.
-     * @param {{id: string, name: string}} params
+     * @param {{groups: array<string>, id: string, name: string}} params
      */
     constructor(params) {
         Object.assign(this, params);
@@ -121,18 +121,16 @@ export default class Device {
     }
 
     /**
-     * Call API to get a single setting of an effect.
+     * Call API to get a all effect settings.
      * @param {string} effectIdentifier
-     * @param {string} key
      * @return {jQuery.jqXHR}
      */
-    getEffectSetting(effectIdentifier, key) {
+    getEffectSettings(effectIdentifier) {
         return $.ajax({
             url: "/api/settings/effect",
             data: {
                 "device": this.id,
-                "effect": effectIdentifier,
-                "setting_key": key,
+                "effect": effectIdentifier
             }
         });
     }
@@ -177,7 +175,6 @@ export default class Device {
         }).done((data) => {
             this.setActiveEffect(data["effect"]);
             this.getCycleStatus();
-            return this._activeEffect;
         });
     }
 
