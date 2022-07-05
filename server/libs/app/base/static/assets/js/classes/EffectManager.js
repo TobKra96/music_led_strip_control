@@ -13,8 +13,6 @@ export default class EffectManager {
          */
         this.currentDevice = currentDevice;
 
-        if (!this.currentDevice) return;
-
         $.ajax({
             url: "/api/resources/effects",
             data: {}
@@ -34,7 +32,7 @@ export default class EffectManager {
      * @param {string} effect
      */
     switchEffect(effect) {
-        if (!this.allEffects.includes(effect)) return;
+        if (!this.allEffects.includes(effect) || !this.currentDevice) return;
 
         $.ajax({
             url: "/api/effect/active",
@@ -46,6 +44,7 @@ export default class EffectManager {
             // this could cause Problems later
             this.currentDevice.setActiveEffect(data.effect);
             this.currentDevice.getCycleStatus();
+            console.log(data.effect);
         }).fail((data) => {
             console.log(JSON.stringify(data, null, '\t'));
             new Toast("Error while setting effect.").error();
