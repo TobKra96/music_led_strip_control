@@ -60,7 +60,6 @@ $(document).ready(function () {
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.has('id')) {
             let passedId = urlParams.get('id');
-            console.log(passedId)
             let selectedDeviceFromUrl = devices.find(device => device.id === passedId);
             if (selectedDeviceFromUrl !== undefined) {
                 currentDevice = selectedDeviceFromUrl;
