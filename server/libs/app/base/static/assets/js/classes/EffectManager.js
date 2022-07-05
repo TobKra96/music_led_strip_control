@@ -8,7 +8,12 @@ export default class EffectManager {
      * @param {Device|undefined} currentDevice
      */
     constructor(currentDevice) {
-        this.currentDevice = currentDevice ? currentDevice : undefined;
+        /**
+         * @type {Device}
+         */
+        this.currentDevice = currentDevice;
+
+        if (!this.currentDevice) return;
 
         $.ajax({
             url: "/api/resources/effects",
@@ -29,7 +34,7 @@ export default class EffectManager {
      * @param {string} effect
      */
     switchEffect(effect) {
-        if (!this.allEffects.includes(effect) || !this.currentDevice) return;
+        if (!this.allEffects.includes(effect)) return;
 
         $.ajax({
             url: "/api/effect/active",

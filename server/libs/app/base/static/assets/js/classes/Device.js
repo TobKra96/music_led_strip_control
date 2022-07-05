@@ -121,7 +121,7 @@ export default class Device {
     }
 
     /**
-     * Call API to get a all effect settings.
+     * Call API to get all effect settings.
      * @param {string} effectIdentifier
      * @return {jQuery.jqXHR}
      */
@@ -167,14 +167,14 @@ export default class Device {
      * @return {jQuery.jqXHR}
      */
     getActiveEffect() {
+        this.getCycleStatus();
         return $.ajax({
             url: "/api/effect/active",
             data: {
                 "device": this.id
             }
         }).done((data) => {
-            this.setActiveEffect(data["effect"]);
-            this.getCycleStatus();
+            this.setActiveEffect(data.effect);
         });
     }
 
@@ -187,7 +187,7 @@ export default class Device {
 
         $(".dashboard_effect_active").removeClass("dashboard_effect_active");
         $("#" + this._activeEffect).addClass("dashboard_effect_active");
-        if (this._activeEffect != "") {
+        if (this._activeEffect !== "") {
             const activeEffectText = $("#" + this._activeEffect).text().trim();
             $("#selected_effect_txt").text(activeEffectText);
         }

@@ -4,29 +4,11 @@ import Tagin from "../plugins/tagin/js/tagin.js";
 
 let output_types = {};
 let devices = jinja_devices.map(d => { return new Device(d) });
+/**
+ * @type {Device|undefined}
+ */
 let currentDevice = devices.find(d => d.id === localStorage.getItem("lastDevice"));
 let tagin;
-// Select first device if previously "All Devices" selected or localStorage is clear
-currentDevice = currentDevice ? currentDevice : devices[0];
-if (currentDevice) {
-    $(`a[data-device_id=${currentDevice.id}`).removeClass("active");
-}
-
-// Get device id from url parameters
-const urlParams = new URLSearchParams(window.location.search);
-if (urlParams.has('id')) {
-    let passedId = urlParams.get('id');
-    let selectedDeviceFromUrl = devices.find(device => device.id === passedId);
-    if (selectedDeviceFromUrl !== undefined) {
-        currentDevice = selectedDeviceFromUrl;
-    }
-}
-
-if (currentDevice) {
-    localStorage.setItem('lastDevice', currentDevice.id);
-    $(`a[data-device_id=${currentDevice.id}`).addClass("active");
-    $("#selected_device_txt").text(currentDevice.name);
-}
 
 
 // Init and load all settings
@@ -65,6 +47,30 @@ $(document).ready(function () {
             $("#noDeviceFound").removeClass('d-none');
             $("#selected_device_label").addClass('d-none');
             return;
+        }
+
+        if (!currentDevice) {
+            // Select first device if previously "All Devices" selected.
+            currentDevice = devices[0];
+        } else {
+            $(`a[data-device_id=${currentDevice.id}`).removeClass("active");
+        }
+
+        // Get device id from url parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has('id')) {
+            let passedId = urlParams.get('id');
+            console.log(passedId)
+            let selectedDeviceFromUrl = devices.find(device => device.id === passedId);
+            if (selectedDeviceFromUrl !== undefined) {
+                currentDevice = selectedDeviceFromUrl;
+            }
+        }
+
+        if (currentDevice) {
+            localStorage.setItem('lastDevice', currentDevice.id);
+            $(`a[data-device_id=${currentDevice.id}`).addClass("active");
+            $("#selected_device_txt").text(currentDevice.name);
         }
 
         currentDevice.refreshConfig();
