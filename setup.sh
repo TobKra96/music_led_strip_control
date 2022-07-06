@@ -109,7 +109,7 @@ sudo apt-get update -qq && apt-get upgrade -qqy
 # git: For cloning the MLSC repository.
 # libatlas-base-dev: Required for Numpy module.
 # portaudio19-dev: Audio drivers.
-sudo apt-get -y --no-install-recommends install git libatlas-base-dev portaudio19-dev python3 python3-pip
+sudo apt-get -y --no-install-recommends install git libatlas-base-dev portaudio19-dev python3 python3-dev python3-pip
 
 # Upgrade Pip to the latest version.
 sudo pip3 install --no-cache-dir --no-input --upgrade pip
