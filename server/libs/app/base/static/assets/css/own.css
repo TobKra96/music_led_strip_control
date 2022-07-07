@@ -17,8 +17,28 @@
 
 /* Make all card and alert corners rounded */
 .card,
-.alert {
+.alert,
+.modal-content {
     border-radius: 15px;
+}
+
+/* Keep modal style consistent with cards */
+.modal-content {
+    border: none;
+    -webkit-box-shadow: 0 1px 20px 0 rgba(69, 90, 100, 0.08);
+    box-shadow: 0 1px 20px 0 rgba(69, 90, 100, 0.08);
+}
+.modal-header {
+    border-bottom: 1px solid #f1f1f1;
+}
+.modal-header::after {
+    content: "";
+    background-color: #04a9f5;
+    position: absolute;
+    left: 0;
+    top: 20px;
+    width: 4px;
+    height: 20px;
 }
 
 /* Rotate arrow icon on accordion collapse */
