@@ -15,6 +15,16 @@
     }
 }
 
+/* Keep toast style consistent with cards */
+.toast {
+    border-radius: 15px;
+    border: none;
+}
+.toast-header {
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+}
+
 /* Make all card and alert corners rounded */
 .card,
 .alert,
