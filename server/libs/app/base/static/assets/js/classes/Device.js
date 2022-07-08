@@ -156,9 +156,9 @@ export default class Device {
      */
     setCycleStatus(isCycleActive) {
         if (isCycleActive) {
-            $("#effect_random_cycle").css("box-shadow", "inset 0 0 0 3px #3f4d67");
+            $("#effect_random_cycle").addClass("active")
         } else {
-            $("#effect_random_cycle").css("box-shadow", "0 1px 20px 0 rgb(69 90 100 / 8%)");
+            $("#effect_random_cycle").removeClass("active")
         }
     }
 
