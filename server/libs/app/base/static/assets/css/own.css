@@ -209,6 +209,16 @@ select.gradients {
     cursor: pointer;
 }
 
+/* Theme button */
+#theme-indicator {
+    font-size: 1.3rem;
+    transition: 0.2s;
+}
+#theme-indicator:hover {
+    color: #282a2c;
+    cursor: pointer;
+}
+
 /* Change tooltip color and width */
 .tooltip-inner {
     background-color: #3f4d67 !important;

@@ -22,8 +22,20 @@
     <link rel="stylesheet" href="/static/assets/plugins/pickr/css/monolith.min.css">
     <!-- own css -->
     <link rel="stylesheet" href="/static/assets/css/own.css">
+    <!-- dark theme css -->
+    <link rel="stylesheet" href="/static/assets/css/dark.css">
     <!-- tagin css theme -->
     <link rel="stylesheet" href="/static/assets/plugins/tagin/css/tagin.css">
+
+    <script>
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+            localStorage.theme = 'dark';
+        } else {
+            document.documentElement.classList.remove('dark');
+            localStorage.theme = 'light';
+        }
+    </script>
 
     <!-- Specific CSS goes HERE -->
     {% block stylesheets %}{% endblock stylesheets %}
