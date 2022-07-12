@@ -213,7 +213,7 @@ def set_device_settings():  # pylint: disable=E0211
 @login_required
 def get_output_type_device_settings():  # pylint: disable=E0211
     """
-    Return a specific output-type setting for a device
+    Return output-type settings for a device
     ---
     tags:
       - Settings
