@@ -13,12 +13,14 @@ export default class Device {
         // this._name = name;
         this._activeEffect = "";
         this.link = $(`a[data-device_id=${this.id}`)[0];
+
+        // Insert Base Device ("all_devices") into localStorage if "lastDevice" does not exist yet.
+        !('lastDevice' in localStorage) && localStorage.setItem("lastDevice", this.id);
+
         this._isCurrent = this.id === localStorage.getItem("lastDevice");
 
-        // Insert first device ("all_devices") into localStorage if "lastDevice" does not exist yet
-        !('lastDevice' in localStorage) && localStorage.setItem("lastDevice", this.id);
-        // Select last selected device if there is any
-        this.id === localStorage.getItem("lastDevice") && (
+        // Select last selected device if there is any.
+        this.isCurrent && (
             this._activate(),
             $(`a[data-device_id=${this.id}`).addClass("active"),
             // Async function

@@ -2,9 +2,9 @@ import Device from "./classes/Device.js";
 import Toast from "./classes/Toast.js";
 
 /**
- * @type {Device|undefined}
+ * @type {Device}
  */
-let currentDevice = undefined;
+let currentDevice;
 let effectIdentifier = "";
 
 // Init and load all settings
@@ -29,7 +29,8 @@ $(function () {
     }
 
     // Create Base Device ("all_devices").
-    const baseDevice = new Device({ groups: [], id: "all_devices", name: "All Devices" });
+    currentDevice = new Device({ groups: [], id: "all_devices", name: "All Devices" });
+    const baseDevice = currentDevice;
 
     // Only allow `all_devices` for sync fade.
     if (["effect_sync_fade"].includes(effectIdentifier)) {
