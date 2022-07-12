@@ -361,7 +361,7 @@ $('input[type=range]').on('input', function () {
 
 // Hide unused output settings
 $('#output_type').on('change', () => {
-    if ($('#output_type').val() == 'output_raspi') {
+    if ($('#output_type').val() === 'output_raspi') {
         $('#raspberrypi').removeClass('d-none');
         $('#udp').addClass('d-none');
     } else {

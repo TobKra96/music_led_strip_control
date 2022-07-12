@@ -83,7 +83,7 @@ $(function () {
         }),
 
         // Only generate checkboxes for Random Cycle effect page.
-        effectIdentifier == "effect_random_cycle" ? checkboxPromise() : ""
+        effectIdentifier === "effect_random_cycle" ? checkboxPromise() : ""
 
     ]).then(() => {
         SetLocalSettings();
@@ -117,7 +117,7 @@ function generateEffectCheckboxes(parentId, effects) {
 function SetLocalSettings() {
     currentDevice.getEffectSettings(effectIdentifier).done((response) => {
         Object.entries(response.settings).forEach(([key, value]) => {
-            if ($("#" + key).attr('type') == 'checkbox') {
+            if ($("#" + key).attr('type') === 'checkbox') {
                 $("#" + key).prop('checked', value);
             } else if ($("#" + key).hasClass('color_input')) {
                 // Set RGB color and value from config

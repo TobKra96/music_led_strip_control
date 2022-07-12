@@ -70,12 +70,12 @@ function getLocalSettings() {
  */
 function populateGeneralSettings(settings) {
     Object.entries(settings).forEach(([key, value]) => {
-        if ($("#" + key).attr('type') == 'checkbox') {
+        if ($("#" + key).attr('type') === 'checkbox') {
             $("#" + key).prop('checked', value);
-        } else if ($("#" + key).prop("tagName") == "SELECT") {
+        } else if ($("#" + key).prop("tagName") === "SELECT") {
             // const optionExists = $("#" + key).find(`option[value='${value}']`).length > 0;
             $("#" + key).val(value);
-        } else if (key == "device_groups") {
+        } else if (key === "device_groups") {
             tagin.addTag(value);
         } else {
             $("#" + key).val(value);
@@ -272,7 +272,7 @@ $('.custom-file-input').on('change', (e) => {
 $("#toggle_pin_view").on("mouseover mouseleave", function (event) {
     event.preventDefault();
     let pinField = $('#DASHBOARD_PIN');
-    pinField.attr('type') == 'text' ? pinField.attr('type', 'password') : pinField.attr('type', 'text');
+    pinField.attr('type') === 'text' ? pinField.attr('type', 'password') : pinField.attr('type', 'text');
     $('#toggle_pin_view').toggleClass("icon-eye");
     $('#toggle_pin_view').toggleClass("icon-eye-off");
 });

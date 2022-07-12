@@ -202,9 +202,9 @@ export default class Device {
     refreshConfig() {
         this.getSettings("effects").then((response) => {
             Object.entries(response.settings).forEach(([key, value]) => {
-                if ($("#" + key).attr('type') == 'checkbox') {
+                if ($("#" + key).attr('type') === 'checkbox') {
                     $("#" + key).prop('checked', value);
-                } else if ($("#" + key).attr('type') == 'option') {
+                } else if ($("#" + key).attr('type') === 'option') {
                     populateDeviceGroups(value);
                     populateGlobalGroups(value);
                 } else {
@@ -220,7 +220,7 @@ export default class Device {
 
         this.getOutputSettings().then((response) => {
             Object.entries(response.output_settings).forEach(([key, value]) => {
-                if ($("#" + key).attr('type') == 'checkbox') {
+                if ($("#" + key).attr('type') === 'checkbox') {
                     $("#" + key).prop('checked', value);
                 } else {
                     $("#" + key).val(value);
