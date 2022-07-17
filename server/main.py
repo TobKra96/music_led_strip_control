@@ -7,8 +7,8 @@
 from sys import version_info, platform
 import sys
 
-if version_info < (3, 7):
-    sys.exit("\033[91mError: MLSC requires Python 3.7 or greater.")
+if version_info < (3, 8):
+    sys.exit("\033[91mError: MLSC requires Python 3.8 or greater.")
 
 from libs.audio_process_service import AudioProcessService
 from libs.notification_service import NotificationService
