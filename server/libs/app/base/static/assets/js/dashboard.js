@@ -28,6 +28,20 @@ $(function () {
         });
     });
 
+    // Add "Edit" button to effect buttons.
+    let editButton = '<i class="feather icon-edit edit_button" aria-hidden="true"></i>';
+    $(editButton).insertAfter("#effect_random_cycle");
+    $("#dashboard-list-none-music, #dashboard-list-music").children().each((_, element) => {
+        $(editButton).appendTo($(element));
+    });
+
+    $('.edit_button').on('click', (e) => {
+        window.location.href = `/effects/${$(e.target).siblings()[0].id}`;
+    });
+    $(".edit_button").on("mouseover mouseout", (e) => {
+        $($(e.target).siblings()[0]).toggleClass("dashboard_effect_hover");
+    });
+
 });
 
 /**

@@ -1129,6 +1129,7 @@ Navbar from style.css without navbar-dark
 
 /* Dashboard buttons */
 .dark .dashboard_effect:hover,
+.dark .dashboard_effect_hover,
 .dark .dashboard_effect_active {
     background-color: var(--slate-500);
     color: white;
@@ -1138,6 +1139,20 @@ Navbar from style.css without navbar-dark
 }
 .dark #effect_random_cycle.active {
     box-shadow: inset 0 0 0 3px var(--slate-500);
+}
+
+/* Effect Edit buttons */
+.dark .edit_button {
+    background-color: #334155;
+    color: #94a3b8;
+    -webkit-transition: all 0.2s ease-in-out;
+    transition: all 0.2s ease-in-out;
+}
+.dark .edit_button:hover {
+    background-color: #2f3c4e;
+    color: #e7edf4;
+    -webkit-transition: all 0.2s ease-in-out;
+    transition: all 0.2s ease-in-out;
 }
 
 /* Tagin tag inputs */
@@ -1180,7 +1195,7 @@ Navbar from style.css without navbar-dark
 
 /* System status card drag highlight */
 .dark .highlight {
-    background-color: #50607D;
+    background-color: #50607d;
     opacity: 0.1;
 }
 
