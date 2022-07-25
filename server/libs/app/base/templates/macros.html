@@ -1,0 +1,7 @@
+{% macro nav_link(endpoint, name) %}
+    {% if endpoint.endswith(segment) %}
+        <li class="active"><a href="{{ endpoint }}">{{ name }}</a></li>
+    {% else %}
+        <li><a href="{{ endpoint }}">{{ name }}</a></li>
+    {% endif %}
+{% endmacro %}

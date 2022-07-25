@@ -1,3 +1,5 @@
+{% from "macros.html" import nav_link with context %}
+
 <nav class="pcoded-navbar">
     <div class="navbar-wrapper">
         <div class="navbar-brand header-logo">
@@ -28,50 +30,50 @@
                         <li class="py-0 nav-item pcoded-menu-caption">
                             <label>Special Effects</label>
                         </li>
-                        <li class="{{'active' if segment == 'effect_random_cycle'}}"><a href="/effects/effect_random_cycle">Random Cycle</a></li>
+                        {{ nav_link('/effects/effect_random_cycle', 'Random Cycle') }}
 
                         <li class="pb-0 nav-item pcoded-menu-caption">
                             <label>Non-Music Effects</label>
                         </li>
-                        <li class="{{'active' if segment == 'effect_single'}}"><a href="/effects/effect_single">Single</a></li>
-                        <li class="{{'active' if segment == 'effect_gradient'}}"><a href="/effects/effect_gradient">Gradient</a></li>
-                        <li class="{{'active' if segment == 'effect_fade'}}"><a href="/effects/effect_fade">Fade</a></li>
-                        <li class="{{'active' if segment == 'effect_sync_fade'}}"><a href="/effects/effect_sync_fade">Sync Fade</a></li>
-                        <li class="{{'active' if segment == 'effect_slide'}}"><a href="/effects/effect_slide">Slide</a></li>
-                        <li class="{{'active' if segment == 'effect_bubble'}}"><a href="/effects/effect_bubble">Bubble</a></li>
-                        <li class="{{'active' if segment == 'effect_twinkle'}}"><a href="/effects/effect_twinkle">Twinkle</a></li>
-                        <li class="{{'active' if segment == 'effect_pendulum'}}"><a href="/effects/effect_pendulum">Pendulum</a></li>
-                        <li class="{{'active' if segment == 'effect_rods'}}"><a href="/effects/effect_rods">Rods</a></li>
-                        <li class="{{'active' if segment == 'effect_segment_color'}}"><a href="/effects/effect_segment_color">Segment Color</a></li>
-                        <li class="{{'active' if segment == 'effect_fireplace'}}"><a href="/effects/effect_fireplace">Fireplace</a></li>
-                        <li class="{{'active' if segment == 'effect_strobe'}}"><a href="/effects/effect_strobe">Strobe</a></li>
+                        {{ nav_link('/effects/effect_single', 'Single') }}
+                        {{ nav_link('/effects/effect_gradient', 'Gradient') }}
+                        {{ nav_link('/effects/effect_fade', 'Fade') }}
+                        {{ nav_link('/effects/effect_sync_fade', 'Sync Fade') }}
+                        {{ nav_link('/effects/effect_slide', 'Slide') }}
+                        {{ nav_link('/effects/effect_bubble', 'Bubble') }}
+                        {{ nav_link('/effects/effect_twinkle', 'Twinkle') }}
+                        {{ nav_link('/effects/effect_pendulum', 'Pendulum') }}
+                        {{ nav_link('/effects/effect_rods', 'Rods') }}
+                        {{ nav_link('/effects/effect_segment_color', 'Segment Color') }}
+                        {{ nav_link('/effects/effect_fireplace', 'Fireplace') }}
+                        {{ nav_link('/effects/effect_strobe', 'Strobe') }}
 
                         <li class="pb-0 nav-item pcoded-menu-caption">
                             <label>Music Effects</label>
                         </li>
-                        <li class="{{'active' if segment == 'effect_scroll'}}"><a href="/effects/effect_scroll">Scroll</a></li>
-                        <li class="{{'active' if segment == 'effect_advanced_scroll'}}"><a href="/effects/effect_advanced_scroll">Advanced Scroll</a></li>
-                        <li class="{{'active' if segment == 'effect_energy'}}"><a href="/effects/effect_energy">Energy</a></li>
-                        <li class="{{'active' if segment == 'effect_wavelength'}}"><a href="/effects/effect_wavelength">Wavelength</a></li>
-                        <li class="{{'active' if segment == 'effect_bars'}}"><a href="/effects/effect_bars">Bars</a></li>
-                        <li class="{{'active' if segment == 'effect_power'}}"><a href="/effects/effect_power">Power</a></li>
-                        <li class="{{'active' if segment == 'effect_beat'}}"><a href="/effects/effect_beat">Beat</a></li>
-                        <li class="{{'active' if segment == 'effect_beat_twinkle'}}"><a href="/effects/effect_beat_twinkle">Beat Twinkle</a></li>
-                        <li class="{{'active' if segment == 'effect_beat_slide'}}"><a href="/effects/effect_beat_slide">Beat Slide</a></li>
-                        <li class="{{'active' if segment == 'effect_wave'}}"><a href="/effects/effect_wave">Wave</a></li>
-                        <li class="{{'active' if segment == 'effect_wiggle'}}"><a href="/effects/effect_wiggle">Wiggle</a></li>
-                        <li class="{{'active' if segment == 'effect_vu_meter'}}"><a href="/effects/effect_vu_meter">VU Meter</a></li>
-                        <li class="{{'active' if segment == 'effect_spectrum_analyzer'}}"><a href="/effects/effect_spectrum_analyzer">Spectrum Analyzer</a></li>
-                        <li class="{{'active' if segment == 'effect_direction_changer'}}"><a href="/effects/effect_direction_changer">Direction Changer</a></li>
-                        <li class="{{'active' if segment == 'effect_border'}}"><a href="/effects/effect_border">Border</a></li>
+                        {{ nav_link('/effects/effect_scroll', 'Scroll') }}
+                        {{ nav_link('/effects/effect_advanced_scroll', 'Advanced Scroll') }}
+                        {{ nav_link('/effects/effect_energy', 'Energy') }}
+                        {{ nav_link('/effects/effect_wavelength', 'Wavelength') }}
+                        {{ nav_link('/effects/effect_bars', 'Bars') }}
+                        {{ nav_link('/effects/effect_power', 'Power') }}
+                        {{ nav_link('/effects/effect_beat', 'Beat') }}
+                        {{ nav_link('/effects/effect_beat_twinkle', 'Beat Twinkle') }}
+                        {{ nav_link('/effects/effect_beat_slide', 'Beat Slide') }}
+                        {{ nav_link('/effects/effect_wave', 'Wave') }}
+                        {{ nav_link('/effects/effect_wiggle', 'Wiggle') }}
+                        {{ nav_link('/effects/effect_vu_meter', 'VU Meter') }}
+                        {{ nav_link('/effects/effect_spectrum_analyzer', 'Spectrum Analyzer') }}
+                        {{ nav_link('/effects/effect_direction_changer', 'Direction Changer') }}
+                        {{ nav_link('/effects/effect_border', 'Border') }}
                     </ul>
                 </li>
                 <li class="nav-item pcoded-hasmenu {{'pcoded-trigger' if '_settings' in segment}}">
                     <a href="javascript:" class="nav-link"><span class="pcoded-micon"><i class="feather icon-settings"></i></span><span class="pcoded-mtext">Settings</span></a>
                     <ul id="settings_list" class="pcoded-submenu">
-                        <li class="{{'active' if segment == 'general_settings'}}"><a href="/settings/general_settings"></i>General Settings</a></li>
-                        <li class="{{'active' if segment == 'device_settings'}}"><a href="/settings/device_settings"></i>Device Settings</a></li>
-                        <!--<li class="{{'active' if segment == 'microphone_adjustment'}}"><a href="/settings/microphone_adjustment"></i>Microphone Adjustment</a></li>-->
+                        {{ nav_link('/settings/general_settings', 'General Settings') }}
+                        {{ nav_link('/settings/device_settings', 'Device Settings') }}
+                        <!-- {{ nav_link('/settings/microphone_adjustment', 'Microphone Adjustment') }} -->
                     </ul>
                 </li>
                 <li class="nav-item pcoded-menu-caption {{'d-none' if not current_user.is_authenticated}}">
