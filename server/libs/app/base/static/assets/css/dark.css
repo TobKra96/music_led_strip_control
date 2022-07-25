@@ -504,8 +504,8 @@ html {
 
 .dark .form-control:disabled,
 .dark .form-control[readonly] {
-    background: #232527;
-    color: #a4b0b7;
+    background: var(--slate-800);
+    color: var(--slate-400);
 }
 
 .dark .bootstrap-tagsinput {
