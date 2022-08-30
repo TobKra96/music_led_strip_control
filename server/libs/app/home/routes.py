@@ -25,6 +25,7 @@ def route_pages(page, template):
     devices = Executer.instance.device_executer.get_devices()
 
     # TODO: Organize this in a better way.
+    groups = None
     if page == 'settings':
         groups = Executer.instance.device_executer.get_groups()
     elif page == 'effects':
