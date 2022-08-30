@@ -1428,9 +1428,9 @@ class ConfigValidatorService():
             ],
             "properties": {
                 "device_groups": {
-                    "type": "array",
-                    "minItems": 0,
-                    "maxItems": 100,
+                    "type": "object",
+                    "minProperties": 0,
+                    "maxProperties": 100,
                     "uniqueItems": True
                 },
                 "device_name": {
@@ -1623,9 +1623,9 @@ class ConfigValidatorService():
                     ]
                 },
                 "device_groups": {
-                    "type": "array",
-                    "minItems": 0,
-                    "maxItems": 100,
+                    "type": "object",
+                    "minProperties": 0,
+                    "maxProperties": 100,
                     "uniqueItems": True
                 },
                 "device_id": {

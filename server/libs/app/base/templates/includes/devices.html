@@ -12,7 +12,7 @@
                         Total devices: <span class="badge badge-secondary" id="device_count">{{ devices|length }}</span>
                     </span>
                     <span class="text-secondary" id="selected_device_label">
-                        &ensp;|&ensp;Device: <span class="badge badge-secondary" id="selected_device_txt"></span>
+                        &ensp;|&ensp;<span id="selected_type">Device</span>: <span class="badge badge-secondary" id="selected_device_txt"></span>
                     </span>
                     {% if segment == "dashboard" %}
                     <span class="text-secondary">
@@ -38,6 +38,16 @@
                             </a>
                         </li>
                     {% endfor %}
+
+                    {% if segment not in ["device_settings"] %}
+                        {% for group in groups %}
+                            <li class="nav-item group_item">
+                                <a href="#pills-{{ loop.index+devices|length+1 }}" class="{{ 'disabled' if segment in ['effect_sync_fade'] }} nav-link group_pill" data-device_id={{ group.id }} role="tab" data-toggle="pill" aria-controls="pills-{{ loop.index+devices|length+1 }}" aria-selected="false">
+                                    {{ group.name }}
+                                </a>
+                            </li>
+                        {% endfor %}
+                    {% endif %}
                 </ul>
             </div>
         </a>

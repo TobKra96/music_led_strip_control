@@ -9,8 +9,8 @@ class EffectExecuter(ExecuterBase):
         """
         Return True if Random Cycle effect is active for specified device.
         """
-        if device == self.all_devices_id:
-            return False  # Does not work with "all_devices" ID yet.
+        if device == self.all_devices_id or device.startswith("group_"):
+            return False  # Does not work with "all_devices" ID or groups yet.
 
         if device not in self._config["device_configs"]:
             return None
@@ -24,11 +24,20 @@ class EffectExecuter(ExecuterBase):
     def get_active_effect(self, device):
         """
         Return active effect for a specified device.
+        If device is `all_devices` or another group, return list of active effects.
+        If the list has only one effect, or has all same effects, return that effect.
         """
-        selected_device = device
         if device == self.all_devices_id:
-            selected_device = next(iter(self._config["device_configs"]))
-        return self._config["device_configs"][selected_device]["effects"]["last_effect"]
+            active_effects = [d["effects"]["last_effect"] for d in self._config["device_configs"].values()]
+        elif device.startswith("group_"):
+            if device not in self._config["general_settings"]["device_groups"]:
+                return None
+            active_effects = [d["effects"]["last_effect"] for d in self._config["device_configs"].values() if device in d["device_groups"]]
+        else:
+            active_effects = [self._config["device_configs"][device]["effects"]["last_effect"]]
+        if len(set(active_effects)) == 1:  # Length of a set with same items is 1.
+            return active_effects[0]
+        return active_effects
 
     @handle_config_errors
     def get_active_effects(self):

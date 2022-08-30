@@ -34,15 +34,40 @@ export default class EffectManager {
     switchEffect(effect) {
         if (!this.allEffects.includes(effect) || !this.currentDevice) return;
 
+        const data = {};
+
+        if (this.currentDevice.isGroup && this.currentDevice.id !== "all_devices") {
+            // Set effect for all devices in a group.
+            const assignedDevices = jinja_groups.find(g => g.id === this.currentDevice.id).assigned_to;
+            data.devices = [];
+            Object.keys(assignedDevices).forEach(device => {
+                data.devices.push({
+                    "device": device,
+                    "effect": effect
+                });
+            });
+        } else {
+            // Set effect for single device.
+            data.device = this.currentDevice.id;
+            data.effect = effect;
+        }
+
         $.ajax({
             url: "/api/effect/active",
             type: "POST",
-            data: JSON.stringify({ "device": this.currentDevice.id, "effect": effect }),
+            data: JSON.stringify(data),
             contentType: 'application/json;charset=UTF-8'
         }).done((data) => {
             // UI and State Updates should be here
-            // this could cause Problems later
-            this.currentDevice.setActiveEffect(data.effect);
+
+            let activeEffect;
+            if (data.devices) {
+                // Get first device's effect since all devices in the group should have the same effect.
+                activeEffect = data.devices[0].effect;
+            } else if (data.effect) {
+                activeEffect = data.effect;
+            }
+            this.currentDevice.setActiveEffectStyle(activeEffect);
             this.currentDevice.getCycleStatus();
         }).fail((data) => {
             console.log(JSON.stringify(data, null, '\t'));

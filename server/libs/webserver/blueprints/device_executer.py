@@ -52,7 +52,7 @@ class DeviceExecuter(ExecuterBase):
             current_device = dict()
             current_device["name"] = self._config["device_configs"][device_key]["device_name"]
             current_device["id"] = device_key
-            current_device["groups"] = self._config["device_configs"][device_key]["device_groups"]
+            current_device["assigned_to"] = self._config["device_configs"][device_key]["device_groups"]
 
             devices.append(current_device)
         return devices
@@ -81,10 +81,10 @@ class DeviceExecuter(ExecuterBase):
                 self.save_config()
 
                 self.refresh_device(self.all_devices_id)
-                break
+                return new_device_id
 
             i += 1
-        return i
+        return None
 
     @handle_config_errors
     def delete_device(self, device):
@@ -95,9 +95,34 @@ class DeviceExecuter(ExecuterBase):
 
     @handle_config_errors
     def get_groups(self):
+        """
+        Get all global groups.
+        """
         global_groups = dict()
         global_groups["groups"] = self._config["general_settings"]["device_groups"]
         return global_groups
+
+    @handle_config_errors
+    def get_assigned_groups(self):
+        """
+        Get all groups assigned to devices.
+        """
+        assigned_groups = []
+
+        global_groups = self.get_groups()["groups"]
+        for group_id, group_name in global_groups.items():
+            devices = {}  # Clear device list on every group iteration.
+            for device_id, device in self._config["device_configs"].items():
+                if group_id in device["device_groups"]:
+                    devices[device_id] = device["device_name"]
+            if devices:
+                assigned_groups.append({
+                    "name": group_name,
+                    "id": group_id,
+                    "assigned_to": devices
+                })
+
+        return assigned_groups
 
     @handle_config_errors
     def create_new_group(self, new_group_name):
@@ -107,23 +132,28 @@ class DeviceExecuter(ExecuterBase):
         """
         device_groups = self._config["general_settings"]["device_groups"]
 
-        if len(device_groups) < 100:
-            if new_group_name and new_group_name not in device_groups:
-                device_groups.append(new_group_name)
+        if new_group_name and new_group_name not in device_groups.values():
+            i = 0
+            while i < 100:
+                new_group_id = f"group_{i}"
+                if new_group_id not in self._config["general_settings"]["device_groups"]:
+                    device_groups[new_group_id] = new_group_name
+                    break
+                i += 1
 
-                self.save_config()
-                self.refresh_device(self.all_devices_id)
-                return self.get_groups()
+            self.save_config()
+            self.refresh_device(self.all_devices_id)
+            return self.get_groups()
         return None
 
     @handle_config_errors
-    def delete_group(self, group_name):
+    def delete_group(self, group_id):
         # Delete group from each device.
         for device_key in self._config["device_configs"]:
-            if group_name in self._config["device_configs"][device_key]["device_groups"][:]:
-                self._config["device_configs"][device_key]["device_groups"].remove(group_name)
+            if group_id in self._config["device_configs"][device_key]["device_groups"]:
+                del self._config["device_configs"][device_key]["device_groups"][group_id]
         # Delete global group.
-        self._config["general_settings"]["device_groups"].remove(group_name)
+        del self._config["general_settings"]["device_groups"][group_id]
 
         self.save_config()
         self.refresh_device(self.all_devices_id)
@@ -137,12 +167,12 @@ class DeviceExecuter(ExecuterBase):
         This prevents deleted groups from still displaying on devices.
         """
         removed_groups = {}
-        groups_to_remove = []
+        groups_to_remove = {}
         for device_key in self._config["device_configs"]:
-            for device_group in self._config["device_configs"][device_key]["device_groups"][:]:
+            for device_group in list(self._config["device_configs"][device_key]["device_groups"]):
                 if device_group not in self._config["general_settings"]["device_groups"]:
-                    groups_to_remove.append(device_group)
-                    self._config["device_configs"][device_key]["device_groups"].remove(device_group)
+                    groups_to_remove[device_group] = self._config["device_configs"][device_key]["device_groups"][device_group]
+                    del self._config["device_configs"][device_key]["device_groups"][device_group]
 
         removed_groups["removed_groups"] = groups_to_remove
 

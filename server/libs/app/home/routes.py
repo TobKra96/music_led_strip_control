@@ -14,7 +14,7 @@ from jinja2 import TemplateNotFound
 @login_required
 def index():
     devices = Executer.instance.device_executer.get_devices()
-    groups = Executer.instance.device_executer.get_groups()
+    groups = Executer.instance.device_executer.get_assigned_groups()
     # active_effect = Executer.instance.effect_executer.get_active_effect(data_in["device"])
     return render_template('dashboard.html', segment='dashboard', devices=devices, groups=groups)
 
@@ -23,7 +23,12 @@ def index():
 @login_required
 def route_pages(page, template):
     devices = Executer.instance.device_executer.get_devices()
-    groups = Executer.instance.device_executer.get_groups()
+
+    # TODO: Organize this in a better way.
+    if page == 'settings':
+        groups = Executer.instance.device_executer.get_groups()
+    elif page == 'effects':
+        groups = Executer.instance.device_executer.get_assigned_groups()
 
     try:
         if not template.endswith('.html'):
@@ -40,7 +45,7 @@ def route_pages(page, template):
 @login_required
 def route_template(template):
     devices = Executer.instance.device_executer.get_devices()
-    groups = Executer.instance.device_executer.get_groups()
+    groups = Executer.instance.device_executer.get_assigned_groups()
 
     try:
         if not template.endswith('.html'):

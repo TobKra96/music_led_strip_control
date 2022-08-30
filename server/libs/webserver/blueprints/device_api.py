@@ -58,7 +58,7 @@ def create_device():  # pylint: disable=E0211
           application/json:
             schema:
               example:
-                index: int
+                device_id: str
               type: object
       "422":
         description: Unprocessable Entity
@@ -69,7 +69,7 @@ def create_device():  # pylint: disable=E0211
         return "Unprocessable Entity.", 422
 
     data_out = {
-        "index": result
+        "device_id": result
     }
 
     return jsonify(data_out)
@@ -139,10 +139,8 @@ def get_groups():  # pylint: disable=E0211
             schema:
               example:
                 groups:
-                  - str
+                  group_0: str
               type: object
-      "403":
-        description: Could not find groups
       "422":
         description: Unprocessable Entity
     """
@@ -150,9 +148,6 @@ def get_groups():  # pylint: disable=E0211
 
     if data_out is None:
         return "Unprocessable Entity.", 422
-
-    if not data_out["groups"]:
-        return "Could not find groups.", 403
 
     return jsonify(data_out)
 
@@ -173,7 +168,7 @@ def create_group():  # pylint: disable=E0211
           examples:
             example1:
               value:
-                group: example_group
+                group: Example Group
               summary: group name
       description: Name of `group` to create
       required: true
@@ -185,7 +180,7 @@ def create_group():  # pylint: disable=E0211
             schema:
               example:
                 groups:
-                  - str
+                  group_0: str
               type: object
       "403":
         description: Input data are wrong
@@ -221,9 +216,9 @@ def delete_group():  # pylint: disable=E0211
           examples:
             example1:
               value:
-                group: example_group
-              summary: group name
-      description: Name of `group` to delete
+                group: group_0
+              summary: group ID
+      description: ID of `group` to delete
       required: true
     responses:
       "200":
@@ -261,7 +256,7 @@ def remove_invalid_device_groups():  # pylint: disable=E0211
     ---
     tags:
       - System
-    description: This endpoint should be called after deleting a global group.\n\n
+    description: This endpoint should be called after a global group was deleted and there are orphan device groups left.\n\n
                  It compares device groups with global groups and removes device groups that do not exist.\n\n
                  This prevents deleted global groups from still displaying on devices.
     responses:

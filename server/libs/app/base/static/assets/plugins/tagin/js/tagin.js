@@ -36,8 +36,7 @@ class Tagin {
         input.className = this.classInput;
         input.placeholder = this.placeholder;
         const wrapper = document.createElement('div');
-        // const addedTargetClasses = this.target.className;
-        const addedTargetClasses = this.target.className.replace('setting_input', '').replace(/\s+/g, ' ').trim();
+        const addedTargetClasses = this.target.className;
         wrapper.className = `${this.classWrapper} ${addedTargetClasses}`;
         wrapper.classList.remove(this.classElement);
         wrapper.insertAdjacentHTML('afterbegin', tags);
@@ -45,10 +44,19 @@ class Tagin {
         this.target.insertAdjacentElement('afterend', wrapper); // insert wrapper after input
         this.wrapper = wrapper;
         this.input = input;
+        this.tagIds = [];
     }
-    createTag(value) {
+    createTag(value, tagId) {
+        if (tagId === undefined) {
+            let i = 0;
+            while (i < 100) {
+                tagId = `group_${i}`;
+                if (!this.getTagObjects().hasOwnProperty(tagId)) break;
+                i++;
+            }
+        }
         const onclick = `this.closest('div').dispatchEvent(new CustomEvent('tagin:remove', { detail: this }))`;
-        return `<span class="${this.classTag}">${value}<span onclick="${onclick}" class="${this.classRemove}"></span></span>`;
+        return `<span class="${this.classTag}" tag-id="${tagId}">${value}<span onclick="${onclick}" class="${this.classRemove}"></span></span>`;
     }
     getValue() {
         return this.target.value.trim();
@@ -58,6 +66,18 @@ class Tagin {
     }
     getTags() {
         return Array.from(this.wrapper.getElementsByClassName(this.classTag)).map(tag => tag.textContent);
+    }
+    /**
+     * Custom method to get tags as objects
+     * @returns {Object}
+     */
+    getTagObjects() {
+        const tags = {};
+        Array.prototype.slice.call(this.wrapper.getElementsByClassName(this.classTag), 0).forEach(tag => {
+            const tag_id = tag.getAttribute('tag-id');
+            tags[tag_id] = tag.textContent;
+        });
+        return tags;
     }
     getTag() {
         return this.getTags().join(this.separator);
@@ -123,16 +143,17 @@ class Tagin {
             value
                 .split(this.separator)
                 .filter((i) => i !== '')
-                .forEach((val) => {
+                .forEach((val, index) => {
                     if (this.getTags().includes(val) && this.duplicate === false) {
                         this.alertExist(val);
                     }
                     else {
-                        input.insertAdjacentHTML('beforebegin', this.createTag(val));
+                        input.insertAdjacentHTML('beforebegin', this.createTag(val, this.tagIds[index]));
                         this.updateValue();
                     }
                 });
             input.value = '';
+            this.tagIds = [];
             input.removeAttribute('style');
         }
     }
@@ -150,9 +171,27 @@ class Tagin {
             this.getValue().trim() !== '' && this.input.insertAdjacentHTML('beforebegin', this.getValues().map(val => this.createTag(val)).join(''));
         }
     }
-    addTag(tag) {
-        this.input.value = (Array.isArray(tag) ? tag.join(this.separator) : tag) + this.separator;
+    /**
+     * Modified method to allow using objects for tags
+     * @param {string|Array.<string>|Object} tag
+     * @param {string} [tagId] Used if `tag` is a string.
+     */
+    addTag(tag, tagId = undefined) {
+        if (typeof tag === 'object' && tag !== null) {
+            this.input.value = Object.values(tag).join(this.separator) + this.separator;
+            this.tagIds = Object.keys(tag);
+        } else {
+            this.input.value = (Array.isArray(tag) ? tag.join(this.separator) : tag) + this.separator;
+            if (tagId) this.tagIds.push(tagId);
+        }
         this.input.dispatchEvent(new Event('input'));
+    }
+    /**
+     * Custom method to clear all tags
+     */
+    clearTags() {
+        [...this.wrapper.getElementsByClassName(this.classTag)].map(tag => tag.remove());
+        this.updateValue();
     }
 }
 

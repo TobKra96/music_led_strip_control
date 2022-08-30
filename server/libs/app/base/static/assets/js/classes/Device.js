@@ -1,23 +1,29 @@
+import Tagin from "../../plugins/tagin/js/tagin.js";
 import EffectManager from "./EffectManager.js";
 const effectManager = new EffectManager();
 
+// Do not init tagin if it is not on the page.
+const taginEl = document.querySelector(".tagin")
+const tagin = taginEl === null || taginEl === undefined ? undefined : new Tagin(taginEl);
+
 // classes/Device.js
-export default class Device {
+class Device {
     /**
      * Create a device.
-     * @param {{groups: array<string>, id: string, name: string}} params
+     * @param {Object} params Device parameters.
+     * @param {Object} params.assigned_to
+     * @param {string} params.id
+     * @param {string} params.name
      */
     constructor(params) {
         Object.assign(this, params);
         // this.id = id;
         // this._name = name;
-        this._activeEffect = "";
+        this.isGroup = this.id.startsWith("group_") || this.id === "all_devices";
         this.link = $(`a[data-device_id=${this.id}`)[0];
 
         // Insert Base Device ("all_devices") into localStorage if "lastDevice" does not exist yet.
         !('lastDevice' in localStorage) && localStorage.setItem("lastDevice", this.id);
-
-        this._isCurrent = this.id === localStorage.getItem("lastDevice");
 
         // Select last selected device if there is any.
         this.isCurrent && (
@@ -28,10 +34,9 @@ export default class Device {
         );
 
         // Add basic behavior to Pills
-        const self = this;
-        $(`a[data-device_id=${this.id}`).on("click", function () {
-            self.link = this;
-            self._activate();
+        $(`a[data-device_id=${this.id}`).on("click", e => {
+            this.link = e.currentTarget;
+            this._activate();
         });
     }
 
@@ -39,6 +44,10 @@ export default class Device {
      * Set active device in device bar and save it to localStorage.
      */
     _activate() {
+        $("#selected_type").text("Device");
+        if (this.isGroup) {
+            $("#selected_type").text("Group");
+        }
         $("#selected_device_txt").text(this.name);
         localStorage.setItem('lastDevice', this.id);
         effectManager.currentDevice = this;
@@ -49,7 +58,7 @@ export default class Device {
      * @return {boolean}
      */
     get isCurrent() {
-        return this._isCurrent;
+        return this.id === localStorage.getItem("lastDevice");
     }
 
     /**
@@ -142,13 +151,14 @@ export default class Device {
      * @return {jQuery.jqXHR}
      */
     getCycleStatus() {
+        // TODO: Implement UI/UX for multiple devices with active `Random Cycle`.
         return $.ajax({
             url: "/api/effect/cycle-status",
             data: {
                 "device": this.id
             }
         }).done((data) => {
-            this.setCycleStatus(data.random_cycle_active);
+            this.setCycleStatusStyle(data.random_cycle_active);
         });
     }
 
@@ -156,7 +166,7 @@ export default class Device {
      * Set border style for `Random Cycle` button.
      * @param {boolean} isCycleActive
      */
-    setCycleStatus(isCycleActive) {
+    setCycleStatusStyle(isCycleActive) {
         if (isCycleActive) {
             $("#effect_random_cycle").addClass("active")
         } else {
@@ -176,21 +186,61 @@ export default class Device {
                 "device": this.id
             }
         }).done((data) => {
-            this.setActiveEffect(data.effect);
+            this.setActiveEffectStyle(data.effect);
         });
     }
 
     /**
-     * Set style for selected effect button and device bar.
-     * @param {string} newActiveEffect
+     * Show indicator dot on effect buttons which are active.
      */
-    setActiveEffect(newActiveEffect) {
-        this._activeEffect = newActiveEffect;
+    setDeviceIndicators() {
+        $.ajax("/api/effect/active").done((data) => {
+            // Group devices by effect.
+            const result = data.devices.reduce((group, device) => {
+                const { effect } = device;
+                group[effect] = group[effect] ?? [];
+                group[effect].push(device);
+                return group;
+            }, {});
+
+            // Insert device names into active indicator title.
+            $(".active_indicator").addClass("d-none");
+            Object.entries(result).forEach(([effect, devices]) => {
+                let grouped = [];
+                Object.values(devices).forEach((item) => {
+                    // BUG: Error when newly created device is undefined.
+                    let deviceName = jinja_devices.find(d => d.id === item.device).name;
+                    grouped.push(deviceName);
+                });
+                // TODO: Clicking the dot should show a list of devices with that effect.
+                // Currently only shows devices on hover in a title.
+                $(`#${effect}`).siblings(".active_indicator").removeClass("d-none").attr("title", grouped.join(", "));
+            });
+        });
+    }
+
+    /**
+     * Set style for active effect buttons and update device bar data.
+     * @param {string|Array.<string>} newActiveEffect Effect or array of effects.
+     */
+    setActiveEffectStyle(newActiveEffect) {
+
+        // WIP: Not working yet.
+        // setDeviceIndicators();
+
+        if (newActiveEffect instanceof Array) {
+            $(".dashboard_effect_active").removeClass("dashboard_effect_active");
+            $("#selected_effect_txt").text("Multiple Effects");
+            newActiveEffect.forEach((effect) => {
+                $("#" + effect).addClass("dashboard_effect_active");
+            });
+            return;
+        }
 
         $(".dashboard_effect_active").removeClass("dashboard_effect_active");
-        $("#" + this._activeEffect).addClass("dashboard_effect_active");
-        if (this._activeEffect !== "") {
-            const activeEffectText = $("#" + this._activeEffect).text().trim();
+        $("#" + newActiveEffect).addClass("dashboard_effect_active");
+        if (newActiveEffect !== "") {
+            const activeEffectText = $("#" + newActiveEffect).text().trim();
             $("#selected_effect_txt").text(activeEffectText);
         }
 
@@ -206,7 +256,7 @@ export default class Device {
                     $("#" + key).prop('checked', value);
                 } else if ($("#" + key).attr('type') === 'option') {
                     populateDeviceGroups(value);
-                    populateGlobalGroups(value);
+                    populateGlobalGroups(Object.values(value));
                 } else {
                     $("#" + key).val(value);
                 }
@@ -235,15 +285,12 @@ export default class Device {
 
 /**
  * Populate selected device groups on Device Settings page.
- * @param {Array.<string>} deviceGroups
+ * @param {Object} deviceGroups
  */
 function populateDeviceGroups(deviceGroups) {
-    // Manually trigger change event to update device groups
-    const target = document.querySelector('#device_groups');
-    target.value = deviceGroups.join(",");
-    target.dispatchEvent(new Event('change'));
-    // Show device group block if there are groups
-    if (deviceGroups.length > 0) {
+    tagin.clearTags();
+    tagin.addTag(deviceGroups);
+    if (Object.keys(deviceGroups).length > 0) {
         $('#device_group_pills').removeClass("d-none");
     }
 }
@@ -256,12 +303,14 @@ function populateGlobalGroups(deviceGroups) {
     // Clear all dropdown group options
     $("#device_group_dropdown").empty();
     // Populate device group dropdown with all available groups
-    jinja_groups.groups.forEach(globalGroup => {
+    Object.entries(jinja_groups.groups).forEach(([groupId, globalGroup]) => {
         if (!deviceGroups.includes(globalGroup)) {
-            $("#device_group_dropdown").prepend(`<option value="${globalGroup}">${globalGroup}</option>`);
+            $("#device_group_dropdown").append(`<option tag-id="${groupId}" value="${globalGroup}">${globalGroup}</option>`);
         }
     });
     // Add placeholder option on top
     $("#device_group_dropdown").prepend(`<option value="placeholder" disabled selected>Select a group</option>`);
     $("#device_group_dropdown")[0].selectedIndex = 0;
 }
+
+export { Device, tagin };

@@ -47,6 +47,11 @@ def get_active_effect():  # pylint: disable=E0211
                 summary: With specified device
               example2:
                 value:
+                  device: str
+                  effect: str/array
+                summary: With "all_devices" or another group as specified device
+              example3:
+                value:
                   devices:
                     - device: str
                       effect: str
@@ -193,7 +198,8 @@ def get_cycle_status():  # pylint: disable=E0211
       - Effect
     parameters:
       - description:
-          ID of `device` to return Random Cycle effect status from
+          ID of `device` to return Random Cycle effect status from\n\n
+          __Note:__ `all_devices` or other group IDs are not supported and will return `False`
         name: device
         in: query
         required: true

@@ -4,7 +4,7 @@ import Tagin from "../plugins/tagin/js/tagin.js";
 let tagin;
 
 // Init and load all settings
-$(document).ready(() => {
+$(() => {
     $("#settings_list").slideDown();
     $("#device_dropdown").hide();
 
@@ -21,18 +21,14 @@ $(document).ready(() => {
     Promise.all([
 
         $.ajax("/api/resources/logging-levels").done((response) => {
-            $('.logging_levels').each(function () {
-                Object.entries(response).forEach(([key, value]) => {
-                    $(this).append(`<option value="${key}">${value}</option>`);
-                });
+            Object.entries(response).forEach(([key, value]) => {
+                $('.logging_levels').append(`<option value="${key}">${value}</option>`);
             });
         }),
 
         $.ajax("/api/resources/audio-devices").done((response) => {
-            $('.audio_devices').each(function () {
-                Object.entries(response).forEach(([key, value]) => {
-                    $(this).append(`<option value="${key}">${value}</option>`);
-                });
+            Object.entries(response).forEach(([key, value]) => {
+                $('.audio_devices').append(`<option value="${key}">${value}</option>`);
             });
         })
 
@@ -106,7 +102,7 @@ function setLocalSettings() {
                 }
                 return parseInt(value);
             },
-            tags: () => { return tagin.getTags(); }
+            tags: () => { return tagin.getTagObjects(); }
         }
     });
 
@@ -131,7 +127,7 @@ function setLocalSettings() {
  * @param {Object} settings
  */
 function setGeneralSettings(settings) {
-    let generalSettings = {
+    const generalSettings = {
         "settings": settings
     };
 
@@ -262,16 +258,16 @@ $("#import_btn").on("click", () => {
 });
 
 // Insert filename of imported config
-$('.custom-file-input').on('change', (e) => {
-    let fileName = $('#configUpload').val().split('\\').pop();
+$('.custom-file-input').on('change', e => {
+    const fileName = $('#configUpload').val().split('\\').pop();
     let nextSibling = e.target.nextElementSibling;
     nextSibling.innerText = fileName;
 })
 
 // Toggle PIN visibility on hover
-$("#toggle_pin_view").on("mouseover mouseleave", function (event) {
-    event.preventDefault();
-    let pinField = $('#DASHBOARD_PIN');
+$("#toggle_pin_view").on("mouseover mouseleave", e => {
+    e.preventDefault();
+    const pinField = $('#DASHBOARD_PIN');
     pinField.attr('type') === 'text' ? pinField.attr('type', 'password') : pinField.attr('type', 'text');
     $('#toggle_pin_view').toggleClass("icon-eye");
     $('#toggle_pin_view').toggleClass("icon-eye-off");

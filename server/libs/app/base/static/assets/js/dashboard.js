@@ -1,8 +1,8 @@
-import Device from "./classes/Device.js";
+import { Device } from "./classes/Device.js";
 import Toast from "./classes/Toast.js";
 
 
-$(function () {
+$(() => {
 
     setThemeIcon(localStorage.theme);
 
@@ -15,31 +15,36 @@ $(function () {
         return;
     }
 
-    // Create Base Device ("all_devices").
-    const baseDevice = new Device({ groups: [], id: "all_devices", name: "All Devices" })
+    // Create Base Group ("all_devices").
+    let devicesById = {};
+    jinja_devices.forEach(device => { devicesById[device.id] = device.name });
+    const baseGroup = new Device({ assigned_to: devicesById, id: "all_devices", name: "All Devices" });
 
-    // Create Devices from Jinja output.
-    const devices = [baseDevice].concat(jinja_devices.map(d => { return new Device(d) }));
+    // Create Devices and Groups from Jinja output.
+    const devices = jinja_devices.map(d => { return new Device(d) });
+    const groups = [baseGroup].concat(jinja_groups.map(g => { return new Device(g) }));
 
-    devices.forEach(device => {
-        device.link.addEventListener('click', () => {
+    devices.concat(groups).forEach(item => {
+        $(item.link).on('click', () => {
             // Async function
-            device.getActiveEffect();
+            item.getActiveEffect();
         });
     });
 
     // Add "Edit" button to effect buttons.
-    let editButton = '<i class="feather icon-edit edit_button" aria-hidden="true"></i>';
+    const editButton = '<i class="feather icon-edit edit_button" aria-hidden="true"></i>';
+    const activeIndicator = '<i class="active_indicator d-none" aria-hidden="true"></i>';
     $(editButton).insertAfter("#effect_random_cycle");
     $("#dashboard-list-none-music, #dashboard-list-music").children().each((_, element) => {
         $(editButton).appendTo($(element));
+        $(activeIndicator).appendTo($(element)); // Also add active indicator.
     });
 
-    $('.edit_button').on('click', (e) => {
-        window.location.href = `/effects/${$(e.target).siblings()[0].id}`;
+    $('.edit_button').on('click', e => {
+        window.location.href = `/effects/${$(e.currentTarget).siblings()[0].id}`;
     });
-    $(".edit_button").on("mouseover mouseout", (e) => {
-        $($(e.target).siblings()[0]).toggleClass("dashboard_effect_hover");
+    $(".edit_button").on("mouseover mouseout", e => {
+        $($(e.currentTarget).siblings()[0]).toggleClass("dashboard_effect_hover");
     });
 
 });
@@ -48,7 +53,7 @@ $(function () {
  * Show corresponding theme icon.
  * @param {string} theme
  */
-let setThemeIcon = (theme) => {
+const setThemeIcon = (theme) => {
     if (theme === "dark") {
         $("#theme-indicator").addClass("icon-sun");
         $("#theme-indicator").removeClass("icon-moon");
@@ -61,7 +66,7 @@ let setThemeIcon = (theme) => {
 /**
  * Toggle theme and save to localStorage.
  */
-let toggleTheme = () => {
+const toggleTheme = () => {
     if (localStorage.theme === "dark") {
         $("html").removeClass('dark');
         localStorage.theme = "light";
