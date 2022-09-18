@@ -1,13 +1,15 @@
 from libs.webserver.executer_base import ExecuterBase
 
 from configparser import ConfigParser, ParsingError, MissingSectionHeaderError
-from flask_login import LoginManager, UserMixin, login_user, logout_user
+from flask_login import LoginManager, UserMixin, login_user
 from flask import request, redirect, url_for, session
 from urllib.parse import urlparse, urljoin
 from copy import deepcopy
 from os import chmod
 import platform
+import secrets
 import re
+
 
 USE_PIN_LOCK = True
 login_manager = LoginManager()
@@ -52,8 +54,10 @@ class AuthenticationExecuter(ExecuterBase):
         if not self.validate_pin(self.DEFAULT_PIN) and USE_PIN_LOCK:
             raise ValueError("PIN must be from 4 to 8 digits.")
 
-        server.secret_key = 'secretkey'
+        server.secret_key = secrets.token_urlsafe(16)  # Force login on restart.
         if not USE_PIN_LOCK:
+            # TODO: LOGIN_DISABLED will be deprecated.
+            # https://github.com/maxcountryman/flask-login/issues/697
             server.config['LOGIN_DISABLED'] = True
         login_manager.init_app(server)
 
@@ -115,13 +119,6 @@ class AuthenticationExecuter(ExecuterBase):
         ref_url = urlparse(request.host_url)
         test_url = urlparse(urljoin(request.host_url, target))
         return test_url.scheme in ('http', 'https') and ref_url.netloc == test_url.netloc
-
-    def first_call(self):
-        self.logger.debug("Enter first_call")
-        USE_PIN_LOCK = self.file_values["USE_PIN_LOCK"]
-        if USE_PIN_LOCK:
-            self.logger.debug("Logout User")
-            logout_user()
 
     def set_pin_setting(self, data):
         self.logger.debug("Enter set_pin_setting()")

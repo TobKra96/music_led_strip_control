@@ -6,11 +6,6 @@ from flask_login import current_user, logout_user, login_required
 authentication_api = Blueprint('authentication_api', __name__)
 
 
-@authentication_api.before_app_first_request
-def first():
-    Executer.instance.authentication_executer.first_call()
-
-
 @authentication_api.get('/login')
 def show_login_page():
     use_pin_lock = Executer.instance.authentication_executer.get_use_pin_lock()
