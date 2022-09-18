@@ -217,7 +217,7 @@ def export_config():  # pylint: disable=E0211
                 type: string
     """
     Executer.instance.logger.debug(f"Send file: {Executer.instance.general_settings_executer.export_config_path}")
-    return send_file(Executer.instance.general_settings_executer.export_config_path, as_attachment=True, cache_timeout=-1, mimetype="text/html")
+    return send_file(Executer.instance.general_settings_executer.export_config_path, as_attachment=True, max_age=-1, mimetype="text/html")
 
 
 @general_settings_api.post('/api/settings/configuration/file')
