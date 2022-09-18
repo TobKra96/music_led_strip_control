@@ -65,6 +65,7 @@ function getLocalSettings() {
  * @param {Object} settings
  */
 function populateGeneralSettings(settings) {
+    tagin.clearTags();
     Object.entries(settings).forEach(([key, value]) => {
         if ($("#" + key).attr('type') === 'checkbox') {
             $("#" + key).prop('checked', value);
