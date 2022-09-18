@@ -133,13 +133,6 @@ class ConfigService():
         return config_template
 
     def check_compatibility(self):
-        try:
-            self.config_validator_service.validate_config(self.config)
-        except ValidationError as e:
-            # Todo: Handle validation errors.
-            # https://python-jsonschema.readthedocs.io/en/stable/errors/
-            self.logger.error(f"Could not validate config settings: {e}")
-            # self.load_backup()
         loaded_config = self.config
         template_config = self.load_template()
 
@@ -160,6 +153,15 @@ class ConfigService():
         self.check_devices(loaded_config["device_configs"], template_config["default_device"])
 
         self.config = loaded_config
+
+        try:
+            self.config_validator_service.validate_config(self.config)
+        except ValidationError as e:
+            # Todo: Handle validation errors.
+            # https://python-jsonschema.readthedocs.io/en/stable/errors/
+            self.logger.error(f"Could not validate config settings: {e}")
+            # self.load_backup()
+
         self.save_config()
 
     def check_leaf(self, loaded_config_leaf, template_config_leaf):

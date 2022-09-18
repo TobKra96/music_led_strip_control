@@ -1850,7 +1850,9 @@ class ConfigValidatorService():
         }
 
         version_schema = {
-            "const": 2
+            "type": "integer",
+            "minimum": 2,
+            "maximum": 3
         }
 
         # Config schema
