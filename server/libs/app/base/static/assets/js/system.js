@@ -1,51 +1,48 @@
 import Toast from "./classes/Toast.js";
 
-$(document).ready(function () {
-    // Do not collapse accordion when clicking on body
-    $(".collapse").on('click', (e) => {
+$(() => {
+    // Do not collapse accordion when clicking on body.
+    $(".collapse").on('click', e => {
         e.stopPropagation();
     });
 
-    // Restore system status card positions on reload
+    // Restore system status card positions on reload.
     const order = JSON.parse(localStorage.getItem('order'));
     if (order) {
         Object.entries(order).forEach(([column, cards]) => {
             cards.forEach((card) => {
-                let $target = $(".connectedSortable").find('#' + card);
+                const $target = $(".connectedSortable").find('#' + card);
                 $target.appendTo($('#' + column));
             });
         });
     }
 
-    $(function () {
-        $("#sortable-1, #sortable-2, #sortable-3").sortable({
-            connectWith: ".connectedSortable",
-            containment: ".sortableParent",
-            placeholder: "highlight",
-            forcePlaceholderSize: true,
-            delay: 100,
-            revert: 300,
-            cursor: "move",
-            tolerance: "pointer",
-            update: function (event, ui) {
-                const col1 = $("#sortable-1").sortable('toArray');
-                const col2 = $("#sortable-2").sortable('toArray');
-                const col3 = $("#sortable-3").sortable('toArray');
-                const order = {
-                    "sortable-1": col1,
-                    "sortable-2": col2,
-                    "sortable-3": col3,
-                };
-                localStorage.setItem('order', JSON.stringify(order));
-            }
-        }).disableSelection();
-    });
+    $("#sortable-1, #sortable-2, #sortable-3").sortable({
+        connectWith: ".connectedSortable",
+        containment: ".sortableParent",
+        placeholder: "highlight",
+        forcePlaceholderSize: true,
+        delay: 100,
+        revert: 300,
+        cursor: "move",
+        tolerance: "pointer",
+        update: function (event, ui) {
+            const col1 = $("#sortable-1").sortable('toArray');
+            const col2 = $("#sortable-2").sortable('toArray');
+            const col3 = $("#sortable-3").sortable('toArray');
+            const order = {
+                "sortable-1": col1,
+                "sortable-2": col2,
+                "sortable-3": col3,
+            };
+            localStorage.setItem('order', JSON.stringify(order));
+        }
+    }).disableSelection();
 
     /**
-     * Call API to get performance data and update system status cards.
+     * Call API every 10 seconds to get performance data and update system status cards.
      */
-    function getPerformance() {
-        // Called every 10 seconds
+    const getPerformance = () => {
         $.ajax("/api/system/performance").done((data) => {
             const cpuUsage = data.system.cpu_info.percent;
             $("#cpu_usage_percent").text(cpuUsage + "%");
@@ -105,7 +102,7 @@ $(document).ready(function () {
                     $("#network_interfaces").append(interfaceCard);
                 });
             }
-        }).catch((error) => {
+        }).catch(() => {
             new Toast("Unable to reach the server.").error();
         });
         setTimeout(getPerformance, 10000);
@@ -113,15 +110,18 @@ $(document).ready(function () {
     getPerformance();
 
     /**
-     * Call API to get temperature data and update system status cards.
+     * Call API every 20 seconds to get temperature data and update system status cards.
      */
-    function getTemperature() {
-        // Called every 20 seconds
+    const getTemperature = () => {
         $.ajax("/api/system/temperature").done((data) => {
             const cpuTempC = data.system.raspi.celsius;
             const cpuTempF = data.system.raspi.fahrenheit;
-            $("#cpu_temperature").html(cpuTempC + "°C&nbsp;&nbsp;/&nbsp;&nbsp;" + cpuTempF + "°F");
-            $("#cpu_temperature_progress").css("width", cpuTempC + "%");
+            if (cpuTempC === 0 && cpuTempF === 0) {
+                $("#cpu_temperature").html("N/A");
+            } else {
+                $("#cpu_temperature").html(cpuTempC + "°C&nbsp;&nbsp;/&nbsp;&nbsp;" + cpuTempF + "°F");
+                $("#cpu_temperature_progress").css("width", cpuTempC + "%");
+            }
         });
         setTimeout(getTemperature, 20000);
     }
@@ -130,12 +130,11 @@ $(document).ready(function () {
     /**
      * Call API to get services data and update service status card as `Checking`.
      */
-    function getServices() {
-        // Preload services
+    const getServices = () => {
         $.ajax("/api/system/services").done((data) => {
             data.services.forEach((service, index, array) => {
-                let status = "Checking";
-                let statusColor = "theme-bg2";
+                const status = "Checking";
+                const statusColor = "theme-bg2";
                 let border;
                 index === array.length - 1 ? border = "" : border = "border-bottom";
                 const serviceCard = `
@@ -162,10 +161,9 @@ $(document).ready(function () {
     getServices();
 
     /**
-     * Call API to get status of services.
+     * Call API once on page load to get status of services.
      */
-    function getServicesStatus() {
-        // Called once on page load
+    const getServicesStatus = () => {
         $.ajax("/api/system/services/status").done((data) => {
             data.services.forEach(service => {
                 let status = "Stopped";
@@ -181,18 +179,17 @@ $(document).ready(function () {
             });
         }).catch((xhr) => {
             console.log(xhr.responseText);
-        })
+        });
     }
 
     /**
      * Call API to get devices data and update device card as `Checking`.
      */
-    function getDevices() {
-        // Preload devices
+    const getDevices = () => {
         $.ajax("/api/system/devices").done((devices) => {
             if ($("#devices").children("div").length < devices.length) {
                 devices.forEach((device, index, array) => {
-                    let status = "Checking";
+                    const status = "Checking";
                     let border;
                     index === array.length - 1 ? border = "" : border = "border-bottom";
                     const deviceCard = `
@@ -220,10 +217,9 @@ $(document).ready(function () {
     getDevices();
 
     /**
-     * Call API to get status of devices.
+     * Call API every 10 seconds to get status of devices.
      */
-    function getDevicesStatus() {
-        // Called every 10 seconds
+    const getDevicesStatus = () => {
         $.ajax("/api/system/devices/status").done((data) => {
             data.devices.forEach(device => {
                 let status = "Offline";
@@ -241,12 +237,12 @@ $(document).ready(function () {
     }
 
     /**
-     * Call API to get software version data and update version card.
+     * Call API once to get software version data and update version card.
      */
-    function getVersion() {
+    const getVersion = () => {
         $.ajax("/api/system/version").done((data) => {
             data.versions.forEach((software, index, array) => {
-                let statusColor = "theme-bg2";
+                const statusColor = "theme-bg2";
                 let border;
                 index === array.length - 1 ? border = "" : border = "border-bottom";
                 const versionCard = `
@@ -267,14 +263,14 @@ $(document).ready(function () {
             });
         });
     }
-    getVersion()
+    getVersion();
 
     /**
      * Convert bytes to gigabytes.
      * @param {number} bytes
      * @return {number}
      */
-    function bytesToGigabytes(bytes) {
+    const bytesToGigabytes = bytes => {
         return bytes / 1024 / 1024 / 1024;
     }
 
