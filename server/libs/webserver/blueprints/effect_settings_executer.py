@@ -4,7 +4,6 @@ from libs.webserver.executer_base import ExecuterBase, handle_config_errors
 class EffectSettingsExecuter(ExecuterBase):
 
     # TODO: Fix returning "all_devices" instead of actual device ID.
-    # Check if there are any API calls that ise "all_devices".
 
     # Return setting_value.
     @handle_config_errors
