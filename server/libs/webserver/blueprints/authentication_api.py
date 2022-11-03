@@ -1,17 +1,17 @@
 from libs.webserver.executer import Executer
 
 from flask import render_template, request, jsonify, redirect, url_for, session, flash, Blueprint
-from flask_login import current_user, logout_user, login_required
+from flask_login import current_user, logout_user
 
 authentication_api = Blueprint('authentication_api', __name__)
 
 
 @authentication_api.get('/login')
 def show_login_page():
-    use_pin_lock = Executer.instance.authentication_executer.get_use_pin_lock()
+    is_pin_active = Executer.instance.authentication_executer.is_pin_active()
     is_authenticated = current_user.is_authenticated
 
-    if not use_pin_lock or is_authenticated:
+    if not is_pin_active or is_authenticated:
         return redirect("/")
 
     return render_template('login.html')
@@ -40,29 +40,26 @@ def login():
           description: OK
     """
     pin = request.form.get('pin')
-    if 'next' in request.args:
-        session['next'] = request.args['next']
-    else:
-        session['next'] = None
+
     if not pin:
         flash('PIN is required')
-        return redirect(url_for('authentication_api.login', next=session['next']))
-    if not pin.isdigit():
+    elif not pin.isdigit():
         flash('PIN must only contain digits')
-        return redirect(url_for('authentication_api.login', next=session['next']))
-    if not Executer.instance.authentication_executer.validate_pin(pin):
+    elif not Executer.instance.authentication_executer.validate_pin(pin):
         flash('PIN must be at least 4 digits long')
-        return redirect(url_for('authentication_api.login', next=session['next']))
-    if pin != Executer.instance.authentication_executer.DEFAULT_PIN:
+    elif pin != Executer.instance.authentication_executer.USER_PIN:
         flash('Invalid PIN')
-        return redirect(url_for('authentication_api.login', next=session['next']))
-    if pin == Executer.instance.authentication_executer.DEFAULT_PIN:
+
+    elif pin == Executer.instance.authentication_executer.USER_PIN:
         Executer.instance.authentication_executer.login()
-        if session['next'] is not None:
-            if Executer.instance.authentication_executer.is_safe_url(session['next']):
-                return redirect(session['next'])
+        if session.get('next') is not None:
+            next_page = session['next']
+            session['next'] = None
+            if Executer.instance.authentication_executer.is_safe_url(next_page):
+                return redirect(next_page)
         return redirect("/")
-    return render_template('login.html')
+
+    return redirect(url_for('authentication_api.login', next=session.get('next')))
 
 
 @authentication_api.get('/logout')
@@ -109,10 +106,10 @@ def get_pin_setting():  # pylint: disable=E0211
       "401":
         description: Unauthorized
     """
-    use_pin_lock = Executer.instance.authentication_executer.get_use_pin_lock()
+    is_pin_active = Executer.instance.authentication_executer.is_pin_active()
     is_authenticated = current_user.is_authenticated
 
-    if not use_pin_lock or is_authenticated:
+    if not is_pin_active or is_authenticated:
         data_in = Executer.instance.authentication_executer.get_pin_setting()
         data_out = {
             "DEFAULT_PIN": data_in["DEFAULT_PIN"],
@@ -157,10 +154,10 @@ def set_pin_setting():  # pylint: disable=E0211
       "401":
         description: Unauthorized
     """
-    use_pin_lock = Executer.instance.authentication_executer.get_use_pin_lock()
+    is_pin_active = Executer.instance.authentication_executer.is_pin_active()
     is_authenticated = current_user.is_authenticated
 
-    if not use_pin_lock or is_authenticated:
+    if not is_pin_active or is_authenticated:
         data_in = request.get_json()
 
         data_out = {
@@ -194,10 +191,10 @@ def reset_pin_setting():  # pylint: disable=E0211
       "401":
         description: Unauthorized
     """
-    use_pin_lock = Executer.instance.authentication_executer.get_use_pin_lock()
+    is_pin_active = Executer.instance.authentication_executer.is_pin_active()
     is_authenticated = current_user.is_authenticated
 
-    if not use_pin_lock or is_authenticated:
+    if not is_pin_active or is_authenticated:
         data_out = Executer.instance.authentication_executer.reset_pin_settings()
         return jsonify(data_out)
 
