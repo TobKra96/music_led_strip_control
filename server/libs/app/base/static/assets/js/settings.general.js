@@ -13,7 +13,8 @@ $(() => {
         duplicate: false,
         enter: true,
         transform: input => input,
-        placeholder: 'Add a group...'
+        placeholder: 'Add a group...',
+        maximum: 100
     };
     tagin = new Tagin(document.querySelector(".tagin"), taginOptions);
 
@@ -146,7 +147,7 @@ function setGeneralSettings(settings) {
             data: {},
             contentType: 'application/json;charset=UTF-8'
         }).done((response) => {
-            console.log(JSON.stringify(response));
+            console.log("Removing any stray device groups: " + JSON.stringify(response));
         });
     }).fail((xhr) => {
         console.log("Error while setting general settings. Error: " + xhr.responseText);
@@ -287,4 +288,4 @@ $('#FRAMES_PER_BUFFER_TOOLTIP').attr('data-original-title', 'The buffer size of 
 $('#N_FFT_BINS_TOOLTIP').attr('data-original-title', 'The amount of slices that the audio spectrum will be divided into.<br><br>Default setting: 24');
 $('#LOG_LEVEL_CONSOLE_TOOLTIP').attr('data-original-title', 'The logging verbosity level in the console.<br><br>Default setting: info');
 $('#LOG_LEVEL_FILE_TOOLTIP').attr('data-original-title', 'The logging verbosity level in a log file.<br>Enable or disable file logging using the checkbox below.<br><br>Use this only for debugging.<br>File logging for extensive periods of time could cause SD card wear-out.<br><br>Default setting: info');
-$('#MODIFY_GLOBAL_GROUP_TOOLTIP').attr('data-original-title', 'Add or remove group tags, which can be used to organize devices.');
+$('#MODIFY_GLOBAL_GROUP_TOOLTIP').attr('data-original-title', 'Add or remove group tags, which can be used to organize devices. Maximum 100 groups allowed.');

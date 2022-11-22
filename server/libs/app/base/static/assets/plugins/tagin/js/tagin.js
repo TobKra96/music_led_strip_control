@@ -25,6 +25,7 @@ class Tagin {
         this.duplicate = options?.duplicate || inputElement.dataset.taginDuplicate !== undefined;
         this.transform = options?.transform || inputElement.dataset.taginTransform || 'input => input';
         this.enter = options?.enter || inputElement.dataset.taginEnter !== undefined;
+        this.maximum = options?.maximum || inputElement.dataset.taginMaximum || undefined;
         this.createWrapper();
         this.autowidth();
         this.addEventListener();
@@ -85,6 +86,15 @@ class Tagin {
     updateValue() {
         this.target.value = this.getTag();
         this.target.dispatchEvent(new Event('change'));
+
+        if (this.maximum && this.getTags().length === this.maximum) {
+            this.input.disabled = true;
+            this.input.placeholder = '';
+        } else if (this.maximum && this.getTags().length === this.maximum - 1) {
+            this.input.disabled = false;
+            this.input.placeholder = this.placeholder;
+            this.autowidth();
+        }
     }
     autowidth() {
         const fakeEl = document.createElement('div');
