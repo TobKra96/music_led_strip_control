@@ -385,7 +385,7 @@
             },
             "output_udp": {
                 "udp_client_ip": "127.0.0.1",
-                "udp_client_port": "7777"
+                "udp_client_port": 7777
             }
         }
     },
