@@ -1,11 +1,9 @@
 from enum import Enum
 
 
-class EffectNames():
-    """
-    Add a new effect ID and Name to the correct dictionary in this class.
+class EffectNames:
+    """Add a new effect ID and Name to the correct dictionary in this class."""
 
-    """
     non_music = {
         "effect_single": "Single",
         "effect_gradient": "Gradient",
@@ -49,4 +47,4 @@ class EffectNames():
 
 # Dynamically create `EffectsEnum`, so that only one place (`EffectNames`)
 # needs to be changed when adding new effects.
-EffectsEnum = Enum('EffectsEnum', {**EffectNames.non_music, **EffectNames.music, **EffectNames.special})
+EffectsEnum = Enum("EffectsEnum", {**EffectNames.non_music, **EffectNames.music, **EffectNames.special})

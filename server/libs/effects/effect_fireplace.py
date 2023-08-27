@@ -1,13 +1,14 @@
-from libs.effects.effect import Effect  # pylint: disable=E0611, E0401
-
-from scipy.ndimage import gaussian_filter1d
 from random import randint
+
 import numpy as np
+from scipy.ndimage import gaussian_filter1d
+
+from libs.effects.effect import Effect  # pylint: disable=E0611, E0401
 
 
 class EffectFireplace(Effect):
 
-    def __init__(self, device):
+    def __init__(self, device) -> None:
         # Call the constructor of the base class.
         super().__init__(device)
         # Setup for "EffectFireplace" (don't change this).
@@ -269,8 +270,7 @@ class EffectFireplace(Effect):
         return result_color
 
     def get_firebase_flicker_steps(self, current_speed):
-        """
-        Calculate the steps for the rollspeed.
+        """Calculate the steps for the rollspeed.
         Up to 1 you can adjust the speed very fine. After this, you need to add decades to increase the speed.
         """
         max_counter = 1
@@ -292,8 +292,7 @@ class EffectFireplace(Effect):
         return steps
 
     def get_sparks_flicker_steps(self, current_speed):
-        """
-        Calculate the steps for the rollspeed.
+        """Calculate the steps for the rollspeed.
         Up to 1 you can adjust the speed very fine. After this, you need to add decades to increase the speed.
         """
         max_counter = 1
@@ -315,8 +314,7 @@ class EffectFireplace(Effect):
         return steps
 
     def get_sparks_fly_steps(self, current_speed):
-        """
-        Calculate the steps for the rollspeed.
+        """Calculate the steps for the rollspeed.
         Up to 1 you can adjust the speed very fine. After this, you need to add decades to increase the speed.
         """
         max_counter = 1

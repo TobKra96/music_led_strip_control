@@ -1,12 +1,12 @@
-from libs.config_converter.config_converter_base import ConfigConverterBase  # pylint: disable=E0611, E0401
-
-import logging
 import json
+import logging
 import os
+
+from libs.config_converter.config_converter_base import ConfigConverterBase  # pylint: disable=E0611, E0401
 
 
 class ConfigConverterV2(ConfigConverterBase):
-    def __init__(self):
+    def __init__(self) -> None:
         self.logger = logging.getLogger(__name__)
 
         self.from_version = 1
@@ -40,30 +40,30 @@ class ConfigConverterV2(ConfigConverterBase):
 
     def save_tmp_json(self, old_config, tmp_convert_file_path):
         try:
-            self.logger.debug(f"Save tmp config file.")
+            self.logger.debug("Save tmp config file.")
             # Write tmp file
-            with open(tmp_convert_file_path, 'w') as write_file:
+            with open(tmp_convert_file_path, "w") as write_file:
                 json.dump(old_config, write_file, indent=4, sort_keys=True)
 
         except Exception as e:
-            self.logger.exception(f"Exception while saving the tmp file.", e)
+            self.logger.exception("Exception while saving the tmp file.", e)
 
     def delete_tmp_json(self, tmp_convert_file_path):
         try:
-            self.logger.debug(f"Delete tmp config file.")
+            self.logger.debug("Delete tmp config file.")
             # Search and delete tmp file
             if os.path.exists(tmp_convert_file_path):
                 os.remove(tmp_convert_file_path)
         except Exception as e:
-            self.logger.exception(f"Exception while delete the tmp file.", e)
+            self.logger.exception("Exception while delete the tmp file.", e)
 
     def read_tmp_json(self, tmp_convert_file_path):
         try:
-            self.logger.debug(f"Read tmp config file.")
+            self.logger.debug("Read tmp config file.")
             with open(tmp_convert_file_path, "r") as read_file:
                 return json.load(read_file)
         except Exception as e:
-            self.logger.exception(f"Exception while read the tmp file.", e)
+            self.logger.exception("Exception while read the tmp file.", e)
 
     def dict_to_json_string(self, old_config_dict):
         return json.dumps(old_config_dict)

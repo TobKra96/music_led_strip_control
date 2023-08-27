@@ -1,25 +1,28 @@
-from libs.notification_enum import NotificationEnum  # pylint: disable=E0611, E0401
-from libs.notification_item import NotificationItem  # pylint: disable=E0611, E0401
-from libs.config_service import ConfigService  # pylint: disable=E0611, E0401
-from libs.effects_enum import EffectsEnum  # pylint: disable=E0611, E0401
-from libs.effect_item import EffectItem  # pylint: disable=E0611, E0401
+import atexit
+import logging
+from collections.abc import Mapping
+from functools import wraps
 
 from apscheduler.schedulers.background import BackgroundScheduler
-from functools import wraps
-import logging
-import atexit
+from jsonschema import Draft202012Validator, ValidationError, validate
 
+from libs.config_service import ConfigService  # pylint: disable=E0611, E0401
+from libs.effect_item import EffectItem  # pylint: disable=E0611, E0401
+from libs.effects_enum import EffectsEnum  # pylint: disable=E0611, E0401
+from libs.notification_enum import NotificationEnum  # pylint: disable=E0611, E0401
+from libs.notification_item import NotificationItem  # pylint: disable=E0611, E0401
 
 scheduler = BackgroundScheduler()
 
 
 def handle_config_errors(func):
-    """
+    """# WARNING: DEPRECATED.
+
     Decorator for catching any `Key` or `Value` errors in the config when calling API endpoints.
-    In case of error, `None` is returned and the respective Flask Blueprint will show `422 Unprocessable Entity`.
+    In case of error, None is returned.
     """
     @wraps(func)
-    def wrapper(*args, **kwargs):
+    def wrapper(*args, **kwargs) -> None:
         try:
             return func(*args, **kwargs)
         except (KeyError, ValueError):
@@ -27,8 +30,42 @@ def handle_config_errors(func):
     return wrapper
 
 
-class ExecuterBase():
-    def __init__(self, config_lock, notification_queue_in, notification_queue_out, effects_queue, py_audio):
+def update(orig: dict, new: dict) -> dict:
+    """Update a dict recursively with new values.
+
+    Also, overwrite `device_groups` without keeping old values.
+
+    https://stackoverflow.com/questions/3232943.
+    """
+    for k, v in new.items():
+        if k in ["device_groups"]:
+            orig[k] = v
+        if isinstance(v, Mapping):
+            orig[k] = update(orig.get(k, {}), v)
+        else:
+            orig[k] = v
+    return orig
+
+
+def validate_schema(data: dict, schema: dict) -> bool:
+    """Validate the request data against a JSON schema.
+
+    All API schemas are defined in `/libs/webserver/schemas/`.
+    """
+    try:
+        validate(data, schema, format_checker=Draft202012Validator.FORMAT_CHECKER)
+    except ValidationError as e:
+        logger = logging.getLogger(__name__)
+        path_fmt = " -> ".join([str(p) for p in e.absolute_path])
+        logger.error(f"Schema validation error in request:\n{path_fmt} - {e.message}")  # noqa: TRY400
+
+        return False
+
+    return True
+
+
+class ExecuterBase:
+    def __init__(self, config_lock, notification_queue_in, notification_queue_out, effects_queue, py_audio) -> None:
         self.logger = logging.getLogger(__name__)
 
         self._config_lock = config_lock
@@ -76,14 +113,13 @@ class ExecuterBase():
         self.notification_queue_out.put(notification_item)
         self.logger.debug("Notification Item put into queue.")
 
-    def refresh_device(self, deviceId):
-        self.put_into_notification_queue(
-            NotificationEnum.config_refresh, deviceId)
+    def refresh_device(self, device_id):
+        self.put_into_notification_queue(NotificationEnum.config_refresh, device_id)
 
     def validate_data_in(self, dictionary, keys):
-        if not (type(dictionary) is dict):
-            self.logger.error(
-                "Error in validate_data_in: dictionary is not a dict.")
+        """WARNING: DEPRECATED."""
+        if not isinstance(dictionary, dict):
+            self.logger.error("Error in validate_data_in: dictionary is not a dict.")
             return False
 
         if keys is None:
@@ -91,9 +127,8 @@ class ExecuterBase():
             return False
 
         for currentkey in keys:
-            if not (currentkey in dictionary):
-                self.logger.error(
-                    f"Error in validate_data_in: Could not find the key: {currentkey}")
+            if currentkey not in dictionary:
+                self.logger.error(f"Error in validate_data_in: Could not find the key: {currentkey}")
                 self.logger.error("Dict:")
                 self.logger.error(str(dictionary))
                 return False

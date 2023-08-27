@@ -1,13 +1,13 @@
+import logging
+from multiprocessing import Process, Queue
+
 from libs.effect_service import EffectService
 from libs.output_service import OutputService
 from libs.queue_wrapper import QueueWrapper  # pylint: disable=E0611, E0401
 
-from multiprocessing import Process, Queue
-import logging
-
 
 class Device:
-    def __init__(self, config, device_config, color_service_global):
+    def __init__(self, config, device_config, color_service_global) -> None:
         self.logger = logging.getLogger(__name__)
 
         self.__config = config

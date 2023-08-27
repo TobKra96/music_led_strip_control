@@ -2,22 +2,25 @@
 #   Contains all configuration for the server.
 #   Load and save the config after every change.
 #
-from libs.config_converter.config_converter_service import ConfigConverterService  # pylint: disable=E0611, E0401
-from libs.config_converter.config_validator_service import ConfigValidatorService  # pylint: disable=E0611, E0401
+from __future__ import annotations
 
-from jsonschema.exceptions import ValidationError
-from logging.handlers import RotatingFileHandler
-from shutil import copyfile, copy
-from pathlib import Path
-import coloredlogs
-import logging
 import json
-import sys
+import logging
 import os
+import sys
+from logging.handlers import RotatingFileHandler
+from pathlib import Path
+from shutil import copy, copyfile
+
+import coloredlogs
+from jsonschema.exceptions import ValidationError
+
+from libs.config_converter.config_converter_service import ConfigConverterService  # pylint: disable=E0611, E0401
+from libs.webserver.schemas.config_validator_service import ConfigValidatorService  # pylint: disable=E0611, E0401
 
 
-class ConfigService():
-    def __init__(self, config_lock):
+class ConfigService:
+    def __init__(self: ConfigService, config_lock) -> None:
         self.config = None
 
         # Start with the default logging settings, because the config was not loaded.
@@ -78,7 +81,7 @@ class ConfigService():
         self.logger.debug("Settings loaded from config.")
 
     def save_config(self, config=None):
-        """Save the config file. Use the current self.config"""
+        """Save the config file. Use the current self.config."""
         self.logger.debug("Saving settings...")
 
         self.config_lock.acquire()
@@ -140,7 +143,7 @@ class ConfigService():
         loaded_config = config_converter_service.upgrade(loaded_config)
 
         # Loop through the root.
-        for key, value in template_config.items():
+        for key in template_config:
             if key == "device_configs":
                 continue
 
@@ -153,6 +156,8 @@ class ConfigService():
         self.check_devices(loaded_config["device_configs"], template_config["default_device"])
 
         self.config = loaded_config
+
+        # TODO: Figure out how to validate default groups.
 
         try:
             self.config_validator_service.validate_config(self.config)
@@ -220,7 +225,7 @@ class ConfigService():
 
         if logging_file_enabled:
             file_formatter = logging.Formatter(format_string_file)
-            rotating_file_handler = RotatingFileHandler(logging_path + logging_file, mode='a', maxBytes=5 * 1024 * 1024, backupCount=5, encoding='utf-8')
+            rotating_file_handler = RotatingFileHandler(logging_path + logging_file, mode="a", maxBytes=5 * 1024 * 1024, backupCount=5, encoding="utf-8")
             rotating_file_handler.setLevel(logging_level_file)
             rotating_file_handler.setFormatter(file_formatter)
             root_logger.addHandler(rotating_file_handler)
@@ -233,15 +238,14 @@ class ConfigService():
 
     @staticmethod
     def instance(config_lock, imported_instance=None):
-        """
-        Returns the current instance of the Config_Service.
+        """Returns the current instance of the Config_Service.
         Use this method and not the current_instance variable directly.
         This method will create the config if it's null.
         """
         if imported_instance is not None:
             ConfigService.current_instance = imported_instance
 
-        if not hasattr(ConfigService, 'current_instance'):
+        if not hasattr(ConfigService, "current_instance"):
             ConfigService.current_instance = ConfigService(config_lock)
 
         return ConfigService.current_instance

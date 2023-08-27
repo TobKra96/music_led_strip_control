@@ -1,0 +1,42 @@
+Return Random Cycle effect status
+---
+tags:
+  - Effect
+
+parameters:
+  - name: device
+    in: query
+    description: "Device ID whose Random Cycle effect status is to be returned.\n\n
+                  __Note:__ `all_devices` or other group IDs are not supported and will return `False`"
+    required: true
+    schema:
+      type: string
+    examples:
+      example1:
+        summary: device ID device_0
+        value: device_0
+
+responses:
+  200:
+    description: OK
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - device
+            - random_cycle_active
+          properties:
+            device:
+              type: string
+            random_cycle_active:
+              type: boolean
+        examples:
+          example1:
+            summary: Random Cycle effect status for a single device
+            value:
+              device: string
+              random_cycle_active: boolean
+
+  422:
+    description: Unprocessable Entity

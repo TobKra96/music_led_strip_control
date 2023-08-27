@@ -1,0 +1,99 @@
+Set active effect
+---
+tags:
+  - Effect
+
+requestBody:
+  description: "The `effect` which to set for the specified `device`\n\n
+                Remove `device` to apply effect to all devices"
+  required: true
+  content:
+    application/json:
+      schema:
+        oneOf:
+          - type: object
+            required:
+              - device
+              - effect
+            properties:
+              device:
+                type: string
+              effect:
+                type: string
+
+          - type: object
+            required:
+              - devices
+            properties:
+              devices:
+                type: array
+                items:
+                  type: object
+                  required:
+                    - device
+                    - effect
+                  properties:
+                    device:
+                      type: string
+                    effect:
+                      type: string
+
+          - type: object
+            required:
+              - effect
+            properties:
+              effect:
+                type: string
+
+      examples:
+        example1:
+          summary: Set for one device
+          value:
+            device: device_0
+            effect: effect_off
+        example2:
+          summary: Set for multiple devices
+          value:
+            devices:
+              - device: device_0
+                effect: effect_off
+        example3:
+          summary: Set for all devices
+          value:
+            effect: effect_off
+
+responses:
+  200:
+    description: OK
+    content:
+      application/json:
+        schema:
+          example:
+            device: string
+            effect: string
+          type: object
+        examples:
+          example1:
+            summary: With one device
+            value:
+              device: string
+              effect: string
+          example2:
+            summary: With multiple devices
+            value:
+              devices:
+                - device: string
+                  effect: string
+          example3:
+            summary: With all devices
+            value:
+              effect: string
+
+  404:
+    description: Not Found
+
+  409:
+    description: Conflict. Duplicate device specified
+
+  422:
+    description: Unprocessable Entity

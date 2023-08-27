@@ -1,240 +1,96 @@
-from libs.webserver.executer import Executer
-
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, jsonify, request
 from flask_login import login_required
-import copy
+from flask_openapi import swag_from
+from libs.webserver.executer import Executer
+from libs.webserver.executer_base import validate_schema
+from libs.webserver.messages import DeviceNotFound, DuplicateItem, UnprocessableEntity
+from libs.webserver.schemas.effect_api_schema import (
+    DEVICE_ACTIVE_EFFECT_SCHEMA,
+    DEVICE_CYCLE_STATUS_SCHEMA,
+    SET_ACTIVE_EFFECT_ALL_SCHEMA,
+    SET_ACTIVE_EFFECT_MULT_SCHEMA,
+    SET_ACTIVE_EFFECT_SCHEMA,
+)
 
-effect_api = Blueprint('effect_api', __name__)
+effect_api = Blueprint("effect_api", __name__)
 
 
-@effect_api.get('/api/effect/active')
+@effect_api.get("/api/effect/active")
 @login_required
+@swag_from("docs/effect_api/get_active_effect.yml")
 def get_active_effect():  # pylint: disable=E0211
-    """
-    Return active effect
-    ---
-    tags:
-      - Effect
-    parameters:
-      - description:
-          ID of `device` to return active effect from\n\n
-          Return active effects for all devices if not specified
-        name: device
-        in: query
-        required: false
-        schema:
-          type: string
-        examples:
-          example1:
-            value: device_0
-            summary: device ID
-    responses:
-      "200":
-        description: OK
-        content:
-          application/json:
-            schema:
-              example:
-                devices:
-                  - device: str
-                    effect: str
-              type: object
-            examples:
-              example1:
-                value:
-                  device: str
-                  effect: str
-                summary: With specified device
-              example2:
-                value:
-                  device: str
-                  effect: str/array
-                summary: With "all_devices" or another group as specified device
-              example3:
-                value:
-                  devices:
-                    - device: str
-                      effect: str
-                summary: Without specified device
-      "403":
-        description: Input data are wrong
-      "422":
-        description: Unprocessable Entity
-    """
-    if len(request.args) == 1:
-        # Retrieve the active effect for specific device.
-        data_in = request.args.to_dict()
-
-        if not Executer.instance.effect_executer.validate_data_in(data_in, ("device",)):
-            return "Input data are wrong.", 403
-
-        result = Executer.instance.effect_executer.get_active_effect(data_in["device"])
-
-        if result is None:
-            return "Unprocessable Entity.", 422
-
-        data_out = copy.deepcopy(data_in)
-        data_out["effect"] = result
-        return jsonify(data_out)
-
-    if not request.args:
-        # Retrieve the active effect for all devices.
-        result = Executer.instance.effect_executer.get_active_effects()
-
-        if result is None:
-            return "Unprocessable Entity.", 422
-
-        data_out = dict()
-        data_out["devices"] = result
-        return jsonify(data_out)
-
-    return "Input data are wrong.", 403
-
-
-@effect_api.post('/api/effect/active')
-@login_required
-def set_active_effect():  # pylint: disable=E0211
-    """
-    Set active effect
-    ---
-    tags:
-      - Effect
-    requestBody:
-      description:
-        The `effect` which to set for the specified `device`\n\n
-        Remove `device` to apply effect to all devices
-      content:
-        application/json:
-          schema:
-            type: string
-          examples:
-            example1:
-              value:
-                device: device_0
-                effect: effect_off
-              summary: Set for one device
-            example2:
-              value:
-                devices:
-                  - device: device_0
-                    effect: effect_off
-              summary: Set for multiple devices
-            example3:
-              value:
-                effect: effect_off
-              summary: Set for all devices
-      required: true
-    responses:
-      "200":
-        description: OK
-        content:
-          application/json:
-            schema:
-              example:
-                device: str
-                effect: str
-              type: object
-            examples:
-              example1:
-                value:
-                  device: str
-                  effect: str
-                summary: With one device
-              example2:
-                value:
-                  devices:
-                    - device: str
-                      effect: str
-                summary: With multiple devices
-              example3:
-                value:
-                  effect: str
-                summary: With all devices
-      "403":
-        description: Input data are wrong
-      "422":
-        description: Unprocessable Entity
-    """
-    data_in = request.get_json()
-    data_out = None
-    if data_in:
-        effect_dict = Executer.instance.general_executer.get_effects()
-        # Set effect for 1 device.
-        if all(key in data_in for key in ("device", "effect")):
-            if not Executer.instance.effect_executer.validate_data_in(data_in, ("device", "effect",)):
-                return "Input data are wrong.", 403
-
-            data_out = Executer.instance.effect_executer.set_active_effect(data_in["device"], data_in["effect"], effect_dict)
-
-        # Set effect for multiple devices.
-        elif "devices" in data_in:
-            if not Executer.instance.effect_executer.validate_data_in(data_in, ("devices",)):
-                return "Input data are wrong.", 403
-
-            data_out = Executer.instance.effect_executer.set_active_effect_for_multiple(data_in["devices"], effect_dict)
-
-        # Set effect for all devices.
-        elif "effect" in data_in:
-            if not Executer.instance.effect_executer.validate_data_in(data_in, ("effect",)):
-                return "Input data is wrong.", 403
-
-            data_out = Executer.instance.effect_executer.set_active_effect_for_all(data_in["effect"], effect_dict)
-
-        if data_out is None:
-            return "Unprocessable Entity.", 422
-
-        return jsonify(data_out)
-
-    return "Input data are wrong.", 403
-
-
-@effect_api.get('/api/effect/cycle-status')
-@login_required
-def get_cycle_status():  # pylint: disable=E0211
-    """
-    Return Random Cycle effect status
-    ---
-    tags:
-      - Effect
-    parameters:
-      - description:
-          ID of `device` to return Random Cycle effect status from\n\n
-          __Note:__ `all_devices` or other group IDs are not supported and will return `False`
-        name: device
-        in: query
-        required: true
-        schema:
-          type: string
-        examples:
-          example1:
-            value: device_0
-            summary: device ID
-    responses:
-      "200":
-        description: OK
-        content:
-          application/json:
-            schema:
-              example:
-                devices:
-                  - device: str
-                    random_cycle_active: bool
-              type: object
-      "403":
-        description: Input data are wrong
-      "422":
-        description: Unprocessable Entity
-    """
     data_in = request.args.to_dict()
 
-    if not Executer.instance.effect_executer.validate_data_in(data_in, ("device",)):
-        return "Input data are wrong.", 403
+    if set(data_in) == {"device"}:  # Get the active effect for a specific device.
 
-    result = Executer.instance.effect_executer.is_cycle_job_running(data_in["device"])
+        if not validate_schema(data_in, DEVICE_ACTIVE_EFFECT_SCHEMA):
+            return UnprocessableEntity.as_response()
 
-    if result is None:
-        return "Unprocessable Entity.", 422
+        data_out = Executer.instance.effect_executer.get_active_effect(data_in["device"])
 
-    data_out = copy.deepcopy(data_in)
-    data_out["random_cycle_active"] = result
+        if data_out is DeviceNotFound:
+            return DeviceNotFound.as_response()
+
+        return jsonify(data_out)
+
+    if not set(data_in):  # Get the active effects for all devices.
+        data_out = Executer.instance.effect_executer.get_active_effects()
+
+        return jsonify(data_out)
+
+    return UnprocessableEntity.as_response()
+
+
+@effect_api.post("/api/effect/active")
+@login_required
+@swag_from("docs/effect_api/set_active_effect.yml")
+def set_active_effect():  # pylint: disable=E0211
+    data_in = request.get_json()
+    data_out = {}
+
+    if set(data_in) == {"device", "effect"}:  # Set effect for one device.
+
+        if not validate_schema(data_in, SET_ACTIVE_EFFECT_SCHEMA):
+            return UnprocessableEntity.as_response()
+
+        data_out = Executer.instance.effect_executer.set_active_effect(data_in["device"], data_in["effect"])
+
+    elif set(data_in) == {"devices"}:  # Set effect for multiple devices.
+        if not validate_schema(data_in, SET_ACTIVE_EFFECT_MULT_SCHEMA):
+            return UnprocessableEntity.as_response()
+
+        data_out = Executer.instance.effect_executer.set_active_effect_for_multiple(data_in["devices"])
+
+    elif set(data_in) == {"effect"}:  # Set effect for all devices.
+        if not validate_schema(data_in, SET_ACTIVE_EFFECT_ALL_SCHEMA):
+            return UnprocessableEntity.as_response()
+
+        data_out = Executer.instance.effect_executer.set_active_effect_for_all(data_in["effect"])
+
+    else:
+        return UnprocessableEntity.as_response()
+
+    if data_out is DuplicateItem:
+        return DuplicateItem.as_response()
+
+    if data_out is DeviceNotFound:
+        return DeviceNotFound.as_response()
+
+    return jsonify(data_out)
+
+
+@effect_api.get("/api/effect/cycle-status")
+@login_required
+@swag_from("docs/effect_api/get_cycle_status.yml")
+def get_cycle_status():  # pylint: disable=E0211
+    data_in = request.args.to_dict()
+
+    if not validate_schema(data_in, DEVICE_CYCLE_STATUS_SCHEMA):
+        return UnprocessableEntity.as_response()
+
+    data_out = Executer.instance.effect_executer.is_cycle_job_running(data_in["device"])
+
+    if data_out is DeviceNotFound:
+        return DeviceNotFound.as_response()
+
     return jsonify(data_out)

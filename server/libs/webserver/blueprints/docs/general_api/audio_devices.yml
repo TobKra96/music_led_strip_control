@@ -1,0 +1,20 @@
+Return audio devices
+---
+tags:
+  - Resources
+
+responses:
+  200:
+    description: OK
+    content:
+      application/json:
+        schema:
+          type: object
+          description: Audio device ID
+          additionalProperties:
+            type: string
+            description: Audio device name
+
+        example:
+          1: string
+          2: string

@@ -1,3 +1,5 @@
+import logging
+
 from libs.webserver.blueprints.authentication_executer import AuthenticationExecuter
 from libs.webserver.blueprints.device_executer import DeviceExecuter
 from libs.webserver.blueprints.device_settings_executer import DeviceSettingsExecuter
@@ -5,14 +7,12 @@ from libs.webserver.blueprints.effect_executer import EffectExecuter
 from libs.webserver.blueprints.effect_settings_executer import EffectSettingsExecuter
 from libs.webserver.blueprints.general_executer import GeneralExecuter
 from libs.webserver.blueprints.general_settings_executer import GeneralSettingsExecuter
-from libs.webserver.blueprints.system_info_executer import SystemInfoExecuter
 from libs.webserver.blueprints.microphone_settings_executer import MicrophoneSettingsExecuter
+from libs.webserver.blueprints.system_info_executer import SystemInfoExecuter
 
-import logging
 
-
-class Executer():
-    def __init__(self, config_lock, notification_queue_in, notification_queue_out, effects_queue, py_audio):
+class Executer:
+    def __init__(self, config_lock, notification_queue_in, notification_queue_out, effects_queue, py_audio) -> None:
         self.logger = logging.getLogger(__name__)
 
         self.authentication_executer = AuthenticationExecuter(

@@ -1,7 +1,8 @@
-from libs.effects.effect import Effect  # pylint: disable=E0611, E0401
+import random
 
 import numpy as np
-import random
+
+from libs.effects.effect import Effect  # pylint: disable=E0611, E0401
 
 
 class EffectPower(Effect):
@@ -30,7 +31,7 @@ class EffectPower(Effect):
         # If the r array is smaller than the led_count, the r array will be filled with the last value.
         r_len_before_resize = len(r)
         missing_values = led_count - r_len_before_resize
-        r = np.pad(r, (0, missing_values), 'edge')
+        r = np.pad(r, (0, missing_values), "edge")
 
         output = np.array([self._color_service.full_gradients[effect_config["color_mode"]][0, :led_count] * r,
                            self._color_service.full_gradients[effect_config["color_mode"]][1, :led_count] * r,

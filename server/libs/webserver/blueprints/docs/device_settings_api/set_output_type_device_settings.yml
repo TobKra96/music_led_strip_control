@@ -1,0 +1,137 @@
+Set output-type settings for a device
+---
+tags:
+  - Settings
+
+requestBody:
+  description: |
+    The settings to set for a specified output type<br><br>
+    __Note:__ It is not required to include all keys inside `settings`<br><br>
+    View the table below for the allowed `settings` keys for each `output_type_key`:<br><br>
+    | Selected `output_type_key` | Allowed `settings` keys                                  |
+    | ---------------------------| ---------------------------------------------------------|
+    | *output_mqtt*              | *mqtt_broker, mqtt_path*                                 |
+    | *output_raspi*             | *led_channel, led_dma, led_freq_hz, led_invert, led_pin* |
+    | *output_udp*               | *udp_client_ip, udp_client_port*                         |
+  required: true
+  content:
+    application/json:
+      schema:
+        type: object
+        required:
+          - device
+          - output_type_key
+          - settings
+        properties:
+          device:
+            type: string
+            description: Device ID
+          output_type_key:
+            type: string
+            description: The name of the output type
+            enum:
+              - output_mqtt
+              - output_raspi
+              - output_udp
+          settings:
+            oneOf:
+              - type: object
+                properties:
+                  mqtt_broker:
+                    type: string
+                  mqtt_path:
+                    type: string
+
+              - type: object
+                properties:
+                  led_channel:
+                    type: integer
+                  led_dma:
+                    type: integer
+                  led_freq_hz:
+                    type: integer
+                  led_invert:
+                    type: boolean
+                  led_pin:
+                    type: integer
+
+              - type: object
+                properties:
+                  udp_client_ip:
+                    type: string
+                  udp_client_port:
+                    type: integer
+      examples:
+        example1:
+          summary: Default output_mqtt settings
+          value:
+            device: device_0
+            output_type_key: output_mqtt
+            settings:
+              mqtt_broker: localhost
+              mqtt_path: led/device_a
+
+        example2:
+          summary: Default output_raspi settings
+          value:
+            device: device_0
+            output_type_key: output_raspi
+            settings:
+              led_channel: 0
+              led_dma: 10
+              led_freq_hz: 800000
+              led_invert: false
+              led_pin: 18
+
+        example3:
+          summary: Default output_udp settings
+          value:
+            device: device_0
+            output_type_key: output_udp
+            settings:
+              udp_client_ip: 127.0.0.1
+              udp_client_port: 7777
+
+responses:
+  200:
+    description: OK
+    content:
+      application/json:
+        schema:
+          type: object
+        examples:
+          example1:
+            summary: With output_mqtt settings
+            value:
+              device: string
+              output_type_key: string
+              settings:
+                mqtt_broker: string
+                mqtt_path: string
+
+          example2:
+            summary: With output_raspi settings
+            value:
+              device: string
+              output_type_key: string
+              settings:
+                led_channel: integer
+                led_dma: integer
+                led_freq_hz: integer
+                led_invert: boolean
+                led_pin: integer
+
+          example3:
+            summary: With output_udp settings
+            value:
+              device: string
+              output_type_key: string
+              settings:
+                udp_client_ip: string
+                udp_client_port: string/integer
+
+  404:
+    description: Not Found
+
+  422:
+    description: Unprocessable Entity

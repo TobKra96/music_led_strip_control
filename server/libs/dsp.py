@@ -1,10 +1,11 @@
-from scipy.ndimage import gaussian_filter1d
 from math import log
+
 import numpy as np
+from scipy.ndimage import gaussian_filter1d
 
 
-class DSP():
-    def __init__(self, config, device_config=None):
+class DSP:
+    def __init__(self, config, device_config=None) -> None:
         self._config = config
         self._device_config = device_config
 
@@ -14,10 +15,7 @@ class DSP():
         frames_per_buffer = self._config["general_settings"]["frames_per_buffer"]
         n_rolling_history = self._config["general_settings"]["n_rolling_history"]
 
-        if device_config is None:
-            led_count = 200
-        else:
-            led_count = self._device_config["led_count"]
+        led_count = 200 if device_config is None else self._device_config["led_count"]
 
         self.fft_plot_filter = ExpFilter(np.tile(1e-1, n_fft_bins), alpha_decay=0.5, alpha_rise=0.99)
         self.mel_gain = ExpFilter(np.tile(1e-1, n_fft_bins), alpha_decay=0.01, alpha_rise=0.99)
@@ -44,11 +42,12 @@ class DSP():
         self.create_mel_bank()
 
     def update(self, audio_samples):
-        """
-        Return processed audio data.
+        """Return processed audio data.
+
         Returns mel curve, x/y data.
         This method is called every time there is a microphone update.
-        Returns:
+
+        Returns
         -------
         audio_data: dict
             Dict containing "mel", "vol", "x", and "y".
@@ -69,7 +68,7 @@ class DSP():
         N_zeros = 2**int(np.ceil(np.log2(N))) - N
         # Pad with zeros until the next power of two.
         y_data *= self.fft_window
-        y_padded = np.pad(y_data, (0, N_zeros), mode='constant')
+        y_padded = np.pad(y_data, (0, N_zeros), mode="constant")
         YS = np.abs(np.fft.rfft(y_padded))
         # Construct a Mel filterbank from the FFT data.
         mel = np.atleast_2d(YS).T * self.mel_y.T
@@ -124,12 +123,13 @@ class DSP():
         )
 
 
-class ExpFilter():
+class ExpFilter:
     """Simple exponential smoothing filter."""
-    def __init__(self, val=0.0, alpha_decay=0.5, alpha_rise=0.5):
+
+    def __init__(self, val=0.0, alpha_decay=0.5, alpha_rise=0.5) -> None:
         """Small rise/decay factors = more smoothing."""
-        assert 0.0 < alpha_decay < 1.0, 'Invalid decay smoothing factor.'
-        assert 0.0 < alpha_rise < 1.0, 'Invalid rise smoothing factor.'
+        assert 0.0 < alpha_decay < 1.0, "Invalid decay smoothing factor."  # noqa: S101
+        assert 0.0 < alpha_rise < 1.0, "Invalid rise smoothing factor."  # noqa: S101
         self.alpha_decay = alpha_decay
         self.alpha_rise = alpha_rise
         self.value = val
@@ -145,8 +145,9 @@ class ExpFilter():
         return self.value
 
 
-class Melbank():
-    """This class implements a Mel Filter Bank.
+class Melbank:
+    """Implement a Mel Filter Bank.
+
     In other words it is a filter bank with triangular shaped bands
     arranged on the mel frequency scale.
     An example is shown in the following figure:
@@ -175,29 +176,32 @@ class Melbank():
         plt.title('Mel Matrix')
         plt.tight_layout()
     Functions
-    ---------
+    ---------.
     """
+
     def hertz_to_mel(self, freq):
-        """
-        Returns mel-frequency from linear frequency input.
+        """Return mel-frequency from linear frequency input.
+
         Parameter
         ---------
         freq : scalar or ndarray
             Frequency value or array in Hz.
+
         Returns
         -------
         mel : scalar or ndarray
-            Mel-frequency value or ndarray in Mel
+            Mel-frequency value or ndarray in Mel.
         """
         return 3340.0 * log(1 + (freq / 250.0), 9)
 
     def mel_to_hertz(self, mel):
-        """
-        Returns frequency from mel-frequency input.
+        """Return frequency from mel-frequency input.
+
         Parameter
         ---------
         mel : scalar or ndarray
             Mel-frequency value or ndarray in Mel
+
         Returns
         -------
         freq : scalar or ndarray
@@ -207,8 +211,8 @@ class Melbank():
         return 250.0 * (9**(mel / 3340.0)) - 250.0
 
     def melfrequencies_mel_filterbank(self, num_bands, freq_min, freq_max, num_fft_bands):
-        """
-        Returns centerfrequencies and band edges for a mel filter bank
+        """Return centerfrequencies and band edges for a mel filter bank.
+
         Parameters
         ----------
         num_bands : int
@@ -219,13 +223,13 @@ class Melbank():
             Maximum frequency for the last band.
         num_fft_bands : int
             Number of fft bands.
+
         Returns
         -------
         center_frequencies_mel : ndarray
         lower_edges_mel : ndarray
-        upper_edges_mel : ndarray
+        upper_edges_mel : ndarray.
         """
-
         mel_max = self.hertz_to_mel(freq_max)
         mel_min = self.hertz_to_mel(freq_min)
         delta_mel = np.abs(mel_max - mel_min) / (num_bands + 1.0)
@@ -237,8 +241,8 @@ class Melbank():
 
     def compute_melmat(self, num_mel_bands=12, freq_min=64, freq_max=8000,
                        num_fft_bands=513, sample_rate=16000):
-        """
-        Returns tranformation matrix for mel spectrum.
+        """Return tranformation matrix for mel spectrum.
+
         Parameters
         ----------
         num_mel_bands : int
@@ -257,6 +261,7 @@ class Melbank():
         sample_rate : scalar
             Sample rate for the signals that will be used.
             Default: 44100
+
         Returns
         -------
         melmat : ndarray

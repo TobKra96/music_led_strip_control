@@ -1,19 +1,20 @@
-from libs.effects.effect import Effect  # pylint: disable=E0611, E0401
+import random
 
 import numpy as np
-import random
+
+from libs.effects.effect import Effect  # pylint: disable=E0611, E0401
 
 
 class EffectBeat(Effect):
 
-    def __init__(self, device):
+    def __init__(self, device) -> None:
         # Call the constructor of the base class.
         super().__init__(device)
         # Setup for "EffectBeat" (don't change this).
         self.gradient_position = 0
 
     def run(self):
-        """Effect that flashes to the beat"""
+        """Effect that flashes to the beat."""
         effect_config = self.get_effect_config("effect_beat")
         led_count = self._device.device_config["led_count"]
         current_gradient = effect_config["gradient"]

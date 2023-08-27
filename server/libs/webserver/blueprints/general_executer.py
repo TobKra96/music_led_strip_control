@@ -1,58 +1,45 @@
-from libs.webserver.executer_base import ExecuterBase, handle_config_errors
-from libs.effects_enum import EffectsEnum, EffectNames  # pylint: disable=E0611, E0401
+from __future__ import annotations
+
 from libs.audio_info import AudioInfo  # pylint: disable=E0611, E0401
+from libs.effects_enum import EffectNames, EffectsEnum  # pylint: disable=E0611, E0401
+from libs.webserver.executer_base import ExecuterBase
 
 
 class GeneralExecuter(ExecuterBase):
 
-    @handle_config_errors
-    def get_colors(self):
-        colors = dict()
-        for colorID in self._config["colors"]:
-            colors[colorID] = colorID
-        return colors
+    def get_colors(self) -> dict[str, str]:
+        """Return colors."""
+        return {key: key for key in self._config["colors"]}
 
-    @handle_config_errors
-    def get_gradients(self):
-        gradients = dict()
-        for gradientID in self._config["gradients"]:
-            gradients[gradientID] = gradientID
-        return gradients
+    def get_gradients(self) -> dict[str, str]:
+        """Return gradients."""
+        return {key: key for key in self._config["gradients"]}
 
-    @handle_config_errors
-    def get_led_strips(self):
-        led_strips = dict()
-        for led_strip_ID in self._config["led_strips"]:
-            led_strips[led_strip_ID] = self._config["led_strips"][led_strip_ID]
-        return led_strips
+    def get_led_strips(self) -> dict[str, str]:
+        """Return LED strips."""
+        return dict(self._config["led_strips"])
 
-    @handle_config_errors
-    def get_logging_levels(self):
-        logging_levels = dict()
-        for logging_level_ID in self._config["logging_levels"]:
-            logging_levels[logging_level_ID] = self._config["logging_levels"][logging_level_ID]
-        return logging_levels
+    def get_logging_levels(self) -> dict[str, str]:
+        """Return logging levels."""
+        return dict(self._config["logging_levels"])
 
-    @handle_config_errors
-    def get_audio_devices(self):
-        audio_devices_dict = dict()
+    def get_audio_devices(self) -> dict:
+        """Return audio devices."""
         audio_devices = AudioInfo.get_audio_devices(self._py_audio)
-        for current_audio_device in audio_devices:
-            audio_devices_dict[current_audio_device.device_id] = current_audio_device.to_string()
-        return audio_devices_dict
+        return {value.device_id: value.to_string() for value in audio_devices}
 
-    @handle_config_errors
-    def get_output_types(self):
-        output_types = dict()
-        output_types["output_raspi"] = "Output Raspberry Pi"
-        output_types["output_udp"] = "Output Network via UDP"
-        return output_types
+    def get_output_types(self) -> dict[str, str]:
+        """Return output types."""
+        return {
+            "output_raspi": "Output Raspberry Pi",
+            "output_udp": "Output Network via UDP"
+        }
 
-    @handle_config_errors
-    def get_effects(self):
-        effects = dict()
-        effects["non_music"] = EffectNames.non_music
-        effects["music"] = EffectNames.music
-        effects["special"] = EffectNames.special
-        effects["order"] = {effect.name: index for index, effect in enumerate(EffectsEnum, 1)}
-        return effects
+    def get_effects(self) -> dict[str, dict]:
+        """Return effects."""
+        return {
+            "non_music": EffectNames.non_music,
+            "music": EffectNames.music,
+            "special": EffectNames.special,
+            "order": {effect.name: index for index, effect in enumerate(EffectsEnum, 1)}
+        }

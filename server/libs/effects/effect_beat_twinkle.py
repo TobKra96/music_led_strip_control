@@ -1,17 +1,18 @@
-from libs.effects.effect import Effect  # pylint: disable=E0611, E0401
+import random
 
 import numpy as np
-import random
+
+from libs.effects.effect import Effect  # pylint: disable=E0611, E0401
 
 
 class EffectBeatTwinkle(Effect):
-    def __init__(self, device):
+    def __init__(self, device) -> None:
         # Call the constructor of the base class.
         super().__init__(device)
         self.gradient_position = 0
 
     def run(self):
-        """Effect that flashes parts of strip to the beat"""
+        """Effect that flashes parts of strip to the beat."""
         effect_config = self.get_effect_config("effect_beat_twinkle")
         led_count = self._device.device_config["led_count"]
         current_gradient = effect_config["gradient"]
@@ -39,11 +40,11 @@ class EffectBeatTwinkle(Effect):
 
         if self.current_freq_detects["beat"]:
 
-            endIndex = led_count - star_length
-            if endIndex <= 0:
-                endIndex = led_count
+            end_index = led_count - star_length
+            if end_index <= 0:
+                end_index = led_count
 
-            star_start_index = random.randrange(0, endIndex, 1)
+            star_start_index = random.randrange(0, end_index, 1)
             color = [0, 0, 0]
 
             if colorful_mode:

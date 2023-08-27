@@ -1,10 +1,11 @@
-from scipy.ndimage import gaussian_filter1d
-import numpy as np
 import logging
 
+import numpy as np
+from scipy.ndimage import gaussian_filter1d
 
-class ColorService():
-    def __init__(self, config, device_config):
+
+class ColorService:
+    def __init__(self, config, device_config) -> None:
         self.logger = logging.getLogger(__name__)
 
         self._config = config
@@ -17,7 +18,7 @@ class ColorService():
     def build_gradients(self):
         self.full_gradients = {}
 
-        for key in self._config["gradients"].keys():
+        for key in self._config["gradients"]:
             not_mirrored_gradient = self._easing_gradient_generator(
                 self._config["gradients"][key],  # All colors of the current gradient.
                 self._device_config["led_count"]
@@ -49,10 +50,10 @@ class ColorService():
             )
 
     def _easing_gradient_generator(self, colors, length):
-        """
-        returns np.array of given length that eases between specified colors
+        """Return np.array of given length that eases between specified colors.
 
-        parameters:
+        Parameters
+        ----------
         colors - list, colors must be in self.config.colour_manager["colors"]
             eg. ["red", "orange", "blue", "purple"]
         length - int, length of array to return. should be from self.config.settings
@@ -99,8 +100,8 @@ class ColorService():
         return output
 
     def colour(self, colour):
-        """
-        Returns the values of a given color.
+        """Return the values of a given color.
+
         Use this function to get color values.
         """
         if colour in self._config["colors"]:
@@ -116,17 +117,17 @@ class ColorService():
         for gradient in self._config["gradients"]:
             for color in self._config["gradients"][gradient]:
                 # Fill the whole strip with the color.
-                currentColorArray = np.array([
+                current_color_array = np.array([
                     [color[0] for i in range(led_count)],
                     [color[1] for i in range(led_count)],
                     [color[2] for i in range(led_count)]
                 ])
 
                 if gradient not in self.full_slide:
-                    self.full_slide[gradient] = currentColorArray
+                    self.full_slide[gradient] = current_color_array
 
                 else:
-                    self.full_slide[gradient] = np.concatenate((self.full_slide[gradient], currentColorArray), axis=1)
+                    self.full_slide[gradient] = np.concatenate((self.full_slide[gradient], current_color_array), axis=1)
 
     def build_bubblearrays(self):
         led_count = self._device_config["led_count"]
@@ -149,7 +150,7 @@ class ColorService():
 
                 for current_bubble_repeat in range(repeat_count):
 
-                    #             Find the right spot in the array for the repetition.                     Find the right spot in the repetition for the color.
+                    #             Find the right spot in the array for the repetition.                  Find the right spot in the repetition for the color.
                     start_index = int((current_bubble_repeat * gradient_color_count * steps_between_bubbles) + (current_color * steps_between_bubbles))
                     end_index = int(start_index + effect_config["bubble_length"])
 

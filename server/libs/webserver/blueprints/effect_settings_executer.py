@@ -1,70 +1,99 @@
-from libs.webserver.executer_base import ExecuterBase, handle_config_errors
+from __future__ import annotations
+
+from libs.webserver.executer_base import ExecuterBase
+from libs.webserver.messages import BadRequest, DeviceNotFound, NotFound, SettingNotFound
 
 
 class EffectSettingsExecuter(ExecuterBase):
 
     # TODO: Fix returning "all_devices" instead of actual device ID.
 
-    # Return setting_value.
-    @handle_config_errors
-    def get_effect_setting(self, device, effect, setting_key):
-        selected_device = device
-        if device == self.all_devices_id:
-            selected_device = next(iter(self._config["device_configs"]))
+    def get_effect_setting(self, device: str, effect: str, setting_key: str) -> dict | DeviceNotFound | SettingNotFound:
+        """Return the value of a setting for an effect."""
+        # TODO: Get the effect setting for groups.
+        # selected_device = device
+        # if device == self.all_devices_id:
+        #     selected_device = next(iter(self._config["device_configs"]))
 
-        # print(selected_device)
-        return self._config["device_configs"][selected_device]["effects"][effect][setting_key]
+        if device not in self._config["device_configs"]:
+            return DeviceNotFound
 
-    @handle_config_errors
-    def get_effect_settings(self, device, effect):
-        settings = dict()
-        selected_device = device
+        if setting_key not in self._config["device_configs"][device]["effects"][effect]:
+            return SettingNotFound
 
-        self.logger.debug(f"Get effect settings of {device}, Effect: {effect}")
+        return {
+            "device": device,
+            "effect": effect,
+            "setting_key": setting_key,
+            "setting_value": self._config["device_configs"][device]["effects"][effect][setting_key]
+        }
 
-        if device == self.all_devices_id:
-            selected_device = next(iter(self._config["device_configs"]))
-            self.logger.debug(f"Get effect settings of {selected_device}")
+    def get_effect_settings(self, device: str, effect: str) -> dict | DeviceNotFound:
+        """Return all settings for an effect."""
+        # settings = dict()
+        # selected_device = device
 
-        for effect_setting_key in self._config["device_configs"][selected_device]["effects"][effect]:
-            settings[effect_setting_key] = self._config["device_configs"][selected_device]["effects"][effect][effect_setting_key]
+        # if device == self.all_devices_id:
+        #     selected_device = next(iter(self._config["device_configs"]))
 
-        self.logger.debug(f"Settings: {settings}")
+        # for effect_setting_key in self._config["device_configs"][selected_device]["effects"][effect]:
+        #     settings[effect_setting_key] = self._config["device_configs"][selected_device]["effects"][effect][effect_setting_key]
 
-        # result = {
-        #     "device": selected_device,
-        #     "effect": effect,
-        #     "settings": settings
-        # }
+        if device not in self._config["device_configs"]:
+            return DeviceNotFound
 
-        return settings
+        return {
+            "device": device,
+            "effect": effect,
+            "settings": self._config["device_configs"][device]["effects"][effect]
+        }
 
-    def set_effect_setting(self, device, effect, settings):
-        if device == self.all_devices_id:
-            return self.set_effect_setting_for_all(effect, settings)
+    def set_effect_settings(self, device: str, effect: str, settings: dict) -> dict | NotFound | BadRequest:
+        """Set effect settings for a device."""
+        # if device == self.all_devices_id:
+        #     return self.set_effect_setting_for_all(effect, settings)
+
+        if not settings:
+            return BadRequest  # Don't let an empty dict through.
+
+        if device not in self._config["device_configs"] or effect not in self._config["device_configs"][device]["effects"]:
+            return NotFound
 
         for setting_key, setting_value in settings.items():
+            if setting_key not in self._config["device_configs"][device]["effects"][effect]:
+                return NotFound
             self._config["device_configs"][device]["effects"][effect][setting_key] = setting_value
         self.update_cycle_job(device, effect)
 
         self.save_config()
         self.refresh_device(device)
-        return self._config["device_configs"]
+        return {
+            "device": device,
+            "effect": effect,
+            "settings": settings
+        }
 
-    def set_effect_setting_for_all(self, effect, settings):
-        for device_key in self._config["device_configs"]:
+    def set_effect_settings_for_all(self, effect: str, settings: dict) -> dict | NotFound | BadRequest:
+        """Set effect settings for all devices."""
+        if not settings:
+            return BadRequest  # Don't let an empty dict through.
+
+        for device in self._config["device_configs"]:
             for setting_key, setting_value in settings.items():
-                self._config["device_configs"][device_key]["effects"][effect][setting_key] = setting_value
-            self.update_cycle_job(device_key, effect)
+                if setting_key not in self._config["device_configs"][device]["effects"][effect]:
+                    return NotFound
+                self._config["device_configs"][device]["effects"][effect][setting_key] = setting_value
+            self.update_cycle_job(device, effect)
 
         self.save_config()
         self.refresh_device(self.all_devices_id)
-        return self._config["device_configs"]
+        return {
+            "effect": effect,
+            "settings": settings
+        }
 
-    def update_cycle_job(self, device, effect):
-        """
-        Change the Random Cycle Effect job interval on save.
-        """
+    def update_cycle_job(self, device: str, effect: str) -> None:
+        """Change the Random Cycle Effect job interval on save."""
         if effect != "effect_random_cycle":
             return
 

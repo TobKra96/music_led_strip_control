@@ -1,11 +1,11 @@
-from libs.effects.effect import Effect  # pylint: disable=E0611, E0401
-
 import numpy as np
+
+from libs.effects.effect import Effect  # pylint: disable=E0611, E0401
 
 
 class EffectRods(Effect):
 
-    def __init__(self, device):
+    def __init__(self, device) -> None:
 
         # Call the constructor of the base class.
         super().__init__(device)

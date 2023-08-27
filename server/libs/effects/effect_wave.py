@@ -1,11 +1,11 @@
-from libs.effects.effect import Effect  # pylint: disable=E0611, E0401
-
 import numpy as np
+
+from libs.effects.effect import Effect  # pylint: disable=E0611, E0401
 
 
 class EffectWave(Effect):
     def run(self):
-        """Effect that flashes to the beat with scrolling coloured bits"""
+        """Effect that flashes to the beat with scrolling coloured bits."""
         effect_config = self.get_effect_config("effect_wave")
         led_count = self._device.device_config["led_count"]
 

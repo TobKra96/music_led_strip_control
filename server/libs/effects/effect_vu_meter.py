@@ -1,10 +1,10 @@
-from libs.effects.effect import Effect  # pylint: disable=E0611, E0401
-
 import numpy as np
+
+from libs.effects.effect import Effect  # pylint: disable=E0611, E0401
 
 
 class EffectVuMeter(Effect):
-    def __init__(self, device):
+    def __init__(self, device) -> None:
 
         # Call the constructor of the base class.
         super().__init__(device)
@@ -14,7 +14,7 @@ class EffectVuMeter(Effect):
         self.vol_history = np.zeros(300)
 
     def run(self):
-        """Effect that lights up more leds when volume gets higher"""
+        """Effect that lights up more leds when volume gets higher."""
         effect_config = self.get_effect_config("effect_vu_meter")
         led_count = self._device.device_config["led_count"]
 
@@ -61,12 +61,12 @@ class EffectVuMeter(Effect):
 
         self.prev_output = output
 
-    def set_vol_history(self, currentVol):
+    def set_vol_history(self, current_vol):
         # Roll the history for one.
         self.vol_history = np.roll(self.vol_history, 1, axis=0)
         # Add the new value.
-        self.vol_history[0] = currentVol
+        self.vol_history[0] = current_vol
 
-    def get_normalized_vol(self, currentVol):
-        normalized_vol = (currentVol - np.min(self.vol_history)) / (np.max(self.vol_history) - np.min(self.vol_history))
+    def get_normalized_vol(self, current_vol):
+        normalized_vol = (current_vol - np.min(self.vol_history)) / (np.max(self.vol_history) - np.min(self.vol_history))
         return normalized_vol

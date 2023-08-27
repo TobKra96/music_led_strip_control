@@ -1,0 +1,38 @@
+Raspberry Pi temperature
+---
+tags:
+  - System
+
+responses:
+  200:
+    description: OK
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - system
+          properties:
+            system:
+              type: object
+              required:
+                - raspi
+              properties:
+                raspi:
+                  type: object
+                  required:
+                    - celsius
+                    - fahrenheit
+                  properties:
+                    celsius:
+                      type: number
+                      description: Temperature in Celsius
+                    fahrenheit:
+                      type: number
+                      description: Temperature in Fahrenheit
+
+        example:
+          system:
+            raspi:
+              celsius: number
+              fahrenheit: number

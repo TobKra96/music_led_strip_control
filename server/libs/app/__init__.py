@@ -1,33 +1,48 @@
-
-"""
-Copyright (c) 2019 - present AppSeed.us
-"""
-
-from flask import Flask, render_template
 from importlib import import_module
 
+from flask import Flask, render_template, request
+from werkzeug.exceptions import HTTPException
 
-def register_blueprints(app):
-    for module_name in ('base', 'home'):
-        module = import_module('libs.app.{}.routes'.format(module_name))
+from libs.webserver.messages import BadRequest, MethodNotAllowed, NotFound, ServerError
+
+
+def bad_request(_: HTTPException) -> tuple:
+    return BadRequest.as_response()
+
+
+def not_found(e: HTTPException) -> tuple:
+    if request.path.startswith("/api/"):
+        return NotFound.as_response()
+    return render_template("home/error.html", code=e.code, message="Page not found"), e.code
+
+
+def method_not_allowed(e: HTTPException) -> tuple:
+    if request.path.startswith("/api/"):
+        return MethodNotAllowed.as_response()
+    return render_template("home/error.html", code=e.code, message="Method not allowed"), e.code
+
+
+def server_error(e: HTTPException) -> tuple:
+    if request.path.startswith("/api/"):
+        return ServerError.as_response()
+    return render_template("home/error.html", code=e.code, message="Server error"), e.code
+
+
+def register_blueprints(app: Flask) -> None:
+    for module_name in ["home"]:
+        module = import_module(f"libs.app.{module_name}.routes")
         app.register_blueprint(module.blueprint)
 
 
-def page_not_found(_):
-    return render_template('page-404.html'), 404
-
-
-def server_error(_):
-    return render_template('page-500.html'), 500
-
-
-def register_errors(app):
-    app.register_error_handler(404, page_not_found)
+def register_errors(app: Flask) -> None:
+    app.register_error_handler(400, bad_request)
+    app.register_error_handler(404, not_found)
+    app.register_error_handler(405, method_not_allowed)
     app.register_error_handler(500, server_error)
 
 
-def create_app():
-    app = Flask(__name__, static_folder='base/static')
+def create_app() -> Flask:
+    app = Flask(__name__, static_folder="static")
     register_blueprints(app)
     register_errors(app)
     return app

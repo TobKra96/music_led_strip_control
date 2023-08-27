@@ -1,16 +1,18 @@
-from libs.notification_enum import NotificationEnum  # pylint: disable=E0611, E0401
-from libs.outputs.output_raspi import OutputRaspi  # pylint: disable=E0611, E0401
-from libs.outputs.output_dummy import OutputDummy  # pylint: disable=E0611, E0401
-from libs.outputs.output_udp import OutputUDP  # pylint: disable=E0611, E0401
-from libs.output_enum import OutputsEnum  # pylint: disable=E0611, E0401
-from libs.fps_limiter import FPSLimiter  # pylint: disable=E0611, E0401
-
-from time import time
-import numpy as np
 import logging
+import sys
+from time import time
+
+import numpy as np
+
+from libs.fps_limiter import FPSLimiter  # pylint: disable=E0611, E0401
+from libs.notification_enum import NotificationEnum  # pylint: disable=E0611, E0401
+from libs.output_enum import OutputsEnum  # pylint: disable=E0611, E0401
+from libs.outputs.output_dummy import OutputDummy  # pylint: disable=E0611, E0401
+from libs.outputs.output_raspi import OutputRaspi  # pylint: disable=E0611, E0401
+from libs.outputs.output_udp import OutputUDP  # pylint: disable=E0611, E0401
 
 
-class OutputService():
+class OutputService:
     def start(self, device):
         self.logger = logging.getLogger(__name__)
 
@@ -51,11 +53,11 @@ class OutputService():
         self.logger.debug(
             f'Output component started. Device: {self._device.device_config["device_name"]}')
 
-        while not self._cancel_token:
-            try:
+        try:
+            while not self._cancel_token:
                 self.output_routine()
-            except KeyboardInterrupt:
-                break
+        except KeyboardInterrupt:
+            sys.exit()
 
     def output_routine(self):
         # Limit the fps to decrease lags caused by 100 percent CPU.

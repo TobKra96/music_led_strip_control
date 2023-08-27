@@ -1,15 +1,16 @@
-from libs.color_service import ColorService  # pylint: disable=E0611, E0401
-from libs.math_service import MathService  # pylint: disable=E0611, E0401
-from libs.dsp import DSP  # pylint: disable=E0611, E0401
-
 from collections import deque
 from time import time
+
 import numpy as np
+
+from libs.color_service import ColorService  # pylint: disable=E0611, E0401
+from libs.dsp import DSP  # pylint: disable=E0611, E0401
+from libs.math_service import MathService  # pylint: disable=E0611, E0401
 
 
 class Effect:
 
-    def __init__(self, device):
+    def __init__(self, device) -> None:
         self._device = device
 
         # Initial config load.
@@ -101,9 +102,10 @@ class Effect:
             self.freq_channels[i].appendleft(y[i])
 
     def detect_freqs(self):
-        """
-        Function that updates current_freq_detects. Any visualisation algorithm can check if
-        there is currently a beat, low, mid, or high by querying the self.current_freq_detects dict.
+        """Update current_freq_detects.
+
+        Any visualisation algorithm can check if there is currently a beat,
+        low, mid, or high by querying the self.current_freq_detects dict.
         """
         n_fft_bins = self._config["general_settings"]["n_fft_bins"]
         channel_avgs = []
@@ -129,8 +131,8 @@ class Effect:
                 self.current_freq_detects[i] = False
 
     def get_roll_steps(self, current_speed):
-        """
-        Calculate the steps for the rollspeed.
+        """Calculate the steps for the rollspeed.
+
         Up to 1 you can adjust the speed very fine. After this, you need to add decades to increase the speed.
         """
         max_counter = 1
@@ -161,13 +163,13 @@ class Effect:
     def get_mel(self, audio_data):
 
         # Audio Data is empty.
-        if(audio_data is None):
+        if (audio_data is None):
             return None
 
         audio_mel = audio_data["mel"]
 
         # mel is empty.
-        if(audio_mel is None):
+        if (audio_mel is None):
             return None
 
         return audio_mel
@@ -175,13 +177,13 @@ class Effect:
     def get_vol(self, audio_data):
 
         # Audio Data is empty.
-        if(audio_data is None):
+        if (audio_data is None):
             return None
 
         audio_vol = audio_data["vol"]
 
         # vol is empty.
-        if(audio_vol is None):
+        if (audio_vol is None):
             return None
 
         return audio_vol

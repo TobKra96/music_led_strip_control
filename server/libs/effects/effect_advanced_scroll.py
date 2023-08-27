@@ -1,11 +1,11 @@
-from libs.effects.effect import Effect  # pylint: disable=E0611, E0401
-
-from scipy.ndimage import gaussian_filter1d
 import numpy as np
+from scipy.ndimage import gaussian_filter1d
+
+from libs.effects.effect import Effect  # pylint: disable=E0611, E0401
 
 
 class EffectAdvancedScroll(Effect):
-    def __init__(self, device):
+    def __init__(self, device) -> None:
         # Call the constructor of the base class.
         super().__init__(device)
 
@@ -74,7 +74,7 @@ class EffectAdvancedScroll(Effect):
         presence_steps = effect_config["presence_speed"]
         brilliance_steps = effect_config["brilliance_speed"]
 
-        if(subbass_steps > 0):
+        if (subbass_steps > 0):
             self.output_scroll_subbass[:, subbass_steps:] = self.output_scroll_subbass[:, :-subbass_steps]
 
             # Create new color originating at the center.
@@ -82,7 +82,7 @@ class EffectAdvancedScroll(Effect):
             self.output_scroll_subbass[1, :subbass_steps] = subbass_val[1]
             self.output_scroll_subbass[2, :subbass_steps] = subbass_val[2]
 
-        if(bass_steps > 0):
+        if (bass_steps > 0):
             self.output_scroll_bass[:, bass_steps:] = self.output_scroll_bass[:, :-bass_steps]
 
             # Create new color originating at the center.
@@ -90,7 +90,7 @@ class EffectAdvancedScroll(Effect):
             self.output_scroll_bass[1, :bass_steps] = bass_val[1]
             self.output_scroll_bass[2, :bass_steps] = bass_val[2]
 
-        if(lowmid_steps > 0):
+        if (lowmid_steps > 0):
             self.output_scroll_lowmid[:, lowmid_steps:] = self.output_scroll_lowmid[:, :-lowmid_steps]
 
             # Create new color originating at the center.
@@ -98,7 +98,7 @@ class EffectAdvancedScroll(Effect):
             self.output_scroll_lowmid[1, :lowmid_steps] = lowmid_val[1]
             self.output_scroll_lowmid[2, :lowmid_steps] = lowmid_val[2]
 
-        if(mid_steps > 0):
+        if (mid_steps > 0):
             self.output_scroll_mid[:, mid_steps:] = self.output_scroll_mid[:, :-mid_steps]
 
             # Create new color originating at the center.
@@ -106,7 +106,7 @@ class EffectAdvancedScroll(Effect):
             self.output_scroll_mid[1, :mid_steps] = mid_val[1]
             self.output_scroll_mid[2, :mid_steps] = mid_val[2]
 
-        if(uppermid_steps > 0):
+        if (uppermid_steps > 0):
             self.output_scroll_uppermid[:, uppermid_steps:] = self.output_scroll_uppermid[:, :-uppermid_steps]
 
             # Create new color originating at the center.
@@ -114,7 +114,7 @@ class EffectAdvancedScroll(Effect):
             self.output_scroll_uppermid[1, :uppermid_steps] = uppermid_val[1]
             self.output_scroll_uppermid[2, :uppermid_steps] = uppermid_val[2]
 
-        if(presence_steps > 0):
+        if (presence_steps > 0):
             self.output_scroll_presence[:, presence_steps:] = self.output_scroll_presence[:, :-presence_steps]
 
             # Create new color originating at the center.
@@ -122,7 +122,7 @@ class EffectAdvancedScroll(Effect):
             self.output_scroll_presence[1, :presence_steps] = presence_val[1]
             self.output_scroll_presence[2, :presence_steps] = presence_val[2]
 
-        if(brilliance_steps > 0):
+        if (brilliance_steps > 0):
             self.output_scroll_brilliance[:, brilliance_steps:] = self.output_scroll_brilliance[:, :-brilliance_steps]
 
             # Create new color originating at the center.

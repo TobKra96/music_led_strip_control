@@ -4,32 +4,31 @@
 # The program will start here.
 # This file will only initialize and start the processes.
 
-from sys import version_info, platform
 import sys
+from sys import platform, version_info
 
 if version_info < (3, 8):
     sys.exit("\033[91mError: MLSC requires Python 3.8 or greater.")
 
+import logging
+import subprocess
+from multiprocessing import Lock, Process, Queue
+from time import sleep
+
+import pyaudio
 from libs.audio_process_service import AudioProcessService
+from libs.config_service import ConfigService
+from libs.device_manager import DeviceManager
 from libs.notification_service import NotificationService
 from libs.webserver.webserver import Webserver
-from libs.device_manager import DeviceManager
-from libs.config_service import ConfigService
 
-from multiprocessing import Process, Queue, Lock
-from time import sleep
-import subprocess
-import pyaudio
-import logging
 if platform == "linux":
     import fcntl
 import os
 
 
 def instance_already_running():
-    """
-    Detect if an an instance is already running, globally
-    at the operating system level.
+    """Detect if an an instance is already running, globally at the operating system level.
 
     Using `os.open` ensures that the file pointer won't be closed
     by Python's garbage collector after the function's scope is exited.
@@ -37,7 +36,6 @@ def instance_already_running():
     The lock will be released when the program exits, or could be
     released if the file pointer were closed.
     """
-
     lock_path = "../default.lock"
 
     lock_file_pointer = os.open(lock_path, os.O_WRONLY | os.O_CREAT)
@@ -45,29 +43,34 @@ def instance_already_running():
     try:
         fcntl.lockf(lock_file_pointer, fcntl.LOCK_EX | fcntl.LOCK_NB)
         return False
-    except IOError:
+    except OSError:
         return True
 
 
 if platform == "linux" and instance_already_running():
-    x = subprocess.Popen(["/usr/bin/systemctl", "is-active", "mlsc"], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=False, text=True)
+    x = subprocess.Popen(
+        ["/usr/bin/systemctl", "is-active", "mlsc"],
+        stdin=subprocess.PIPE,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        shell=False,
+        text=True
+    )
     systemctl_status = x.communicate()[0].strip()
-    if systemctl_status == 'active':
+    if systemctl_status == "active":
         sys.exit("\033[91mError: MLSC is already running as a service.\nStop the running service with 'sudo systemctl stop mlsc'.")
     else:
         sys.exit("\033[91mError: MLSC is already running directly.\nStop the running instance with 'CTRL+C'.")
 
 
-class Main():
-    """
-    This is the main class. It controls everything.
+class Main:
+    """Main class. It controls everything.
+
     It's the first starting point of the program.
     """
+
     def start(self):
-        """
-        This function will start all necessary components.
-        Let's go :-D
-        """
+        """Start all necessary components."""
         # We need a lock to prevent too fast saving and loading actions of the config
         self._config_lock = Lock()
 

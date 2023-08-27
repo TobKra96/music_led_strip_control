@@ -1,12 +1,13 @@
+import logging
+import sys
+from time import sleep
+
 from libs.notification_enum import NotificationEnum  # pylint: disable=E0611, E0401
 from libs.notification_item import NotificationItem  # pylint: disable=E0611, E0401
 from libs.queue_wrapper import QueueWrapper  # pylint: disable=E0611, E0401
 
-from time import sleep
-import logging
 
-
-class NotificationService():
+class NotificationService:
     def start(self, config_lock, notification_queue_device_manager_in,
               notification_queue_device_manager_out, notification_queue_audio_in,
               notification_queue_audio_out, notification_queue_webserver_in,
@@ -32,11 +33,12 @@ class NotificationService():
 
         self._cancel_token = False
         self.logger.debug("NotificationService component started.")
-        while not self._cancel_token:
-            # 1. Check Webserver
-            # 2. Check Output
-            # 3. Check Effects
-            try:
+
+        try:
+            while not self._cancel_token:
+                # 1. Check Webserver
+                # 2. Check Output
+                # 3. Check Effects
                 sleep(0.5)
 
                 if not self._notification_queue_webserver_out.empty():
@@ -51,8 +53,8 @@ class NotificationService():
                         self.config_refresh(self._current_notification_item)
                         self.logger.debug("Config reloaded.")
 
-            except KeyboardInterrupt:
-                break
+        except KeyboardInterrupt:
+            sys.exit()
 
     def stop(self):
         self._cancel_token = True
@@ -89,14 +91,14 @@ class NotificationService():
         while processes_not_ready:
 
             # Check the notification queue of device_manager, if it is ready to continue.
-            if(not self._notification_queue_device_manager_out.empty()):
+            if (not self._notification_queue_device_manager_out.empty()):
                 current_output_out = self._notification_queue_device_manager_out.get_blocking()
                 if current_output_out.notification_enum is NotificationEnum.config_refresh_finished:
                     device_ready = True
                     self.logger.debug("Device refreshed the config.")
 
             # Check the notification queue of audio, if it is ready to continue.
-            if(not self._notification_queue_audio_out.empty()):
+            if (not self._notification_queue_audio_out.empty()):
                 current_effects_out = self._notification_queue_audio_out.get_blocking()
                 if current_effects_out.notification_enum is NotificationEnum.config_refresh_finished:
                     effect_ready = True

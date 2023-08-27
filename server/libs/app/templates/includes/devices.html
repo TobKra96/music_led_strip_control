@@ -1,0 +1,64 @@
+<script type="text/javascript">
+    // Transfer Python data to JS.
+    const jinja_devices = JSON.parse('{{ devices|tojson|safe }}');
+    const jinja_groups = JSON.parse('{{ groups|tojson|safe }}');
+</script>
+
+<div class="accordion mt-4" id="accordionDevices">
+    <div class="card">
+        <a class="collapsed" href="#!" data-toggle="collapse" data-target="#collapseMenu" aria-expanded="false" aria-controls="collapseMenu" draggable="false">
+            <div class="card-header d-flex flex-wrap align-items-center p-2" id="accordionHeading">
+
+                <span class="badge badge_green px-3 py-2 m-1 flex-grow-1 flex-sm-grow-0 text-truncate">
+                    <i class="fa-solid fa-network-wired"></i>
+                    <span id="device_count" class="ml-2">{{ devices|length }}</span>
+                    <span>device</span><span id="plural_label">{{ "s" if devices|length != 1 }}</span>
+                </span>
+
+                <span id="selected_device_label" class="badge badge_blue px-3 py-2 m-1 flex-grow-1 flex-sm-grow-0 text-truncate {{ 'd-none' if devices|length == 0 }}">
+                    <i id="device_type_icon" class="fa-regular fa-lightbulb"></i>
+                    <span id="selected_device_txt" class="ml-2"></span>
+                </span>
+
+                {% if segment == "dashboard" %}
+                    <span class="badge badge_blue px-3 py-2 m-1 flex-grow-1 flex-sm-grow-0 {{ 'd-none' if devices|length == 0 }}">
+                        <i id="effect_icon" class="fa-solid fa-bolt-lightning"></i>
+                        <span id="selected_effect_txt" class="ml-2"></span>
+                    </span>
+                {% endif %}
+
+                <div class="ml-auto mr-2 d-none d-sm-block">
+                    <i class="fa-solid fa-chevron-down text-secondary"></i>
+                </div>
+
+            </div>
+            <div id="collapseMenu" class="card-body p-0 collapse" aria-labelledby="accordionHeading" data-parent="#accordionDevices">
+                <nav class="nav nav-pills shadow-none font-weight-bold" id="device_tab_id" role="tablist">
+
+                    {% if segment not in ["device_settings"] %}
+                        <a href="#pills-all_devices" class="{{ 'disabled' if devices|length == 0 }} nav-link col-6 col-sm-auto" data-device-id="all_devices" role="tab" data-toggle="pill" aria-controls="pills-all_devices" aria-selected="false">
+                            <i class="fa-solid fa-circle-nodes"></i>
+                            <span class="ml-1">All Devices</span>
+                        </a>
+                    {% endif %}
+
+                    {% for device in devices %}
+                        <a href="#pills-{{ device.id }}" class="{{ 'disabled' if segment in ['effect_sync_fade'] }} nav-link col-6 col-sm-auto" data-device-id="{{ device.id }}" role="tab" data-toggle="pill" aria-controls="pills-{{ device.id }}" aria-selected="false">
+                            {{ device.name }}
+                        </a>
+                    {% endfor %}
+
+                    {% if segment not in ["device_settings"] %}
+                        {% for group in groups %}
+                            <a href="#pills-{{ group.id }}" class="{{ 'disabled' if segment in ['effect_sync_fade'] }} nav-link col-6 col-sm-auto" data-device-id="{{ group.id }}" role="tab" data-toggle="pill" aria-controls="pills-{{ group.id }}" aria-selected="false">
+                                <i class="fa-solid fa-circle-nodes"></i>
+                                <span class="ml-1">{{ group.name }}</span>
+                            </a>
+                        {% endfor %}
+                    {% endif %}
+
+                </nav>
+            </div>
+        </a>
+    </div>
+</div>

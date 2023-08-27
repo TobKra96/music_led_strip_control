@@ -1,0 +1,81 @@
+Return gradients
+---
+tags:
+  - Resources
+
+responses:
+  200:
+    description: OK
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - dancefloor
+            - fruity
+            - jamaica
+            - jungle
+            - jupiter
+            - ocean
+            - peach
+            - pulse
+            - rust
+            - safari
+            - spectral
+            - sunny
+            - sunset
+          properties:
+            dancefloor:
+              type: string
+              constant: dancefloor
+            fruity:
+              type: string
+              constant: fruity
+            jamaica:
+              type: string
+              constant: jamaica
+            jungle:
+              type: string
+              constant: jungle
+            jupiter:
+              type: string
+              constant: jupiter
+            ocean:
+              type: string
+              constant: ocean
+            peach:
+              type: string
+              constant: peach
+            pulse:
+              type: string
+              constant: pulse
+            rust:
+              type: string
+              constant: rust
+            safari:
+              type: string
+              constant: safari
+            spectral:
+              type: string
+              constant: spectral
+            sunny:
+              type: string
+              constant: sunny
+            sunset:
+              type: string
+              constant: sunset
+
+        example:
+          dancefloor: string
+          fruity: string
+          jamaica: string
+          jungle: string
+          jupiter: string
+          ocean: string
+          peach: string
+          pulse: string
+          rust: string
+          safari: string
+          spectral: string
+          sunny: string
+          sunset: string

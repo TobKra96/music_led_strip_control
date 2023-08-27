@@ -1,11 +1,12 @@
-from libs.effects.effect import Effect  # pylint: disable=E0611, E0401
+import random
 
 import numpy as np
-import random
+
+from libs.effects.effect import Effect  # pylint: disable=E0611, E0401
 
 
 class EffectDirectionChanger(Effect):
-    def __init__(self, device):
+    def __init__(self, device) -> None:
         # Call the constructor of the base class.
         super().__init__(device)
         self.gradient_position = 0

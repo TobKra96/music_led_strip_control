@@ -1,13 +1,11 @@
-from libs.effects.effect import Effect  # pylint: disable=E0611, E0401
-
 import numpy as np
+
+from libs.effects.effect import Effect  # pylint: disable=E0611, E0401
 
 
 class EffectSegmentColor(Effect):
     def run(self):
-        """
-        Show one single color.
-        """
+        """Show one single color."""
         # Get the config of the current effect.
         effect_config = self.get_effect_config("effect_segment_color")
         led_count = self._device.device_config["led_count"]

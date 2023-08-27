@@ -1,0 +1,179 @@
+Return general settings
+---
+tags:
+  - Settings
+
+parameters:
+  - name: setting_key
+    in: query
+    description: "Specific general setting to return\n\n
+                  Return all settings if not specified"
+    required: false
+    schema:
+      type: string
+      enum:
+        - default_sample_rate
+        - device_groups
+        - device_id
+        - frames_per_buffer
+        - log_file_enabled
+        - log_level_console
+        - log_level_file
+        - max_frequency
+        - min_frequency
+        - min_volume_threshold
+        - n_fft_bins
+        - n_rolling_history
+        - webserver_port
+
+responses:
+  200:
+    description: OK
+    content:
+      application/json:
+        schema:
+          oneOf:
+            - type: object
+              required:
+                - setting_key
+                - setting_value
+              properties:
+                setting_key:
+                  type: string
+                  enum:
+                    - default_sample_rate
+                    - device_groups
+                    - device_id
+                    - frames_per_buffer
+                    - log_file_enabled
+                    - log_level_console
+                    - log_level_file
+                    - max_frequency
+                    - min_frequency
+                    - min_volume_threshold
+                    - n_fft_bins
+                    - n_rolling_history
+                    - webserver_port
+                setting_value:
+                  oneOf:
+                    - type: string
+                    - type: number
+                    - type: integer
+                    - type: boolean
+                    - type: object
+                      description: Group ID
+                      additionalProperties:
+                        type: string
+                        description: Group name
+                      maxProperties: 100
+
+            - type: object
+              required:
+                - setting_value
+              properties:
+                setting_value:
+                  type: object
+                  required:
+                    - default_sample_rate
+                    - device_groups
+                    - device_id
+                    - frames_per_buffer
+                    - log_file_enabled
+                    - log_level_console
+                    - log_level_file
+                    - max_frequency
+                    - min_frequency
+                    - min_volume_threshold
+                    - n_fft_bins
+                    - n_rolling_history
+                    - webserver_port
+                  properties:
+                    default_sample_rate:
+                      type: integer
+                      enum:
+                        - 44100
+                        - 48000
+                    device_groups:
+                      type: object
+                      description: Group ID
+                      additionalProperties:
+                        type: string
+                        description: Group name
+                      maxProperties: 100
+                    device_id:
+                      type: string
+                      description: Audio device ID
+                      minimum: -1
+                      maximum: 100
+                    frames_per_buffer:
+                      type: integer
+                      multipleOf: 2
+                    log_file_enabled:
+                      type: boolean
+                    log_level_console:
+                      type: string
+                      enum:
+                        - notset
+                        - debug
+                        - info
+                        - warning
+                        - error
+                        - critical
+                    log_level_file:
+                      type: string
+                      enum:
+                        - notset
+                        - debug
+                        - info
+                        - warning
+                        - error
+                        - critical
+                    max_frequency:
+                      type: integer
+                      minimum: 1
+                      maximum: 140000
+                    min_frequency:
+                      type: integer
+                      minimum: 1
+                      maximum: 140000
+                    min_volume_threshold:
+                      type: number
+                      minimum: 0
+                      maximum: 1
+                    n_fft_bins:
+                      type: integer
+                      multipleOf: 2
+                    n_rolling_history:
+                      type: integer
+                      multipleOf: 2
+                    webserver_port:
+                      type: integer
+                      minimum: 1
+                      maximum: 65535
+
+        examples:
+          example1:
+            summary: With specified setting_key
+            value:
+              setting_key: string
+              setting_value: string/number/integer/boolean/object
+          example2:
+            summary: Without specified setting_key
+            value:
+              setting_value:
+                default_sample_rate: integer
+                device_groups: object
+                device_id: integer
+                frames_per_buffer: integer
+                log_file_enabled: boolean
+                log_level_console: string
+                log_level_file: string
+                max_frequency: integer
+                min_frequency: integer
+                min_volume_threshold: number
+                n_fft_bins: integer
+                n_rolling_history: integer
+                webserver_port: integer
+
+  422:
+    description: Unprocessable Entity

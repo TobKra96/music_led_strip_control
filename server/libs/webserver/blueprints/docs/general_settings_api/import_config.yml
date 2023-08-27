@@ -1,0 +1,35 @@
+Import configuration file
+---
+tags:
+  - Settings
+
+requestBody:
+  content:
+    multipart/form-data:
+      schema:
+        type: object
+        required:
+          - imported_config
+        properties:
+          imported_config:
+            description: Upload config file.
+            type: string
+            format: binary
+
+responses:
+  200:
+    description: Config file imported
+    content:
+      application/json:
+        schema:
+          type: object
+          $ref: '#/components/schemas/APIResponse'
+
+  400:
+    description: Invalid config file
+
+  404:
+    description: No config file selected
+
+  415:
+    description: Unsupported media type

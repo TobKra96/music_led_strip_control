@@ -1,0 +1,21 @@
+Add new device
+---
+tags:
+  - System
+
+responses:
+  200:
+    description: OK
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - device_id
+          properties:
+            device_id:
+              type: string
+              description: ID of the new device
+
+  409:
+    description: Conflict. Maximum number of devices reached

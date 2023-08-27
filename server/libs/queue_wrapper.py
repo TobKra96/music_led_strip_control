@@ -1,9 +1,9 @@
-from multiprocessing import Queue
 import logging
+from multiprocessing import Queue
 
 
-class QueueWrapper():
-    def __init__(self, queue):
+class QueueWrapper:
+    def __init__(self, queue) -> None:
         self.logger = logging.getLogger(__name__)
         self.queue = queue
 

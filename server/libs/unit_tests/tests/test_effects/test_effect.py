@@ -1,9 +1,11 @@
+import copy
+
 import pytest
+
+from libs.device import Device
+from libs.effects.effect import Effect
 from libs.unit_tests.testfixtures.demodevice import DemoDevice
 from libs.unit_tests.testfixtures.helper_functions import generate_random_demo_audiodata
-from libs.effects.effect import Effect
-from libs.device import Device
-import copy
 
 
 class TestEffect():
@@ -13,14 +15,14 @@ class TestEffect():
         self.demodevice = DemoDevice()
 
     def test_init_single_effect(self, setup_fixture):
-        '''Init a device without other calls'''
+        '''Init a device without other calls.'''
         self.effect = Effect(self.demodevice)
 
         assert isinstance(self.effect, Effect)
         assert isinstance(self.demodevice, Device)
 
     def test_run(self, setup_fixture):
-        '''Run should throw not implemented exception'''
+        '''Run should throw not implemented exception.'''
         exception_found = False
 
         self.effect = Effect(self.demodevice)
@@ -36,7 +38,7 @@ class TestEffect():
         assert exception_found
 
     def test_update_freq_channels(self, setup_fixture):
-        '''Try to use the update_freq_channels'''
+        '''Try to use the update_freq_channels.'''
         self.effect = Effect(self.demodevice)
 
         freq_channels_0 = None

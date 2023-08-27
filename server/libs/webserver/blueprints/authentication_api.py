@@ -1,26 +1,24 @@
+from flask import Blueprint, flash, jsonify, redirect, render_template, request, session, url_for
+from flask_login import current_user, logout_user
 from libs.webserver.executer import Executer
 
-from flask import render_template, request, jsonify, redirect, url_for, session, flash, Blueprint
-from flask_login import current_user, logout_user
-
-authentication_api = Blueprint('authentication_api', __name__)
+authentication_api = Blueprint("authentication_api", __name__)
 
 
-@authentication_api.get('/login')
+@authentication_api.get("/login")
 def show_login_page():
     is_pin_active = Executer.instance.authentication_executer.is_pin_active()
     is_authenticated = current_user.is_authenticated
 
     if not is_pin_active or is_authenticated:
-        return redirect("/")
+        return redirect(url_for("home_blueprint.index"))
 
-    return render_template('login.html')
+    return render_template("home/login.html")
 
 
-@authentication_api.post('/login')
+@authentication_api.post("/login")
 def login():
-    """
-    Log in user
+    """Log in user
     ---
     tags:
       - Auth
@@ -37,35 +35,34 @@ def login():
               - pin
       responses:
         "200":
-          description: OK
-    """
-    pin = request.form.get('pin')
+          description: OK.
+    """  # noqa: D205
+    pin = request.form.get("pin")
 
     if not pin:
-        flash('PIN is required')
+        flash("PIN is required")
     elif not pin.isdigit():
-        flash('PIN must only contain digits')
+        flash("PIN must only contain digits")
     elif not Executer.instance.authentication_executer.validate_pin(pin):
-        flash('PIN must be at least 4 digits long')
+        flash("PIN must be at least 4 digits long")
     elif pin != Executer.instance.authentication_executer.USER_PIN:
-        flash('Invalid PIN')
+        flash("Invalid PIN")
 
     elif pin == Executer.instance.authentication_executer.USER_PIN:
         Executer.instance.authentication_executer.login()
-        if session.get('next') is not None:
-            next_page = session['next']
-            session['next'] = None
+        if session.get("next") is not None:
+            next_page = session["next"]
+            session["next"] = None
             if Executer.instance.authentication_executer.is_safe_url(next_page):
                 return redirect(next_page)
-        return redirect("/")
+        return redirect(url_for("home_blueprint.index"))
 
-    return redirect(url_for('authentication_api.login', next=session.get('next')))
+    return redirect(url_for("authentication_api.login", next=session.get("next")))
 
 
-@authentication_api.get('/logout')
+@authentication_api.get("/logout")
 def logout():
-    """
-    Log out user
+    """Log out user
     ---
     tags:
       - Auth
@@ -78,17 +75,16 @@ def logout():
         content:
           text/html:
             schema:
-              type: string
-    """
+              type: string.
+    """  # noqa: D205, D301
     if current_user.is_authenticated:
         logout_user()
-    return redirect(url_for('authentication_api.login'))
+    return redirect(url_for("authentication_api.login"))
 
 
-@authentication_api.get('/api/auth/pin')
+@authentication_api.get("/api/auth/pin")
 def get_pin_setting():  # pylint: disable=E0211
-    """
-    Return PIN code
+    """Return PIN code
     ---
     tags:
       - Auth
@@ -104,8 +100,8 @@ def get_pin_setting():  # pylint: disable=E0211
                 USE_PIN_LOCK: bool
               type: object
       "401":
-        description: Unauthorized
-    """
+        description: Unauthorized.
+    """  # noqa: D205
     is_pin_active = Executer.instance.authentication_executer.is_pin_active()
     is_authenticated = current_user.is_authenticated
 
@@ -120,10 +116,9 @@ def get_pin_setting():  # pylint: disable=E0211
     return "Unauthorized", 401
 
 
-@authentication_api.post('/api/auth/pin')
+@authentication_api.post("/api/auth/pin")
 def set_pin_setting():  # pylint: disable=E0211
-    """
-    Set PIN code
+    """Set PIN code
     ---
     tags:
       - Auth
@@ -152,8 +147,8 @@ def set_pin_setting():  # pylint: disable=E0211
                 USE_PIN_LOCK: bool
               type: object
       "401":
-        description: Unauthorized
-    """
+        description: Unauthorized.
+    """  # noqa: D205
     is_pin_active = Executer.instance.authentication_executer.is_pin_active()
     is_authenticated = current_user.is_authenticated
 
@@ -170,10 +165,9 @@ def set_pin_setting():  # pylint: disable=E0211
     return "Unauthorized", 401
 
 
-@authentication_api.delete('/api/auth/pin')
+@authentication_api.delete("/api/auth/pin")
 def reset_pin_setting():  # pylint: disable=E0211
-    """
-    Reset PIN code
+    """Reset PIN code
     ---
     tags:
       - Auth
@@ -189,8 +183,8 @@ def reset_pin_setting():  # pylint: disable=E0211
                 USE_PIN_LOCK: bool
               type: object
       "401":
-        description: Unauthorized
-    """
+        description: Unauthorized.
+    """  # noqa: D205
     is_pin_active = Executer.instance.authentication_executer.is_pin_active()
     is_authenticated = current_user.is_authenticated
 

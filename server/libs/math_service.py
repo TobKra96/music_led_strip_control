@@ -1,10 +1,9 @@
 import numpy as np
 
 
-class MathService():
+class MathService:
     def interpolate(self, y, new_length):
-        """
-        Intelligently resizes the array by linearly interpolating the values.
+        """Intelligently resizes the array by linearly interpolating the values.
 
         Parameters
         ----------
@@ -29,7 +28,7 @@ class MathService():
 
 
 def memoize(function):
-    """Provides a decorator for memoizing functions"""
+    """Provide a decorator for memoizing functions."""
     from functools import wraps
     memo = {}
 

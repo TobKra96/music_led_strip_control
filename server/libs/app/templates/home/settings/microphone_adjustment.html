@@ -1,0 +1,75 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Microphone Adjustment {% endblock %}
+
+<!-- Specific CSS goes HERE -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+<div class="pcoded-content">
+    <div class="pcoded-inner-content">
+        <!-- [ breadcrumb ] start -->
+        <div class="page-header">
+            <div class="page-block">
+                <div class="row align-items-center">
+                    <div class="col-md-12">
+                        <div class="page-header-title">
+                            <h5 class="m-b-10">Microphone Adjustment</h5>
+                        </div>
+                        <ul class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="{{ url_for('home_blueprint.index') }}"><i class="feather icon-home"></i></a></li>
+                            <li class="breadcrumb-item"><a href="javascript:">Settings</a></li>
+                            <li class="breadcrumb-item"><a href="javascript:">Microphone Adjustment</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- [ breadcrumb ] end -->
+        <div class="main-body">
+            <div class="page-wrapper">
+                <!-- [ Main Content ] start -->
+
+                <div class="row mt-4">
+                    <div class="col-md-12 col-lg-8">
+                        <form id="settingsForm" action method="post" novalidate autocomplete="off">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5>Microphone Level</h5>
+                                </div>
+                                <div class="card-block">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label>Microphone Level <span for="level" class="mb-0 badge badge-secondary"></span></label>
+                                                <input id="level" type="range" class="custom-range mt-3 setting_input" min="0" max="100" step="1" required>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="output">Console Output</label>
+                                                <textarea class="form-control" id="output" rows="8" disabled="true" spellcheck="false"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="mt-4 d-flex flex-md-row flex-column justify-content-md-end">
+                                        <button type="button" id="save_btn" class="btn btn-success m-0 mb-3 mb-md-0">Save</button>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- [ Main Content ] end -->
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+<script src="{{ url_for('static', filename='assets/js/settings.microphone.js') }}" type="module"></script>
+{% endblock javascripts %}

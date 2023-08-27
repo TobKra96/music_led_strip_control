@@ -1,11 +1,12 @@
-from libs.outputs.output import Output  # pylint: disable=E0611, E0401
+import logging
 
 import numpy as np
-import logging
+
+from libs.outputs.output import Output  # pylint: disable=E0611, E0401
 
 
 class OutputRaspi(Output):
-    def __init__(self, device):
+    def __init__(self, device) -> None:
         # Call the constructor of the base class.
         super().__init__(device)
         self.logger = logging.getLogger(__name__)
@@ -13,6 +14,7 @@ class OutputRaspi(Output):
         try:
             import _rpi_ws281x as ws  # pylint: disable=import-error
         except (ImportError, ModuleNotFoundError):
+            return
             from rpi_ws281x import ws
 
         output_id = "output_raspi"
@@ -79,7 +81,7 @@ class OutputRaspi(Output):
         resp = ws.ws2811_init(self._leds)
         if resp != ws.WS2811_SUCCESS:
             message = ws.ws2811_get_return_t_str(resp)
-            raise RuntimeError(f'ws2811_init failed with code {resp} ({message})')
+            raise RuntimeError(f"ws2811_init failed with code {resp} ({message})")
 
     def show(self, output_array):
         try:
@@ -117,4 +119,4 @@ class OutputRaspi(Output):
 
         if resp != ws.WS2811_SUCCESS:
             message = ws.ws2811_get_return_t_str(resp)
-            raise RuntimeError(f'ws2811_render failed with code {resp} ({message})')
+            raise RuntimeError(f"ws2811_render failed with code {resp} ({message})")

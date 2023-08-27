@@ -1,10 +1,11 @@
-from time import time
-import numpy as np
 import logging
+from time import time
+
+import numpy as np
 
 
-class ColorServiceGlobal():
-    def __init__(self, config):
+class ColorServiceGlobal:
+    def __init__(self, config) -> None:
         self.logger = logging.getLogger(__name__)
 
         self._config = config
@@ -33,7 +34,7 @@ class ColorServiceGlobal():
 
         self.full_gradients = {}
 
-        for key in self._config["gradients"].keys():
+        for key in self._config["gradients"]:
             not_mirrored_gradient = self._easing_gradient_generator(
                 self._config["gradients"][key],  # All colors of the current gradient.
                 led_count
@@ -48,10 +49,10 @@ class ColorServiceGlobal():
             )
 
     def _easing_gradient_generator(self, colors, length):
-        """
-        returns np.array of given length that eases between specified colors
+        """Return np.array of given length that eases between specified colors.
 
-        parameters:
+        Parameters
+        ----------
         colors - list, colors must be in self.config.colour_manager["colors"]
             eg. ["red", "orange", "blue", "purple"]
         length - int, length of array to return. should be from self.config.settings
@@ -98,8 +99,8 @@ class ColorServiceGlobal():
         return output
 
     def colour(self, colour):
-        """
-        Returns the values of a given color.
+        """Return the values of a given color.
+
         Use this function to get color values.
         """
         if colour in self._config["colors"]:

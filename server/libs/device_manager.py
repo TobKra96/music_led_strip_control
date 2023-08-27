@@ -1,17 +1,18 @@
+import copy
+import logging
+import sys
+from time import time
+
 from libs.color_service_global import ColorServiceGlobal  # pylint: disable=E0611, E0401
-from libs.notification_item import NotificationItem  # pylint: disable=E0611, E0401
-from libs.notification_enum import NotificationEnum  # pylint: disable=E0611, E0401
 from libs.config_service import ConfigService  # pylint: disable=E0611, E0401
-from libs.fps_limiter import FPSLimiter  # pylint: disable=E0611, E0401
 from libs.device import Device  # pylint: disable=E0611, E0401
+from libs.fps_limiter import FPSLimiter  # pylint: disable=E0611, E0401
+from libs.notification_enum import NotificationEnum  # pylint: disable=E0611, E0401
+from libs.notification_item import NotificationItem  # pylint: disable=E0611, E0401
 from libs.queue_wrapper import QueueWrapper  # pylint: disable=E0611, E0401
 
-from time import time
-import logging
-import copy
 
-
-class DeviceManager():
+class DeviceManager:
     def start(self, config_lock, notification_queue_in, notification_queue_out, effect_queue, audio_queue):
         self.logger = logging.getLogger(__name__)
 
@@ -36,11 +37,11 @@ class DeviceManager():
         self.start_time = time()
         self.ten_seconds_counter = time()
 
-        while True:
-            try:
+        try:
+            while True:
                 self.routine()
-            except KeyboardInterrupt:
-                break
+        except KeyboardInterrupt:
+            sys.exit()
 
     def routine(self):
         self.check_effect_changes()
@@ -99,11 +100,11 @@ class DeviceManager():
                 self.logger.debug(
                     f"Device count after: {devices_count_after_reload}")
 
-                if(devices_count_before_reload != devices_count_after_reload):
+                if (devices_count_before_reload != devices_count_after_reload):
                     self.reinit_devices()
 
-                if(current_notification_item.device_id == self._all_devices_ID):
-                    for key, value in self._devices.items():
+                if (current_notification_item.device_id == self._all_devices_ID):
+                    for key in self._devices:
                         self.restart_device(key)
                 else:
                     self.restart_device(current_notification_item.device_id)
@@ -124,7 +125,7 @@ class DeviceManager():
     def refresh_audio_queues(self, audio_data):
         if audio_data is None:
             return
-        for key, value in self._devices.items():
+        for value in self._devices.values():
             audio_copy = copy.deepcopy(audio_data)
             value.audio_queue.put_none_blocking(audio_data)
 
@@ -132,7 +133,7 @@ class DeviceManager():
         self.logger.debug("Entering init_devices()")
         self._color_service_global = ColorServiceGlobal(self._config)
 
-        for key in self._config["device_configs"].keys():
+        for key in self._config["device_configs"]:
             device_id = key
             self.logger.debug(f"Init device with device id: {device_id}")
             self._devices[device_id] = Device(
@@ -141,7 +142,7 @@ class DeviceManager():
 
     def reinit_devices(self):
         self.logger.debug("Entering reinit_devices()")
-        for key, value in self._devices.items():
+        for key in self._devices:
             self.stop_device(key)
         self._devices = {}
         self.init_devices()

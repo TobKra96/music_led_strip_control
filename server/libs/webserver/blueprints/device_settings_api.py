@@ -1,416 +1,143 @@
-from libs.webserver.executer import Executer
-
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, jsonify, request
 from flask_login import login_required
-import copy
+from flask_openapi import swag_from
+from libs.webserver.executer import Executer
+from libs.webserver.executer_base import validate_schema
+from libs.webserver.messages import DeviceNotFound, SettingNotFound, UnprocessableEntity
+from libs.webserver.schemas.device_settings_api_schema import (
+    ALL_DEVICE_SETTINGS_SCHEMA,
+    DEVICE_SETTINGS_WITH_EXCL_SCHEMA,
+    GET_ALL_OUTPUT_SETTINGS_SCHEMA,
+    GET_OUTPUT_SETTING_SCHEMA,
+    ONE_DEVICE_SETTING_SCHEMA,
+    SET_DEVICE_SETTINGS_SCHEMA,
+    SET_OUTPUT_SETTINGS_SCHEMA,
+)
 
-device_settings_api = Blueprint('device_settings_api', __name__)
+device_settings_api = Blueprint("device_settings_api", __name__)
 
 
-@device_settings_api.get('/api/settings/device')
+@device_settings_api.get("/api/settings/device")
 @login_required
-def get_device_setting():  # pylint: disable=E0211
-    """
-    Return device settings
-    ---
-    tags:
-      - Settings
-    parameters:
-      - description: ID of `device` to return settings from
-        in: query
-        name: device
-        required: true
-        schema:
-          type: string
-        examples:
-          example1:
-            value: device_0
-            summary: device ID
-      - description:
-          Specific `setting_key` to return from device\n\n
-          Return all settings if not specified
-        in: query
-        name: setting_key
-        required: false
-        schema:
-          type: string
-          enum:
-            - device_groups
-            - device_name
-            - effects
-            - fps
-            - led_brightness
-            - led_count
-            - led_mid
-            - led_strip
-            - output
-            - output_type
-      - description:
-          Specific `excluded_key` to exclude from returned settings\n\n
-          __Note:__ `excluded_key` is only allowed if `setting_key` is __NOT__ specified
-        in: query
-        name: excluded_key
-        required: false
-        schema:
-          type: string
-          enum:
-            - device_groups
-            - device_name
-            - effects
-            - fps
-            - led_brightness
-            - led_count
-            - led_mid
-            - led_strip
-            - output
-            - output_type
-    responses:
-      "200":
-        description: OK
-        content:
-          application/json:
-            schema:
-              type: object
-            examples:
-              example1:
-                value:
-                  device: str
-                  setting_key: str
-                  setting_value: str/int/array/bool/num
-                summary: With specified setting_key
-              example2:
-                value:
-                  device: str
-                  settings: object
-                summary: Without specified setting_key
-              example3:
-                value:
-                  device: str
-                  excluded_key: str
-                  settings: str/int/array/bool/num
-                summary: With specified excluded_key
-      "403":
-        description: Input data are wrong
-      "422":
-        description: Unprocessable Entity
-    """
+@swag_from("docs/device_settings_api/get_device_settings.yml")
+def get_device_settings():  # pylint: disable=E0211
     data_in = request.args.to_dict()
 
-    # Get one specific device setting of one device.
-    if len(data_in) == 2 and "setting_key" in data_in:
+    if set(data_in) == {"device"}:  # Get all device settings of one device.
 
-        if not Executer.instance.device_settings_executer.validate_data_in(data_in, ("device", "setting_key",)):
-            return "Input data are wrong.", 403
+        if not validate_schema(data_in, ALL_DEVICE_SETTINGS_SCHEMA):
+            return UnprocessableEntity.as_response()
 
-        result = Executer.instance.device_settings_executer.get_device_setting(data_in["device"], data_in["setting_key"])
+        data_out = Executer.instance.device_settings_executer.get_device_settings(data_in["device"])
 
-        if result is None:
-            return "Unprocessable Entity", 422
-
-        data_out = copy.deepcopy(data_in)
-        data_out["setting_value"] = result
-        return jsonify(data_out)
-
-    if len(data_in) == 1:  # Get all device settings of one device.
-
-        if not Executer.instance.device_settings_executer.validate_data_in(data_in, ("device",)):
-            return "Input data are wrong.", 403
-
-        result = Executer.instance.device_settings_executer.get_device_settings(data_in["device"])
-
-        if result is None:
-            return "Unprocessable Entity.", 422
-
-        data_out = copy.deepcopy(data_in)
-        data_out["settings"] = result
-        return jsonify(data_out)
-
-    # Get all device settings of one device excluding a specific setting.
-    if len(data_in) == 2 and "excluded_key" in data_in:
-
-        if not Executer.instance.device_settings_executer.validate_data_in(data_in, ("device", "excluded_key",)):
-            return "Input data are wrong.", 403
-
-        result = Executer.instance.device_settings_executer.get_device_settings(data_in["device"])
-
-        if result is None or data_in["excluded_key"] not in result:
-            return "Unprocessable Entity.", 422
-
-        data_out = copy.deepcopy(data_in)
-        result.pop(data_in["excluded_key"])
-        data_out["settings"] = result
+        if data_out is DeviceNotFound:
+            return DeviceNotFound.as_response()
 
         return jsonify(data_out)
 
-    return "Input data are wrong.", 403
+    if set(data_in) == {"device", "setting_key"}:  # Get one specific device setting of one device.
+
+        if not validate_schema(data_in, ONE_DEVICE_SETTING_SCHEMA):
+            return UnprocessableEntity.as_response()
+
+        data_out = Executer.instance.device_settings_executer.get_device_setting(data_in["device"], data_in["setting_key"])
+
+        if data_out is DeviceNotFound:
+            return DeviceNotFound.as_response()
+
+        return jsonify(data_out)
+
+    if set(data_in) == {"device", "excluded_key"}:  # Get all settings of one device excluding a specific setting.
+
+        if not validate_schema(data_in, DEVICE_SETTINGS_WITH_EXCL_SCHEMA):
+            return UnprocessableEntity.as_response()
+
+        data_out = Executer.instance.device_settings_executer.get_device_settings(data_in["device"], data_in["excluded_key"])
+
+        if data_out is DeviceNotFound:
+            return DeviceNotFound.as_response()
+
+        return jsonify(data_out)
+
+    return UnprocessableEntity.as_response()
 
 
-@device_settings_api.post('/api/settings/device')
+@device_settings_api.post("/api/settings/device")
 @login_required
+@swag_from("docs/device_settings_api/set_device_settings.yml")
 def set_device_settings():  # pylint: disable=E0211
-    """
-    Set device settings
-    ---
-    tags:
-      - Settings
-    requestBody:
-      content:
-        application/json:
-          schema:
-            type: string
-          examples:
-            example1:
-              value:
-                device: device_0
-                settings:
-                  device_name: Default Device
-                  fps: 60
-                  led_brightness: 100
-                  led_count: 124
-                  led_mid: 64
-                  led_strip: ws2812_strip
-                  output_type: output_raspi
-              summary: Default device settings
-      description: The `settings` which to set for the specified `device`
-      required: true
-    responses:
-      "200":
-        description: OK
-        content:
-          application/json:
-            schema:
-              example:
-                device: str
-                settings:
-                  device_name: str
-                  fps: int
-                  led_brightness: str
-                  led_count: int
-                  led_mid: int
-                  led_strip: str
-                  output_type: str
-              type: object
-      "403":
-        description: Input data are wrong
-      "422":
-        description: Unprocessable Entity
-    """
     data_in = request.get_json()
 
-    if not Executer.instance.device_settings_executer.validate_data_in(data_in, ("device", "settings", )):
-        return "Input data are wrong.", 403
+    if not validate_schema(data_in, SET_DEVICE_SETTINGS_SCHEMA):
+        return UnprocessableEntity.as_response()
 
-    result = Executer.instance.device_settings_executer.set_device_setting(data_in["device"], data_in["settings"])
+    data_out = Executer.instance.device_settings_executer.set_device_settings(data_in["device"], data_in["settings"])
 
-    if result is None:
-        return "Unprocessable Entity.", 422
+    if data_out is DeviceNotFound:
+        return DeviceNotFound.as_response()
 
-    data_out = copy.deepcopy(data_in)
     return jsonify(data_out)
 
 
-@device_settings_api.get('/api/settings/device/output-type')
+@device_settings_api.get("/api/settings/device/output-type")
 @login_required
+@swag_from("docs/device_settings_api/get_output_type_device_settings.yml")
 def get_output_type_device_settings():  # pylint: disable=E0211
-    """
-    Return output-type settings for a device
-    ---
-    tags:
-      - Settings
-    parameters:
-      - description: The device ID
-        in: query
-        name: device
-        required: true
-        schema:
-          type: string
-        examples:
-          example1:
-            value: device_0
-            summary: device ID
-      - description:
-          The output type ID\n\n
-          Return all output settings if `output_type_key` and `setting_key` are not specified
-        in: query
-        name: output_type_key
-        required: false
-        schema:
-          type: string
-          enum:
-            - output_raspi
-            - output_udp
-      - description:
-          "__Note:__ `setting_key` is required if `output_type_key` is specified\n\n
-          The `setting_key` for a specified `device` to get the value from\n\n
-          If `output_type_key` is output_raspi, the following `setting_key` keys are allowed:\n\n
-          led_channel, led_dma, led_freq_hz, led_invert, led_pin\n\n
-          If `output_type_key` is output_udp, the following `setting_key` keys are allowed:\n\n
-          udp_client_ip, udp_client_port"
-        in: query
-        name: setting_key
-        required: false
-        schema:
-          type: string
-          enum:
-            - led_channel
-            - led_dma
-            - led_freq_hz
-            - led_invert
-            - led_pin
-            - udp_client_ip
-            - udp_client_port
-    responses:
-      "200":
-        description: OK
-        content:
-          application/json:
-            schema:
-              type: object
-            examples:
-              example1:
-                value:
-                  device: str
-                  output_type_key: str
-                  setting_key: str
-                  setting_value: str/int/array/bool/num
-                summary: With specified output_type_key and setting_key
-              example2:
-                value:
-                  device: str
-                  output_settings:
-                    led_channel: int
-                    led_dma: int
-                    led_freq_hz: int
-                    led_invert: bool
-                    led_pin: int
-                    mqtt_broker: str
-                    mqtt_path: str
-                    udp_client_ip: str
-                    udp_client_port: int
-                summary: Without specified output_type_key and setting_key
-      "403":
-        description: Input data are wrong
-      "422":
-        description: Unprocessable Entity
-    """
     data_in = request.args.to_dict()
 
-    if len(data_in) == 3:
+    if set(data_in) == {"device"}:  # Get all output type settings of a device.
 
-        if not Executer.instance.device_settings_executer.validate_data_in(data_in, ("device", "output_type_key", "setting_key",)):
-            return "Input data are wrong.", 403
+        if not validate_schema(data_in, GET_ALL_OUTPUT_SETTINGS_SCHEMA):
+            return UnprocessableEntity.as_response()
 
-        result = Executer.instance.device_settings_executer.get_output_type_device_setting(data_in["device"], data_in["output_type_key"], data_in["setting_key"])
+        data_out = Executer.instance.device_settings_executer.get_all_output_type_settings(data_in["device"])
 
-        if result is None:
-            return "Unprocessable Entity.", 422
-
-        data_out = copy.deepcopy(data_in)
-        data_out["setting_value"] = result
-        return jsonify(data_out)
-
-    # Get all output type settings of one device.
-    if len(data_in) == 1:
-
-        if not Executer.instance.device_settings_executer.validate_data_in(data_in, ("device",)):
-            return "Input data are wrong.", 403
-
-        result = Executer.instance.device_settings_executer.get_all_output_type_settings(data_in["device"])
-
-        if result is None:
-            return "Unprocessable Entity.", 422
-
-        data_out = copy.deepcopy(data_in)
-        data_out["output_settings"] = result
+        if data_out is DeviceNotFound:
+            return DeviceNotFound.as_response()
 
         return jsonify(data_out)
 
-    return "Input data are wrong.", 403
+    if set(data_in) == {"device", "output_type_key", "setting_key"}:  # Get one specific output type setting of a device.
+
+        if not validate_schema(data_in, GET_OUTPUT_SETTING_SCHEMA):
+            return UnprocessableEntity.as_response()
+
+        data_out = Executer.instance.device_settings_executer.get_output_type_device_setting(
+            data_in["device"],
+            data_in["output_type_key"],
+            data_in["setting_key"]
+        )
+
+        if data_out is DeviceNotFound:
+            return DeviceNotFound.as_response()
+
+        if data_out is SettingNotFound:
+            return SettingNotFound.as_response()
+
+        return jsonify(data_out)
+
+    return UnprocessableEntity.as_response()
 
 
-@device_settings_api.post('/api/settings/device/output-type')
+@device_settings_api.post("/api/settings/device/output-type")
 @login_required
+@swag_from("docs/device_settings_api/set_output_type_device_settings.yml")
 def set_output_type_device_settings():  # pylint: disable=E0211
-    """
-    Set a specific output-type setting for a device
-    ---
-    tags:
-      - Settings
-    requestBody:
-      content:
-        application/json:
-          schema:
-            type: string
-          examples:
-            example1:
-              value:
-                device: device_0
-                output_type_key: output_raspi
-                settings:
-                  led_channel: 0
-                  led_dma: 10
-                  led_freq_hz: 800000
-                  led_invert: false
-                  led_pin: 18
-              summary: Default output_raspi settings
-            example2:
-              value:
-                device: device_0
-                output_type_key: output_udp
-                settings:
-                  udp_client_ip: 127.0.0.1
-                  udp_client_port: 7777
-              summary: Default output_udp settings
-      description:
-        "The output-type `settings` which to set for the specified `device`\n\n
-        Available `output_type_key` keys: output_raspi, output_udp\n\n
-        If `output_type_key` is output_raspi, the following `setting_key` keys are allowed:\n\n
-        led_channel, led_dma, led_freq_hz, led_invert, led_pin\n\n
-        If `output_type_key` is output_udp, the following `setting_key` keys are allowed:\n\n
-        udp_client_ip, udp_client_port\n\n
-        __Note:__ It is not required to include all above keys inside `settings`"
-      required: true
-    responses:
-      "200":
-        description: OK
-        content:
-          application/json:
-            schema:
-              type: object
-            examples:
-              example1:
-                value:
-                  device: str
-                  output_type_key: str
-                  settings:
-                    led_channel: int
-                    led_dma: int
-                    led_freq_hz: int
-                    led_invert: bool
-                    led_pin: int
-                summary: With output_raspi settings
-              example2:
-                value:
-                  device: str
-                  output_type_key: str
-                  settings:
-                    udp_client_ip: str
-                    udp_client_port: str/int
-                summary: With output_udp settings
-      "403":
-        description: Input data are wrong
-      "422":
-        description: Unprocessable Entity
-    """
     data_in = request.get_json()
 
-    if not Executer.instance.device_settings_executer.validate_data_in(data_in, ("device", "output_type_key", "settings", )):
-        return "Input data are wrong.", 403
+    if not validate_schema(data_in, SET_OUTPUT_SETTINGS_SCHEMA):
+        return UnprocessableEntity.as_response()
 
-    result = Executer.instance.device_settings_executer.set_output_type_device_setting(data_in["device"], data_in["output_type_key"], data_in["settings"])
+    data_out = Executer.instance.device_settings_executer.set_output_type_device_settings(
+        data_in["device"],
+        data_in["output_type_key"],
+        data_in["settings"]
+    )
 
-    if result is None:
-        return "Unprocessable Entity.", 422
+    if data_out is DeviceNotFound:
+        return DeviceNotFound.as_response()
 
-    data_out = copy.deepcopy(data_in)
+    if data_out is SettingNotFound:
+        return SettingNotFound.as_response()
+
     return jsonify(data_out)

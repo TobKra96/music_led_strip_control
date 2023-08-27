@@ -1,11 +1,11 @@
-from libs.effects.effect import Effect  # pylint: disable=E0611, E0401
-
-from scipy.ndimage import gaussian_filter1d
 import numpy as np
+from scipy.ndimage import gaussian_filter1d
+
+from libs.effects.effect import Effect  # pylint: disable=E0611, E0401
 
 
 class EffectScroll(Effect):
-    def __init__(self, device):
+    def __init__(self, device) -> None:
         # Call the constructor of the base class.
         super().__init__(device)
 
@@ -52,7 +52,7 @@ class EffectScroll(Effect):
         mid_steps = effect_config["mid_speed"]
         low_steps = effect_config["low_speed"]
 
-        if(high_steps > 0):
+        if (high_steps > 0):
             self.output_scroll_high[:, high_steps:] = self.output_scroll_high[:, :-high_steps]
 
             # Create new color originating at the center.
@@ -60,7 +60,7 @@ class EffectScroll(Effect):
             self.output_scroll_high[1, :high_steps] = high_val[1]
             self.output_scroll_high[2, :high_steps] = high_val[2]
 
-        if(mid_steps > 0):
+        if (mid_steps > 0):
             self.output_scroll_mid[:, mid_steps:] = self.output_scroll_mid[:, :-mid_steps]
 
             # Create new color originating at the center.
@@ -68,7 +68,7 @@ class EffectScroll(Effect):
             self.output_scroll_mid[1, :mid_steps] = mids_val[1]
             self.output_scroll_mid[2, :mid_steps] = mids_val[2]
 
-        if(low_steps > 0):
+        if (low_steps > 0):
             self.output_scroll_low[:, low_steps:] = self.output_scroll_low[:, :-low_steps]
 
             # Create new color originating at the center.

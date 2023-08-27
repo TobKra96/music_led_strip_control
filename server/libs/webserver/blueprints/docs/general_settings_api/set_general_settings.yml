@@ -1,0 +1,88 @@
+Set general settings
+---
+tags:
+  - Settings
+
+requestBody:
+  description: "The general settings which to set\n\n
+                __Note:__ Not all settings are required."
+  required: true
+  content:
+    application/json:
+      schema:
+        type: object
+        required:
+          - settings
+        properties:
+          settings:
+            type: object
+            properties:
+              default_sample_rate:
+                type: integer
+              device_groups:
+                type: object
+                description: Group ID
+                additionalProperties:
+                  type: string
+                  description: Group name
+                maxProperties: 100
+              device_id:
+                type: string
+                description: Audio device ID
+              frames_per_buffer:
+                type: integer
+              log_file_enabled:
+                type: boolean
+              log_level_console:
+                type: string
+              log_level_file:
+                type: string
+              max_frequency:
+                type: integer
+              min_frequency:
+                type: integer
+              min_volume_threshold:
+                type: number
+              n_fft_bins:
+                type: integer
+              n_rolling_history:
+                type: integer
+              webserver_port:
+                type: integer
+
+      examples:
+        example1:
+          summary: Some default general settings
+          value:
+            settings:
+              frames_per_buffer: 512
+              log_file_enabled: false
+              log_level_console: info
+              log_level_file: info
+              max_frequency: 16000
+              min_frequency: 50
+              min_volume_threshold: 0.001
+
+responses:
+  200:
+    description: OK
+    content:
+      application/json:
+        schema:
+          type: object
+
+        examples:
+          example1:
+            summary: Some default general settings
+            value:
+              settings:
+                frames_per_buffer: integer
+                log_file_enabled: boolean
+                log_level_console: string
+                log_level_file: string
+                max_frequency: integer
+                min_frequency: integer
+                min_volume_threshold: number
+
+  422:
+    description: Unprocessable Entity

@@ -1,0 +1,26 @@
+Return output types
+---
+tags:
+  - Resources
+
+responses:
+  200:
+    description: OK
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - output_raspi
+            - output_udp
+          properties:
+            output_raspi:
+              type: string
+              constant: Output Raspberry Pi
+            output_udp:
+              type: string
+              constant: Output Network via UDP
+
+        example:
+          output_raspi: string
+          output_udp: string

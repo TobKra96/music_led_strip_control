@@ -1,0 +1,87 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Edit Effect Random Cycle {% endblock %}
+
+<!-- Specific CSS goes HERE -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+    <div class="pcoded-content">
+        <div class="pcoded-inner-content">
+
+            {% include 'includes/toasts.html' %}
+
+            <!-- [ breadcrumb ] start -->
+            <div class="page-header">
+                <div class="page-block">
+                    <div class="row align-items-center">
+                        <div class="col-md-12">
+                            <div class="page-header-title">
+                                <h5 class="m-b-10">Random Cycle</h5>
+                            </div>
+                            <ul class="breadcrumb">
+                                <li class="breadcrumb-item"><a href="{{ url_for('home_blueprint.index') }}"><i class="feather icon-home"></i></a></li>
+                                <li class="breadcrumb-item"><a href="javascript:">Edit Effects</a></li>
+                                <li class="breadcrumb-item"><a href="javascript:">Random Cycle</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- [ breadcrumb ] end -->
+            <div class="main-body">
+                <div class="page-wrapper">
+                    <!-- [ Main Content ] start -->
+
+                    {% include 'includes/devices.html' %}
+
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5>Random Cycle Effect Settings</h5>
+                                </div>
+                                <div class="card-block">
+                                    <p>
+                                        Enter the interval between effects. Maximum 3600 seconds (1 hour).<br>
+                                        Select at least two effects from the checkbox list. Otherwise all effects will be enabled.
+                                    </p>
+                                    <input type="hidden" id="settingsIdentifier" value="effect">
+                                    <input type="hidden" id="effectIdentifier" value="effect_random_cycle">
+                                    <form id="settingsForm" action method="post" novalidate autocomplete="off">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label>Interval in seconds</label>
+                                                    <input name="interval:number" id="interval" class="form-control setting_input" oninput="if (this.value > 3600) this.value = 3600;" onkeypress="return event.charCode >= 48 && event.charCode <= 57" type="number" name="number" required>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6"></div>
+                                            <div id="nonMusicEffectCol" class="col-md-6">
+                                                <h5>Non-Music Effects</h5>
+                                            </div>
+                                            <div id="musicEffectCol" class="col-md-6">
+                                                <h5>Music Effects</h5>
+                                            </div>
+                                        </div>
+                                        <div class="mt-4 d-flex flex-md-row flex-column justify-content-md-end">
+                                            <button type="button" id="save_btn" class="btn btn-success m-0">Save</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- [ Main Content ] end -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+<script src="{{ url_for('static', filename='assets/js/settings.effect.js') }}" type="module"></script>
+{% endblock javascripts %}

@@ -1,16 +1,18 @@
-from libs.notification_item import NotificationItem  # pylint: disable=E0611, E0401
-from libs.notification_enum import NotificationEnum  # pylint: disable=E0611, E0401
-from libs.config_service import ConfigService  # pylint: disable=E0611, E0401
-from libs.queue_wrapper import QueueWrapper  # pylint: disable=E0611, E0401
-from libs.fps_limiter import FPSLimiter  # pylint: disable=E0611, E0401
-from libs.audio_info import AudioInfo  # pylint: disable=E0611, E0401
-from libs.dsp import DSP  # pylint: disable=E0611, E0401
-
+import logging
+import sys
 from multiprocessing import Queue
 from time import time
+
 import numpy as np
 import pyaudio
-import logging
+
+from libs.audio_info import AudioInfo  # pylint: disable=E0611, E0401
+from libs.config_service import ConfigService  # pylint: disable=E0611, E0401
+from libs.dsp import DSP  # pylint: disable=E0611, E0401
+from libs.fps_limiter import FPSLimiter  # pylint: disable=E0611, E0401
+from libs.notification_enum import NotificationEnum  # pylint: disable=E0611, E0401
+from libs.notification_item import NotificationItem  # pylint: disable=E0611, E0401
+from libs.queue_wrapper import QueueWrapper  # pylint: disable=E0611, E0401
 
 
 class AudioProcessService:
@@ -28,12 +30,12 @@ class AudioProcessService:
 
         self.init_audio_service(show_output=True)
 
-        while True:
-            try:
+        try:
+            while True:
                 self.audio_service_routine()
                 self._fps_limiter.fps_limiter()
-            except KeyboardInterrupt:
-                break
+        except KeyboardInterrupt:
+            sys.exit()
 
     def init_audio_service(self, show_output=False):
         try:
@@ -46,8 +48,7 @@ class AudioProcessService:
             self._skip_routine = False
             self._devices = AudioInfo.get_audio_devices(self._py_audio)
 
-            self.log_output(show_output, logging.INFO,
-                            "Found the following audio sources:")
+            self.log_output(show_output, logging.INFO, "Found the following audio sources:")
 
             # Select the audio device you want to use.
             selected_device_list_index = 0
@@ -57,8 +58,8 @@ class AudioProcessService:
                 if mic_id == -1:
                     return
                 selected_device_list_index = int(mic_id)
-            except Exception as e:
-                self.logger.exception(f"Could not parse audio id: {e}")
+            except Exception:
+                self.logger.exception("Could not parse audio id.")
 
             # Check if the index is inside the list.
             self.selected_device = None
@@ -138,10 +139,8 @@ class AudioProcessService:
                 frames_per_buffer=self._frames_per_buffer,
                 stream_callback=callback
             )
-        except Exception as e:
-            self.logger.error("Could not init AudioService.")
-            self.logger.exception(
-                f"Unexpected error in init_audio_service: {e}")
+        except Exception:
+            self.logger.exception("Unexpected error in init_audio_service.")
 
     def log_output(self, show_output, log_level, message):
         if show_output:
@@ -207,8 +206,7 @@ class AudioProcessService:
 
             self.start_time_2 = time()
 
-        except IOError:
-            self.logger.exception("IOError while reading the Microphone Stream.")
-        except Exception as e:
-            self.logger.error("Could not run AudioService routine.")
-            self.logger.exception(f"Unexpected error in routine: {e}")
+        except OSError:
+            self.logger.exception("OSError while reading the Microphone Stream.")
+        except Exception:
+            self.logger.exception("Unexpected error in routine.")

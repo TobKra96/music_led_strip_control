@@ -1,24 +1,22 @@
-from libs.webserver.executer_base import ExecuterBase
-
-from configparser import ConfigParser, ParsingError, MissingSectionHeaderError
-from flask import request, redirect, url_for, session, Flask, Response
-from flask_login import LoginManager, UserMixin, login_user
-from urllib.parse import urlparse, urljoin
-from typing import TypedDict
+import platform
+import re
+import secrets
+from configparser import ConfigParser, MissingSectionHeaderError, ParsingError
 from copy import deepcopy
 from os import chmod
-import platform
-import secrets
-import re
+from typing import TypedDict
+from urllib.parse import urljoin, urlparse
 
+from flask import Flask, Response, redirect, request, session, url_for
+from flask_login import LoginManager, UserMixin, login_user
+from libs.webserver.executer_base import ExecuterBase
 
 login_manager = LoginManager()
 
 
 class PinConfig(TypedDict):
-    """
-    Type definition for the PIN config dictionary.
-    """
+    """Type definition for the PIN config dictionary."""
+
     DEFAULT_PIN: str
     USE_PIN_LOCK: bool
 
@@ -31,15 +29,22 @@ class User(UserMixin):
 @login_manager.user_loader
 def user_loader(user_id: str) -> User:
     if not AuthenticationExecuter.instance.is_pin_active():
-        return
-    user = User(user_id)
-    return user
+        return None
+    return User(user_id)
 
 
 @login_manager.unauthorized_handler
 def unauthorized() -> Response:
-    session['next'] = request.path
-    return redirect(url_for('authentication_api.login', next=session.get('next')))
+    # TODO: Do not check amount of url queries, so that an API key can be used.
+    # if request.path.startswith("/api/"):
+    #     error_msg = {
+    #         "error": "Unauthorized",
+    #         "message": "No valid API key provided."
+    #         "status": 401
+    #     }
+    #     return jsonify(error_msg), 401
+    session["next"] = request.path
+    return redirect(url_for("authentication_api.login", next=session.get("next")))
 
 
 class AuthenticationExecuter(ExecuterBase):
@@ -62,32 +67,29 @@ class AuthenticationExecuter(ExecuterBase):
         self.logger.debug("Enter add_server_authentication()")
 
         if not self.validate_pin(self.USER_PIN) and self.IS_PIN_ACTIVE:
-            raise ValueError("PIN must be from 4 to 8 digits.")
+            msg = "PIN must be from 4 to 8 digits."
+            raise ValueError(msg)
 
         server.secret_key = secrets.token_urlsafe(16)  # Force login on restart.
         if not self.IS_PIN_ACTIVE:
             # TODO: LOGIN_DISABLED will be deprecated.
             # https://github.com/maxcountryman/flask-login/issues/697
-            server.config['LOGIN_DISABLED'] = True
+            server.config["LOGIN_DISABLED"] = True
         login_manager.init_app(server)
 
         return server
 
     def save_config(self) -> None:
-        """
-        Save PIN config to file.
-        """
+        """Save PIN config to file."""
         self.logger.debug("Saving PIN to file...")
-        with open(self.config_path, 'w') as configfile:
+        with open(self.config_path, "w") as configfile:
             self.config.write(configfile)
             if platform.system().lower() == "linux":
                 chmod(self.config_path, 775)
         self.logger.debug("Pin saved to file.")
 
     def reset_config(self) -> None:
-        """
-        Reset the PIN config file to default values.
-        """
+        """Reset the PIN config file to default values."""
         self.logger.debug("Resetting PIN...")
         for section in self.config.sections():
             self.config.remove_section(section)
@@ -96,15 +98,12 @@ class AuthenticationExecuter(ExecuterBase):
         self.logger.debug("PIN reset.")
 
     def read_config(self) -> PinConfig:
-        """
-        Read PIN settings from config file.
-        Check if .ini file exists and if security options are valid.
-        """
+        """Read PIN settings from config file. Check if .ini file exists and if security options are valid."""
         default_values = deepcopy(self.default_values)
         try:
             self.logger.debug("Reading PIN config...")
             dataset = self.config.read(self.config_path)
-            self.logger.debug(f"PIN config read.")
+            self.logger.debug("PIN config read.")
         except (ParsingError, MissingSectionHeaderError) as e:
             self.logger.debug(f"Reading PIN failed: {e}")
             self.reset_config()
@@ -115,8 +114,8 @@ class AuthenticationExecuter(ExecuterBase):
         if self.config_path in dataset:
             try:
                 new_values: PinConfig = {
-                    "DEFAULT_PIN": self.config['SECURITY'].get('DEFAULT_PIN'),
-                    "USE_PIN_LOCK": self.config['SECURITY'].getboolean('USE_PIN_LOCK')
+                    "DEFAULT_PIN": self.config["SECURITY"].get("DEFAULT_PIN"),
+                    "USE_PIN_LOCK": self.config["SECURITY"].getboolean("USE_PIN_LOCK")
                 }
                 return new_values
             except (ValueError, KeyError) as e:
@@ -124,60 +123,46 @@ class AuthenticationExecuter(ExecuterBase):
                 self.reset_config()
                 return default_values
         else:
-            self.logger.debug(f"PIN file is not in dataset.")
+            self.logger.debug("PIN file is not in dataset.")
             self.reset_config()
         self.logger.debug("PIN read from file.")
         return default_values
 
     def validate_pin(self, pin: str) -> bool:
-        """
-        Validate PIN to be from 4 to 8 digits.
-        """
+        """Validate PIN to be from 4 to 8 digits."""
         return bool(re.fullmatch(r"\d{4,8}", pin))
 
     def is_safe_url(self, target: str) -> bool:
-        """
-        Check if URL is safe to redirect to.
-        """
+        """Check if URL is safe to redirect to."""
         ref_url = urlparse(request.host_url)
         test_url = urlparse(urljoin(request.host_url, target))
-        return test_url.scheme in ('http', 'https') and ref_url.netloc == test_url.netloc
+        return test_url.scheme in ("http", "https") and ref_url.netloc == test_url.netloc
 
     def set_pin_setting(self, data: PinConfig) -> None:
-        """
-        Interface to set PIN settings from API.
-        """
+        """Interface to set PIN settings from API."""
         self.logger.debug("Enter set_pin_setting()")
         self.config["SECURITY"] = data
         self.save_config()
 
     def get_pin_setting(self) -> PinConfig:
-        """
-        Interface to get PIN settings from API.
-        """
+        """Interface to get PIN settings from API."""
         self.logger.debug("Enter get_pin_setting()")
         return self.read_config()
 
     def reset_pin_settings(self) -> PinConfig:
-        """
-        Interface to reset PIN settings from API.
-        """
+        """Interface to reset PIN settings from API."""
         self.logger.debug("Enter reset_pin_settings()")
         self.reset_config()
         return self.read_config()
 
     def login(self) -> None:
-        """
-        Log in the user.
-        """
+        """Log in the user."""
         self.logger.debug("Enter login()")
         user_id = "1001"
         user = User(user_id)
         login_user(user)
 
     def is_pin_active(self) -> bool:
-        """
-        Check if PIN is active.
-        """
+        """Check if PIN is active."""
         self.logger.debug("Enter is_pin_active()")
         return self.IS_PIN_ACTIVE

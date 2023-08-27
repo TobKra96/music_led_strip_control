@@ -1,0 +1,85 @@
+Return active effect
+---
+tags:
+  - Effect
+
+parameters:
+  - name: device
+    in: query
+    description: "ID of `device` to return active effect from\n\n
+                  Return active effects for all devices and groups if not specified"
+    required: false
+    schema:
+      type: string
+    examples:
+      example1:
+        summary: device ID device_0
+        value: device_0
+
+responses:
+  200:
+    description: OK
+    content:
+      application/json:
+        schema:
+          oneOf:
+            - type: object
+              properties:
+                devices:
+                  type: array
+                  items:
+                    type: object
+                    required:
+                      - device
+                      - effect
+                    properties:
+                      device:
+                        type: string
+                      effect:
+                        type: string
+                groups:
+                  type: array
+                  items:
+                    type: object
+                    required:
+                      - group
+                      - effects
+                    properties:
+                      group:
+                        type: string
+                      effects:
+                        type: array
+                        items:
+                          type: string
+
+            - type: object
+              required:
+                - device
+                - effect
+              properties:
+                device:
+                  type: string
+                effect:
+                  type: string
+
+        examples:
+          example1:
+            summary: Without specified device
+            value:
+              devices:
+                - device: string
+                  effect: string
+              groups:
+                - group: string
+                  effects: array
+          example2:
+            summary: With specified device
+            value:
+              device: string
+              effect: string
+
+  404:
+    description: Not Found
+
+  422:
+    description: Unprocessable Entity

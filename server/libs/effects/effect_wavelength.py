@@ -1,7 +1,7 @@
-from libs.effects.effect import Effect  # pylint: disable=E0611, E0401
-
-from scipy.ndimage import gaussian_filter1d
 import numpy as np
+from scipy.ndimage import gaussian_filter1d
+
+from libs.effects.effect import Effect  # pylint: disable=E0611, E0401
 
 
 class EffectWavelength(Effect):
@@ -31,7 +31,7 @@ class EffectWavelength(Effect):
         # If the r array is smaller than the led_count, the r array will be filled with the last value.
         r_len_before_resize = len(r)
         missing_values = led_count - r_len_before_resize
-        r = np.pad(r, (0, missing_values), 'edge')
+        r = np.pad(r, (0, missing_values), "edge")
 
         start_gradient_index = (led_count if effect_config["reverse_grad"] else 0)
         end_gradient_index = (None if effect_config["reverse_grad"] else led_count)
