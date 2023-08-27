@@ -151,9 +151,9 @@ class Webserver:
         Swagger(self.server, template=swagger_template, config=swagger_config)
 
         if DEBUG:
-            self.server.run(host="127.0.0.1", port=webserver_port, load_dotenv=False, debug=True)
+            self.server.run(host="0.0.0.0", port=webserver_port, load_dotenv=False, debug=True)  # noqa: S104
         else:
-            serve(self.server, host="127.0.0.1", port=webserver_port, threads=8, clear_untrusted_proxy_headers=False)
+            serve(self.server, host="0.0.0.0", port=webserver_port, threads=8, clear_untrusted_proxy_headers=False)  # noqa: S104
 
         while True:
             sleep(10)
