@@ -121,7 +121,7 @@ class SystemInfoExecuter(ExecuterBase):
     def get_services() -> dict[str, list[str]]:
         """Return list of system services."""
         return {
-            "services": ["mlsc", "hostapd", "dhcpcd", "dnsmasq"]
+            "services": ["mlsc", "hostapd", "NetworkManager", "dnsmasq"]
         }
 
     def get_system_info_services(self: SystemInfoExecuter) -> dict[str, list[dict]]:
