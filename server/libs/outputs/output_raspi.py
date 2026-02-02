@@ -1,16 +1,19 @@
-from libs.outputs.output import Output  # pylint: disable=E0611, E0401
-
 import numpy as np
-import logging
+from loguru import logger
+
+from libs.outputs.output import Output
 
 
 class OutputRaspi(Output):
-    def __init__(self, device):
+    def __init__(self, device) -> None:
         # Call the constructor of the base class.
-        super(OutputRaspi, self).__init__(device)
-        self.logger = logging.getLogger(__name__)
+        super().__init__(device)
 
-        import _rpi_ws281x as ws  # pylint: disable=import-error
+        try:
+            import _rpi_ws281x as ws  # noqa: PLC0415
+        except (ImportError, ModuleNotFoundError):
+            return
+            from rpi_ws281x import ws  # noqa: PLC0415
 
         output_id = "output_raspi"
 
@@ -50,15 +53,14 @@ class OutputRaspi(Output):
             led_strip = self._led_strip_mapper[self._led_strip]
             if led_strip is not None:
                 self._led_strip_translated = led_strip
-                self.logger.debug(f"Found Led Strip {self._led_strip}")
+                logger.debug(f"Found Led Strip {self._led_strip}")
         except Exception as e:
-            self.logger.exception(f"Could not find LED Strip Type. Exception: {str(e)}")
-            pass
+            logger.exception(f"Could not find LED Strip Type. Exception: {e}")
 
         self._led_brightness_translated = int(255 * (self._led_brightness / 100))
 
-        self.logger.debug(f"LED Brightness: {self._led_brightness}")
-        self.logger.debug(f"LED Brightness converted: {self._led_brightness_translated}")
+        logger.debug(f"LED Brightness: {self._led_brightness}")
+        logger.debug(f"LED Brightness converted: {self._led_brightness_translated}")
 
         self._leds = ws.new_ws2811_t()
 
@@ -77,10 +79,14 @@ class OutputRaspi(Output):
         resp = ws.ws2811_init(self._leds)
         if resp != ws.WS2811_SUCCESS:
             message = ws.ws2811_get_return_t_str(resp)
-            raise RuntimeError(f'ws2811_init failed with code {resp} ({message})')
+            error_msg = f"ws2811_init failed with code {resp} ({message})"
+            raise RuntimeError(error_msg)
 
     def show(self, output_array):
-        import _rpi_ws281x as ws  # pylint: disable=import-error
+        try:
+            import _rpi_ws281x as ws  # noqa: PLC0415
+        except (ImportError, ModuleNotFoundError):
+            from rpi_ws281x import ws  # noqa: PLC0415
 
         # Typecast the array to int.
         output_array = output_array.clip(0, 255).astype(int)
@@ -88,9 +94,9 @@ class OutputRaspi(Output):
         # Check if we have a white channel or not.
         if len(output_array[:]) == 4 and "SK6812" in self._led_strip:
             # Sort the colors as RGB type.
-            g = np.left_shift(output_array[1][:].astype(int), 24)  # pylint: disable=assignment-from-no-return
-            r = np.left_shift(output_array[0][:].astype(int), 16)  # pylint: disable=assignment-from-no-return
-            b = np.left_shift(output_array[2][:].astype(int), 8)  # pylint: disable=assignment-from-no-return
+            g = np.left_shift(output_array[1][:].astype(int), 24)
+            r = np.left_shift(output_array[0][:].astype(int), 16)
+            b = np.left_shift(output_array[2][:].astype(int), 8)
             w = output_array[3][:].astype(int)
             grbw = np.bitwise_or(np.bitwise_or(np.bitwise_or(r, g), b), w).astype(int)
 
@@ -99,8 +105,8 @@ class OutputRaspi(Output):
                 ws.ws2811_led_set(self.channel, i, int(grbw[i].item()))
         else:
             # Sort the colors as RGB type.
-            g = np.left_shift(output_array[1][:].astype(int), 16)  # pylint: disable=assignment-from-no-return
-            r = np.left_shift(output_array[0][:].astype(int), 8)  # pylint: disable=assignment-from-no-return
+            g = np.left_shift(output_array[1][:].astype(int), 16)
+            r = np.left_shift(output_array[0][:].astype(int), 8)
             b = output_array[2][:].astype(int)
             grb = np.bitwise_or(np.bitwise_or(r, g), b).astype(int)
 
@@ -112,4 +118,5 @@ class OutputRaspi(Output):
 
         if resp != ws.WS2811_SUCCESS:
             message = ws.ws2811_get_return_t_str(resp)
-            raise RuntimeError(f'ws2811_render failed with code {resp} ({message})')
+            error_msg = f"ws2811_render failed with code {resp} ({message})"
+            raise RuntimeError(error_msg)

@@ -1,0 +1,68 @@
+Return colors
+---
+tags:
+  - Resources
+
+responses:
+  200:
+    description: OK
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - black
+            - blue
+            - cyan
+            - green
+            - orange
+            - pink
+            - purple
+            - red
+            - white
+            - yellow
+          properties:
+            # `constant` is a custom property, not part of the OpenAPI spec,
+            # since `const` is available only in OpenAPI 3.1
+            black:
+              type: string
+              constant: black
+            blue:
+              type: string
+              constant: blue
+            cyan:
+              type: string
+              constant: cyan
+            green:
+              type: string
+              constant: green
+            orange:
+              type: string
+              constant: orange
+            pink:
+              type: string
+              constant: pink
+            purple:
+              type: string
+              constant: purple
+            red:
+              type: string
+              constant: red
+            white:
+              type: string
+              constant: white
+            yellow:
+              type: string
+              constant: yellow
+
+        example:
+          black: string
+          blue: string
+          cyan: string
+          green: string
+          orange: string
+          pink: string
+          purple: string
+          red: string
+          white: string
+          yellow: string

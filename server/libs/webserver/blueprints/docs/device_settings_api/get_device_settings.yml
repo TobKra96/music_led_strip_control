@@ -1,0 +1,138 @@
+Return device settings
+---
+tags:
+  - Settings
+
+parameters:
+  - name: device
+    in: query
+    description: ID of `device` to return settings from
+    required: true
+    schema:
+      type: string
+    examples:
+      example1:
+        summary: device ID device_0
+        value: device_0
+
+  - name: setting_key
+    in: query
+    description: "Specific `setting_key` to return from device\n\n
+                  Return all settings if not specified\n\n
+                  __Note:__ `excluded_key` and `setting_key` are mutually exclusive"
+    required: false
+    schema:
+      type: string
+      enum:
+        - device_groups
+        - device_name
+        - effects
+        - fps
+        - led_brightness
+        - led_count
+        - led_mid
+        - led_strip
+        - output
+        - output_type
+
+  - name: excluded_key
+    in: query
+    description: "Specific `excluded_key` to exclude from returned settings\n\n
+                  __Note:__ `excluded_key` and `setting_key` are mutually exclusive"
+    required: false
+    schema:
+      type: string
+      enum:
+        - device_groups
+        - device_name
+        - effects
+        - fps
+        - led_brightness
+        - led_count
+        - led_mid
+        - led_strip
+        - output
+        - output_type
+
+responses:
+  200:
+    description: OK
+    content:
+      application/json:
+        schema:
+          oneOf:
+            - type: object
+              required:
+                - device
+                - setting_key
+                - setting_value
+              properties:
+                device:
+                  type: string
+                  description: Device ID
+                setting_key:
+                  type: string
+                  description: Setting to return
+                setting_value:
+                  oneOf:
+                    - type: string
+                    - type: integer
+                      format: int32
+                    - type: object
+                      description: A setting value that is a dictionary
+                  description: Value of setting
+
+            - type: object
+              required:
+                - device
+                - settings
+              properties:
+                device:
+                  type: string
+                  description: Device ID
+                settings:
+                  type: object
+                  description: All settings for device
+
+            - type: object
+              required:
+                - device
+                - excluded_key
+                - settings
+              properties:
+                device:
+                  type: string
+                  description: Device ID
+                excluded_key:
+                  type: string
+                  description: Setting to exclude
+                settings:
+                  type: object
+                  description: All settings for device except `excluded_key`
+
+        examples:
+          example1:
+            summary: Without specified setting_key or excluded_key
+            value:
+              device: string
+              settings: object
+
+          example2:
+            summary: With specified setting_key
+            value:
+              device: string
+              setting_key: string
+              setting_value: string/integer/object
+
+          example3:
+            summary: With specified excluded_key
+            value:
+              device: string
+              excluded_key: string
+              settings: object
+
+  404:
+    description: Not Found
+
+  422:
+    description: Unprocessable Entity

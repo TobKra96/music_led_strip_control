@@ -1,0 +1,149 @@
+Return output-type settings for a device
+---
+tags:
+  - Settings
+
+parameters:
+  - name: device
+    in: query
+    description: The device ID
+    required: true
+    schema:
+      type: string
+    examples:
+      example1:
+        summary: device ID device_0
+        value: device_0
+
+  - name: output_type_key
+    in: query
+    description: "The name of the output type\n\n
+                 Return all output settings if `output_type_key` and `setting_key` are not specified"
+    required: false
+    schema:
+      type: string
+      enum:
+        - output_mqtt
+        - output_raspi
+        - output_udp
+
+  - name: setting_key
+    in: query
+    description: |
+      The setting to get from the selected `output_type_key` output<br><br>
+      __Note:__ `setting_key` is REQUIRED if `output_type_key` is specified<br><br>
+      View the table below for the allowed `setting_key` values for each `output_type_key`:<br><br>
+      | Selected `output_type_key` | Allowed `setting_key` value                              |
+      | ---------------------------| ---------------------------------------------------------|
+      | *output_mqtt*              | *mqtt_broker, mqtt_path*                                 |
+      | *output_raspi*             | *led_channel, led_dma, led_freq_hz, led_invert, led_pin* |
+      | *output_udp*               | *udp_client_ip, udp_client_port*                         |
+    required: false
+    schema:
+      type: string
+      enum:
+        - mqtt_broker
+        - mqtt_path
+        - led_channel
+        - led_dma
+        - led_freq_hz
+        - led_invert
+        - led_pin
+        - udp_client_ip
+        - udp_client_port
+
+responses:
+  200:
+    description: OK
+    content:
+      application/json:
+        schema:
+          oneOf:
+            - type: object
+              required:
+                - device
+                - output_settings
+              properties:
+                device:
+                  type: string
+                  description: Device ID
+                output_settings:
+                  type: object
+                  properties:
+                    led_channel:
+                      type: integer
+                      format: int32
+                    led_dma:
+                      type: integer
+                      format: int32
+                    led_freq_hz:
+                      type: integer
+                      format: int32
+                    led_invert:
+                      type: boolean
+                    led_pin:
+                      type: integer
+                      format: int32
+                    mqtt_broker:
+                      type: string
+                    mqtt_path:
+                      type: string
+                    udp_client_ip:
+                      type: string
+                    udp_client_port:
+                      type: integer
+                      format: int32
+
+            - type: object
+              required:
+                - device
+                - output_type_key
+                - setting_key
+                - setting_value
+              properties:
+                device:
+                  type: string
+                  description: Device ID
+                output_type_key:
+                  type: string
+                setting_key:
+                  type: string
+                setting_value:
+                  oneOf:
+                    - type: string
+                    - type: integer
+                      format: int32
+                    - type: boolean
+
+        examples:
+          example1:
+            summary: Without specified output_type_key and setting_key
+            value:
+              device: string
+              output_settings:
+                led_channel: integer
+                led_dma: integer
+                led_freq_hz: integer
+                led_invert: boolean
+                led_pin: integer
+                mqtt_broker: string
+                mqtt_path: string
+                udp_client_ip: string
+                udp_client_port: integer
+
+          example2:
+            summary: With specified output_type_key and setting_key
+            value:
+              device: string
+              output_type_key: string
+              setting_key: string
+              setting_value: string/integer/boolean
+
+  404:
+    $ref: '#/components/responses/404'
+
+  422:
+    $ref: '#/components/responses/422'
+
+  401:
+    description: Unauthorized

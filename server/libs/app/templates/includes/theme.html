@@ -1,0 +1,10 @@
+<!-- This script should be included in the head of the page as a Jinja2 template, to avoid FOUC. -->
+<script>
+    if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+        localStorage.theme = 'dark';
+    } else {
+        document.documentElement.classList.remove('dark');
+        localStorage.theme = 'light';
+    }
+</script>

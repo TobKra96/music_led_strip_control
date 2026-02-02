@@ -1,31 +1,51 @@
 from enum import Enum
+from typing import ClassVar
 
 
-class EffectsEnum(Enum):
-    effect_off = 1
-    effect_single = 2
-    effect_gradient = 3
-    effect_fade = 4
-    effect_server = 5
-    effect_scroll = 6
-    effect_energy = 7
-    effect_wavelength = 8
-    effect_bars = 9
-    effect_power = 10
-    effect_beat = 11
-    effect_wave = 12
-    effect_slide = 13
-    effect_bubble = 14
-    effect_twinkle = 15
-    effect_pendulum = 16
-    effect_rods = 17
-    effect_beat_slide = 18
-    effect_wiggle = 19
-    effect_vu_meter = 20
-    effect_spectrum_analyzer = 21
-    effect_sync_fade = 22
-    effect_advanced_scroll = 23
-    effect_direction_changer = 24
-    effect_beat_twinkle = 25
-    effect_segment_color = 26
-    effect_fireplace = 27
+class EffectNames:
+    """Add a new effect ID and Name to the correct dictionary in this class."""
+
+    non_music: ClassVar[dict[str, str]] = {
+        "effect_single": "Single",
+        "effect_gradient": "Gradient",
+        "effect_fade": "Fade",
+        "effect_sync_fade": "Sync Fade",
+        "effect_slide": "Slide",
+        "effect_bubble": "Bubble",
+        "effect_twinkle": "Twinkle",
+        "effect_pendulum": "Pendulum",
+        "effect_rods": "Rods",
+        "effect_segment_color": "Segment Color",
+        "effect_fireplace": "Fireplace",
+        "effect_strobe": "Strobe"
+    }
+
+    music: ClassVar[dict[str, str]] = {
+        "effect_scroll": "Scroll",
+        "effect_advanced_scroll": "Advanced Scroll",
+        "effect_energy": "Energy",
+        "effect_wavelength": "Wavelength",
+        "effect_bars": "Bars",
+        "effect_power": "Power",
+        "effect_beat": "Beat",
+        "effect_beat_twinkle": "Beat Twinkle",
+        "effect_beat_slide": "Beat Slide",
+        "effect_wave": "Wave",
+        "effect_wiggle": "Wiggle",
+        "effect_vu_meter": "VU Meter",
+        "effect_spectrum_analyzer": "Spectrum Analyzer",
+        "effect_direction_changer": "Direction Changer",
+        "effect_border": "Border"
+    }
+
+    special: ClassVar[dict[str, str]] = {
+        "effect_off": "Off",
+        "effect_random_cycle": "Random Cycle",
+        "effect_random_non_music": "Random Non-Music",
+        "effect_random_music": "Random Music"
+    }
+
+
+# Dynamically create `EffectsEnum`, so that only one place (`EffectNames`)
+# needs to be changed when adding new effects.
+EffectsEnum = Enum("EffectsEnum", {**EffectNames.non_music, **EffectNames.music, **EffectNames.special})

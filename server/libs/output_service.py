@@ -1,24 +1,24 @@
-from libs.notification_enum import NotificationEnum  # pylint: disable=E0611, E0401
-from libs.outputs.output_raspi import OutputRaspi  # pylint: disable=E0611, E0401
-from libs.outputs.output_dummy import OutputDummy  # pylint: disable=E0611, E0401
-from libs.outputs.output_udp import OutputUDP  # pylint: disable=E0611, E0401
-from libs.output_enum import OutputsEnum  # pylint: disable=E0611, E0401
-from libs.fps_limiter import FPSLimiter  # pylint: disable=E0611, E0401
-
+import sys
 from time import time
+
 import numpy as np
-import logging
+from loguru import logger
+
+from libs.fps_limiter import FPSLimiter
+from libs.notification_enum import NotificationEnum
+from libs.output_enum import OutputsEnum
+from libs.outputs.output_dummy import OutputDummy
+from libs.outputs.output_raspi import OutputRaspi
+from libs.outputs.output_udp import OutputUDP
 
 
-class OutputService():
+class OutputService:
     def start(self, device):
-        self.logger = logging.getLogger(__name__)
 
         self._device = device
         self._led_strip = self._device.device_config["led_strip"]
 
-        self.logger.info(
-            f'Starting Output service... Device: {self._device.device_config["device_name"]}')
+        logger.info(f'Starting Output service... Device: {self._device.device_config["device_name"]}')
 
         # Initial config load.
         self._config = self._device.config
@@ -44,18 +44,17 @@ class OutputService():
         }
 
         current_output_enum = OutputsEnum[self._device.device_config["output_type"]]
-        self.logger.debug(f"Found output: {current_output_enum}")
+        logger.debug(f"Found output: {current_output_enum}")
         self._current_output = self._available_outputs[current_output_enum](
             self._device)
 
-        self.logger.debug(
-            f'Output component started. Device: {self._device.device_config["device_name"]}')
+        logger.debug(f'Output component started. Device: {self._device.device_config["device_name"]}')
 
-        while not self._cancel_token:
-            try:
+        try:
+            while not self._cancel_token:
                 self.output_routine()
-            except KeyboardInterrupt:
-                break
+        except KeyboardInterrupt:
+            sys.exit()
 
     def output_routine(self):
         # Limit the fps to decrease lags caused by 100 percent CPU.
@@ -89,7 +88,7 @@ class OutputService():
         if not self._output_queue.empty():
             current_output_array = self._output_queue.get_blocking()
             # Add another Array of LEDS for White Channel
-            if "SK6812" in self._led_strip and len(current_output_array) == 3:
+            if "sk6812" in self._led_strip and len(current_output_array) == 3:
                 current_output_array = np.vstack(
                     (current_output_array, np.zeros(self._device.device_config["led_count"])))
 
@@ -101,8 +100,7 @@ class OutputService():
             self.ten_seconds_counter = time()
             self.time_dif = self.end_time - self.start_time
             self.fps = 1 / self.time_dif
-            self.logger.info(
-                f'FPS: {self.fps:.2f} | Device: {self._device.device_config["device_name"]}')
+            logger.info(f'FPS: {self.fps:.2f} | Device: {self._device.device_config["device_name"]}')
 
         self.start_time = time()
 
@@ -111,7 +109,7 @@ class OutputService():
         self._current_output.clear()
 
     def refresh(self):
-        self.logger.debug("Refreshing output...")
+        logger.debug("Refreshing output...")
 
         # Refresh the config,
         self._config = self._device.config
@@ -120,4 +118,4 @@ class OutputService():
         self._device_notification_queue_out.put_blocking(
             NotificationEnum.config_refresh_finished)
 
-        self.logger.debug("Output refreshed.")
+        logger.debug("Output refreshed.")

@@ -1,0 +1,263 @@
+html {
+    --white-base: #ffffff;
+    --white-1: #c9d0d5;
+    --black-base: #000000;
+    --black-1: #090909;
+    --black-2: #101011;
+    --slate-border-2: #2c3849;
+    --slate-border-3: #242e3c;
+    --slate-border-4: #17202e;
+    --slate-900: #0f172a;
+    --slate-800: #1e293b;
+    --slate-700: #334155;
+    --slate-600: #475569;
+    --slate-500: #64748b;
+    --slate-400: #94a3b8;
+    --slate-300: #cbd5e1;
+    --slate-200: #e2e8f0;
+    --slate-100: #f1f5f9;
+    --slate-50: #f8fafc;
+    --red-500: #ef4444;
+    --red-300: #fca5a5;
+    --green-600: #16a34a;
+    --emerald-500: #10b981;
+    --teal-500: #14b8a6;
+    --blue-500: #3b82f6;
+    --blue-400: #60a5fa;
+}
+
+/* Dark theme. */
+
+/* ########################################### */
+
+/* Background */
+html, .swagger-ui {
+    background: var(--slate-800);
+    color: rgb(216, 222, 233);
+}
+
+/* ########################################### */
+
+/* Top bar */
+.swagger-ui .topbar {
+    background: var(--slate-900);
+}
+
+/* Top bar input */
+.swagger-ui .topbar .download-url-wrapper input[type=text] {
+    background: var(--slate-600);
+    color: var(--white-base);
+    border: 2px solid var(--slate-600);
+}
+
+/* Top bar "Explore" button */
+.swagger-ui .topbar .download-url-wrapper .download-url-button {
+    background: var(--green-600);
+    border: 2px solid var(--green-600);
+}
+
+/* ########################################### */
+
+/* Header title */
+.swagger-ui .info .title {
+    color: var(--white-base);
+}
+
+/* Header links */
+.swagger-ui .info a {
+    color: var(--blue-400);
+}
+
+/* Header description */
+.swagger-ui .info li, .swagger-ui .info p, .swagger-ui .info table {
+    color: var(--slate-300);
+}
+
+/* ########################################### */
+
+/* Scheme and Auth container */
+.swagger-ui .scheme-container {
+    background: var(--slate-700);
+}
+
+/* Server URL selector */
+.swagger-ui .servers select {
+    background: var(--slate-600);
+    color: var(--white-base);
+    border-color: var(--slate-800);
+}
+
+/* ########################################### */
+
+/* Tag names */
+.swagger-ui .opblock-tag {
+    background: var(--slate-800);
+    color: var(--slate-300);
+    border-color: var(--slate-700);
+}
+
+/* Tag descriptions */
+.swagger-ui .opblock-tag small {
+    color: var(--slate-300);
+}
+
+/* Tag arrows */
+.swagger-ui .expand-methods svg, .swagger-ui .expand-operation svg {
+    fill: var(--slate-300);
+}
+
+/* ########################################### */
+
+/* Endpoint URLs */
+.swagger-ui .opblock .opblock-summary-operation-id, .swagger-ui .opblock .opblock-summary-path, .swagger-ui .opblock .opblock-summary-path__deprecated {
+    color: var(--white-base);
+}
+
+/* Endpoint descriptions */
+.swagger-ui .opblock .opblock-summary-description {
+    color: var(--slate-300);
+}
+
+/* Endpoint icons */
+.swagger-ui svg:not(:root) {
+    fill: var(--slate-300);
+}
+
+/* ########################################### */
+
+/* Endpoint docs description */
+.swagger-ui .opblock-description-wrapper p, .swagger-ui .opblock-external-docs-wrapper p, .swagger-ui .opblock-title_normal p,
+.swagger-ui .opblock-description-wrapper, .swagger-ui .opblock-external-docs-wrapper, .swagger-ui .opblock-title_normal {
+    color: var(--slate-300);
+}
+
+/* Endpoint docs section header */
+.swagger-ui .opblock .opblock-section-header {
+    background: hsla(0, 0%, 100%, 0.05);
+}
+
+/* Endpoint docs section header text */
+.swagger-ui .opblock .opblock-section-header h4 {
+    color: var(--white-base);
+}
+
+/* Endpoint "Try Out" button */
+.swagger-ui .btn.try-out__btn {
+    color: var(--slate-300);
+    border-color: var(--slate-300);
+}
+
+/* Endpoint "Cancel" button */
+.swagger-ui .btn.cancel {
+    color: var(--red-300);
+    border-color: var(--red-300);
+}
+
+/* Endpoint "Execute" button */
+.swagger-ui .btn.execute {
+    background: var(--blue-500);
+    border-color: var(--blue-500);
+}
+
+/* Endpoint request media type and example selectors */
+.swagger-ui select {
+    background: var(--slate-800);
+    color: var(--white-base);
+    border-color: var(--slate-600);
+}
+
+/* Endpoint response table status code */
+.swagger-ui .response-col_status {
+    color: var(--slate-300);
+}
+
+/* Endpoint response table status description */
+.swagger-ui table thead tr td, .swagger-ui table thead tr th {
+    border-color: var(--slate-600);
+    color: var(--slate-300);
+}
+
+/* Endpoint response table links */
+.swagger-ui .response-col_links {
+    color: var(--slate-300);
+}
+
+/* Endpoint response media type selector */
+.swagger-ui .response-control-media-type--accept-controller select {
+    background: var(--slate-800);
+    color: var(--green-600);
+    border-color: var(--green-600);
+}
+
+/* Endpoint response media type selector message */
+.swagger-ui .response-control-media-type__accept-message {
+    color: var(--green-600);
+}
+
+/* Example/Schema tabs */
+.swagger-ui .tab li button.tablinks {
+    color: var(--slate-300);
+}
+
+/* Example/Schema tab divider */
+.swagger-ui .tab li:first-of-type:after {
+    background: var(--slate-500);
+}
+
+/* ########################################### */
+
+/* DELETE method icon and header underline */
+.swagger-ui .opblock.opblock-delete .opblock-summary-method,
+.swagger-ui .opblock.opblock-delete .tab-header .tab-item.active h4 span:after {
+    background: var(--red-500);
+}
+
+/* DELETE method box */
+.swagger-ui .opblock.opblock-delete {
+    background: rgba(239, 68, 68, 0.05);
+    border-color: var(--red-500);
+}
+
+/* ########################################### */
+
+/* GET method icon and header underline */
+.swagger-ui .opblock.opblock-get .opblock-summary-method,
+.swagger-ui .opblock.opblock-get .tab-header .tab-item.active h4 span:after {
+    background: var(--blue-500);
+}
+
+/* GET method box */
+.swagger-ui .opblock.opblock-get {
+    background: rgba(59, 130, 246, 0.05);
+    border-color: var(--blue-500);
+}
+
+/* ########################################### */
+
+/* POST method icon and header underline */
+.swagger-ui .opblock.opblock-post .opblock-summary-method,
+.swagger-ui .opblock.opblock-post .tab-header .tab-item.active h4 span:after {
+    background: var(--emerald-500);
+}
+
+/* POST method box */
+.swagger-ui .opblock.opblock-post {
+    background: rgba(16, 185, 129, 0.1);
+    border-color: var(--emerald-500);
+}
+
+/* ########################################### */
+
+/* PATCH method icon and header underline */
+.swagger-ui .opblock.opblock-patch .opblock-summary-method,
+.swagger-ui .opblock.opblock-patch .tab-header .tab-item.active h4 span:after {
+    background: var(--teal-500);
+}
+
+/* PATCH method box */
+.swagger-ui .opblock.opblock-patch {
+    background: rgba(20, 184, 166, 0.1);
+    border-color: var(--teal-500);
+}
+
+/* ########################################### */

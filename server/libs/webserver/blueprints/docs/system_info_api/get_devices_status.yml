@@ -1,0 +1,36 @@
+Devices status
+---
+tags:
+  - System
+
+responses:
+  200:
+    description: OK
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - devices
+          properties:
+            devices:
+              type: array
+              items:
+                type: object
+                required:
+                  - connected
+                  - id
+                  - name
+                properties:
+                  connected:
+                    type: boolean
+                  id:
+                    type: string
+                  name:
+                    type: string
+
+        example:
+          devices:
+            - connected: boolean
+              id: string
+              name: string

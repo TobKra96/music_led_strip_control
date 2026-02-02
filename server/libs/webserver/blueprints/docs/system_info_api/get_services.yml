@@ -1,0 +1,23 @@
+System services
+---
+tags:
+  - System
+
+responses:
+  200:
+    description: OK
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - services
+          properties:
+            services:
+              type: array
+              items:
+                type: string
+
+        example:
+          services:
+            - string

@@ -1,9 +1,9 @@
-from time import time, sleep
+from time import sleep, time
 
 
 class FPSLimiter:
 
-    def __init__(self, fps):
+    def __init__(self, fps) -> None:
         self._fps = fps
 
         # Init FPS Limiter.

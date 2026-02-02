@@ -1,0 +1,76 @@
+Set effect settings
+---
+tags:
+  - Settings
+
+requestBody:
+  description: "The effect settings which to set.\n\n
+                Remove `device` to apply effect settings to all devices\n\n
+                __Note:__ Not all settings are required."
+  required: true
+  content:
+    application/json:
+      schema:
+        type: object
+        required:
+          - effect
+          - settings
+        properties:
+          device:
+            type: string
+          effect:
+            type: string
+          settings:
+            type: object
+            description: Effect settings. Check the config for available settings
+
+      examples:
+        example1:
+          summary: Default effect_single settings
+          value:
+            device: device_0
+            effect: effect_single
+            settings:
+              color: blue
+              custom_color:
+                - 0
+                - 0
+                - 255
+              use_custom_color: false
+              white: 0
+
+responses:
+  200:
+    description: OK
+    content:
+      application/json:
+        schema:
+          type: object
+
+        examples:
+          example1:
+            summary: Default effect_single settings for a single device
+            value:
+              device: device_0
+              effect: effect_single
+              settings:
+                color: string
+                custom_color: array
+                use_custom_color: boolean
+                white: integer
+
+          example2:
+            summary: Default effect_single settings for all devices
+            value:
+              effect: effect_single
+              settings:
+                color: string
+                custom_color: array
+                use_custom_color: boolean
+                white: integer
+
+  404:
+   description: Not Found
+
+  422:
+   description: Unprocessable Entity

@@ -1,53 +1,66 @@
-from libs.webserver.executer_base import ExecuterBase
-
-from sys import platform
-import subprocess
 import re
+import subprocess
+from sys import platform
+
+from libs.webserver.executer_base import ExecuterBase
+from loguru import logger
 
 
 class MicrophoneSettingsExecuter(ExecuterBase):
-    def microphone_get_volume(self):
-        result = dict()
+    def microphone_get_volume(self) -> dict:
+        """Return information about the microphone volume."""
+        result = {}
         try:
             process = subprocess.run(
-                ["amixer", "get", "Mic"], universal_newlines=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                ["/usr/bin/amixer", "-D", "hw:Device", "sget", "Mic"],
+                text=True,
+                capture_output=True,
+                check=False
+            )
 
             result["output"] = process.stdout
             result["error"] = process.stderr
             result["returncode"] = process.returncode
             result["level"] = self.get_level_form_output(result["output"])
 
-        except Exception as e:
+        except Exception:
+            logger.exception("Unknown error.")
             if platform == "linux":
-                self.logger.exception(f"Exeception during mic level down.", e)
+                logger.exception("Exeception during mic level down.")
             result["level"] = 0
             result["output"] = ""
             result["error"] = "Could not change set mic volume."
             result["returncode"] = 1
 
-        finally:
-            return result
+        return result
 
-    def microphone_set_volume(self, level):
-        result = dict()
+    @staticmethod
+    def microphone_set_volume(level: str) -> dict:
+        """Set the microphone volume."""
+        result = {}
         try:
             process = subprocess.run(
-                ["amixer", "set", "Mic", f"{level}%"], universal_newlines=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                ["/usr/bin/amixer", "-D", "hw:Device", "sset", "Mic", f"{level}%"],
+                text=True,
+                capture_output=True,
+                check=False
+            )
 
             result["output"] = process.stdout
             result["error"] = process.stderr
             result["returncode"] = process.returncode
 
-        except Exception as e:
-            self.logger.exception(f"Exeception during mic level up.", e)
+        except Exception:
+            logger.exception("Exeception during mic level up.")
             result["output"] = ""
             result["error"] = "Could not change set mic volume."
             result["returncode"] = 1
 
-        finally:
-            return result
+        return result
 
-    def get_level_form_output(self, output):
+    @staticmethod
+    def get_level_form_output(output: str) -> int:
+        """Get the level from the output of the amixer command."""
         if output is None or not output:
             return 0
 
@@ -56,7 +69,7 @@ class MicrophoneSettingsExecuter(ExecuterBase):
         x = re.search(r"(\d+)?%", output)
         try:
             level = int(x.group(1))
-        except Exception as e:
-            self.logger.debug("Could not get mic level.")
+        except Exception:
+            logger.exception("Could not get mic level.")
 
         return level

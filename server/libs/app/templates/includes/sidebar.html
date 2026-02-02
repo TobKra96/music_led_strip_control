@@ -1,0 +1,100 @@
+{% from "includes/macros.html" import nav_link with context %}
+
+<nav class="pcoded-navbar">
+    <div class="navbar-wrapper">
+        <div class="navbar-brand header-logo">
+            <div class="b-brand">
+                <img src="{{ url_for('static', filename='assets/images/mlsc_icon.svg') }}" alt="MLSC" draggable="false" width="40px">
+                <span class="b-title">MLSC</span>
+            </div>
+            <a class="mobile-menu" id="mobile-collapse" href="javascript:"><span></span></a>
+        </div>
+
+        <div class="navbar-content scroll-div">
+            <ul class="nav pcoded-inner-navbar">
+                <li class="nav-item pcoded-menu-caption">
+                    <label>Navigation</label>
+                </li>
+                <li class="nav-item {{'active' if segment == 'dashboard'}}">
+                    <a href="{{ url_for('home_blueprint.index') }}" class="nav-link"><span class="pcoded-micon"><i class="feather icon-home"></i></span><span class="pcoded-mtext">Dashboard</span></a>
+                </li>
+                <li class="nav-item {{'active' if segment == 'system_status'}}">
+                    <a href="{{ url_for('home_blueprint.route_system_status') }}" class="nav-link"><span class="pcoded-micon"><i class="feather icon-activity"></i></span><span class="pcoded-mtext">System Status</span></a>
+                </li>
+                <li class="nav-item pcoded-menu-caption">
+                    <label>General</label>
+                </li>
+                <li class="nav-item pcoded-hasmenu {{'pcoded-trigger' if 'effect_' in segment}}">
+                    <a href="javascript:" class="nav-link"><span class="pcoded-micon"><i class="feather icon-edit"></i></span><span class="pcoded-mtext">Edit Effects</span></a>
+                    <ul id="effect_list" class="pcoded-submenu">
+                        <li class="py-0 nav-item pcoded-menu-caption">
+                            <label>Special Effects</label>
+                        </li>
+                        {{ nav_link('/effects/effect_random_cycle', 'Random Cycle') }}
+
+                        <li class="pb-0 nav-item pcoded-menu-caption">
+                            <label>Non-Music Effects</label>
+                        </li>
+                        {{ nav_link('/effects/effect_single', 'Single') }}
+                        {{ nav_link('/effects/effect_gradient', 'Gradient') }}
+                        {{ nav_link('/effects/effect_fade', 'Fade') }}
+                        {{ nav_link('/effects/effect_sync_fade', 'Sync Fade') }}
+                        {{ nav_link('/effects/effect_slide', 'Slide') }}
+                        {{ nav_link('/effects/effect_bubble', 'Bubble') }}
+                        {{ nav_link('/effects/effect_twinkle', 'Twinkle') }}
+                        {{ nav_link('/effects/effect_pendulum', 'Pendulum') }}
+                        {{ nav_link('/effects/effect_rods', 'Rods') }}
+                        {{ nav_link('/effects/effect_segment_color', 'Segment Color') }}
+                        {{ nav_link('/effects/effect_fireplace', 'Fireplace') }}
+                        {{ nav_link('/effects/effect_strobe', 'Strobe') }}
+
+                        <li class="pb-0 nav-item pcoded-menu-caption">
+                            <label>Music Effects</label>
+                        </li>
+                        {{ nav_link('/effects/effect_scroll', 'Scroll') }}
+                        {{ nav_link('/effects/effect_advanced_scroll', 'Advanced Scroll') }}
+                        {{ nav_link('/effects/effect_energy', 'Energy') }}
+                        {{ nav_link('/effects/effect_wavelength', 'Wavelength') }}
+                        {{ nav_link('/effects/effect_bars', 'Bars') }}
+                        {{ nav_link('/effects/effect_power', 'Power') }}
+                        {{ nav_link('/effects/effect_beat', 'Beat') }}
+                        {{ nav_link('/effects/effect_beat_twinkle', 'Beat Twinkle') }}
+                        {{ nav_link('/effects/effect_beat_slide', 'Beat Slide') }}
+                        {{ nav_link('/effects/effect_wave', 'Wave') }}
+                        {{ nav_link('/effects/effect_wiggle', 'Wiggle') }}
+                        {{ nav_link('/effects/effect_vu_meter', 'VU Meter') }}
+                        {{ nav_link('/effects/effect_spectrum_analyzer', 'Spectrum Analyzer') }}
+                        {{ nav_link('/effects/effect_direction_changer', 'Direction Changer') }}
+                        {{ nav_link('/effects/effect_border', 'Border') }}
+                    </ul>
+                </li>
+                <li class="nav-item pcoded-hasmenu {{'pcoded-trigger' if '_settings' in segment}}">
+                    <a href="javascript:" class="nav-link"><span class="pcoded-micon"><i class="feather icon-settings"></i></span><span class="pcoded-mtext">Settings</span></a>
+                    <ul id="settings_list" class="pcoded-submenu">
+                        {{ nav_link('/settings/general_settings', 'General Settings') }}
+                        {{ nav_link('/settings/device_settings', 'Device Settings') }}
+                        <!-- {{ nav_link('/settings/microphone_adjustment', 'Microphone Adjustment') }} -->
+                    </ul>
+                </li>
+                <li class="nav-item pcoded-menu-caption {{'d-none' if not current_user.is_authenticated}}">
+                    <label>Security</label>
+                </li>
+                <li class="nav-item {{'d-none' if not current_user.is_authenticated}}">
+                    <a href="{{ url_for('authentication_api.logout') }}" class="nav-link"><span class="pcoded-micon"><i class="feather icon-lock"></i></span><span class="pcoded-mtext">Lock Dashboard</span></a>
+                </li>
+                <li class="nav-item pcoded-menu-caption">
+                    <label>Information</label>
+                </li>
+                <li class="nav-item">
+                    <a href="https://github.com/TobKra96/music_led_strip_control" target="_blank" rel="noopener noreferrer" class="nav-link"><span class="pcoded-micon"><i class="feather icon-github"></i></span><span class="pcoded-mtext">GitHub Homepage</span></a>
+                </li>
+                <li class="nav-item">
+                    <a href="https://discord.gg/Xa28JAvAZA" target="_blank" rel="noopener noreferrer" class="nav-link"><span class="pcoded-micon"><i class="feather icon-message-square"></i></span><span class="pcoded-mtext">Discord Channel</span></a>
+                </li>
+                <li class="nav-item mb-4">
+                    <a href="{{ url_for('flask_openapi.apidocs') }}" target="_blank" rel="noopener noreferrer" class="nav-link"><span class="pcoded-micon"><i class="feather icon-file"></i></span><span class="pcoded-mtext">API Documentation</span></a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>

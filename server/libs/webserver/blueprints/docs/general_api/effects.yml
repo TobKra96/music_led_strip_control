@@ -1,0 +1,349 @@
+Return effects and their order
+---
+tags:
+  - Resources
+responses:
+  200:
+    description: OK
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - music
+            - non_music
+            - order
+            - special
+          properties:
+            music:
+              type: object
+              required:
+                - effect_advanced_scroll
+                - effect_bars
+                - effect_beat
+                - effect_beat_slide
+                - effect_beat_twinkle
+                - effect_border
+                - effect_direction_changer
+                - effect_energy
+                - effect_power
+                - effect_scroll
+                - effect_spectrum_analyzer
+                - effect_vu_meter
+                - effect_wave
+                - effect_wavelength
+                - effect_wiggle
+              properties:
+                effect_advanced_scroll:
+                  type: string
+                  constant: Advanced Scroll
+                effect_bars:
+                  type: string
+                  constant: Bars
+                effect_beat:
+                  type: string
+                  constant: Beat
+                effect_beat_slide:
+                  type: string
+                  constant: Beat Slide
+                effect_beat_twinkle:
+                  type: string
+                  constant: Beat Twinkle
+                effect_border:
+                  type: string
+                  constant: Border
+                effect_direction_changer:
+                  type: string
+                  constant: Direction Changer
+                effect_energy:
+                  type: string
+                  constant: Energy
+                effect_power:
+                  type: string
+                  constant: Power
+                effect_scroll:
+                  type: string
+                  constant: Scroll
+                effect_spectrum_analyzer:
+                  type: string
+                  constant: Spectrum Analyzer
+                effect_vu_meter:
+                  type: string
+                  constant: VU Meter
+                effect_wave:
+                  type: string
+                  constant: Wave
+                effect_wavelength:
+                  type: string
+                  constant: Wavelength
+                effect_wiggle:
+                  type: string
+                  constant: Wiggle
+            non_music:
+              type: object
+              required:
+                - effect_bubble
+                - effect_fade
+                - effect_fireplace
+                - effect_gradient
+                - effect_pendulum
+                - effect_rods
+                - effect_segment_color
+                - effect_single
+                - effect_slide
+                - effect_strobe
+                - effect_sync_fade
+                - effect_twinkle
+              properties:
+                effect_bubble:
+                  type: string
+                  constant: Bubble
+                effect_fade:
+                  type: string
+                  constant: Fade
+                effect_fireplace:
+                  type: string
+                  constant: Fireplace
+                effect_gradient:
+                  type: string
+                  constant: Gradient
+                effect_pendulum:
+                  type: string
+                  constant: Pendulum
+                effect_rods:
+                  type: string
+                  constant: Rods
+                effect_segment_color:
+                  type: string
+                  constant: Segment Color
+                effect_single:
+                  type: string
+                  constant: Single
+                effect_slide:
+                  type: string
+                  constant: Slide
+                effect_strobe:
+                  type: string
+                  constant: Strobe
+                effect_sync_fade:
+                  type: string
+                  constant: Sync Fade
+                effect_twinkle:
+                  type: string
+                  constant: Twinkle
+            order:
+              type: object
+              required:
+                - effect_advanced_scroll
+                - effect_bars
+                - effect_beat
+                - effect_beat_slide
+                - effect_beat_twinkle
+                - effect_border
+                - effect_bubble
+                - effect_direction_changer
+                - effect_energy
+                - effect_fade
+                - effect_fireplace
+                - effect_gradient
+                - effect_off
+                - effect_pendulum
+                - effect_power
+                - effect_random_cycle
+                - effect_random_music
+                - effect_random_non_music
+                - effect_rods
+                - effect_scroll
+                - effect_segment_color
+                - effect_single
+                - effect_slide
+                - effect_spectrum_analyzer
+                - effect_strobe
+                - effect_sync_fade
+                - effect_twinkle
+                - effect_vu_meter
+                - effect_wave
+                - effect_wavelength
+                - effect_wiggle
+              properties:
+                effect_advanced_scroll:
+                  type: integer
+                  constant: 14
+                effect_bars:
+                  type: integer
+                  constant: 17
+                effect_beat:
+                  type: integer
+                  constant: 19
+                effect_beat_slide:
+                  type: integer
+                  constant: 21
+                effect_beat_twinkle:
+                  type: integer
+                  constant: 20
+                effect_border:
+                  type: integer
+                  constant: 27
+                effect_bubble:
+                  type: integer
+                  constant: 6
+                effect_direction_changer:
+                  type: integer
+                  constant: 26
+                effect_energy:
+                  type: integer
+                  constant: 15
+                effect_fade:
+                  type: integer
+                  constant: 3
+                effect_fireplace:
+                  type: integer
+                  constant: 11
+                effect_gradient:
+                  type: integer
+                  constant: 2
+                effect_off:
+                  type: integer
+                  constant: 28
+                effect_pendulum:
+                  type: integer
+                  constant: 8
+                effect_power:
+                  type: integer
+                  constant: 18
+                effect_random_cycle:
+                  type: integer
+                  constant: 29
+                effect_random_music:
+                  type: integer
+                  constant: 31
+                effect_random_non_music:
+                  type: integer
+                  constant: 30
+                effect_rods:
+                  type: integer
+                  constant: 9
+                effect_scroll:
+                  type: integer
+                  constant: 13
+                effect_segment_color:
+                  type: integer
+                  constant: 10
+                effect_single:
+                  type: integer
+                  constant: 1
+                effect_slide:
+                  type: integer
+                  constant: 5
+                effect_spectrum_analyzer:
+                  type: integer
+                  constant: 25
+                effect_strobe:
+                  type: integer
+                  constant: 12
+                effect_sync_fade:
+                  type: integer
+                  constant: 4
+                effect_twinkle:
+                  type: integer
+                  constant: 7
+                effect_vu_meter:
+                  type: integer
+                  constant: 24
+                effect_wave:
+                  type: integer
+                  constant: 22
+                effect_wavelength:
+                  type: integer
+                  constant: 16
+                effect_wiggle:
+                  type: integer
+                  constant: 23
+            special:
+              type: object
+              required:
+                - effect_off
+                - effect_random_cycle
+                - effect_random_music
+                - effect_random_non_music
+              properties:
+                effect_off:
+                  type: string
+                  constant: "Off"  # In quotes to avoid YAML parsing as boolean
+                effect_random_cycle:
+                  type: string
+                  constant: Random Cycle
+                effect_random_music:
+                  type: string
+                  constant: Random Music
+                effect_random_non_music:
+                  type: string
+                  constant: Random Non-Music
+
+        example:
+          music:
+            effect_advanced_scroll: string
+            effect_bars: string
+            effect_beat: string
+            effect_beat_slide: string
+            effect_beat_twinkle: string
+            effect_border: Border
+            effect_direction_changer: string
+            effect_energy: string
+            effect_power: string
+            effect_scroll: string
+            effect_spectrum_analyzer: string
+            effect_vu_meter: string
+            effect_wave: string
+            effect_wavelength: string
+            effect_wiggle: string
+          non_music:
+            effect_bubble: string
+            effect_fade: string
+            effect_fireplace: string
+            effect_gradient: string
+            effect_pendulum: string
+            effect_rods: string
+            effect_segment_color: string
+            effect_single: string
+            effect_slide: string
+            effect_strobe: string
+            effect_sync_fade: string
+            effect_twinkle: string
+          order:
+            effect_advanced_scroll: integer
+            effect_bars: integer
+            effect_beat: integer
+            effect_beat_slide: integer
+            effect_beat_twinkle: integer
+            effect_border: integer
+            effect_bubble: integer
+            effect_direction_changer: integer
+            effect_energy: integer
+            effect_fade: integer
+            effect_fireplace: integer
+            effect_gradient: integer
+            effect_off: integer
+            effect_pendulum: integer
+            effect_power: integer
+            effect_random_cycle: integer
+            effect_random_music: integer
+            effect_random_non_music: integer
+            effect_rods: integer
+            effect_scroll: integer
+            effect_segment_color: integer
+            effect_single: integer
+            effect_slide: integer
+            effect_spectrum_analyzer: integer
+            effect_strobe: integer
+            effect_sync_fade: integer
+            effect_twinkle: integer
+            effect_vu_meter: integer
+            effect_wave: integer
+            effect_wavelength: integer
+            effect_wiggle: integer
+          special:
+            effect_off: string
+            effect_random_cycle: string
+            effect_random_music: string
+            effect_random_non_music: string

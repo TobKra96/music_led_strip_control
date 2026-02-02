@@ -1,13 +1,13 @@
-from libs.effects.effect import Effect  # pylint: disable=E0611, E0401
-
-from scipy.ndimage.filters import gaussian_filter1d
 import numpy as np
+from scipy.ndimage import gaussian_filter1d
+
+from libs.effects.effect import Effect
 
 
 class EffectScroll(Effect):
-    def __init__(self, device):
+    def __init__(self, device) -> None:
         # Call the constructor of the base class.
-        super(EffectScroll, self).__init__(device)
+        super().__init__(device)
 
         # Scroll Variables.
         self.output_scroll_high = np.array([[0 for i in range(self.led_count)] for i in range(3)])
@@ -26,7 +26,7 @@ class EffectScroll(Effect):
             return
 
         # Effect that scrolls colors corresponding to frequencies across the strip.
-        y = y**4.0
+        y **= 4.0
         n_pixels = led_count
         y = np.copy(self._math_service.interpolate(y, (n_pixels // 2)))
         self._dsp.common_mode.update(y)
@@ -52,7 +52,7 @@ class EffectScroll(Effect):
         mid_steps = effect_config["mid_speed"]
         low_steps = effect_config["low_speed"]
 
-        if(high_steps > 0):
+        if (high_steps > 0):
             self.output_scroll_high[:, high_steps:] = self.output_scroll_high[:, :-high_steps]
 
             # Create new color originating at the center.
@@ -60,7 +60,7 @@ class EffectScroll(Effect):
             self.output_scroll_high[1, :high_steps] = high_val[1]
             self.output_scroll_high[2, :high_steps] = high_val[2]
 
-        if(mid_steps > 0):
+        if (mid_steps > 0):
             self.output_scroll_mid[:, mid_steps:] = self.output_scroll_mid[:, :-mid_steps]
 
             # Create new color originating at the center.
@@ -68,7 +68,7 @@ class EffectScroll(Effect):
             self.output_scroll_mid[1, :mid_steps] = mids_val[1]
             self.output_scroll_mid[2, :mid_steps] = mids_val[2]
 
-        if(low_steps > 0):
+        if (low_steps > 0):
             self.output_scroll_low[:, low_steps:] = self.output_scroll_low[:, :-low_steps]
 
             # Create new color originating at the center.
@@ -90,9 +90,6 @@ class EffectScroll(Effect):
         if blur_amount > 0:
             self.output = gaussian_filter1d(self.output, sigma=blur_amount)
 
-        if effect_config["mirror"]:
-            output_array = self.mirror_array(self.output, led_mid, led_count)
-        else:
-            output_array = self.output
+        output_array = self.mirror_array(self.output, led_mid, led_count) if effect_config["mirror"] else self.output
 
         self.queue_output_array_noneblocking(output_array)

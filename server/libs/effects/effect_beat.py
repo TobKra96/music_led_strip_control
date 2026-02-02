@@ -1,18 +1,20 @@
-from libs.effects.effect import Effect  # pylint: disable=E0611, E0401
+import random
 
 import numpy as np
-import random
+
+from libs.effects.effect import Effect
 
 
 class EffectBeat(Effect):
 
-    def __init__(self, device):
+    def __init__(self, device) -> None:
         # Call the constructor of the base class.
-        super(EffectBeat, self).__init__(device)
+        super().__init__(device)
         # Setup for "EffectBeat" (don't change this).
         self.gradient_position = 0
 
     def run(self):
+        """Effect that flashes to the beat."""
         effect_config = self.get_effect_config("effect_beat")
         led_count = self._device.device_config["led_count"]
         current_gradient = effect_config["gradient"]
@@ -30,7 +32,6 @@ class EffectBeat(Effect):
 
         output = np.zeros((3, led_count))
 
-        """Effect that flashes to the beat"""
         if self.current_freq_detects["beat"]:
             if colorful_mode:
                 full_gradient_ref = self._color_service.full_gradients
@@ -39,7 +40,7 @@ class EffectBeat(Effect):
                     self.gradient_position = random.randrange(0, len(full_gradient_ref[current_gradient][0]), 1)
 
                 else:
-                    self.gradient_position = self.gradient_position + 1
+                    self.gradient_position += 1
                     if self.gradient_position >= len(full_gradient_ref[current_gradient][0]):
                         self.gradient_position = 0
 

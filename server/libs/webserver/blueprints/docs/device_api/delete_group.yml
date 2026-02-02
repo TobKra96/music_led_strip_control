@@ -1,0 +1,46 @@
+Delete global group
+---
+tags:
+  - System
+
+requestBody:
+  description: ID of `group` to delete
+  required: true
+  content:
+    application/json:
+      schema:
+        type: object
+        required:
+          - group
+        properties:
+          group:
+            type: string
+      examples:
+        example1:
+          summary: group ID "group_0"
+          value:
+            group: group_0
+
+responses:
+  200:
+    description: OK
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - groups
+          properties:
+            groups:
+              type: object
+              description: Group ID
+              additionalProperties:
+                type: string
+                description: Group name
+              maxProperties: 100
+
+  404:
+    description: Not Found
+
+  422:
+    description: Unprocessable Entity

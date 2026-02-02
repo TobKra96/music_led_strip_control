@@ -1,22 +1,20 @@
-from libs.effects.effect import Effect  # pylint: disable=E0611, E0401
-
 import numpy as np
+
+from libs.effects.effect import Effect
 
 
 class EffectSegmentColor(Effect):
     def run(self):
-        """
-        Show one single color.
-        """
+        """Show one single color."""
         # Get the config of the current effect.
         effect_config = self.get_effect_config("effect_segment_color")
         led_count = self._device.device_config["led_count"]
         # Build an empty array.
         output_array = np.zeros((3, led_count))
 
-        max = (len(effect_config.keys()) // 3) + 1
+        max_len = (len(effect_config.keys()) // 3) + 1
 
-        for x in range(1, max):
+        for x in range(1, max_len):
             segment_number = str(x).zfill(2)
 
             colorkey = f"segment_{segment_number}_color"
@@ -35,14 +33,12 @@ class EffectSegmentColor(Effect):
             if start <= 0:
                 start = 1
 
-            if start > led_count:
-                start = led_count
+            start = min(start, led_count)
 
             if end <= 0:
                 end = 1
 
-            if end > led_count:
-                end = led_count
+            end = min(end, led_count)
 
             if end < start:
                 continue

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>
+        MLSC | {% block title %}{% endblock %}
+    </title>
+    <!-- Meta -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+    <!-- Favicon icon -->
+    <link rel="icon" href="{{ url_for('static', filename='assets/images/favicon.ico') }}" type="image/x-icon">
+
+    <!-- fontawesome icon -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/fonts/fontawesome/css/fontawesome-all.min.css') }}">
+    <!-- animation css -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/plugins/animation/css/animate.min.css') }}">
+    <!-- vendor css -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/style.css') }}">
+    <!-- own css -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/own.css') }}">
+    <!-- dark theme css -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/dark.css') }}">
+
+    <!-- Specific CSS goes HERE -->
+    {% block stylesheets %}{% endblock stylesheets %}
+
+    <!-- Set the theme based on the user preference -->
+    {% include 'includes/theme.html' %}
+
+</head>
+
+<body>
+
+    <!-- [ Pre-loader ] start -->
+    <div class="loader-bg">
+        <div class="loader-track">
+            <div class="loader-fill"></div>
+        </div>
+    </div>
+
+    <!-- SideBar -->
+    {% include 'includes/sidebar.html' %}
+
+    <!-- Top Bar -->
+    {% include 'includes/navigation.html' %}
+
+    <div class="pcoded-main-container">
+        <div class="pcoded-wrapper">
+            {% block content %}{% endblock content %}
+        </div>
+    </div>
+
+    {% include 'includes/scripts.html' %}
+
+    <!-- Specific Page JS goes HERE  -->
+    {% block javascripts %}{% endblock javascripts %}
+
+</body>
+</html>

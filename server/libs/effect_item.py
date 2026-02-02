@@ -1,5 +1,5 @@
-class EffectItem():
-    def __init__(self, effect_enum, device_id):
+class EffectItem:
+    def __init__(self, effect_enum, device_id) -> None:
         self.__effect_enum = effect_enum
         self.__device_id = device_id
 

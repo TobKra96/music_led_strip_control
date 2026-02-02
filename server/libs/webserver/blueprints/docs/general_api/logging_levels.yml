@@ -1,0 +1,46 @@
+Return logging levels
+---
+tags:
+  - Resources
+
+responses:
+  200:
+    description: OK
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - critical
+            - debug
+            - error
+            - info
+            - notset
+            - warning
+          properties:
+            critical:
+              type: string
+              constant: Critical
+            debug:
+              type: string
+              constant: Debug
+            error:
+              type: string
+              constant: Error
+            info:
+              type: string
+              constant: Info
+            notset:
+              type: string
+              constant: Not set
+            warning:
+              type: string
+              constant: Warning
+
+        example:
+          critical: string
+          debug: string
+          error: string
+          info: string
+          notset: string
+          warning: string

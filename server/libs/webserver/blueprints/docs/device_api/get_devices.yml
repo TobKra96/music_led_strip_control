@@ -1,0 +1,94 @@
+Return devices
+---
+tags:
+  - System
+
+responses:
+  200:
+    description: OK
+    content:
+      application/json:
+        schema:
+          type: array
+          items:
+            type: object
+            required:
+              - assigned_to
+              - id
+              - name
+            properties:
+              assigned_to:
+                type: object
+                description: Group ID
+                additionalProperties:
+                  type: string
+                  description: Group name
+              id:
+                type: string
+                description: Device ID
+              name:
+                type: string
+                description: Device name
+          maxItems: 100
+
+components:
+  schemas:
+    APIResponse:
+      type: object
+      required:
+        - code
+        - message
+        - message_id
+      properties:
+        code:
+          type: integer
+          format: int32
+          description: HTTP status code
+          minimum: 100
+          maximum: 600
+        message:
+          type: string
+          description: Response message
+        message_id:
+          type: string
+          description: Message ID
+
+  responses:
+    404:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/APIResponse'
+          examples:
+            NotFound:
+              $ref: '#/components/examples/NotFound'
+
+    422:
+      description: Unprocessable Entity
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/APIResponse'
+          examples:
+            UnprocessableEntity:
+              $ref: '#/components/examples/UnprocessableEntity'
+
+  examples:
+    NotFound:
+      value:
+        code: 404
+        message: Resource does not exist
+        message_id: NotFound
+
+    UnprocessableEntity:
+      value:
+        code: 422
+        message: Unprocessable entity. Check the request body.
+        message_id: UnprocessableEntity
+
+  # TODO:
+  # Change example to examples.
+  # Compose error messages better.
+  # Set all data types to proper formats.
+  # Add examples to components.

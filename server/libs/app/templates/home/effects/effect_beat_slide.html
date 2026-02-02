@@ -1,0 +1,98 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Edit Effect Beat Slide {% endblock %}
+
+<!-- Specific CSS goes HERE -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+    <div class="pcoded-content">
+        <div class="pcoded-inner-content">
+
+            {% include 'includes/toasts.html' %}
+
+            <!-- [ breadcrumb ] start -->
+            <div class="page-header">
+                <div class="page-block">
+                    <div class="row align-items-center">
+                        <div class="col-md-12">
+                            <div class="page-header-title">
+                                <h5 class="m-b-10">Beat Slide</h5>
+                            </div>
+                            <ul class="breadcrumb">
+                                <li class="breadcrumb-item"><a href="{{ url_for('home_blueprint.index') }}"><i class="feather icon-home"></i></a></li>
+                                <li class="breadcrumb-item"><a href="javascript:">Edit Effects</a></li>
+                                <li class="breadcrumb-item"><a href="javascript:">Beat Slide</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- [ breadcrumb ] end -->
+            <div class="main-body">
+                <div class="page-wrapper">
+                    <!-- [ Main Content ] start -->
+
+                    {% include 'includes/devices.html' %}
+
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5>Beat Slide Effect Settings</h5>
+                                </div>
+                                <div class="card-block">
+                                    <p>Edit the Beat Slide effect.</p>
+                                    <input type="hidden" id="settingsIdentifier" value="effect">
+                                    <input type="hidden" id="effectIdentifier" value="effect_beat_slide">
+                                    <form id="settingsForm" action method="post" novalidate autocomplete="off">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label>Single Color</label>
+                                                    <select name="color:string" id="color" class="form-control colors setting_input"></select>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6"></div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label>Speed <span for="speed" class="mb-0 badge badge-secondary"></span></label>
+                                                    <input name="speed:number" id="speed" type="range" class="custom-range setting_input" min="0" max="20" step="0.1" required>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>Slider Length <span for="slider_length" class="mb-0 badge badge-secondary"></span></label>
+                                                    <input name="slider_length:number" id="slider_length" type="range" class="custom-range setting_input" min="0" max="200" step="1" required>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label>Bar Length <span for="bar_length" class="mb-0 badge badge-secondary"></span></label>
+                                                    <input name="bar_length:number" id="bar_length" type="range" class="custom-range setting_input" min="0" max="600" step="1" required>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>Decay <span for="decay" class="mb-0 badge badge-secondary"></span></label>
+                                                    <input name="decay:number" id="decay" type="range" class="custom-range setting_input" min="0" max="0.9" step="0.1" required>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="mt-4 d-flex flex-md-row flex-column justify-content-md-end">
+                                            <button type="button" id="save_btn" class="btn btn-success m-0">Save</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- [ Main Content ] end -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+<script src="{{ url_for('static', filename='assets/js/settings.effect.js') }}" type="module"></script>
+{% endblock javascripts %}

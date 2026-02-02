@@ -1,5 +1,5 @@
-class NotificationItem():
-    def __init__(self, notification_enum, device_id):
+class NotificationItem:
+    def __init__(self, notification_enum, device_id) -> None:
         self.__notification_enum = notification_enum
         self.__device_id = device_id
 

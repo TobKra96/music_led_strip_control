@@ -1,11 +1,11 @@
-from scipy.ndimage.filters import gaussian_filter1d
-from numpy import abs, arange, linspace, zeros
 from math import log
+
 import numpy as np
+from scipy.ndimage import gaussian_filter1d
 
 
-class DSP():
-    def __init__(self, config, device_config=None):
+class DSP:
+    def __init__(self, config, device_config=None) -> None:
         self._config = config
         self._device_config = device_config
 
@@ -15,10 +15,7 @@ class DSP():
         frames_per_buffer = self._config["general_settings"]["frames_per_buffer"]
         n_rolling_history = self._config["general_settings"]["n_rolling_history"]
 
-        if device_config is None:
-            led_count = 200
-        else:
-            led_count = self._device_config["led_count"]
+        led_count = 200 if device_config is None else self._device_config["led_count"]
 
         self.fft_plot_filter = ExpFilter(np.tile(1e-1, n_fft_bins), alpha_decay=0.5, alpha_rise=0.99)
         self.mel_gain = ExpFilter(np.tile(1e-1, n_fft_bins), alpha_decay=0.01, alpha_rise=0.99)
@@ -35,7 +32,8 @@ class DSP():
         # self.samples_per_frame = int(default_sample_rate / fps)
         self.samples_per_frame = int(frames_per_buffer)
         # Array containing the rolling audio sample window.
-        self.y_roll = np.random.rand(n_rolling_history, self.samples_per_frame) / 1e16
+        rng = np.random.default_rng()
+        self.y_roll = rng.random((n_rolling_history, self.samples_per_frame)) / 1e16
         self.fft_window = np.hamming(int(frames_per_buffer) * n_rolling_history)
 
         self.samples = None
@@ -45,14 +43,16 @@ class DSP():
         self.create_mel_bank()
 
     def update(self, audio_samples):
-        """
-        Return processed audio data.
+        """Return processed audio data.
+
         Returns mel curve, x/y data.
         This method is called every time there is a microphone update.
-        Returns:
+
+        Returns
         -------
         audio_data: dict
             Dict containing "mel", "vol", "x", and "y".
+
         """
         min_frequency = self._config["general_settings"]["min_frequency"]
         max_frequency = self._config["general_settings"]["max_frequency"]
@@ -66,17 +66,17 @@ class DSP():
         y_data = np.concatenate(self.y_roll, axis=0).astype(np.float32)
         vol = np.max(np.abs(y_data))
         # Transform audio input into the frequency domain.
-        N = len(y_data)
-        N_zeros = 2**int(np.ceil(np.log2(N))) - N
+        N = len(y_data)  # noqa: N806
+        N_zeros = 2**int(np.ceil(np.log2(N))) - N  # noqa: N806
         # Pad with zeros until the next power of two.
         y_data *= self.fft_window
-        y_padded = np.pad(y_data, (0, N_zeros), mode='constant')
-        YS = np.abs(np.fft.rfft(y_padded)[:N // 2])
+        y_padded = np.pad(y_data, (0, N_zeros), mode="constant")
+        YS = np.abs(np.fft.rfft(y_padded))  # noqa: N806
         # Construct a Mel filterbank from the FFT data.
         mel = np.atleast_2d(YS).T * self.mel_y.T
         # Scale data to values more suitable for visualization.
         mel = np.sum(mel, axis=0)
-        mel = mel**2.0
+        mel **= 2.0
         # Gain normalization.
         self.mel_gain.update(np.max(gaussian_filter1d(mel, sigma=1.0)))
         mel /= self.mel_gain.value
@@ -114,7 +114,7 @@ class DSP():
         n_rolling_history = self._config["general_settings"]["n_rolling_history"]
         n_fft_bins = self._config["general_settings"]["n_fft_bins"]
 
-        samples = int(frames_per_buffer * (n_rolling_history / 2))
+        samples = (2**int(np.ceil(np.log2(frames_per_buffer * n_rolling_history)))) // 2 + 1
 
         self.mel_y, (_, self.mel_x) = self.melbank.compute_melmat(
             num_mel_bands=n_fft_bins,
@@ -125,12 +125,13 @@ class DSP():
         )
 
 
-class ExpFilter():
+class ExpFilter:
     """Simple exponential smoothing filter."""
-    def __init__(self, val=0.0, alpha_decay=0.5, alpha_rise=0.5):
+
+    def __init__(self, val=0.0, alpha_decay=0.5, alpha_rise=0.5) -> None:
         """Small rise/decay factors = more smoothing."""
-        assert 0.0 < alpha_decay < 1.0, 'Invalid decay smoothing factor.'
-        assert 0.0 < alpha_rise < 1.0, 'Invalid rise smoothing factor.'
+        assert 0.0 < alpha_decay < 1.0, "Invalid decay smoothing factor."  # noqa: S101
+        assert 0.0 < alpha_rise < 1.0, "Invalid rise smoothing factor."  # noqa: S101
         self.alpha_decay = alpha_decay
         self.alpha_rise = alpha_rise
         self.value = val
@@ -146,8 +147,9 @@ class ExpFilter():
         return self.value
 
 
-class Melbank():
-    """This class implements a Mel Filter Bank.
+class Melbank:
+    """Implement a Mel Filter Bank.
+
     In other words it is a filter bank with triangular shaped bands
     arranged on the mel frequency scale.
     An example is shown in the following figure:
@@ -176,40 +178,47 @@ class Melbank():
         plt.title('Mel Matrix')
         plt.tight_layout()
     Functions
-    ---------
+    ---------.
     """
-    def hertz_to_mel(self, freq):
-        """
-        Returns mel-frequency from linear frequency input.
+
+    @staticmethod
+    def hertz_to_mel(freq):
+        """Return mel-frequency from linear frequency input.
+
         Parameter
         ---------
         freq : scalar or ndarray
             Frequency value or array in Hz.
+
         Returns
         -------
         mel : scalar or ndarray
-            Mel-frequency value or ndarray in Mel
+            Mel-frequency value or ndarray in Mel.
+
         """
         return 3340.0 * log(1 + (freq / 250.0), 9)
 
-    def mel_to_hertz(self, mel):
-        """
-        Returns frequency from mel-frequency input.
+    @staticmethod
+    def mel_to_hertz(mel):
+        """Return frequency from mel-frequency input.
+
         Parameter
         ---------
         mel : scalar or ndarray
             Mel-frequency value or ndarray in Mel
+
         Returns
         -------
         freq : scalar or ndarray
             Frequency value or array in Hz.
+
         """
         # return 700.0 * (10**(mel / 2595.0)) - 700.0
         return 250.0 * (9**(mel / 3340.0)) - 250.0
 
     def melfrequencies_mel_filterbank(self, num_bands, freq_min, freq_max, num_fft_bands):
-        """
-        Returns centerfrequencies and band edges for a mel filter bank
+        """Return centerfrequencies and band edges for a mel filter bank.
+
         Parameters
         ----------
         num_bands : int
@@ -220,17 +229,18 @@ class Melbank():
             Maximum frequency for the last band.
         num_fft_bands : int
             Number of fft bands.
+
         Returns
         -------
         center_frequencies_mel : ndarray
         lower_edges_mel : ndarray
-        upper_edges_mel : ndarray
-        """
+        upper_edges_mel : ndarray.
 
+        """
         mel_max = self.hertz_to_mel(freq_max)
         mel_min = self.hertz_to_mel(freq_min)
-        delta_mel = abs(mel_max - mel_min) / (num_bands + 1.0)
-        frequencies_mel = mel_min + delta_mel * arange(0, num_bands + 2)
+        delta_mel = np.abs(mel_max - mel_min) / (num_bands + 1.0)
+        frequencies_mel = mel_min + delta_mel * np.arange(0, num_bands + 2)
         lower_edges_mel = frequencies_mel[:-2]
         upper_edges_mel = frequencies_mel[2:]
         center_frequencies_mel = frequencies_mel[1:-1]
@@ -238,8 +248,8 @@ class Melbank():
 
     def compute_melmat(self, num_mel_bands=12, freq_min=64, freq_max=8000,
                        num_fft_bands=513, sample_rate=16000):
-        """
-        Returns tranformation matrix for mel spectrum.
+        """Return tranformation matrix for mel spectrum.
+
         Parameters
         ----------
         num_mel_bands : int
@@ -258,6 +268,7 @@ class Melbank():
         sample_rate : scalar
             Sample rate for the signals that will be used.
             Default: 44100
+
         Returns
         -------
         melmat : ndarray
@@ -268,6 +279,7 @@ class Melbank():
             to a mel-spectrum.
         frequencies : tuple (ndarray <num_mel_bands>, ndarray <num_fft_bands>)
             Center frequencies of the mel bands, center frequencies of fft spectrum.
+
         """
         center_frequencies_mel, lower_edges_mel, upper_edges_mel = self.melfrequencies_mel_filterbank(
             num_mel_bands,
@@ -279,8 +291,8 @@ class Melbank():
         center_frequencies_hz = self.mel_to_hertz(center_frequencies_mel)
         lower_edges_hz = self.mel_to_hertz(lower_edges_mel)
         upper_edges_hz = self.mel_to_hertz(upper_edges_mel)
-        freqs = linspace(0.0, sample_rate / 2.0, num_fft_bands)
-        melmat = zeros((num_mel_bands, num_fft_bands))
+        freqs = np.linspace(0.0, sample_rate / 2.0, num_fft_bands)
+        melmat = np.zeros((num_mel_bands, num_fft_bands))
 
         for imelband, (center, lower, upper) in enumerate(zip(
                 center_frequencies_hz, lower_edges_hz, upper_edges_hz)):

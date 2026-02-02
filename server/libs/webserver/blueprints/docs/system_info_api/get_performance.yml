@@ -1,0 +1,128 @@
+System performance
+---
+tags:
+  - System
+
+responses:
+  200:
+    description: OK
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - system
+          properties:
+            system:
+              type: object
+              required:
+                - cpu_info
+                - disk_info
+                - memory_info
+                - network_info
+              properties:
+                cpu_info:
+                  type: object
+                  required:
+                    - frequency
+                    - percent
+                  properties:
+                    frequency:
+                      type: number
+                      description: CPU frequency
+                    percent:
+                      type: number
+                      description: CPU usage
+                disk_info:
+                  type: object
+                  required:
+                    - free
+                    - percent
+                    - total
+                    - used
+                  properties:
+                    free:
+                      type: integer
+                      description: Free disk space
+                    percent:
+                      type: number
+                      description: Disk usage
+                    total:
+                      type: integer
+                      description: Total disk space
+                    used:
+                      type: integer
+                      description: Used disk space
+                memory_info:
+                  type: object
+                  required:
+                    - available
+                    - free
+                    - percent
+                    - total
+                    - used
+                  properties:
+                    available:
+                      type: integer
+                      description: Available memory
+                    free:
+                      type: integer
+                      description: Free memory
+                    percent:
+                      type: number
+                      description: Memory usage
+                    total:
+                      type: integer
+                      description: Total memory
+                    used:
+                      type: integer
+                      description: Used memory
+                network_info:
+                  type: array
+                  items:
+                    type: object
+                    required:
+                      - address
+                      - bytes_recv
+                      - bytes_sent
+                      - name
+                      - netmask
+                    properties:
+                      address:
+                        type: string
+                        description: IP address
+                      bytes_recv:
+                        type: integer
+                        description: Bytes received
+                      bytes_sent:
+                        type: integer
+                        description: Bytes sent
+                      name:
+                        type: string
+                        description: Network interface name
+                      netmask:
+                        type: string
+                        description: Network mask
+
+        example:
+          system:
+            cpu_info:
+              frequency: number
+              percent: number
+            disk_info:
+              free: integer
+              percent: number
+              total: integer
+              used: integer
+            memory_info:
+              available: integer
+              free: integer
+              percent: number
+              total: integer
+              used: integer
+            network_info:
+              - address: string
+                bytes_recv: integer
+                bytes_sent: integer
+                name: string
+                netmask: string

@@ -1,0 +1,47 @@
+Add new global group
+---
+tags:
+  - System
+
+requestBody:
+  description: "Name of `group` to create.\n\n
+               Only alphanumeric characters, underscores, spaces and dashes are allowed"
+  required: true
+  content:
+    application/json:
+      schema:
+        type: object
+        required:
+          - group
+        properties:
+          group:
+            type: string
+      examples:
+        example1:
+          summary: group name "Example Group"
+          value:
+            group: Example Group
+
+responses:
+  200:
+    description: OK
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - groups
+          properties:
+            groups:
+              type: object
+              description: Group ID
+              additionalProperties:
+                type: string
+                description: Group name
+              maxProperties: 100
+
+  409:
+    description: Conflict. Maximum number of groups reached or group already exists
+
+  422:
+    description: Unprocessable Entity

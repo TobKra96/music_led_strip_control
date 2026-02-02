@@ -7,8 +7,8 @@
 </p>
 
 <p align="center">
-  <a style="text-decoration:none" href="https://www.python.org/downloads/release/python-3613/">
-    <img src="https://img.shields.io/badge/python-3.6+-blue.svg?color=3498DB&style=flat-square" alt="Python Version" />
+  <a style="text-decoration:none" href="https://www.python.org/downloads/release/python-3919/">
+    <img src="https://img.shields.io/badge/python-3.9+-blue.svg?color=3498DB&style=flat-square" alt="Python Version" />
   </a>
   <a style="text-decoration:none" href="https://discord.gg/bMmWYGcz/">
     <img src="https://img.shields.io/discord/774182494277992478?color=3498DB&style=flat-square&label=discord" alt="Discord" />
@@ -27,7 +27,6 @@
       <a href="#installing">Installing</a>
       <ul>
         <li><a href="#automated-installation">Automated installation</a></li>
-        <li><a href="#manual-installation">Manual installation</a></li>
       </ul>
     </li>
     <li><a href="#demo">Demo</a></li>
@@ -39,18 +38,21 @@
 
 ## Features
 
-- Audio visualization in real time.
-- Modern web interface.
-- 24 effects with many configuration options.
-- Customizable colors and color schemes.
-- Multicore optimized for large LED strips (900+ LEDs).
-- Multi device support
-- Standalone and client compatible for audio processing.
+- 🎵 Audio visualization in real time.
+- ✨ Modern web interface.
+- 📝 REST API with extensive documentation using SwaggerUI.
+- 🔒 Optional dashboard PIN lock.
+- 📈 System status dashboard.
+- 💡 27 effects with many configuration options.
+- 🎨 Customizable colors and color schemes.
+- ⚡ Multicore optimized for large LED strips (900+ LEDs).
+- 🖥️ Multi-device support.
+- 🎙️ Standalone and client compatible for audio processing.
 
 
 ## Installing
 
-Please check if your hardware is inside the [Compatible Hardware List](https://github.com/TobKra96/music_led_strip_control/wiki/Compatible-Hardware-List).
+Please check if your hardware is listed inside the [Compatible Hardware List](https://github.com/TobKra96/music_led_strip_control/wiki/Compatible-Hardware-List).
 
 ### Automated installation
 Run the following command in your terminal:
@@ -60,8 +62,7 @@ curl -sSL https://raw.githubusercontent.com/TobKra96/music_led_strip_control/mas
 
 The script also accepts some options:
 
-* `-b`, `--branch`       git branch to use (`master`, `dev_2.2`)
-* `-d`, `--developer`    repository of a developer to use (`TobKra96`, `Teraskull`)
+* `-b`, `--branch`       git branch to use (`master`, `dev_2.3`)
 * `-h`, `--help`         show this list of command-line options
 
 After the installation completes, please check the [Installation Guide](https://github.com/TobKra96/music_led_strip_control/wiki/Installation-Guide#iv-configure-music-led-strip-control) to configure the initial settings.
@@ -118,7 +119,13 @@ Flask admin dashboard.
 
 Scripts included:
 
-Bootstrap, jQuery, jQuery-Scrollbar, jQuery-UI, Pickr, Font Awesome.
+[Bootstrap](https://getbootstrap.com/docs/4.6/),
+[jQuery](https://jquery.com/),
+[jQuery-Scrollbar](https://github.com/gromo/jquery.scrollbar/),
+[jQuery-UI](https://jqueryui.com/),
+[Pickr](https://github.com/Simonwep/pickr),
+[Font Awesome](https://fontawesome.com),
+[Tagin](https://github.com/erwinheldy/tagin)
 
 
 ## License

@@ -1,13 +1,13 @@
-from libs.effects.effect import Effect  # pylint: disable=E0611, E0401
-
 import numpy as np
+
+from libs.effects.effect import Effect
 
 
 class EffectWiggle(Effect):
-    def __init__(self, device):
+    def __init__(self, device) -> None:
 
         # Call the constructor of the base class.
-        super(EffectWiggle, self).__init__(device)
+        super().__init__(device)
 
         # Setup for "Wiggle" (don't change this).
         self.bool_lr = 0

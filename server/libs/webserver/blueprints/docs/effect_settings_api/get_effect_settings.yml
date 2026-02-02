@@ -1,0 +1,124 @@
+Return effect settings
+---
+tags:
+  - Settings
+
+parameters:
+  - name: device
+    in: query
+    description: Device for which to get the effect settings from
+    required: true
+    schema:
+      type: string
+    examples:
+      example1:
+        summary: device ID device_0
+        value: device_0
+
+  - name: effect
+    in: query
+    description: Specific effect for a selected device
+    required: true
+    schema:
+      type: string
+      enum:
+        - effect_single
+        - effect_gradient
+        - effect_fade
+        - effect_sync_fade
+        - effect_slide
+        - effect_bubble
+        - effect_twinkle
+        - effect_pendulum
+        - effect_rods
+        - effect_segment_color
+        - effect_fireplace
+        - effect_strobe
+        - effect_scroll
+        - effect_advanced_scroll
+        - effect_energy
+        - effect_wavelength
+        - effect_bars
+        - effect_power
+        - effect_beat
+        - effect_beat_twinkle
+        - effect_beat_slide
+        - effect_wave
+        - effect_wiggle
+        - effect_vu_meter
+        - effect_spectrum_analyzer
+        - effect_direction_changer
+        - effect_border
+        - effect_random_cycle
+  - name: setting_key
+    in: query
+    description: "Specific `setting_key` to return from selected effect\n\n
+                  Return all settings if not specified"
+    required: false
+    schema:
+      type: string
+    examples:
+      example1:
+        summary: color Setting Key
+        value: color
+      example2:
+        summary: gradient Setting Key
+        value: gradient
+
+responses:
+  200:
+    description: OK
+    content:
+      application/json:
+        schema:
+          oneOf:
+            - type: object
+              required:
+                - device
+                - effect
+                - setting_key
+                - setting_value
+              properties:
+                device:
+                  type: string
+                effect:
+                  type: string
+                setting_key:
+                  type: string
+                setting_value:
+                  type: string/number/integer/boolean/array
+
+            - type: object
+              required:
+                - device
+                - effect
+                - settings
+              properties:
+                device:
+                  type: string
+                effect:
+                  type: string
+                settings:
+                  type: object
+                  description: Effect settings. Check the config for available settings
+
+        examples:
+          example1:
+            summary: With specified setting_key
+            value:
+              device: string
+              effect: string
+              setting_key: string
+              setting_value: string/number/integer/boolean/array
+          example2:
+            summary: Without specified setting_key
+            value:
+              device: string
+              effect: string
+              settings: object
+
+  404:
+    description: Not Found
+
+  422:
+    description: Unprocessable Entity

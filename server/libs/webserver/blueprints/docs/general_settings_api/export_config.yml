@@ -1,0 +1,13 @@
+Export configuration file
+---
+tags:
+  - Settings
+
+responses:
+    200:
+      description: OK
+      content:
+        multipart/form-data:
+          schema:
+            type: string
+            format: binary

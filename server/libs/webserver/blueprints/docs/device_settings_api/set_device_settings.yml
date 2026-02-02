@@ -1,0 +1,101 @@
+Set device settings
+---
+tags:
+  - Settings
+
+requestBody:
+  description: "The `settings` which to set for the specified `device`.\n\n
+               __Note:__ Not all settings are required."
+  required: true
+  content:
+    application/json:
+      schema:
+        type: object
+        required:
+          - device
+          - settings
+        properties:
+          device:
+            type: string
+            description: Device ID
+          settings:
+            type: object
+            properties:
+              device_groups:
+                type: object
+                description: Group ID
+                additionalProperties:
+                  type: string
+                  description: Group name
+                maxProperties: 100
+              device_name:
+                type: string
+              effects:
+                type: object
+                description: Effect settings. Check the config for available settings
+              fps:
+                type: integer
+              led_brightness:
+                type: integer
+              led_count:
+                type: integer
+              led_mid:
+                type: integer
+              led_strip:
+                type: string
+              output:
+                type: object
+                description: Output settings. Check the config for available settings
+              output_type:
+                type: string
+            description: Settings to set
+
+      examples:
+        example1:
+          summary: Some default device settings
+          value:
+            device: device_0
+            settings:
+              device_name: Default Device
+              effects:
+                effect_advanced_scroll:
+                  bass_color: orange
+                  bass_speed: 4
+              fps: 60
+              led_brightness: 100
+              led_count: 124
+              led_mid: 64
+              led_strip: ws2812_strip
+              output_type: output_raspi
+
+responses:
+  200:
+    description: OK
+    content:
+      application/json:
+        schema:
+          type: object
+
+        examples:
+          example1:
+            summary: Some default device settings
+            value:
+              device: string
+              settings:
+                device_name: string
+                effects:
+                  effect_advanced_scroll:
+                    bass_color: string
+                    bass_speed: integer
+                fps: integer
+                led_brightness: integer
+                led_count: integer
+                led_mid: integer
+                led_strip: string
+                output_type: string
+
+  404:
+    description: Not Found
+
+  422:
+    description: Unprocessable Entity

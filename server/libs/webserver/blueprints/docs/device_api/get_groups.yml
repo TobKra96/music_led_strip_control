@@ -1,0 +1,22 @@
+Return global groups
+---
+tags:
+  - System
+
+responses:
+  200:
+    description: OK
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - groups
+          properties:
+            groups:
+              type: object
+              description: Group ID
+              additionalProperties:
+                type: string
+                description: Group name
+              maxProperties: 100

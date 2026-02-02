@@ -1,0 +1,96 @@
+Return LED strips
+---
+tags:
+  - Resources
+
+responses:
+  200:
+    description: OK
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - sk6812_shift_wmask
+            - sk6812_strip
+            - sk6812_strip_bgrw
+            - sk6812_strip_brgw
+            - sk6812_strip_gbrw
+            - sk6812_strip_grbw
+            - sk6812_strip_rbgw
+            - sk6812_strip_rgbw
+            - sk6812w_strip
+            - ws2811_strip_bgr
+            - ws2811_strip_brg
+            - ws2811_strip_gbr
+            - ws2811_strip_grb
+            - ws2811_strip_rbg
+            - ws2811_strip_rgb
+            - ws2812_strip
+          properties:
+            sk6812_shift_wmask:
+              type: string
+              constant: sk6812_shift_wmask
+            sk6812_strip:
+              type: string
+              constant: sk6812_strip
+            sk6812_strip_bgrw:
+              type: string
+              constant: sk6812_strip_bgrw
+            sk6812_strip_brgw:
+              type: string
+              constant: sk6812_strip_brgw
+            sk6812_strip_gbrw:
+              type: string
+              constant: sk6812_strip_gbrw
+            sk6812_strip_grbw:
+              type: string
+              constant: sk6812_strip_grbw
+            sk6812_strip_rbgw:
+              type: string
+              constant: sk6812_strip_rbgw
+            sk6812_strip_rgbw:
+              type: string
+              constant: sk6812_strip_rgbw
+            sk6812w_strip:
+              type: string
+              constant: sk6812w_strip
+            ws2811_strip_bgr:
+              type: string
+              constant: ws2811_strip_bgr
+            ws2811_strip_brg:
+              type: string
+              constant: ws2811_strip_brg
+            ws2811_strip_gbr:
+              type: string
+              constant: ws2811_strip_gbr
+            ws2811_strip_grb:
+              type: string
+              constant: ws2811_strip_grb
+            ws2811_strip_rbg:
+              type: string
+              constant: ws2811_strip_rbg
+            ws2811_strip_rgb:
+              type: string
+              constant: ws2811_strip_rgb
+            ws2812_strip:
+              type: string
+              constant: ws2812_strip
+
+        example:
+          sk6812_shift_wmask: string
+          sk6812_strip: string
+          sk6812_strip_bgrw: string
+          sk6812_strip_brgw: string
+          sk6812_strip_gbrw: string
+          sk6812_strip_grbw: string
+          sk6812_strip_rbgw: string
+          sk6812_strip_rgbw: string
+          sk6812w_strip: string
+          ws2811_strip_bgr: string
+          ws2811_strip_brg: string
+          ws2811_strip_gbr: string
+          ws2811_strip_grb: string
+          ws2811_strip_rbg: string
+          ws2811_strip_rgb: string
+          ws2812_strip: string

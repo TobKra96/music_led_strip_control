@@ -1,0 +1,32 @@
+System version
+---
+tags:
+  - System
+
+responses:
+  200:
+    description: OK
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - versions
+          properties:
+            versions:
+              type: array
+              items:
+                type: object
+                required:
+                  - name
+                  - version
+                properties:
+                  name:
+                    type: string
+                  version:
+                    type: string
+
+        example:
+          versions:
+            - name: string
+              version: string

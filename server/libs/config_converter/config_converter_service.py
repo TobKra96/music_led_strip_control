@@ -1,14 +1,15 @@
-from libs.config_converter.config_converter_v2 import ConfigConverterV2  # pylint: disable=E0611, E0401
+from libs.config_converter.config_converter_v2 import ConfigConverterV2
+from libs.config_converter.config_converter_v3 import ConfigConverterV3
 
-import logging
 
+class ConfigConverterService:
+    def __init__(self) -> None:
+        pass
 
-class ConfigConverterService():
-    def __init__(self):
-        self.logger = logging.getLogger(__name__)
-
-    def upgrade(self, old_config):
+    @staticmethod
+    def upgrade(old_config):
         config_converter_v2 = ConfigConverterV2()
+        config_converter_v3 = ConfigConverterV3()
 
         # Convert to the newer config version.
         if "version" not in old_config:
@@ -16,5 +17,8 @@ class ConfigConverterService():
 
         if old_config["version"] < 2:
             old_config = config_converter_v2.upgrade(old_config)
+
+        if old_config["version"] < 3:
+            old_config = config_converter_v3.upgrade(old_config)
 
         return old_config

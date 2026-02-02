@@ -1,0 +1,24 @@
+Remove invalid device groups
+---
+tags:
+  - System
+
+description: "This endpoint should be called after a global group was deleted and there are orphan device groups left.\n\n
+              It compares device groups with global groups and removes any device groups that do not exist.\n\n
+              This prevents deleted global groups from still displaying on devices."
+responses:
+  200:
+    description: OK
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - removed_groups
+          properties:
+            removed_groups:
+              type: object
+              description: Group ID
+              additionalProperties:
+                type: string
+                description: Group name

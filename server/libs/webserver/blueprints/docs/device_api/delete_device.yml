@@ -1,0 +1,42 @@
+Delete device
+---
+tags:
+  - System
+
+requestBody:
+  description: ID of `device` to delete
+  required: true
+  content:
+    application/json:
+      schema:
+        type: object
+        required:
+          - device
+        properties:
+          device:
+            type: string
+      examples:
+        example1:
+          summary: device ID "device_0"
+          value:
+            device: device_0
+
+responses:
+  200:
+    description: OK
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - deleted_device
+          properties:
+            deleted_device:
+              type: string
+              description: ID of the deleted device
+
+  404:
+    description: Not Found
+
+  422:
+    description: Unprocessable Entity

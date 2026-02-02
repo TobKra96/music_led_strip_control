@@ -1,13 +1,13 @@
-from libs.outputs.output import Output  # pylint: disable=E0611, E0401
+from loguru import logger
 
-import logging
+from libs.outputs.output import Output
 
 
 class OutputDummy(Output):
-    def __init__(self, device):
+    def __init__(self, device) -> None:
         # Call the constructor of the base class.
-        super(OutputDummy, self).__init__(device)
-        self.logger = logging.getLogger(__name__)
+        super().__init__(device)
 
-    def show(self, output_array):
-        logging.debug("Output dummy...")
+    @staticmethod
+    def show(output_array) -> None:
+        logger.debug(f"Output dummy... {output_array}")

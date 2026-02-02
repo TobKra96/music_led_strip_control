@@ -1,0 +1,66 @@
+output-format = "grouped"
+
+line-length = 150
+
+target-version = "py39"
+
+extend-exclude = ["unit_tests", "test"]
+
+
+[lint]
+select = ["ALL"]
+
+ignore = [
+    "ANN001",  # missing-type-function-argument
+    "ANN002",  # missing-type-args
+    "ANN003",  # missing-type-kwargs
+    "ANN101",  # missing-type-self
+    "ANN201",  # missing-return-type-undocumented-public-function
+    "ANN202",  # missing-return-type-private-function
+    "ANN205",  # missing-return-type-static-method
+    "BLE001",  # blind-except
+    "COM812",  # missing-trailing-comma
+    "CPY001",  # missing-copyright-notice
+    "D1",      # undocumented-*
+    "D203",    # one-blank-line-before-class (Incompatible with D211 no-blank-line-before-class)
+    "D213",    # multi-line-summary-second-line (Incompatible with D212 multi-line-summary-first-line)
+    "ERA001",  # commented-out-code
+    "FBT",     # flake8-boolean-trap
+    "FIX",     # flake8-fixme
+    "G004",    # logging-f-string
+    "INP001",  # implicit-namespace-package
+    "PLR2004", # magic-value-comparison
+    "RET503",  # implicit-return
+    "RUF029",  # unused-async
+    "S311",    # suspicious-non-cryptographic-random-usage
+    "S404",    # suspicious-subprocess-import
+    "S602",    # subprocess-popen-with-shell-equals-true
+    "S603",    # subprocess-without-shell-equals-true
+    "TD",      # flake8-todos
+    "TRY300",  # try-consider-else
+    "UP007",   # non-pep604-annotation
+]
+
+unfixable = ["B", "UP", "C4", "SIM"]
+
+preview = true
+
+
+[format]
+quote-style = "double"
+
+
+[lint.flake8-quotes]
+inline-quotes = "double"
+
+
+[lint.pylint]
+max-args = 10
+
+max-returns = 10
+
+max-locals = 15
+
+
+[lint.mccabe]
+max-complexity = 15

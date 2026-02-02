@@ -1,144 +1,98 @@
-from libs.webserver.executer import Executer
-
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, jsonify, request
 from flask_login import login_required
-import copy
+from flask_openapi import swag_from
+from libs.webserver.executer import Executer
+from libs.webserver.executer_base import validate_schema
+from libs.webserver.messages import BadRequest, DeviceNotFound, NotFound, SettingNotFound, UnprocessableEntity
+from libs.webserver.schemas.effect_settings_api_schema import (
+    GET_EFFECT_SETTING_SCHEMA,
+    GET_EFFECT_SETTINGS_SCHEMA,
+    SET_EFFECT_SETTINGS_ALL_SCHEMA,
+    SET_EFFECT_SETTINGS_SCHEMA,
+)
 
-effect_settings_api = Blueprint('effect_settings_api', __name__)
+effect_settings_api = Blueprint("effect_settings_api", __name__)
 
 
-@effect_settings_api.get('/api/settings/effect')
+@effect_settings_api.get("/api/settings/effect")
 @login_required
-def get_effect_settings():  # pylint: disable=E0211
-    """
-    Return effect settings
-    ---
-    tags:
-        - Settings
-    parameters:
-        - name: device
-          in: query
-          type: string
-          required: true
-          description: Device for which to get the effect settings from
-        - name: effect
-          in: query
-          type: string
-          required: true
-          description: Specific effect for a selected device
-        - name: setting_key
-          in: query
-          type: string
-          required: false
-          description: Specific `setting_key` to return from selected effect\n
-                       Return all settings if not specified
-    responses:
-        200:
-            description: OK
-            schema:
-                type: object,
-                example:
-                    {
-                        device: str,
-                        effect: str,
-                        setting_key: str,
-                        setting_value: str
-                    }
-        403:
-            description: Input data are wrong
-    """
-    if len(request.args) == 3:
-        # Retrieve a specific setting for one effect from config.
-        data_in = request.args.to_dict()
-        data_out = copy.deepcopy(data_in)
+@swag_from("docs/effect_settings_api/get_effect_settings.yml")
+def get_effect_settings():
+    data_in = request.args.to_dict()
 
-        if not Executer.instance.effect_settings_executer.validate_data_in(data_in, ("device", "effect", "setting_key",)):
-            return "Input data are wrong.", 403
+    if set(data_in) == {"device", "effect", "setting_key"}:  # Get one specific effect setting for a device.
 
-        setting_value = Executer.instance.effect_settings_executer.get_effect_setting(data_in["device"], data_in["effect"], data_in["setting_key"])
-        data_out["setting_value"] = setting_value
+        if not validate_schema(data_in, GET_EFFECT_SETTING_SCHEMA):
+            return UnprocessableEntity.as_response()
 
-        if setting_value is None:
-            return "Could not find settings value: ", 403
-        else:
-            return jsonify(data_out)
+        data_out = Executer.instance.effect_settings_executer.get_effect_setting(
+            data_in["device"],
+            data_in["effect"],
+            data_in["setting_key"]
+        )
 
-    elif len(request.args) == 2:
-        # Retrieve all settings for a specific effect from config.
-        data_in = request.args.to_dict()
-        data_out = copy.deepcopy(data_in)
+        if data_out is DeviceNotFound:
+            return DeviceNotFound.as_response()
 
-        if not Executer.instance.effect_settings_executer.validate_data_in(data_in, ("device", "effect",)):
-            return "Input data are wrong.", 403
+        if data_out is SettingNotFound:
+            return SettingNotFound.as_response()
 
-        settings = Executer.instance.effect_settings_executer.get_effect_settings(data_in["device"], data_in["effect"])
-        data_out["settings"] = settings
+        return jsonify(data_out)
 
-        if settings is None:
-            return "Could not find settings value: ", 403
-        else:
-            return jsonify(data_out)
+    if set(data_in) == {"device", "effect"}:  # Get all effect settings for a device.
 
-    return "Input data are wrong.", 403
+        if not validate_schema(data_in, GET_EFFECT_SETTINGS_SCHEMA):
+            return UnprocessableEntity.as_response()
+
+        data_out = Executer.instance.effect_settings_executer.get_effect_settings(data_in["device"], data_in["effect"])
+
+        if data_out is DeviceNotFound:
+            return DeviceNotFound.as_response()
+
+        if data_out is SettingNotFound:
+            return SettingNotFound.as_response()
+
+        return jsonify(data_out)
+
+    return UnprocessableEntity.as_response()
 
 
-@effect_settings_api.post('/api/settings/effect')
+@effect_settings_api.post("/api/settings/effect")
 @login_required
-def set_effect_settings():  # pylint: disable=E0211
-    """
-    Set effect settings
-    ---
-    tags:
-        - Settings
-    parameters:
-        - name: data
-          in: body
-          type: string
-          required: true
-          description: The effect settings which to set\n
-          schema:
-                type: object,
-                example:
-                    {
-                        device: str,
-                        effect: str,
-                        settings: object
-                    }
-    responses:
-        200:
-            description: OK
-            schema:
-                type: object,
-                example:
-                    {
-                        device: str,
-                        effect: str,
-                        settings: object
-                    }
-        403:
-            description: Input data are wrong
-    """
+@swag_from("docs/effect_settings_api/set_effect_settings.yml")
+def set_effect_settings():
     data_in = request.get_json()
-    if all(key in data_in for key in ("device", "effect", "settings")):
-        # Save a specific setting for one effect to config.
-        data_out = copy.deepcopy(data_in)
 
-        if not Executer.instance.effect_settings_executer.validate_data_in(data_in, ("device", "effect", "settings", )):
-            return "Input data are wrong.", 403
+    if set(data_in) == {"device", "effect", "settings"}:  # Set effect settings for a device.
 
-        Executer.instance.effect_settings_executer.set_effect_setting(data_in["device"], data_in["effect"], data_in["settings"])
+        if not validate_schema(data_in, SET_EFFECT_SETTINGS_SCHEMA):
+            return UnprocessableEntity.as_response()
 
-        return jsonify(data_out)
+        data_out = Executer.instance.effect_settings_executer.set_effect_settings(
+            data_in["device"], data_in["effect"], data_in["settings"])
 
-    elif all(key in data_in for key in ("effect", "settings")):
-        # Save all settings for a specific effect to config.
-        data_out = copy.deepcopy(data_in)
+        if data_out is NotFound:
+            return NotFound.as_response()
 
-        if not Executer.instance.effect_settings_executer.validate_data_in(data_in, ("effect", "settings", )):
-            return "Input data are wrong.", 403
-
-        Executer.instance.effect_settings_executer.set_effect_setting_for_all(data_in["effect"], data_in["settings"])
+        if data_out is BadRequest:
+            return BadRequest.as_response()
 
         return jsonify(data_out)
 
-    return "Input data are wrong.", 403
+    if set(data_in) == {"effect", "settings"}:  # Set effect settings for all devices.
+
+        if not validate_schema(data_in, SET_EFFECT_SETTINGS_ALL_SCHEMA):
+            return UnprocessableEntity.as_response()
+
+        data_out = Executer.instance.effect_settings_executer.set_effect_settings_for_all(
+            data_in["effect"], data_in["settings"])
+
+        if data_out is NotFound:
+            return NotFound.as_response()
+
+        if data_out is BadRequest:
+            return BadRequest.as_response()
+
+        return jsonify(data_out)
+
+    return UnprocessableEntity.as_response()
