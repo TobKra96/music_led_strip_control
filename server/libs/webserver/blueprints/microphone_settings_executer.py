@@ -12,7 +12,7 @@ class MicrophoneSettingsExecuter(ExecuterBase):
         result = {}
         try:
             process = subprocess.run(
-                ["/usr/bin/amixer", "get", "Mic"],
+                ["/usr/bin/amixer", "-D", "hw:Device", "sget", "Mic"],
                 text=True,
                 capture_output=True,
                 check=False
@@ -40,7 +40,7 @@ class MicrophoneSettingsExecuter(ExecuterBase):
         result = {}
         try:
             process = subprocess.run(
-                ["/usr/bin/amixer", "set", "Mic", f"{level}%"],
+                ["/usr/bin/amixer", "-D", "hw:Device", "sset", "Mic", f"{level}%"],
                 text=True,
                 capture_output=True,
                 check=False
