@@ -57,7 +57,7 @@ Please check if your hardware is listed inside the [Compatible Hardware List](ht
 ### Automated installation
 Run the following command in your terminal:
 ```bash
-curl -sSL https://raw.githubusercontent.com/TobKra96/music_led_strip_control/master/setup.sh | sudo bash -s -- -b master
+curl -sSL https://raw.githubusercontent.com/TobKra96/music_led_strip_control/master/setup.sh | bash -s -- -b master
 ```
 
 The script also accepts some options:
