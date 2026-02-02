@@ -1,16 +1,16 @@
-PyAudio==0.2.14
-numpy==1.26.4
-loguru==0.7.2
-scipy==1.13.1
-Werkzeug==3.0.3
-Flask==3.0.3
+# PyAudio==0.2.14  # Use compiled python3-pyaudio (0.2.13) instead.
+numpy==2.4.2
+loguru==0.7.3
+scipy==1.17.0
+Werkzeug==3.1.5
+Flask==3.1.2
 Flask_Login==0.6.3
-Jinja2==3.1.4
-waitress==3.0.0
+Jinja2==3.1.6
+waitress==3.0.2
 rpi_ws281x==5.0.0; sys_platform == "linux"
 rpi-ws281x-mock==0.2.2; sys_platform == "win32"
 icmplib==3.0.4
-Flask-OpenAPI3-UI==9.10.9
-jsonschema==4.22.0
-APScheduler==3.10.4
+Flask-OpenAPI3-UI==2.3.0
+jsonschema==4.26.0
+APScheduler==3.11.2
 psutil
