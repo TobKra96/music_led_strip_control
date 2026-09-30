@@ -1,6 +1,7 @@
 <script type="text/javascript">
     // Transfer data to JS
     let jinja_devices = JSON.parse('{{ devices | tojson }}');
+    let jinja_groups = JSON.parse('{{ groups | default([]) | tojson }}');
 </script>
 <div class="accordion my-3" id="accordionDevices">
     <div class="card p-0">
@@ -30,6 +31,13 @@
                                 All Devices
                             </a>
                         </li>
+                        {% for group in groups %}
+                        <li class="nav-item device_item">
+                            <a href="#pills-{{ group.id }}" class="{{ 'disabled' if segment in ['effect_sync_fade', 'effect_random_cycle'] }} nav-link" data-device_id={{ group.id }} role="tab" data-toggle="pill" aria-controls="pills-{{ group.id }}" aria-selected="false">
+                                <i class="feather icon-layers"></i> {{ group.name }}
+                            </a>
+                        </li>
+                        {% endfor %}
                         {% endif %}
                         <li class="nav-item device_item">
                             <a href="#pills-{{ loop.index+1 }}" class="{{ 'disabled' if segment in ['effect_sync_fade', 'effect_random_cycle'] }} nav-link" data-device_id={{ device.id }} role="tab" data-toggle="pill" aria-controls="pills-{{ loop.index+1 }}" aria-selected="false">

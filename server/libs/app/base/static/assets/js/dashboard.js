@@ -11,7 +11,10 @@ if (!jinja_devices.length) {
             name: "All Devices"
         })
     ];
-    const devices = fake_device.concat(jinja_devices.map(d => { return new Device(d) }));
+    const devices = fake_device.concat(
+        jinja_groups.map(g => { return new Device({ id: g.id, name: g.name }) }),
+        jinja_devices.map(d => { return new Device(d) })
+    );
 
     devices.forEach(device => {
         device.link.addEventListener('click', () => {

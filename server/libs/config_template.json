@@ -660,6 +660,7 @@
         "test": "first"
     },
     "device_configs": {},
+    "device_groups": {},
     "general_settings": {
         "default_sample_rate": 48000,
         "device_id": 0,

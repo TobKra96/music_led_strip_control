@@ -62,4 +62,8 @@ $(document).ready(function () {
     $('#LED_Invert_TOOLTIP').attr('data-original-title', 'The parameter for inverting the LED signal. It can be useful if you want to use an inverted logic level shifter.<br><br>Default value: Off');
     $('#UDP_Client_IP_TOOLTIP').attr('data-original-title', 'The IP address of the client.');
     $('#UDP_Client_Port_TOOLTIP').attr('data-original-title', 'The port used for the communication between the server and client.<br><br>Default setting: 7777');
+
+    // Tooltip descriptions for group settings
+    $('#GROUP_DEVICES_TOOLTIP').attr('data-original-title', 'The devices controlled by this group.<br>A device can be part of multiple groups.');
+    $('#GROUP_FPS_TOOLTIP').attr('data-original-title', 'The maximum FPS applied to every device in this group.');
 });

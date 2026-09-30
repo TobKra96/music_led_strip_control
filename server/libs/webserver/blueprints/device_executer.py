@@ -78,5 +78,8 @@ class DeviceExecuter(ExecuterBase):
 
     def delete_device(self, device):
         del self._config["device_configs"][device]
+        for group_config in self.get_groups_config().values():
+            if device in group_config["devices"]:
+                group_config["devices"].remove(device)
         self.save_config()
         self.refresh_device("all_devices")

@@ -7,6 +7,8 @@ class EffectExecuter(ExecuterBase):
     def get_active_effect(self, device):
         if device == self.all_devices_id:
             return self._config[self.all_devices_id]["effects"]["last_effect"]
+        elif self.is_group(device):
+            return self.get_groups_config()[device]["last_effect"]
         else:
             return self._config["device_configs"][device]["effects"]["last_effect"]
 
@@ -23,6 +25,9 @@ class EffectExecuter(ExecuterBase):
         if device == self.all_devices_id:
             self.set_active_effect_for_all(effect)
             return
+        elif self.is_group(device):
+            self.set_active_effect_for_group(device, effect)
+            return
         else:
             self._config["device_configs"][device]["effects"]["last_effect"] = effect
             self.save_config()
@@ -35,3 +40,14 @@ class EffectExecuter(ExecuterBase):
         self.refresh_device(self.all_devices_id)
         for device_key in self._config["device_configs"]:
             self.set_active_effect(device_key, effect, for_all=True)
+
+    def set_active_effect_for_group(self, group, effect):
+        members = self.get_group_devices(group)
+
+        self.get_groups_config()[group]["last_effect"] = effect
+        for device_key in members:
+            self._config["device_configs"][device_key]["effects"]["last_effect"] = effect
+        self.save_config()
+
+        for device_key in members:
+            self.put_into_effect_queue(device_key, effect)

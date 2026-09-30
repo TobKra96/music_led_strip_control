@@ -24,10 +24,22 @@ class ExecuterBase():
         self.export_config_path = self._config_instance.get_config_path()
 
         self.all_devices_id = "all_devices"
+        self.group_id_prefix = "group_"
 
     # Helper
     def save_config(self):
         self._config_instance.save_config(self._config)
+
+    def get_groups_config(self):
+        return self._config.setdefault("device_groups", {})
+
+    def is_group(self, device):
+        return device in self.get_groups_config()
+
+    def get_group_devices(self, group):
+        """Return the IDs of the group members that still exist."""
+        members = self.get_groups_config()[group]["devices"]
+        return [device for device in members if device in self._config["device_configs"]]
 
     def put_into_effect_queue(self, device, effect, put_all=False):
         self.logger.debug("Preparing new EnumItem...")

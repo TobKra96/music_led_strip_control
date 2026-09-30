@@ -5,6 +5,7 @@ from libs.webserver.blueprints.effect_api import effect_api
 from libs.webserver.blueprints.effect_settings_api import effect_settings_api
 from libs.webserver.blueprints.general_api import general_api
 from libs.webserver.blueprints.general_settings_api import general_settings_api
+from libs.webserver.blueprints.group_api import group_api
 from libs.webserver.blueprints.system_info_api import system_info_api
 from libs.webserver.blueprints.microphone_settings_api import microphone_settings_api
 from libs.webserver.executer import Executer  # pylint: disable=E0611, E0401
@@ -48,6 +49,7 @@ class Webserver():
         self.server.register_blueprint(effect_settings_api)
         self.server.register_blueprint(general_api)
         self.server.register_blueprint(general_settings_api)
+        self.server.register_blueprint(group_api)
         self.server.register_blueprint(system_info_api)
         self.server.register_blueprint(microphone_settings_api)
 

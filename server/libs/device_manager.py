@@ -72,6 +72,11 @@ class DeviceManager():
                 if(current_notification_item.device_id == "all_devices"):
                     for key, value in self._devices.items():
                         self.restart_device(key)
+                elif current_notification_item.device_id in self._config.get("device_groups", {}):
+                    group_config = self._config["device_groups"][current_notification_item.device_id]
+                    for device_id in group_config["devices"]:
+                        if device_id in self._devices:
+                            self.restart_device(device_id)
                 else:
                     self.restart_device(current_notification_item.device_id)
                 self._notification_queue_out.put_blocking(NotificationItem(

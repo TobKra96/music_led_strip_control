@@ -1,0 +1,195 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Group Settings {% endblock %}
+
+<!-- Specific CSS goes HERE -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+    <div class="pcoded-content">
+        <div class="pcoded-inner-content">
+
+            {% include 'includes/toasts.html' %}
+
+            <!-- [ breadcrumb ] start -->
+            <div class="page-header">
+                <div class="page-block">
+                    <div class="row align-items-center">
+                        <div class="col-md-12">
+                            <div class="page-header-title">
+                                <h5 class="m-b-10">Group Settings</h5>
+                            </div>
+                            <ul class="breadcrumb">
+                                <li class="breadcrumb-item"><a href="/"><i class="feather icon-home"></i></a></li>
+                                <li class="breadcrumb-item"><a href="javascript:">Settings</a></li>
+                                <li class="breadcrumb-item"><a href="javascript:">Group Settings</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- [ breadcrumb ] end -->
+            <div class="main-body">
+                <div class="page-wrapper">
+                    <!-- [ Main Content ] start -->
+
+                    <script type="text/javascript">
+                        // Transfer data to JS
+                        let jinja_devices = JSON.parse('{{ devices | tojson }}');
+                        let jinja_groups = JSON.parse('{{ groups | tojson }}');
+                    </script>
+
+                    <div class="accordion my-3" id="accordionGroups">
+                        <div class="card p-0">
+                            <a class="p-0" href="#!" data-toggle="collapse" data-target="#collapseMenu" aria-expanded="false" aria-controls="collapseMenu" draggable="false">
+                                <div class="card-header" id="accordionHeading">
+                                    <h5 class="mb-0">
+                                        <span class="text-secondary">
+                                            Total groups: <span class="badge badge-secondary" id="group_count">{{ groups|length }}</span>
+                                        </span>
+                                        <span class="text-secondary d-none" id="selected_group_label">
+                                            &ensp;|&ensp;Group: <span class="badge badge-secondary" id="selected_group_txt"></span>
+                                        </span>
+                                    </h5>
+                                    <i class="fa fa-chevron-down text-secondary float-right d-none d-sm-block mt-1"></i>
+                                </div>
+                                <div id="collapseMenu" class="card-body p-0 collapse" aria-labelledby="accordionHeading" data-parent="#accordionGroups">
+                                    <ul class="nav nav-pills shadow-none" id="groupTabID" role="tablist">
+                                        {% for group in groups %}
+                                        <li class="nav-item device_item">
+                                            <a href="#pills-{{ group.id }}" class="nav-link" data-group_id="{{ group.id }}" role="tab" data-toggle="pill" aria-controls="pills-{{ group.id }}" aria-selected="false">
+                                                {{ group.name }}
+                                            </a>
+                                        </li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+
+                    <input type="hidden" id="settingsIdentifier" value="group_settings">
+                    <div id="groupFound" class="d-none">
+                        <form id="settingsForm" action method="post" novalidate>
+                            <div class="row mt-4">
+                                <div class="col-md-6">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h5>Configuration</h5>
+                                        </div>
+                                        <div class="card-block">
+                                            <div class="form-group">
+                                                <label>Group Name</label>
+                                                <input id="group_name" class="form-control" type="text" name="text" required>
+                                            </div>
+                                            <label class="row m-0 mb-2 p-0">
+                                                Devices
+                                                <div id="GROUP_DEVICES_TOOLTIP" class="pl-1" data-toggle="tooltip" data-placement="top" data-html="true">
+                                                    <i class="feather icon-help-circle"></i>
+                                                </div>
+                                            </label>
+                                            <div id="group_devices">
+                                                {% for device in devices %}
+                                                <div class="custom-control custom-checkbox my-2">
+                                                    <input type="checkbox" class="custom-control-input group_device_input" id="group_member_{{ device.id }}" data-device_id="{{ device.id }}">
+                                                    <label class="custom-control-label" for="group_member_{{ device.id }}">{{ device.name }}</label>
+                                                </div>
+                                                {% else %}
+                                                <p class="text-muted mb-0">No device found. Create one in "Device Settings".</p>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h5>Group Controls</h5>
+                                        </div>
+                                        <div class="card-block">
+                                            <div class="form-group">
+                                                <label class="row m-0 mb-2 p-0">
+                                                    Maximum FPS
+                                                    <div id="GROUP_FPS_TOOLTIP" class="pl-1" data-toggle="tooltip" data-placement="top" data-html="true">
+                                                        <i class="feather icon-help-circle"></i>
+                                                    </div>
+                                                </label>
+                                                <input id="fps" class="form-control group_setting_input" onkeypress="return event.charCode >= 48 && event.charCode <= 57" type="number" name="number" required>
+                                            </div>
+                                            <div class="form-group">
+                                                <label>LED Brightness <span for="led_brightness" class="mb-0 badge badge-secondary"></span></label>
+                                                <input id="led_brightness" type="range" class="custom-range group_setting_input" min="0" max="100" step="1" required>
+                                            </div>
+                                            <p class="text-muted mb-0">
+                                                Saving applies these values to every device in the group.
+                                                Select the group on the Dashboard or on an effect page to control its effects.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12 m-0">
+                                    <div class="card">
+                                        <div class="card-block">
+                                            <div class="d-flex flex-md-row flex-column justify-content-md-end">
+                                                <button type="button" id="save_btn" class="btn btn-success m-0">Save</button>
+                                                <button type="button" id="create1_btn" class="btn btn-primary m-0 my-3 my-md-0 mx-md-3">Create Group</button>
+                                                <button type="button" id="delete_btn" class="btn btn-danger m-0">Delete Group</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div id="noGroupFound" class="d-none">
+                        <div class="alert alert-info text-center" role="alert">
+                            No group found. Create one to control several devices at once.
+                        </div>
+                        <div class="row mt-4">
+                            <div class="col-md-12 m-0">
+                                <div class="card">
+                                    <div class="card-block">
+                                        <div class="d-flex flex-md-row flex-column justify-content-md-end">
+                                            <button type="button" id="create2_btn" class="btn btn-primary m-0">Create Group</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal fade" id="modal_delete_group" tabindex="-1" role="dialog" aria-labelledby="modal_delete_group" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="modal_delete_group_title">Confirmation</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true" class="feather icon-x"></span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <p>Are you sure you want to delete group "<span id="modal_group_name"></span>"?</p>
+                                    <p>The devices in this group will not be deleted.</p>
+                                </div>
+                                <div class="p-4 mt-4 d-flex flex-md-row flex-column justify-content-md-end">
+                                    <button type="button" class="btn btn-secondary m-0 mb-3 mb-md-0" data-dismiss="modal">Close</button>
+                                    <button type="button" class="btn btn-danger m-0 ml-md-3" id="delete_btn_modal">Delete</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- [ Main Content ] end -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+<script src="/static/assets/js/settings.js"></script>
+<script src="/static/assets/js/settings.group.js" type="module"></script>
+{% endblock javascripts %}

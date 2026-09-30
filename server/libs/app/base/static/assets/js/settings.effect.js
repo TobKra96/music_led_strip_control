@@ -43,7 +43,10 @@ $(function () {
             localStorage.setItem('lastDevice', fake_device[0].id);
         }
 
-        const devices = fake_device.concat(jinja_devices.map(d => { return new Device(d) }));
+        const devices = fake_device.concat(
+            jinja_groups.map(g => { return new Device({ id: g.id, name: g.name }) }),
+            jinja_devices.map(d => { return new Device(d) })
+        );
 
         if (["effect_sync_fade", "effect_random_cycle"].includes(effectIdentifier)) {
             devices[0]._activate();
