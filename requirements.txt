@@ -2,7 +2,7 @@
 numpy==2.4.2
 loguru==0.7.3
 scipy==1.17.0
-Werkzeug==3.1.5
+Werkzeug==3.1.9
 Flask==3.1.2
 Flask_Login==0.6.3
 Jinja2==3.1.6
