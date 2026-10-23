@@ -64,6 +64,10 @@ _Avoid_: Setup mode, rescue AP
 The timed return to the previous Wi-Fi mode when a change to it does not result in a working connection.
 _Avoid_: Undo
 
+**Operation**:
+A tracked change that can take time or fail, such as applying an Output, microphone or Wi-Fi change, and that ends confirmed, rolled back or failed.
+_Avoid_: Job, Task
+
 **Diagnosis**:
 The structured result of an Output's health check: status, human message and suggested fix.
 _Avoid_: Health check
