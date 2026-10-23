@@ -1,6 +1,6 @@
 import pytest
 
-from mlsc.operations import MAX_FINISHED, OperationRegistry, OperationState, RetryPolicy
+from mlsc.operations import MAX_FINISHED, OperationRegistry, OperationState, RetryPolicy, run_ticker, start_ticker
 
 pytestmark = pytest.mark.unit
 
@@ -179,3 +179,27 @@ def test_only_the_most_recent_finished_operations_are_kept(registry):
         registry.run("output", steps.apply, steps.verify, steps.rollback)
 
     assert registry.get(first.id) is None
+
+
+def test_the_ticker_rolls_back_overdue_changes_without_anyone_polling(registry, fake_clock):
+    steps = Recorder()
+    operation = registry.run("wifi", steps.apply, steps.verify, steps.rollback, confirm_within=45)
+    waits = []
+
+    def wait(interval):
+        waits.append(interval)
+        fake_clock.advance(interval)
+        return len(waits) >= 50
+
+    run_ticker(registry, wait, interval=1)
+
+    assert operation.state is OperationState.ROLLED_BACK
+    assert waits[0] == 1
+
+
+def test_the_ticker_thread_stops_when_asked(registry):
+    ticker = start_ticker(registry, interval=0.01)
+
+    ticker.stop()
+
+    assert not ticker.thread.is_alive()

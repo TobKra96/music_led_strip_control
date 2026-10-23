@@ -158,4 +158,31 @@ class OperationRegistry:
                 self._set_state(operation, OperationState.PENDING)
 
 
+TICK_SECONDS = 1.0
+
+
+def run_ticker(operations: OperationRegistry, wait: Callable[[float], bool], interval: float = TICK_SECONDS) -> None:
+    """Tick the registry every `interval` until `wait` reports a stop, so deadlines pass without anyone polling."""
+    while not wait(interval):
+        operations.tick()
+
+
+@dataclass
+class Ticker:
+    thread: threading.Thread
+    _stopped: threading.Event
+
+    def stop(self) -> None:
+        self._stopped.set()
+        self.thread.join()
+
+
+def start_ticker(operations: OperationRegistry, interval: float = TICK_SECONDS) -> Ticker:
+    """Run `run_ticker` in a daemon thread."""
+    stopped = threading.Event()
+    thread = threading.Thread(target=run_ticker, args=(operations, stopped.wait, interval), daemon=True)
+    thread.start()
+    return Ticker(thread, stopped)
+
+
 registry = OperationRegistry()

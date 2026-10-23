@@ -5,6 +5,7 @@ from time import sleep
 from flask_openapi3 import OpenAPI
 from waitress import serve
 
+from mlsc import operations
 from mlsc.api.v2 import register_api_v2
 from mlsc.app import create_app
 from mlsc.webserver.blueprints.authentication_api import authentication_api
@@ -54,6 +55,7 @@ class Webserver:
         webserver_port = Executer.instance.general_settings_executer.get_webserver_port()
 
         register_api_blueprints(self.server)
+        operations.start_ticker(operations.registry)
 
         if DEBUG:
             self.server.run(host="0.0.0.0", port=webserver_port, load_dotenv=False, debug=True)  # ruff: ignore[hardcoded-bind-all-interfaces]
