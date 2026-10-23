@@ -11,7 +11,7 @@
             "console": "integratedTerminal",
             // The server spawns the webserver, audio and device manager as child processes.
             "subProcess": true,
-            "justMyCode": false
+            "justMyCode": true
         },
         {
             "name": "MLSC: attach (debugpy)",
@@ -19,7 +19,7 @@
             "request": "attach",
             "connect": { "host": "localhost", "port": 5678 },
             "subProcess": true,
-            "justMyCode": false
+            "justMyCode": true
         }
     ]
 }

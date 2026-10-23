@@ -1,5 +1,6 @@
 import json
 import re
+import subprocess
 import tomllib
 from pathlib import Path
 
@@ -40,6 +41,6 @@ def test_debugpy_is_a_dev_dependency():
 
 
 def test_vscode_launch_config_is_not_git_ignored():
-    ignored = (ROOT / ".gitignore").read_text(encoding="utf-8").splitlines()
+    result = subprocess.run(["git", "check-ignore", "-q", ".vscode/launch.json"], cwd=ROOT, check=False)  # ruff: ignore[start-process-with-partial-path]
 
-    assert "!.vscode/launch.json" in ignored
+    assert result.returncode == 1
