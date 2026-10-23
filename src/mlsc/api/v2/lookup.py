@@ -47,6 +47,22 @@ def effect_settings(device_id: str, effect: str) -> dict:
     return effects[effect]
 
 
+def require_patch(patch: dict) -> dict:
+    """Return a partial update, or raise a 422 if it changes nothing."""
+    if not patch:
+        raise ProblemError(ValidationError, errors=[{"field": "(body)", "detail": "Send at least one setting."}])
+    return patch
+
+
+def unique_ids(ids: list[str]) -> list[str]:
+    """Return `ids`, or raise a ValueError that names the ids listed more than once."""
+    repeated = sorted({i for i in ids if ids.count(i) > 1})
+    if repeated:
+        msg = f"Each id may be listed only once: {', '.join(repeated)}."
+        raise ValueError(msg)
+    return ids
+
+
 def check_schema(instance: dict, schema: dict) -> None:
     """Raise a 422 that lists every violation of `schema`."""
     errors = sorted(Draft202012Validator(schema).iter_errors(instance), key=lambda error: list(map(str, error.absolute_path)))

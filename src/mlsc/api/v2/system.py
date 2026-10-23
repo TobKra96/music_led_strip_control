@@ -28,29 +28,25 @@ class InfoOut(RootModel[dict]):
     """Information as reported by the host."""
 
 
-def _info(method: str):
-    return getattr(Executer.instance.system_info_executer, method)()
-
-
 @system_api.get("/performance", summary="Get CPU, memory, disk and network usage", responses={"200": InfoOut, "401": Problem})
 @api_login_required
 def get_performance():
-    return _info("get_system_info_performance")
+    return Executer.instance.system_info_executer.get_system_info_performance()
 
 
 @system_api.get("/temperature", summary="Get the CPU temperature", responses={"200": InfoOut, "401": Problem})
 @api_login_required
 def get_temperature():
-    return _info("get_system_info_temperature")
+    return Executer.instance.system_info_executer.get_system_info_temperature()
 
 
 @system_api.get("/services", summary="Get the status of the system services", responses={"200": InfoOut, "401": Problem})
 @api_login_required
 def get_services():
-    return _info("get_system_info_services")
+    return Executer.instance.system_info_executer.get_system_info_services()
 
 
 @system_api.get("/device-status", summary="Check whether each device is reachable", responses={"200": InfoOut, "401": Problem})
 @api_login_required
 def get_device_status():
-    return _info("get_system_info_device_status")
+    return Executer.instance.system_info_executer.get_system_info_device_status()

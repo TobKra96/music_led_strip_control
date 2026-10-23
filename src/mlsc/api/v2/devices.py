@@ -2,7 +2,7 @@ from flask_openapi3 import APIBlueprint, Tag
 from pydantic import BaseModel, Field, RootModel
 
 from mlsc.api.v2.errors import READ_ERRORS, WRITE_ERRORS, Problem, ProblemError, ValidationError
-from mlsc.api.v2.lookup import check_schema, device_settings, effect_settings, require_devices, unwrap
+from mlsc.api.v2.lookup import check_schema, device_settings, effect_settings, require_devices, require_patch, unwrap
 from mlsc.api.v2.security import api_login_required
 from mlsc.webserver.executer import Executer
 from mlsc.webserver.schemas.device_settings_api_schema import SET_DEVICE_SETTINGS_SCHEMA
@@ -43,12 +43,6 @@ def _device(device_id: str) -> dict:
     return next(device for device in Executer.instance.device_executer.get_devices() if device["id"] == device_id)
 
 
-def _patch(body: SettingsPatch) -> dict:
-    if not body.root:
-        raise ProblemError(ValidationError, errors=[{"field": "(body)", "detail": "Send at least one setting."}])
-    return body.root
-
-
 @devices_api.get("", summary="List devices", responses={"200": DeviceListOut, "401": Problem})
 @api_login_required
 def list_devices():
@@ -85,7 +79,7 @@ def get_device_settings(path: DevicePath):
 @api_login_required
 def patch_device_settings(path: DevicePath, body: SettingsPatch):
     """Output settings are updated the same way, nested under `output`."""
-    patch = _patch(body)
+    patch = require_patch(body.root)
     require_devices([path.device_id])
     check_schema(patch, DEVICE_PROPERTIES)
     unwrap(Executer.instance.device_settings_executer.set_device_settings(path.device_id, patch))
@@ -103,7 +97,7 @@ def get_effect_settings(path: EffectSettingsPath):
                    responses={"200": SettingsOut, **WRITE_ERRORS})
 @api_login_required
 def patch_effect_settings(path: EffectSettingsPath, body: SettingsPatch):
-    patch = _patch(body)
+    patch = require_patch(body.root)
     current = effect_settings(path.device_id, path.effect)
     unknown = [key for key in patch if key not in current]
     if unknown:

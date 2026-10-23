@@ -1,3 +1,5 @@
+import io
+import json
 import threading
 from queue import Queue
 
@@ -7,6 +9,7 @@ from mlsc.api.v2 import register_api_v2
 from mlsc.app import create_app
 from mlsc.config_service import ConfigService
 from mlsc.webserver.executer import Executer
+from mlsc.webserver.webserver import register_api_blueprints
 
 pytestmark = pytest.mark.integration
 
@@ -182,7 +185,19 @@ def test_the_bulk_effect_call_names_the_offending_device_and_applies_nothing(cli
 
     assert "device_9" in body["detail"]
     assert client.get("/api/v2/effect").get_json() == before
-    assert_problem(client.put("/api/v2/effect", json={"effect": "effect_fade", "device_ids": [device_id, device_id]}), 422, "ValidationError")
+
+    repeated = {"effect": "effect_fade", "device_ids": [device_id, device_id]}
+    duplicate = assert_problem(client.put("/api/v2/effect", json=repeated), 422, "ValidationError")
+    assert device_id in duplicate["errors"][0]["detail"]
+
+
+def test_group_members_must_be_unique(client, device_id):
+    group_id = client.post("/api/v2/groups", json={"name": "A"}).get_json()["id"]
+
+    body = assert_problem(client.put(f"/api/v2/groups/{group_id}/devices", json={"device_ids": [device_id, device_id]}), 422, "ValidationError")
+
+    assert device_id in body["errors"][0]["detail"]
+    assert client.get(f"/api/v2/groups/{group_id}").get_json()["device_ids"] == []
 
 
 @pytest.mark.parametrize("name", ["colors", "gradients", "logging-levels", "output-types", "effects", "audio-devices"])
@@ -252,3 +267,20 @@ def test_system_device_status_lists_the_devices(client, device_id, monkeypatch, 
     monkeypatch.setattr(executer.system_info_executer, "check_device_status", lambda _address: True)
 
     assert [d["id"] for d in client.get("/api/v2/system/device-status").get_json()["devices"]] == [device_id]
+
+
+def test_a_v1_config_import_is_seen_by_every_executer(client, executer, device_id):
+    """The v1 import replaces the config; the device and effect executers must not keep serving the old one."""
+    document = client.get("/api/v2/config").get_json()
+    client.delete(f"/api/v2/devices/{device_id}")
+    app = create_app()
+    app.config["AUTH_ENABLED"] = False
+    register_api_blueprints(app)
+    v1 = app.test_client()
+
+    imported = v1.post("/api/settings/configuration/file", data={"imported_config": (io.BytesIO(json.dumps(document).encode()), "config.json")})
+
+    assert imported.status_code == 200
+    assert [d["id"] for d in v1.get("/api/system/devices").get_json()] == [device_id]
+    assert v1.get(f"/api/effect/active?device={device_id}").get_json()["device"] == device_id
+    assert executer.effect_executer.get_active_effect(device_id)["device"] == device_id

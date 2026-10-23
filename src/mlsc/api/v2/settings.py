@@ -3,8 +3,8 @@ from flask_openapi3 import APIBlueprint, Tag
 from pydantic import RootModel
 
 from mlsc.api.v2.devices import SettingsOut, SettingsPatch
-from mlsc.api.v2.errors import Problem, ProblemError, ValidationError
-from mlsc.api.v2.lookup import check_schema
+from mlsc.api.v2.errors import BODY_ERRORS, Problem, ProblemError
+from mlsc.api.v2.lookup import check_schema, require_patch
 from mlsc.api.v2.security import api_login_required
 from mlsc.webserver.executer import Executer
 from mlsc.webserver.messages import InvalidConfigFile
@@ -19,7 +19,6 @@ GENERAL_PROPERTIES = {
     **_GENERAL_SETTINGS,
     "properties": {key: schema for key, schema in _GENERAL_SETTINGS["properties"].items() if key != "device_groups"},
 }
-WRITE_ERRORS = {"401": Problem, "415": Problem, "422": Problem}
 
 
 class ConfigDocument(RootModel[dict]):
@@ -38,13 +37,12 @@ def get_settings():
     return _settings()
 
 
-@settings_api.patch("/settings", summary="Update some global settings", responses={"200": SettingsOut, **WRITE_ERRORS})
+@settings_api.patch("/settings", summary="Update some global settings", responses={"200": SettingsOut, **BODY_ERRORS})
 @api_login_required
 def patch_settings(body: SettingsPatch):
-    if not body.root:
-        raise ProblemError(ValidationError, errors=[{"field": "(body)", "detail": "Send at least one setting."}])
-    check_schema(body.root, GENERAL_PROPERTIES)
-    Executer.instance.general_settings_executer.set_general_setting(body.root)
+    patch = require_patch(body.root)
+    check_schema(patch, GENERAL_PROPERTIES)
+    Executer.instance.general_settings_executer.set_general_setting(patch)
     return _settings()
 
 
@@ -62,7 +60,7 @@ def export_config():
     return send_file(Executer.instance.general_settings_executer.export_config_path, mimetype="application/json", max_age=-1)
 
 
-@settings_api.put("/config", summary="Import a configuration", responses={"204": None, "400": Problem, **WRITE_ERRORS})
+@settings_api.put("/config", summary="Import a configuration", responses={"204": None, "400": Problem, **BODY_ERRORS})
 @api_login_required
 def import_config(body: ConfigDocument):
     """Older configuration versions are migrated. An unusable document changes nothing."""

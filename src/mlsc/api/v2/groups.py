@@ -1,8 +1,8 @@
 from flask_openapi3 import APIBlueprint, Tag
-from pydantic import BaseModel, Field, RootModel
+from pydantic import BaseModel, Field, RootModel, field_validator
 
 from mlsc.api.v2.errors import READ_ERRORS, WRITE_ERRORS, Problem
-from mlsc.api.v2.lookup import device_ids, require_devices, require_group, unwrap
+from mlsc.api.v2.lookup import device_ids, require_devices, require_group, unique_ids, unwrap
 from mlsc.api.v2.security import api_login_required
 from mlsc.webserver.executer import Executer
 from mlsc.webserver.schemas.custom_types import valid_name
@@ -21,6 +21,8 @@ class GroupCreate(BaseModel):
 
 class GroupMembers(BaseModel):
     device_ids: list[str] = Field(description="Exactly these devices are members afterwards.")
+
+    _unique = field_validator("device_ids")(unique_ids)
 
 
 class GroupOut(BaseModel):

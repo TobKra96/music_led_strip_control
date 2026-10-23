@@ -3,7 +3,7 @@ from pydantic import BaseModel, Field, RootModel, field_validator
 
 from mlsc.api.v2.devices import DevicePath
 from mlsc.api.v2.errors import READ_ERRORS, WRITE_ERRORS, Problem
-from mlsc.api.v2.lookup import device_ids, require_devices
+from mlsc.api.v2.lookup import device_ids, require_devices, unique_ids
 from mlsc.api.v2.security import api_login_required
 from mlsc.effects_enum import EffectsEnum
 from mlsc.webserver.executer import Executer
@@ -32,10 +32,7 @@ class BulkEffectBody(EffectBody):
     @field_validator("device_ids")
     @classmethod
     def no_duplicates(cls, ids: list[str] | None) -> list[str] | None:
-        if ids is not None and len(set(ids)) != len(ids):
-            msg = "Each device may be listed only once."
-            raise ValueError(msg)
-        return ids
+        return ids if ids is None else unique_ids(ids)
 
 
 class ActiveEffectOut(BaseModel):

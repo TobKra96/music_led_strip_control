@@ -36,7 +36,8 @@ class Problem(BaseModel):
 
 
 READ_ERRORS = {"401": Problem, "404": Problem}
-WRITE_ERRORS = {**READ_ERRORS, "415": Problem, "422": Problem}
+BODY_ERRORS = {"401": Problem, "415": Problem, "422": Problem}
+WRITE_ERRORS = {**READ_ERRORS, **BODY_ERRORS}
 
 
 class InvalidPin(_Message):
