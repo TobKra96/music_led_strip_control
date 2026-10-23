@@ -94,6 +94,10 @@ class OperationNotFound(NotFound):
     _message = "Operation does not exist."
 
 
+class MigrationReportNotFound(NotFound):
+    _message = "There is no migration report to show."
+
+
 class SettingNotFound(NotFound):
     _message = "Setting does not exist."
 

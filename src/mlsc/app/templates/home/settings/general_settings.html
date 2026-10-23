@@ -233,7 +233,7 @@
                             </div>
                             <div class="card-block">
                                 <div class="text-center">
-                                    <a href="/api/settings/configuration/file">
+                                    <a href="/api/v2/config" download="config.json">
                                         <button type="button" id="export_btn" class="btn btn-primary btn-block m-0">Export <span class="feather icon-download"></span></button>
                                     </a>
                                 </div>
@@ -245,8 +245,7 @@
                                 <h5>Import Configuration</h5>
                             </div>
                             <div class="card-block">
-                                <iframe class="d-none" name="dummyframe" id="dummyframe"></iframe>
-                                <form method="POST" action="/api/settings/configuration/file" target="dummyframe" enctype="multipart/form-data">
+                                <form onsubmit="return false;">
                                     <div class="custom-file">
                                         <input type="file" class="custom-file-input" id="configUpload" name="imported_config" accept=".json">
                                         <label class="custom-file-label text-muted m-0 pt-2" for="configUpload">Select config file</label>

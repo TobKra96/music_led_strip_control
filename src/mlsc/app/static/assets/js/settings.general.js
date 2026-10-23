@@ -1,8 +1,15 @@
+import { api } from './classes/Api.js';
 import Toast from './classes/Toast.js';
 import Tagin from '../plugins/tagin/js/tagin.js';
 
 /** @type {Tagin} */
 let tagin;
+
+/** Settings that are still edited through the v1 API, until the microphone has its own v2 resource. */
+const MICROPHONE_KEYS = ['device_id', 'default_sample_rate', 'min_frequency', 'max_frequency', 'min_volume_threshold', 'frames_per_buffer'];
+
+const pick = (obj, keys) => Object.fromEntries(Object.entries(obj).filter(([key]) => keys.includes(key)));
+const omit = (obj, keys) => Object.fromEntries(Object.entries(obj).filter(([key]) => !keys.includes(key)));
 
 // Init and load all settings.
 $(() => {
@@ -24,13 +31,13 @@ $(() => {
     // Preload dropdown values.
     const promises = [
 
-        $.ajax('/api/resources/logging-levels').done((data) => {
+        api.get('/resources/logging-levels').then((data) => {
             $.each(data, (key, value) => {
                 $('.logging_levels').append(`<option value='${key}'>${value}</option>`);
             });
         }),
 
-        $.ajax('/api/resources/audio-devices').done((data) => {
+        api.get('/resources/audio-devices').then((data) => {
             $.each(data, (key, value) => {
                 $('.audio_devices').append(`<option value='${key}'>${value}</option>`);
             });
@@ -43,7 +50,7 @@ $(() => {
      * @param {object} settings
      */
     const populateGeneralSettings = (settings) => {
-        tagin.clearTags();
+        if ('device_groups' in settings) tagin.clearTags();
         $.each(settings, (key, value) => {
             const el = $(`#${key}`);
             if (el.is(':checkbox')) {
@@ -70,23 +77,31 @@ $(() => {
 
     /**
      * Call API to get all general settings.
+     * The microphone settings have no v2 resource yet, so they are still read and written through the v1 API.
      */
     const getLocalSettings = () => {
         const settingsPromises = [
 
-            $.ajax('/api/settings/general').done((data) => {
-                populateGeneralSettings(data.setting_value);
+            api.get('/settings').then((data) => {
+                populateGeneralSettings(omit(data, MICROPHONE_KEYS));
             }),
 
-            $.ajax('/api/auth/pin').done((data) => {
+            api.get('/groups').then((groups) => {
+                populateGeneralSettings({ device_groups: Object.fromEntries(groups.map(g => [g.id, g.name])) });
+            }),
+
+            $.ajax('/api/settings/general').done((data) => {
+                populateGeneralSettings(pick(data.setting_value, MICROPHONE_KEYS));
+            }),
+
+            api.get('/auth/pin').then((data) => {
                 populatePinSettings(data);
             })
 
         ]
 
-        Promise.all(settingsPromises).catch((data) => {
-            console.log(`Error while getting general settings. Error:\n\n${data.responseText}`);
-            new Toast('Error while getting general settings.').error();
+        Promise.all(settingsPromises).catch((error) => {
+            new Toast(`Error while getting general settings. ${error.summary || ''}`).error();
         });
     }
 
@@ -103,48 +118,53 @@ $(() => {
     /**
      * Call API to set general settings.
      * @param {object} settings
+     * @return {Promise}
      */
     const setGeneralSettings = (settings) => {
-        const generalSettings = { settings };
+        const microphone = pick(settings, MICROPHONE_KEYS);
+        const general = omit(settings, [...MICROPHONE_KEYS, 'device_groups']);
 
-        $.ajax({
-            url: '/api/settings/general',
-            type: 'POST',
-            data: JSON.stringify(generalSettings),
-            contentType: 'application/json;charset=UTF-8'
-        }).done((data) => {
-            console.log(`General settings set successfully. Response:\n\n${JSON.stringify(data, null, '\t')}`);
-            new Toast('General settings saved.').success();
-
+        return Promise.all([
+            api.patch('/settings', general),
             $.ajax({
-                url: '/api/system/groups',
-                type: 'PATCH',
+                url: '/api/settings/general',
+                type: 'POST',
+                data: JSON.stringify({ settings: microphone }),
                 contentType: 'application/json;charset=UTF-8'
-            }).done((data) => {
-                console.log(`Removing any stray device groups:\n\n${JSON.stringify(data, null, '\t')}`);
-            });
+            }),
+            setGroups(settings.device_groups),
+        ]);
+    }
 
-        }).fail((data) => {
-            console.log(`Error while setting general settings. Error:\n\n${data.responseText}`);
-            new Toast('Error while saving general settings.').error();
-        });
+    /**
+     * Create the groups that were added as tags and delete the ones that were removed.
+     * @param {Object.<string, string>} wanted Group names by tag id.
+     */
+    const setGroups = async (wanted) => {
+        if (!wanted) return;  // The form did not send any groups.
+        const current = await api.get('/groups');
+        const wantedNames = Object.values(wanted);
+        const currentNames = current.map(g => g.name);
+
+        await Promise.all(current.filter(g => !wantedNames.includes(g.name)).map(g => api.delete(`/groups/${g.id}`)));
+        // Created one after another, as each one is given the next free id.
+        for (const name of wantedNames.filter(n => !currentNames.includes(n))) {
+            await api.post('/groups', { name });
+        }
     }
 
     /**
      * Call API to set validated PIN settings.
      * @param {object} settings
+     * @return {Promise}
      */
     const setPinSettings = (settings) => {
-        const pinData = {
-            DEFAULT_PIN: settings.DASHBOARD_PIN,
-            USE_PIN_LOCK: settings.PIN_LOCK_ENABLED
-        };
+        // The API only accepts 4 to 8 digits. An empty PIN is only allowed while the lock is off: nothing to save then.
+        if (!settings.DASHBOARD_PIN) return Promise.resolve();
 
-        $.ajax({
-            url: '/api/auth/pin',
-            type: 'POST',
-            data: JSON.stringify(pinData),
-            contentType: 'application/json;charset=UTF-8'
+        return api.put('/auth/pin', {
+            default_pin: settings.DASHBOARD_PIN,
+            use_pin_lock: settings.PIN_LOCK_ENABLED
         });
     }
 
@@ -177,76 +197,51 @@ $(() => {
             }
         });
 
-        setGeneralSettings(serializedForm);
-        setPinSettings(serializedPinForm);
-    }
-
-    /**
-     * Call API to reset PIN settings to default values.
-     */
-    const resetPinSettings = () => {
-        $.ajax({
-            url: '/api/auth/pin',
-            type: 'DELETE',
-            contentType: 'application/json;charset=UTF-8'
+        Promise.all([setGeneralSettings(serializedForm), setPinSettings(serializedPinForm)]).then(() => {
+            new Toast('General settings saved.').success();
+        }).catch((error) => {
+            new Toast(`Error while saving general settings. ${error.summary || ''}`).error();
         });
     }
 
     /**
-     * Call API to reset general settings to default values.
+     * Call API to reset all settings to default values.
      */
     const resetSettings = () => {
-        $.ajax({
-            url: '/api/settings/general',
-            type: 'DELETE',
-            contentType: 'application/json;charset=UTF-8'
-        }).done(() => {
+        Promise.all([api.delete('/settings'), api.delete('/auth/pin')]).then(() => {
             getLocalSettings();
-            console.log('Settings reset successfully.');
             new Toast('General settings reset to default.').success();
-        }).fail((data) => {
-            console.log(`Error while resetting settings. Error:\n\n${data.responseText}`);
-            new Toast('Error while resetting settings.').error();
+        }).catch((error) => {
+            new Toast(`Error while resetting settings. ${error.summary}`).error();
         });
     }
 
     /**
      * Call API to import new config file.
      */
-    const importSettings = () => {
-        const fileData = $('#configUpload').prop('files')[0];
+    const importSettings = async () => {
+        const file = $('#configUpload').prop('files')[0];
 
-        if (!fileData) {
+        if (!file) {
             new Toast('No config file selected.').error();
             return;
         }
 
-        const formData = new FormData();
-        formData.append('imported_config', fileData);
-
-        $.ajax({
-            url: '/api/settings/configuration/file',
-            dataType: 'text',
-            cache: false,
-            contentType: false,
-            processData: false,
-            data: formData,
-            type: 'POST'
-        }).done(() => {
-            getLocalSettings();
-            console.log('General settings imported.');
-            new Toast('General settings imported.').success();
-        }).fail((data) => {
-            console.log(`Error while importing general settings. Error:\n\n${data.responseText}`);
-            new Toast('Error while importing general settings.').error();
-        });
+        try {
+            await api.put('/config', JSON.parse(await file.text()));
+        } catch (error) {
+            const reason = error instanceof SyntaxError ? 'The file is not valid JSON.' : error.summary;
+            new Toast(`Error while importing general settings. ${reason}`).error();
+            return;
+        }
+        getLocalSettings();
+        new Toast('General settings imported.').success();
     }
 
     Promise.all(promises).then(() => {
         getLocalSettings();
-    }).catch((data) => {
-        console.log(data);
-        new Toast('Error while preloading dropdown values.').error();
+    }).catch((error) => {
+        new Toast(`Error while preloading dropdown values. ${error.summary}`).error();
     });
 
     $('#save_btn').on('click', () => {
@@ -259,7 +254,6 @@ $(() => {
 
     $('#reset_btn_modal').on('click', () => {
         $('#modal_reset_general').modal('hide');
-        resetPinSettings();
         resetSettings();
     });
 

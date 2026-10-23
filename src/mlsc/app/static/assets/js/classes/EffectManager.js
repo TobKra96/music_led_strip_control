@@ -1,3 +1,4 @@
+import { api } from './Api.js';
 import Toast from './Toast.js';
 
 
@@ -20,7 +21,7 @@ export default class EffectManager {
 
         this.allEffects = [];
 
-        $.ajax('/api/resources/effects').done((data) => {
+        api.get('/resources/effects').then((data) => {
             this.allEffects = [
                 ...Object.keys(data.special),
                 ...Object.keys(data.music),
@@ -42,49 +43,30 @@ export default class EffectManager {
     switchEffect(effect) {
         if (!this.allEffects.includes(effect) || !this.currentDevice) return;
 
-        const data = this._apiDataBuilder(effect);
-
-        $.ajax({
-            url: "/api/effect/active",
-            type: "POST",
-            data: JSON.stringify(data),
-            contentType: 'application/json;charset=UTF-8'
-        }).done((data) => {
+        this._request(effect).then((active) => {
             // UI and State Updates should be here.
             this.currentDevice.setCycleStatusStyle();
-
-            if (data.devices) {
-                this.currentDevice.setActiveEffectStyle(data.devices.map(x => x.effect));
-            } else if (data.effect) {
-                this.currentDevice.setActiveEffectStyle([data.effect]);
-            }
-
-        }).fail((data) => {
-            console.log(JSON.parse(data.responseText));
-            new Toast("Error while setting effect.").error();
+            this.currentDevice.setActiveEffectStyle(active.map(x => x.effect));
+        }).catch((error) => {
+            new Toast(`Error while setting effect. ${error.summary}`).error();
         });
     }
 
     /**
-     * Build a POST request data object for setting an effect.
+     * Call API to set the effect of the current device, group or all devices.
      * @param {string} effect
-     * @returns {{effect: string} | {devices: {device: string, effect: string}[]} | {device: string, effect: string}}
-    */
-    _apiDataBuilder(effect) {
+     * @return {Promise.<Array.<{device_id: string, effect: string}>>} The devices that changed.
+     */
+    _request(effect) {
         if (this.currentDevice.id === 'all_devices') {  // For all devices.
-            return { effect };
+            return api.put('/effect', { effect });
         }
 
         if (this.currentDevice.isGroup) {  // For all devices in a group.
-            const assignedDevices = jinja_groups.find(g => g.id === this.currentDevice.id).assigned_to;
-            const devices = Object.keys(assignedDevices).map(device => ({
-                device,
-                effect
-            }));
-            return { devices };
+            return api.put('/effect', { effect, device_ids: Object.keys(this.currentDevice.assigned_to) });
         }
 
         // For single device.
-        return { device: this.currentDevice.id, effect };
+        return api.put(`/devices/${this.currentDevice.id}/effect`, { effect }).then(x => [x]);
     }
 }

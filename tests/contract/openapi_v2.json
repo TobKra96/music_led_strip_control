@@ -260,6 +260,32 @@
         "title": "LoginBody",
         "type": "object"
       },
+      "MigrationReportOut": {
+        "properties": {
+          "entries": {
+            "items": {
+              "$ref": "#/components/schemas/ReportEntry"
+            },
+            "title": "Entries",
+            "type": "array"
+          },
+          "from_version": {
+            "title": "From Version",
+            "type": "integer"
+          },
+          "to_version": {
+            "title": "To Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "from_version",
+          "to_version",
+          "entries"
+        ],
+        "title": "MigrationReportOut",
+        "type": "object"
+      },
       "OperationOut": {
         "properties": {
           "attempts": {
@@ -389,6 +415,47 @@
           "code"
         ],
         "title": "Problem",
+        "type": "object"
+      },
+      "ReportEntry": {
+        "properties": {
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "level": {
+            "description": "`info` or `warning`.",
+            "title": "Level",
+            "type": "string"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          },
+          "original": {
+            "anyOf": [
+              {},
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The value that was replaced, when there was one.",
+            "title": "Original"
+          },
+          "path": {
+            "description": "Where in the configuration the change was made.",
+            "title": "Path",
+            "type": "string"
+          }
+        },
+        "required": [
+          "level",
+          "code",
+          "path",
+          "message",
+          "original"
+        ],
+        "title": "ReportEntry",
         "type": "object"
       },
       "ResourceOut": {
@@ -2475,6 +2542,101 @@
           }
         },
         "summary": "Check whether each device is reachable",
+        "tags": [
+          "System"
+        ]
+      }
+    },
+    "/api/v2/system/migration-report": {
+      "delete": {
+        "description": "The report is renamed to `migration-report.dismissed.json`, not deleted.",
+        "operationId": "system_api_v2_dismiss_migration_report_migration_report_delete",
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        },
+        "summary": "Dismiss the Migration Report",
+        "tags": [
+          "System"
+        ]
+      },
+      "get": {
+        "description": "The report stays until it is dismissed, so the UI can show it once. `404` when there is nothing to show.",
+        "operationId": "system_api_v2_get_migration_report_migration_report_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MigrationReportOut"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        },
+        "summary": "Get the report of the last Config Migration",
         "tags": [
           "System"
         ]

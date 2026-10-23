@@ -330,3 +330,8 @@ select.gradients {
 .pcoded-navbar.navbar-collapsed:hover ~ .pcoded-main-container:before {
     z-index: 2;
 }
+
+/* Banners */
+.mlsc-banner .close {
+    line-height: 1;
+}

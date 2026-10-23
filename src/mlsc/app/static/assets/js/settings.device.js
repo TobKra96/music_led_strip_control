@@ -1,3 +1,4 @@
+import { api } from './classes/Api.js';
 import { Device, tagin } from './classes/Device.js';
 import Toast from './classes/Toast.js';
 
@@ -14,16 +15,10 @@ $(() => {
 
     const promises = [  // Preload dropdown values.
 
-        $.ajax('/api/resources/output-types').done((data) => {
+        api.get('/resources/output-types').then((data) => {
             outputTypes = data;
             $.each(data, (key, value) => {
                 $('.output_type').append(`<option value='${key}'>${value}</option>`);
-            });
-        }),
-
-        $.ajax('/api/resources/led-strips').done((data) => {
-            $.each(data, (key, value) => {
-                $('.led_strips').append(`<option value='${key}'>${value}</option>`);
             });
         })
 
@@ -75,38 +70,26 @@ $(() => {
             });
         });
 
-    }).catch((data) => {
-        // All requests finished but one or more failed.
-        console.log(data);
-        new Toast('Error while loading settings.').error();
+    }).catch((error) => {
+        new Toast(`Error while loading settings. ${error.summary}`).error();
     });
 
     /**
      * Call API to create new default device.
      */
     const createDevice = () => {
-        $.ajax({
-            url: '/api/system/devices',
-            type: 'POST',
-            contentType: 'application/json;charset=UTF-8'
-        }).done((/** @type {NewDeviceFromApi} */ data) => {
-            console.log(`New device created successfully. Response:\n\n${JSON.stringify(data, null, '\t')}`);
-            const newDeviceId = data.device_id;
+        api.post('/devices').then((/** @type {DeviceFromApi} */ data) => {
+            const newDevice = new Device(data);
+            devices.push(newDevice);
 
-            $.ajax('/api/system/devices').done((/** @type {Array.<DeviceFromApi>} */ data) => {
-                const NewDeviceParams = data.find(d => d.id === newDeviceId);
-                const newDevice = new Device(NewDeviceParams);
-                devices.push(newDevice);
+            dm.current = newDevice;
+            localStorage.setItem('lastDevice', dm.current.id);
 
-                dm.current = newDevice;
-                localStorage.setItem('lastDevice', dm.current.id);
+            _reloadDeviceBar(devices);
 
-                _reloadDeviceBar(devices);
-
-                new Toast(`Device '${dm.current.name}' created.`).success();
-            });
-        }).fail((data) => {
-            console.log(`Error while creating new device. Error:\n\n${data.responseText}`);
+            new Toast(`Device '${dm.current.name}' created.`).success();
+        }).catch((error) => {
+            new Toast(`Error while creating new device. ${error.summary}`).error();
         });
     }
 
@@ -114,19 +97,12 @@ $(() => {
      * Call API to delete a device.
      */
     const deleteDevice = () => {
-        const data = { device: dm.current.id };
+        const deleted = dm.current;
 
-        $.ajax({
-            url: '/api/system/devices',
-            type: 'DELETE',
-            data: JSON.stringify(data),
-            contentType: 'application/json;charset=UTF-8'
-        }).done((/** @type {DeletedDeviceFromApi} */ data) => {
-            console.log(`Device deleted successfully. Response:\n\n${JSON.stringify(data, null, '\t')}`);
+        api.delete(`/devices/${deleted.id}`).then(() => {
+            new Toast(`Device '${deleted.name}' deleted.`).success();
 
-            new Toast(`Device '${dm.current.name}' deleted.`).success();
-
-            devices = devices.filter(d => d.id !== data.deleted_device);
+            devices = devices.filter(d => d.id !== deleted.id);
 
             if (devices.length) {
                 dm.current = devices[devices.length - 1];
@@ -138,8 +114,8 @@ $(() => {
 
             _reloadDeviceBar(devices);
 
-        }).fail((data) => {
-            console.log(`Error while deleting device '${dm.current.name}'. Error:\n\n${data.responseText}`);
+        }).catch((error) => {
+            new Toast(`Error while deleting device '${deleted.name}'. ${error.summary}`).error();
         });
     }
 
@@ -169,60 +145,21 @@ $(() => {
             }
         });
 
-        const deviceSettings = {
-            device: dm.current.id,
-            settings: serializedDeviceForm
-        };
-
-        const settingsPromises = [
-            $.ajax({
-                url: '/api/settings/device',
-                type: 'POST',
-                data: JSON.stringify(deviceSettings),
-                contentType: 'application/json;charset=UTF-8'
-            }).done((data) => {
-                console.log(`Device settings set successfully. Response:\n\n${JSON.stringify(data, null, '\t')}`);
-                dm.current.name = data.settings.device_name;
-                $('#selected_device_txt').text(data.settings.device_name);
-            }).fail((data) => {
-                console.log(`Error while setting '${dm.current.id}' settings. Error:\n\n${data.responseText}`);
-            })
-        ];
-
-        // Serialize device output settings to JSON.
+        // The settings of every output type are saved with the device, nested under `output`.
+        const output = {};
         Object.keys(outputTypes).forEach(outputType => {
-            const serializedOutputForm = $(`#settingsForm .${outputType}`).serializeJSON({
+            output[outputType] = $(`#settingsForm .${outputType}`).serializeJSON({
                 checkboxUncheckedValue: 'false'
             });
-
-            const outputSettings = {
-                device: dm.current.id,
-                output_type_key: outputType,
-                settings: serializedOutputForm
-            };
-
-            settingsPromises.push(
-                $.ajax({
-                    url: '/api/settings/device/output-type',
-                    type: 'POST',
-                    data: JSON.stringify(outputSettings),
-                    contentType: 'application/json;charset=UTF-8'
-                }).done((data) => {
-                    console.log(`Device ${outputType} settings set successfully. Response:\n\n${JSON.stringify(data, null, '\t')}`);
-                }).fail((data) => {
-                    console.log(`Error while setting '${outputType}' settings. Error:\n\n${data.responseText}`);
-                })
-            );
-
         });
 
-        Promise.all(settingsPromises).then(() => {
-            console.log('All device settings saved.');
+        api.patch(`/devices/${dm.current.id}/settings`, { ...serializedDeviceForm, output }).then((data) => {
+            dm.current.name = data.device_name;
+            $('#selected_device_txt').text(data.device_name);
             new Toast(`Device '${dm.current.name}' saved.`).success();
-        }).catch((data) => {
-            new Toast(`Error while saving device '${dm.current.name}'.\n\n${JSON.parse(data.responseText).message}`).error();
+        }).catch((error) => {
+            new Toast(`Error while saving device '${dm.current.name}'. ${error.summary}`).error();
         });
-
     }
 
     /**
@@ -387,7 +324,8 @@ $('#LED_Pin_TOOLTIP').attr('data-original-title', 'The GPIO Pin used for the sig
 $('#LED_Freq_Hz_TOOLTIP').attr('data-original-title', 'The signal frequency used to communicate with the LED Strip.<br><br>Default setting: 800000');
 $('#LED_Channel_TOOLTIP').attr('data-original-title', 'The channel you want to use. PWM0 - 0 and PWM1 - 1.<br><br>Default setting: 0');
 $('#LED_Dma_TOOLTIP').attr('data-original-title', 'The direct memory access channel. Select a channel between 0-14.<br><br>Default setting: 10');
-$('#LED_Strip_TOOLTIP').attr('data-original-title', 'The LED Strip type. Check if the RGB channels are mapped correctly.<br><br>Default setting: ws281x_rgb');
+$('#Chip_Family_TOOLTIP').attr('data-original-title', 'The LED controller chip of your strip.<br><br>Default setting: WS2812');
+$('#Colour_Order_TOOLTIP').attr('data-original-title', 'The order of the colour channels your strip expects. Pick another order if red, green and blue show up swapped.<br><br>Default setting: GRB');
 $('#LED_Invert_TOOLTIP').attr('data-original-title', 'The parameter for inverting the LED signal. It can be useful if you want to use an inverted logic level shifter.<br><br>Default value: Off');
 $('#UDP_Client_IP_TOOLTIP').attr('data-original-title', 'The IP address of the client.');
 $('#UDP_Client_Port_TOOLTIP').attr('data-original-title', 'The port used for the communication between the server and client.<br><br>Default setting: 7777');
@@ -399,14 +337,4 @@ $('#DEVICE_GROUP_TOOLTIP').attr('data-original-title', 'Device groups allow you 
  * @property {object} assigned_to
  * @property {string} id
  * @property {string} name
- */
-
-/**
- * @typedef {object} NewDeviceFromApi
- * @property {string} device_id
- */
-
-/**
- * @typedef {object} DeletedDeviceFromApi
- * @property {string} deleted_device
  */

@@ -1,4 +1,5 @@
 import { initPickr, formatRGB, parseRGB } from './classes/Pickr.js';
+import { api } from './classes/Api.js';
 import { Device } from './classes/Device.js';
 import Toast from './classes/Toast.js';
 
@@ -81,7 +82,7 @@ $(() => {
      * Call API to get all effect names.
      * @return {Promise}
      */
-    const checkboxPromise = () => $.ajax('/api/resources/effects').done((response) => {
+    const checkboxPromise = () => api.get('/resources/effects').then((response) => {
         _createEffectCheckboxes('#nonMusicEffectCol', response.non_music);
         _createEffectCheckboxes('#musicEffectCol', response.music);
     });
@@ -103,8 +104,8 @@ $(() => {
             return;
         }
 
-        dm.current.getEffectSettings(effectIdentifier).then((response) => {
-            $.each(response.settings, (key, value) => {
+        dm.current.getEffectSettings(effectIdentifier).then((settings) => {
+            $.each(settings, (key, value) => {
                 const el = $(`#${key}`);
                 if (el.is(':checkbox')) {
                     el.prop('checked', value);
@@ -118,7 +119,7 @@ $(() => {
                 }
                 el.trigger('change');
             });
-        });
+        }).catch(error => new Toast(`Error while loading effect settings. ${error.summary}`).error());
     }
 
     /**
@@ -142,36 +143,23 @@ $(() => {
             }
         });
 
-        const data = {
-            device: dm.current.id,
-            effect: effectIdentifier,
-            settings: serializedForm
-        };
-
         // Save effect settings to config.
-        $.ajax({
-            url: '/api/settings/effect',
-            type: 'POST',
-            data: JSON.stringify(data),
-            contentType: 'application/json;charset=UTF-8'
-        }).done((data) => {
-            console.log(`Effect settings set successfully. Response:\n\n${JSON.stringify(data, null, '\t')}`);
+        api.patch(`/devices/${dm.current.id}/effects/${effectIdentifier}/settings`, serializedForm).then(() => {
             new Toast('Effect settings saved.').success();
-        }).fail((data) => {
-            console.log(`Error while setting effect settings. Error:\n\n${data.responseText}`);
-            new Toast('Error while saving effect settings.').error();
+        }).catch((error) => {
+            new Toast(`Error while saving effect settings. ${error.summary}`).error();
         });
     }
 
     const promises = [  // Preload dropdown values and checkboxes.
 
-        $.ajax('/api/resources/colors').done((response) => {
+        api.get('/resources/colors').then((response) => {
             $.each(response, (key, value) => {
                 $('.colors').append(`<option value="${key}">${value}</option>`);
             });
         }),
 
-        $.ajax('/api/resources/gradients').done((response) => {
+        api.get('/resources/gradients').then((response) => {
             $.each(response, (key, value) => {
                 $('.gradients').append(`<option value="${key}">${value}</option>`);
             });

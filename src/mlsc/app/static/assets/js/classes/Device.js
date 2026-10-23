@@ -1,4 +1,6 @@
 import Tagin from '../../plugins/tagin/js/tagin.js';
+import { api } from './Api.js';
+import Toast from './Toast.js';
 import EffectManager from './EffectManager.js';
 const effectManager = new EffectManager();
 
@@ -99,63 +101,39 @@ class Device {
     }
 
     /**
-     * Call API to get all device settings.
-     * @param {string} excludedKey
-     * @return {Promise.<jQuery.jqXHR>}
+     * Call API to get all device settings, including `output` and `effects`.
+     * @return {Promise.<object>}
      */
-    async getSettings(excludedKey = '') {
-        const settings = { device: this.id };
-        excludedKey !== '' && (settings.excluded_key = excludedKey);
-        return await $.ajax({
-            url: '/api/settings/device',
-            data: settings
-        });
+    getSettings() {
+        return api.get(`/devices/${this.id}/settings`);
     }
 
     /**
-     * Call API to get all device output settings.
-     * @return {Promise.<jQuery.jqXHR>}
-     */
-    async getOutputSettings() {
-        return await $.ajax({
-            url: '/api/settings/device/output-type',
-            data: { device: this.id }
-        });
-    }
-
-    /**
-     * Call API to get all effect settings.
+     * Call API to get all settings of one effect.
      * @param {string} effectId
-     * @return {Promise.<jQuery.jqXHR>}
+     * @return {Promise.<object>}
      */
-    async getEffectSettings(effectId) {
-        return await $.ajax({
-            url: '/api/settings/effect',
-            data: {
-                device: this.id,
-                effect: effectId
-            }
-        });
+    getEffectSettings(effectId) {
+        return api.get(`/devices/${this.id}/effects/${effectId}/settings`);
     }
 
     /**
-     * Call API to get the `Random Cycle` effect status.
-     * @return {Promise.<jQuery.jqXHR>}
+     * Whether `Random Cycle` runs on this device, or on any device of this group.
+     * @return {Promise.<boolean>}
      */
-    async getCycleStatus() {
-        return await $.ajax({
-            url: '/api/effect/cycle-status',
-            data: { device: this.id }
-        });
+    async isCycleActive() {
+        const ids = this.isGroup ? Object.keys(this.assigned_to) : [this.id];
+        const effects = await Promise.all(ids.map(id => api.get(`/devices/${id}/effect`)));
+        return effects.some(x => x.random_cycle_active);
     }
 
     /**
      * Set border style for `Random Cycle` button.
      */
     setCycleStatusStyle() {
-        this.getCycleStatus().then((response) => {
+        this.isCycleActive().then((active) => {
             // TODO: Implement UI/UX for multiple devices with active `Random Cycle`.
-            if (response.random_cycle_active) {
+            if (active) {
                 $('#effect_random_cycle').addClass('active');
             } else {
                 $('#effect_random_cycle').removeClass('active');
@@ -165,7 +143,7 @@ class Device {
 
     /**
      * Show indicator dot on effect buttons which are active.
-     * @param {Array.<{device: string, effect: string}>} devicesFromApi List of devices with active effects.
+     * @param {Array.<{device_id: string, effect: string}>} devicesFromApi List of devices with active effects.
      */
     setDeviceIndicators(devicesFromApi) {
         // Group devices by effect.
@@ -177,12 +155,12 @@ class Device {
         }, {});
 
         // Insert device names into active indicator title.
-        $.ajax('/api/system/devices').done((refreshedDevices) => {
+        api.get('/devices').then((refreshedDevices) => {
             $('.active_indicator').addClass('d-none');
             Object.entries(result).forEach(([effect, devices]) => {
                 let grouped = [];
                 Object.values(devices).forEach((item) => {
-                    const deviceName = refreshedDevices.find(d => d.id === item.device).name;
+                    const deviceName = refreshedDevices.find(d => d.id === item.device_id).name;
                     grouped.push(deviceName);
                 });
                 // TODO: Clicking the dot should show a list of devices with that effect.
@@ -196,22 +174,18 @@ class Device {
      * Call API to get the active effect for a device.
      */
     getActiveEffect() {
-        $.ajax('/api/effect/active').done(data => {
+        api.get('/effect').then(data => {
             this.setCycleStatusStyle();
 
-            let effects;
-            if (this.id === 'all_devices') {  // `all_devices` is a group, but it's not returned from the API.
-                effects = data.devices.map(x => x.effect);
-            } else {
-                const group = data.groups.find(x => x.group === this.id);
-                effects = group ? group.effects : [data.devices.find(x => x.device === this.id).effect];
-            }
+            // `all_devices` and the groups are not returned from the API, so look up their members.
+            const members = this.isGroup ? Object.keys(this.assigned_to) : [this.id];
+            const effects = data.filter(x => members.includes(x.device_id)).map(x => x.effect);
             this.setActiveEffectStyle(effects);
-        });
+        }).catch(error => new Toast(`Error while loading the active effect. ${error.summary}`).error());
 
         // WIP: Not working yet.
         // Does not update indicator dot on effect click.
-        // this.setDeviceIndicators(data.devices);
+        // this.setDeviceIndicators(data);
     }
 
 
@@ -247,8 +221,8 @@ class Device {
      * Populate device settings forms with data from config.
      */
     refreshConfig() {
-        this.getSettings('effects').then((response) => {
-            $.each(response.settings, (key, value) => {
+        this.getSettings().then(({ effects, output, ...settings }) => {
+            $.each(settings, (key, value) => {
                 const el = $(`#${key}`);
                 if (el.is(':checkbox')) {
                     el.prop('checked', value);
@@ -263,10 +237,9 @@ class Device {
                 }
                 el.trigger('change');
             });
-        });
 
-        this.getOutputSettings().then((response) => {
-            $.each(response.output_settings, (key, value) => {
+            // The output settings of all output types share one flat form.
+            $.each(Object.assign({}, ...Object.values(output)), (key, value) => {
                 const el = $(`#${key}`);
                 if (el.is(':checkbox')) {
                     el.prop('checked', value);
@@ -275,7 +248,7 @@ class Device {
                 }
                 el.trigger('change');
             });
-        });
+        }).catch(error => new Toast(`Error while loading the device settings. ${error.summary}`).error());
     }
 
 }

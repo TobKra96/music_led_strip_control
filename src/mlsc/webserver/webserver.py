@@ -19,6 +19,7 @@ from mlsc.webserver.blueprints.microphone_settings_api import microphone_setting
 from mlsc.webserver.blueprints.system_info_api import system_info_api
 from mlsc.webserver.deprecation import register_v1_deprecation
 from mlsc.webserver.executer import Executer
+from mlsc.webserver.status_publisher import create_status_publisher, start_status_publisher
 
 API_BLUEPRINTS = (
     authentication_api, device_api, device_settings_api, effect_api, effect_settings_api,
@@ -58,6 +59,7 @@ class Webserver:
 
         register_api_blueprints(self.server)
         operations.start_ticker(operations.registry)
+        start_status_publisher(create_status_publisher(Executer.instance.system_info_executer))
 
         if DEBUG:
             self.server.run(host="0.0.0.0", port=webserver_port, load_dotenv=False, debug=True)  # ruff: ignore[hardcoded-bind-all-interfaces]

@@ -48,12 +48,15 @@
     {% include 'includes/navigation.html' %}
 
     <div class="pcoded-main-container">
+        <div id="banner_block" class="px-3 pt-3"></div>
         <div class="pcoded-wrapper">
             {% block content %}{% endblock content %}
         </div>
     </div>
 
     {% include 'includes/scripts.html' %}
+
+    <script src="{{ url_for('static', filename='assets/js/app.js') }}" type="module"></script>
 
     <!-- Specific Page JS goes HERE  -->
     {% block javascripts %}{% endblock javascripts %}

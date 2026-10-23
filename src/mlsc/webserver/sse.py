@@ -46,6 +46,10 @@ class EventBroker:
             self._subscribers.add(subscriber)
             return subscriber
 
+    def has_subscribers(self) -> bool:
+        with self._lock:
+            return bool(self._subscribers)
+
     def unsubscribe(self, subscriber: queue.Queue) -> None:
         with self._lock:
             self._subscribers.discard(subscriber)
