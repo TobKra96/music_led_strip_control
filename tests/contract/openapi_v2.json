@@ -186,65 +186,6 @@
         "title": "SessionOut",
         "type": "object"
       },
-      "ValidationErrorModel": {
-        "properties": {
-          "ctx": {
-            "anyOf": [
-              {
-                "additionalProperties": true,
-                "type": "object"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "description": "An optional object which contains values required to render the error message.",
-            "title": "Error context"
-          },
-          "input": {
-            "description": "The input provided for validation.",
-            "title": "Input"
-          },
-          "loc": {
-            "description": "The error's location as a list.",
-            "items": {},
-            "title": "Location",
-            "type": "array"
-          },
-          "msg": {
-            "description": "A human readable explanation of the error.",
-            "title": "Message",
-            "type": "string"
-          },
-          "type": {
-            "description": "A computer-readable identifier of the error type.",
-            "title": "Error Type",
-            "type": "string"
-          },
-          "url": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "description": "The URL to further information about the error.",
-            "title": "URL"
-          }
-        },
-        "required": [
-          "type",
-          "loc",
-          "msg",
-          "input"
-        ],
-        "title": "ValidationErrorModel",
-        "type": "object"
-      },
       "VersionsOut": {
         "properties": {
           "versions": {
@@ -368,10 +309,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "items": {
-                    "$ref": "#/components/schemas/ValidationErrorModel"
-                  },
-                  "type": "array"
+                  "$ref": "#/components/schemas/Problem"
                 }
               }
             },
@@ -412,10 +350,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "items": {
-                    "$ref": "#/components/schemas/ValidationErrorModel"
-                  },
-                  "type": "array"
+                  "$ref": "#/components/schemas/Problem"
                 }
               }
             },
@@ -454,10 +389,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "items": {
-                    "$ref": "#/components/schemas/ValidationErrorModel"
-                  },
-                  "type": "array"
+                  "$ref": "#/components/schemas/Problem"
                 }
               }
             },
@@ -547,10 +479,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "items": {
-                    "$ref": "#/components/schemas/ValidationErrorModel"
-                  },
-                  "type": "array"
+                  "$ref": "#/components/schemas/Problem"
                 }
               }
             },
@@ -591,10 +520,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "items": {
-                    "$ref": "#/components/schemas/ValidationErrorModel"
-                  },
-                  "type": "array"
+                  "$ref": "#/components/schemas/Problem"
                 }
               }
             },
@@ -658,10 +584,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "items": {
-                    "$ref": "#/components/schemas/ValidationErrorModel"
-                  },
-                  "type": "array"
+                  "$ref": "#/components/schemas/Problem"
                 }
               }
             },
@@ -696,10 +619,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "items": {
-                    "$ref": "#/components/schemas/ValidationErrorModel"
-                  },
-                  "type": "array"
+                  "$ref": "#/components/schemas/Problem"
                 }
               }
             },
@@ -750,10 +670,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "items": {
-                    "$ref": "#/components/schemas/ValidationErrorModel"
-                  },
-                  "type": "array"
+                  "$ref": "#/components/schemas/Problem"
                 }
               }
             },

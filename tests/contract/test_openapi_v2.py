@@ -36,3 +36,19 @@ def test_v2_spec_only_documents_v2_paths_and_problem_errors():
     assert all(path.startswith("/api/v2/") for path in spec["paths"])
     assert "Problem" in spec["components"]["schemas"]
     assert "401" in spec["paths"]["/api/v2/devices"]["get"]["responses"]
+
+
+def test_v2_spec_does_not_depend_on_the_python_version():
+    spec = fetch_spec()
+    descriptions = {response["description"] for item in spec["paths"].values() for op in item.values() for response in op["responses"].values()}
+
+    assert "Unprocessable Content" in descriptions
+    assert "Unprocessable Entity" not in descriptions
+
+
+def test_v2_validation_errors_are_documented_as_problems():
+    spec = fetch_spec()
+    login = spec["paths"]["/api/v2/auth/session"]["get"]["responses"]["422"]
+
+    assert login["content"]["application/json"]["schema"] == {"$ref": "#/components/schemas/Problem"}
+    assert "ValidationErrorModel" not in spec["components"]["schemas"]
