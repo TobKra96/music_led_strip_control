@@ -93,7 +93,10 @@ def test_mic_level_is_not_published_while_nobody_listens(broker):
 
 @pytest.mark.usefixtures("broker")
 def test_device_status_is_replayed_after_last_event_id(client):
-    states = [{"devices": [{"id": "device_0", "name": "Desk", "connected": True, "output_type": "output_dummy"}]}, {"devices": [{"id": "device_0", "name": "Desk", "connected": True, "output_type": "output_udp"}]}]
+    states = [
+        {"devices": [{"id": "device_0", "name": "Desk", "connected": True, "output_type": "output_dummy"}]},
+        {"devices": [{"id": "device_0", "name": "Desk", "connected": True, "output_type": "output_udp"}]},
+    ]
     reads = iter(states)
     system_info = SimpleNamespace(
         get_device_status_event=lambda: next(reads),
@@ -131,17 +134,23 @@ def test_system_stats_arrive_on_the_stream(client):
     response.close()
 
 
-def test_device_status_event_names_the_output_of_each_device():
+def executer_with_output(output_type):
+    """Return a real SystemInfoExecuter over a one-device config, and that config so a test can change the Output."""
+    config = {"device_configs": {"device_0": {"device_name": "Desk", "output_type": output_type}}}
     executer = SystemInfoExecuter.__new__(SystemInfoExecuter)
-    executer._config_instance = SimpleNamespace(config={"device_configs": {"device_0": {"device_name": "Desk", "output_type": "output_dummy"}}})
+    executer._config_instance = SimpleNamespace(config=config)  # ruff: ignore[private-member-access]
+    return executer, config
+
+
+def test_device_status_event_names_the_output_of_each_device():
+    executer, _ = executer_with_output("output_dummy")
 
     assert executer.get_device_status_event() == {"devices": [{"name": "Desk", "id": "device_0", "connected": True, "output_type": "output_dummy"}]}
 
 
-def test_an_output_change_is_a_new_device_status_event(client, broker):
-    output = {"type": "output_dummy"}
-    executer = SystemInfoExecuter.__new__(SystemInfoExecuter)
-    executer._config_instance = SimpleNamespace(config={"device_configs": {"device_0": {"device_name": "Desk", "output_type": output["type"]}}})
+@pytest.mark.usefixtures("broker")
+def test_an_output_change_is_a_new_device_status_event(client):
+    executer, config = executer_with_output("output_dummy")
     system_info = SimpleNamespace(
         get_device_status_event=executer.get_device_status_event,
         get_system_info_performance=lambda: {"system": {}},
@@ -151,7 +160,7 @@ def test_an_output_change_is_a_new_device_status_event(client, broker):
     response = client.get("/api/v2/events")
 
     publisher.poll()
-    executer._config_instance.config["device_configs"]["device_0"]["output_type"] = "output_mock"
+    config["device_configs"]["device_0"]["output_type"] = "output_mock"
     publisher.poll()
 
     statuses = [parse(chunk)[1] for chunk in read_events(response.response, 5) if "event: device.status" in chunk]
