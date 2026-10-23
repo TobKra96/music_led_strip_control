@@ -260,6 +260,58 @@
         "title": "LoginBody",
         "type": "object"
       },
+      "OperationOut": {
+        "properties": {
+          "attempts": {
+            "description": "How many times the change was applied so far.",
+            "title": "Attempts",
+            "type": "integer"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Why the change was rolled back or failed.",
+            "title": "Error"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "description": "What is being changed, e.g. `output`.",
+            "title": "Kind",
+            "type": "string"
+          },
+          "state": {
+            "$ref": "#/components/schemas/OperationState"
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "state",
+          "attempts",
+          "error"
+        ],
+        "title": "OperationOut",
+        "type": "object"
+      },
+      "OperationState": {
+        "enum": [
+          "pending",
+          "confirmed",
+          "rolled_back",
+          "failed"
+        ],
+        "title": "OperationState",
+        "type": "string"
+      },
       "PinSettings": {
         "properties": {
           "default_pin": {
@@ -1935,6 +1987,71 @@
         ]
       }
     },
+    "/api/v2/operations/{operation_id}": {
+      "get": {
+        "description": "Poll the state of a change: `pending`, `confirmed`, `rolled_back` or `failed`. The same objects are pushed as `operation` events.",
+        "operationId": "operations_api_v2_get_operation__operation_id__get",
+        "parameters": [
+          {
+            "description": "Id from the `202` response or the `operation` event.",
+            "in": "path",
+            "name": "operation_id",
+            "required": true,
+            "schema": {
+              "description": "Id from the `202` response or the `operation` event.",
+              "title": "Operation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OperationOut"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        },
+        "summary": "Get an operation",
+        "tags": [
+          "Operations"
+        ]
+      }
+    },
     "/api/v2/resources/audio-devices": {
       "get": {
         "operationId": "resources_api_v2_audio_devices_audio_devices_get",
@@ -2560,6 +2677,10 @@
     {
       "description": "Server-sent event stream",
       "name": "Events"
+    },
+    {
+      "description": "Tracked changes that can take time or fail",
+      "name": "Operations"
     }
   ]
 }

@@ -90,6 +90,10 @@ class GroupNotFound(NotFound):
     _message = "Group does not exist."
 
 
+class OperationNotFound(NotFound):
+    _message = "Operation does not exist."
+
+
 class SettingNotFound(NotFound):
     _message = "Setting does not exist."
 
