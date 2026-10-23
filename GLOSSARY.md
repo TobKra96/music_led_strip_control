@@ -12,6 +12,10 @@ _Avoid_: Controller, strip (when meaning the configuration)
 The backend that delivers pixel frames of a Device: local GPIO, UDP, or Mock.
 _Avoid_: Driver, sink
 
+**Monitor Device**:
+An audio input device that carries audio played by the system or received from a remote source, rather than a microphone.
+_Avoid_: Loopback, Virtual mic
+
 **Mock Output**:
 An Output that drives no hardware and only feeds the Strip Preview.
 _Avoid_: Dummy
