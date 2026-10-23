@@ -80,6 +80,6 @@ def mock_output(fake_device):
 def pytest_collection_modifyitems(items):
     """Mark tests by the directory they live in, so ``-m unit`` and ``-m integration`` select layers."""
     for item in items:
-        for layer in ("unit", "integration"):
+        for layer in ("unit", "integration", "contract"):
             if f"/tests/{layer}/" in item.path.as_posix():
                 item.add_marker(layer)

@@ -67,5 +67,6 @@ max-complexity = 15
 
 
 [lint.per-file-ignores]
+"tests/contract/**" = ["SLF001"]
 "tests/**" = ["S101", "PT001", "PT003", "DOC", "PLC0415"]
 "src/mlsc/paths.py" = ["DOC"]

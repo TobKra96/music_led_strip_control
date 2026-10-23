@@ -57,6 +57,7 @@ addopts = "--strict-markers"
 markers = [
     "unit: fast tests without I/O",
     "integration: whole-app tests with fakes",
+    "contract: golden wire-format and schema tests",
     "hardware: needs a Pi with a real strip, never run in CI",
 ]
 
