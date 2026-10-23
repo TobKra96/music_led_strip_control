@@ -1,10 +1,11 @@
-from flask import Blueprint, jsonify, request
-from flask_login import login_required
-from flask_openapi import swag_from
+from flask import jsonify, request
+from flask_openapi3 import APIBlueprint
 
+from mlsc.webserver.auth import login_required
 from mlsc.webserver.executer import Executer
 from mlsc.webserver.executer_base import validate_schema
 from mlsc.webserver.messages import BadRequest, DeviceNotFound, NotFound, SettingNotFound, UnprocessableEntity
+from mlsc.webserver.openapi_docs import doc
 from mlsc.webserver.schemas.effect_settings_api_schema import (
     GET_EFFECT_SETTING_SCHEMA,
     GET_EFFECT_SETTINGS_SCHEMA,
@@ -12,12 +13,11 @@ from mlsc.webserver.schemas.effect_settings_api_schema import (
     SET_EFFECT_SETTINGS_SCHEMA,
 )
 
-effect_settings_api = Blueprint("effect_settings_api", __name__)
+effect_settings_api = APIBlueprint("effect_settings_api", __name__)
 
 
-@effect_settings_api.get("/api/settings/effect")
+@effect_settings_api.get("/api/settings/effect", **doc("effect_settings_api/get_effect_settings.yml"))
 @login_required
-@swag_from("docs/effect_settings_api/get_effect_settings.yml")
 def get_effect_settings():
     data_in = request.args.to_dict()
 
@@ -58,9 +58,8 @@ def get_effect_settings():
     return UnprocessableEntity.as_response()
 
 
-@effect_settings_api.post("/api/settings/effect")
+@effect_settings_api.post("/api/settings/effect", **doc("effect_settings_api/set_effect_settings.yml"))
 @login_required
-@swag_from("docs/effect_settings_api/set_effect_settings.yml")
 def set_effect_settings():
     data_in = request.get_json()
 

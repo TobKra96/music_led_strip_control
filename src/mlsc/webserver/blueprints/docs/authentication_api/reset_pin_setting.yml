@@ -1,0 +1,17 @@
+Reset PIN code
+---
+tags:
+  - Auth
+description: Resetting PIN is allowed only when logged in or when PIN lock is disabled
+responses:
+  "200":
+    description: OK
+    content:
+      application/json:
+        schema:
+          example:
+            DEFAULT_PIN: str
+            USE_PIN_LOCK: bool
+          type: object
+  "401":
+    description: Unauthorized

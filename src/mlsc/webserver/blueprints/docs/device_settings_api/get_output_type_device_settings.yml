@@ -140,10 +140,10 @@ responses:
               setting_value: string/integer/boolean
 
   404:
-    $ref: '#/components/responses/404'
+    description: Not Found
 
   422:
-    $ref: '#/components/responses/422'
+    description: Unprocessable Entity
 
   401:
     description: Unauthorized

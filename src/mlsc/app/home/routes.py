@@ -1,8 +1,8 @@
 from flask import abort, render_template, request
-from flask_login import login_required
 from jinja2 import TemplateNotFound
 
 from mlsc.app.home import blueprint
+from mlsc.webserver.auth import login_required
 from mlsc.webserver.executer import Executer
 
 

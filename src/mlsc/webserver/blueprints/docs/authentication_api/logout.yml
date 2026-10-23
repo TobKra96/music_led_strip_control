@@ -1,0 +1,16 @@
+Log out user
+---
+tags:
+  - Auth
+description:
+  Redirects to login page if PIN code is enabled
+
+
+  Else, redirects to dashboard
+responses:
+  "200":
+    description: OK
+    content:
+      text/html:
+        schema:
+          type: string

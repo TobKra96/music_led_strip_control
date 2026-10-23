@@ -1,10 +1,11 @@
-from flask import Blueprint, jsonify, request
-from flask_login import login_required
-from flask_openapi import swag_from
+from flask import jsonify, request
+from flask_openapi3 import APIBlueprint
 
+from mlsc.webserver.auth import login_required
 from mlsc.webserver.executer import Executer
 from mlsc.webserver.executer_base import validate_schema
 from mlsc.webserver.messages import DeviceNotFound, DuplicateItem, UnprocessableEntity
+from mlsc.webserver.openapi_docs import doc
 from mlsc.webserver.schemas.effect_api_schema import (
     DEVICE_ACTIVE_EFFECT_SCHEMA,
     DEVICE_CYCLE_STATUS_SCHEMA,
@@ -13,12 +14,11 @@ from mlsc.webserver.schemas.effect_api_schema import (
     SET_ACTIVE_EFFECT_SCHEMA,
 )
 
-effect_api = Blueprint("effect_api", __name__)
+effect_api = APIBlueprint("effect_api", __name__)
 
 
-@effect_api.get("/api/effect/active")
+@effect_api.get("/api/effect/active", **doc("effect_api/get_active_effect.yml"))
 @login_required
-@swag_from("docs/effect_api/get_active_effect.yml")
 def get_active_effect():
     data_in = request.args.to_dict()
 
@@ -42,9 +42,8 @@ def get_active_effect():
     return UnprocessableEntity.as_response()
 
 
-@effect_api.post("/api/effect/active")
+@effect_api.post("/api/effect/active", **doc("effect_api/set_active_effect.yml"))
 @login_required
-@swag_from("docs/effect_api/set_active_effect.yml")
 def set_active_effect():
     data_in = request.get_json()
     data_out = {}
@@ -80,9 +79,8 @@ def set_active_effect():
     return jsonify(data_out)
 
 
-@effect_api.get("/api/effect/cycle-status")
+@effect_api.get("/api/effect/cycle-status", **doc("effect_api/get_cycle_status.yml"))
 @login_required
-@swag_from("docs/effect_api/get_cycle_status.yml")
 def get_cycle_status():
     data_in = request.args.to_dict()
 

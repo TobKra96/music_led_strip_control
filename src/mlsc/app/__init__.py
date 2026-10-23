@@ -1,9 +1,18 @@
 from importlib import import_module
 
-from flask import Flask, render_template, request
+from flask import render_template, request
+from flask_openapi3 import Info, OpenAPI
 from werkzeug.exceptions import HTTPException
 
+from mlsc.webserver import auth
 from mlsc.webserver.messages import BadRequest, MethodNotAllowed, NotFound, ServerError
+
+API_INFO = Info(
+    title="MLSC API",
+    description="API for communicating with the MLSC server. The API is based on the OpenAPI 3.1 specification.",
+    version="2.3.0",
+    license={"name": "MIT", "url": "https://github.com/TobKra96/music_led_strip_control/blob/master/LICENSE"},
+)
 
 
 def bad_request(_: HTTPException) -> tuple:
@@ -28,21 +37,34 @@ def server_error(e: HTTPException) -> tuple:
     return render_template("home/error.html", code=e.code, message="Server error"), e.code
 
 
-def register_blueprints(app: Flask) -> None:
+def register_blueprints(app: OpenAPI) -> None:
     for module_name in ["home"]:
         module = import_module(f"mlsc.app.{module_name}.routes")
         app.register_blueprint(module.blueprint)
 
 
-def register_errors(app: Flask) -> None:
+def register_api_docs(app: OpenAPI) -> None:
+    @app.get("/openapi.json")
+    def openapi_spec() -> dict:
+        return app.api_doc
+
+    @app.get("/api/")
+    def api_docs() -> str:
+        return render_template("swagger.html")
+
+
+def register_errors(app: OpenAPI) -> None:
     app.register_error_handler(400, bad_request)
     app.register_error_handler(404, not_found)
     app.register_error_handler(405, method_not_allowed)
     app.register_error_handler(500, server_error)
 
 
-def create_app() -> Flask:
-    app = Flask(__name__, static_folder="static")
+def create_app() -> OpenAPI:
+    # The interactive docs are served by `register_api_docs` from bundled assets, not by flask-openapi3's CDN-based UI.
+    app = OpenAPI(__name__, static_folder="static", info=API_INFO, doc_ui=False)
     register_blueprints(app)
+    register_api_docs(app)
+    app.context_processor(lambda: {"is_authenticated": auth.is_authenticated})
     register_errors(app)
     return app

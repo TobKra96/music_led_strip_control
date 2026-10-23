@@ -1,0 +1,30 @@
+Set PIN code
+---
+tags:
+  - Auth
+description: Setting PIN is allowed only when logged in or when PIN lock is disabled
+requestBody:
+  content:
+    application/json:
+      schema:
+        type: string
+      examples:
+        example1:
+          value:
+            DEFAULT_PIN: 1111
+            USE_PIN_LOCK: true
+          summary: 4 digit active PIN
+  description: 4-8 digit PIN code and active lock state
+  required: true
+responses:
+  "200":
+    description: OK
+    content:
+      application/json:
+        schema:
+          example:
+            DEFAULT_PIN: str
+            USE_PIN_LOCK: bool
+          type: object
+  "401":
+    description: Unauthorized

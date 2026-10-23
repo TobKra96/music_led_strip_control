@@ -1,0 +1,18 @@
+Log in user
+---
+tags:
+  - Auth
+requestBody:
+  content:
+    application/x-www-form-urlencoded:
+      schema:
+        type: object
+        properties:
+          pin:
+            description: Redirects to next page if login successful
+            type: string
+        required:
+          - pin
+responses:
+  "200":
+    description: OK

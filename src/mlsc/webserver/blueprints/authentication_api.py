@@ -1,15 +1,17 @@
-from flask import Blueprint, flash, jsonify, redirect, render_template, request, session, url_for
-from flask_login import current_user, logout_user
+from flask import flash, jsonify, redirect, render_template, request, session, url_for
+from flask_openapi3 import APIBlueprint
 
+from mlsc.webserver import auth
 from mlsc.webserver.executer import Executer
+from mlsc.webserver.openapi_docs import doc
 
-authentication_api = Blueprint("authentication_api", __name__)
+authentication_api = APIBlueprint("authentication_api", __name__)
 
 
 @authentication_api.get("/login")
 def show_login_page():
     is_pin_active = Executer.instance.authentication_executer.is_pin_active()
-    is_authenticated = current_user.is_authenticated
+    is_authenticated = auth.is_authenticated()
 
     if not is_pin_active or is_authenticated:
         return redirect(url_for("home_blueprint.index"))
@@ -17,27 +19,9 @@ def show_login_page():
     return render_template("home/login.html")
 
 
-@authentication_api.post("/login")
+@authentication_api.post("/login", **doc("authentication_api/login.yml"))
 def login():
-    """Log in user
-    ---
-    tags:
-      - Auth
-    requestBody:
-      content:
-        application/x-www-form-urlencoded:
-          schema:
-            type: object
-            properties:
-              pin:
-                description: Redirects to next page if login successful
-                type: string
-            required:
-              - pin
-      responses:
-        "200":
-          description: OK.
-    """  # ruff: ignore[missing-blank-line-after-summary, missing-trailing-period, missing-terminal-punctuation]
+    """Log in user."""
     pin = request.form.get("pin")
 
     if not pin:
@@ -61,50 +45,18 @@ def login():
     return redirect(url_for("authentication_api.login", next=session.get("next")))
 
 
-@authentication_api.get("/logout")
+@authentication_api.get("/logout", **doc("authentication_api/logout.yml"))
 def logout():
-    """Log out user
-    ---
-    tags:
-      - Auth
-    description:
-      Redirects to login page if PIN code is enabled\n\n
-      Else, redirects to dashboard
-    responses:
-      "200":
-        description: OK
-        content:
-          text/html:
-            schema:
-              type: string.
-    """  # ruff: ignore[missing-blank-line-after-summary, escape-sequence-in-docstring, missing-trailing-period, missing-terminal-punctuation]
-    if current_user.is_authenticated:
-        logout_user()
+    """Log out user."""
+    auth.logout_user()
     return redirect(url_for("authentication_api.login"))
 
 
-@authentication_api.get("/api/auth/pin")
+@authentication_api.get("/api/auth/pin", **doc("authentication_api/get_pin_setting.yml"))
 def get_pin_setting():
-    """Return PIN code
-    ---
-    tags:
-      - Auth
-    description: Returning PIN is allowed only when logged in or when PIN lock is disabled
-    responses:
-      "200":
-        description: OK
-        content:
-          application/json:
-            schema:
-              example:
-                DEFAULT_PIN: str
-                USE_PIN_LOCK: bool
-              type: object
-      "401":
-        description: Unauthorized.
-    """  # ruff: ignore[missing-blank-line-after-summary, missing-trailing-period, missing-terminal-punctuation]
+    """Return PIN code."""
     is_pin_active = Executer.instance.authentication_executer.is_pin_active()
-    is_authenticated = current_user.is_authenticated
+    is_authenticated = auth.is_authenticated()
 
     if not is_pin_active or is_authenticated:
         data_in = Executer.instance.authentication_executer.get_pin_setting()
@@ -117,41 +69,11 @@ def get_pin_setting():
     return "Unauthorized", 401
 
 
-@authentication_api.post("/api/auth/pin")
+@authentication_api.post("/api/auth/pin", **doc("authentication_api/set_pin_setting.yml"))
 def set_pin_setting():
-    """Set PIN code
-    ---
-    tags:
-      - Auth
-    description: Setting PIN is allowed only when logged in or when PIN lock is disabled
-    requestBody:
-      content:
-        application/json:
-          schema:
-            type: string
-          examples:
-            example1:
-              value:
-                DEFAULT_PIN: 1111
-                USE_PIN_LOCK: true
-              summary: 4 digit active PIN
-      description: 4-8 digit PIN code and active lock state
-      required: true
-    responses:
-      "200":
-        description: OK
-        content:
-          application/json:
-            schema:
-              example:
-                DEFAULT_PIN: str
-                USE_PIN_LOCK: bool
-              type: object
-      "401":
-        description: Unauthorized.
-    """  # ruff: ignore[missing-blank-line-after-summary, missing-trailing-period, missing-terminal-punctuation]
+    """Set PIN code."""
     is_pin_active = Executer.instance.authentication_executer.is_pin_active()
-    is_authenticated = current_user.is_authenticated
+    is_authenticated = auth.is_authenticated()
 
     if not is_pin_active or is_authenticated:
         data_in = request.get_json()
@@ -166,28 +88,11 @@ def set_pin_setting():
     return "Unauthorized", 401
 
 
-@authentication_api.delete("/api/auth/pin")
+@authentication_api.delete("/api/auth/pin", **doc("authentication_api/reset_pin_setting.yml"))
 def reset_pin_setting():
-    """Reset PIN code
-    ---
-    tags:
-      - Auth
-    description: Resetting PIN is allowed only when logged in or when PIN lock is disabled
-    responses:
-      "200":
-        description: OK
-        content:
-          application/json:
-            schema:
-              example:
-                DEFAULT_PIN: str
-                USE_PIN_LOCK: bool
-              type: object
-      "401":
-        description: Unauthorized.
-    """  # ruff: ignore[missing-blank-line-after-summary, missing-trailing-period, missing-terminal-punctuation]
+    """Reset PIN code."""
     is_pin_active = Executer.instance.authentication_executer.is_pin_active()
-    is_authenticated = current_user.is_authenticated
+    is_authenticated = auth.is_authenticated()
 
     if not is_pin_active or is_authenticated:
         data_out = Executer.instance.authentication_executer.reset_pin_settings()

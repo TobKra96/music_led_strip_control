@@ -1,21 +1,21 @@
 from json import JSONDecodeError, dumps, loads
 
-from flask import Blueprint, jsonify, request, send_file
-from flask_login import login_required
-from flask_openapi import swag_from
+from flask import jsonify, request, send_file
+from flask_openapi3 import APIBlueprint
 from loguru import logger
 
+from mlsc.webserver.auth import login_required
 from mlsc.webserver.executer import Executer
 from mlsc.webserver.executer_base import validate_schema
 from mlsc.webserver.messages import ConfigFileImported, ConfigFileNotFound, InvalidConfigFile, UnprocessableEntity, UnsupportedMediaType
+from mlsc.webserver.openapi_docs import doc
 from mlsc.webserver.schemas.general_settings_api_schema import ONE_GENERAL_SETTING_SCHEMA, SET_GENERAL_SETTINGS_SCHEMA
 
-general_settings_api = Blueprint("general_settings_api", __name__)
+general_settings_api = APIBlueprint("general_settings_api", __name__)
 
 
-@general_settings_api.get("/api/settings/general")
+@general_settings_api.get("/api/settings/general", **doc("general_settings_api/get_general_settings.yml"))
 @login_required
-@swag_from("docs/general_settings_api/get_general_settings.yml")
 def get_general_settings():
     data_in = request.args.to_dict()
 
@@ -37,9 +37,8 @@ def get_general_settings():
     return UnprocessableEntity.as_response()
 
 
-@general_settings_api.post("/api/settings/general")
+@general_settings_api.post("/api/settings/general", **doc("general_settings_api/set_general_settings.yml"))
 @login_required
-@swag_from("docs/general_settings_api/set_general_settings.yml")
 def set_general_settings():
     data_in = request.get_json()
 
@@ -51,18 +50,16 @@ def set_general_settings():
     return jsonify(data_out)
 
 
-@general_settings_api.delete("/api/settings/general")
+@general_settings_api.delete("/api/settings/general", **doc("general_settings_api/reset_general_settings.yml"))
 @login_required
-@swag_from("docs/general_settings_api/reset_general_settings.yml")
 def reset_general_settings():
     data_out = Executer.instance.general_settings_executer.reset_settings()
 
     return jsonify(data_out)
 
 
-@general_settings_api.get("/api/settings/configuration/file")
+@general_settings_api.get("/api/settings/configuration/file", **doc("general_settings_api/export_config.yml"))
 @login_required
-@swag_from("docs/general_settings_api/export_config.yml")
 def export_config():
     logger.debug(f"Send file: {Executer.instance.general_settings_executer.export_config_path}")
     return send_file(
@@ -73,9 +70,8 @@ def export_config():
     )
 
 
-@general_settings_api.post("/api/settings/configuration/file")
+@general_settings_api.post("/api/settings/configuration/file", **doc("general_settings_api/import_config.yml"))
 @login_required
-@swag_from("docs/general_settings_api/import_config.yml")
 def import_config():
     logger.debug("Import Config Request received.")
 

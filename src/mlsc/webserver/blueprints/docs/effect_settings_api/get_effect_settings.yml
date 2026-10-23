@@ -86,7 +86,7 @@ responses:
                 setting_key:
                   type: string
                 setting_value:
-                  type: string/number/integer/boolean/array
+                  description: string, number, integer, boolean or array
 
             - type: object
               required:

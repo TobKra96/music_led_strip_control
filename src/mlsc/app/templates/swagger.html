@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>MLSC API</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/plugins/swagger-ui/css/swagger-ui.css') }}">
+</head>
+<body>
+    <div id="swagger-ui"></div>
+    <script src="{{ url_for('static', filename='assets/plugins/swagger-ui/js/swagger-ui-bundle.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/plugins/swagger-ui/js/swagger-ui-standalone-preset.js') }}"></script>
+    <script>
+        window.ui = SwaggerUIBundle({
+            url: "{{ url_for('openapi_spec') }}",
+            dom_id: "#swagger-ui",
+            presets: [SwaggerUIBundle.presets.apis, SwaggerUIStandalonePreset],
+            layout: "StandaloneLayout",
+            displayRequestDuration: true,
+            defaultModelExpandDepth: 5,
+            defaultModelsExpandDepth: 5,
+            requestSnippetsEnabled: true,
+            persistAuthorization: true
+        });
+    </script>
+</body>
+</html>

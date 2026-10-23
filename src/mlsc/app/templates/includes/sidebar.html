@@ -76,10 +76,10 @@
                         <!-- {{ nav_link('/settings/microphone_adjustment', 'Microphone Adjustment') }} -->
                     </ul>
                 </li>
-                <li class="nav-item pcoded-menu-caption {{'d-none' if not current_user.is_authenticated}}">
+                <li class="nav-item pcoded-menu-caption {{'d-none' if not is_authenticated()}}">
                     <label>Security</label>
                 </li>
-                <li class="nav-item {{'d-none' if not current_user.is_authenticated}}">
+                <li class="nav-item {{'d-none' if not is_authenticated()}}">
                     <a href="{{ url_for('authentication_api.logout') }}" class="nav-link"><span class="pcoded-micon"><i class="feather icon-lock"></i></span><span class="pcoded-mtext">Lock Dashboard</span></a>
                 </li>
                 <li class="nav-item pcoded-menu-caption">
@@ -92,7 +92,7 @@
                     <a href="https://discord.gg/Xa28JAvAZA" target="_blank" rel="noopener noreferrer" class="nav-link"><span class="pcoded-micon"><i class="feather icon-message-square"></i></span><span class="pcoded-mtext">Discord Channel</span></a>
                 </li>
                 <li class="nav-item mb-4">
-                    <a href="{{ url_for('flask_openapi.apidocs') }}" target="_blank" rel="noopener noreferrer" class="nav-link"><span class="pcoded-micon"><i class="feather icon-file"></i></span><span class="pcoded-mtext">API Documentation</span></a>
+                    <a href="{{ url_for('api_docs') }}" target="_blank" rel="noopener noreferrer" class="nav-link"><span class="pcoded-micon"><i class="feather icon-file"></i></span><span class="pcoded-mtext">API Documentation</span></a>
                 </li>
             </ul>
         </div>

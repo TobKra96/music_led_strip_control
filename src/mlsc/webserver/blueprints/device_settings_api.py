@@ -1,10 +1,11 @@
-from flask import Blueprint, jsonify, request
-from flask_login import login_required
-from flask_openapi import swag_from
+from flask import jsonify, request
+from flask_openapi3 import APIBlueprint
 
+from mlsc.webserver.auth import login_required
 from mlsc.webserver.executer import Executer
 from mlsc.webserver.executer_base import validate_schema
 from mlsc.webserver.messages import DeviceNotFound, SettingNotFound, UnprocessableEntity
+from mlsc.webserver.openapi_docs import doc
 from mlsc.webserver.schemas.device_settings_api_schema import (
     ALL_DEVICE_SETTINGS_SCHEMA,
     DEVICE_SETTINGS_WITH_EXCL_SCHEMA,
@@ -15,12 +16,11 @@ from mlsc.webserver.schemas.device_settings_api_schema import (
     SET_OUTPUT_SETTINGS_SCHEMA,
 )
 
-device_settings_api = Blueprint("device_settings_api", __name__)
+device_settings_api = APIBlueprint("device_settings_api", __name__)
 
 
-@device_settings_api.get("/api/settings/device")
+@device_settings_api.get("/api/settings/device", **doc("device_settings_api/get_device_settings.yml"))
 @login_required
-@swag_from("docs/device_settings_api/get_device_settings.yml")
 def get_device_settings():
     data_in = request.args.to_dict()
 
@@ -63,9 +63,8 @@ def get_device_settings():
     return UnprocessableEntity.as_response()
 
 
-@device_settings_api.post("/api/settings/device")
+@device_settings_api.post("/api/settings/device", **doc("device_settings_api/set_device_settings.yml"))
 @login_required
-@swag_from("docs/device_settings_api/set_device_settings.yml")
 def set_device_settings():
     data_in = request.get_json()
 
@@ -80,9 +79,8 @@ def set_device_settings():
     return jsonify(data_out)
 
 
-@device_settings_api.get("/api/settings/device/output-type")
+@device_settings_api.get("/api/settings/device/output-type", **doc("device_settings_api/get_output_type_device_settings.yml"))
 @login_required
-@swag_from("docs/device_settings_api/get_output_type_device_settings.yml")
 def get_output_type_device_settings():
     data_in = request.args.to_dict()
 
@@ -120,9 +118,8 @@ def get_output_type_device_settings():
     return UnprocessableEntity.as_response()
 
 
-@device_settings_api.post("/api/settings/device/output-type")
+@device_settings_api.post("/api/settings/device/output-type", **doc("device_settings_api/set_output_type_device_settings.yml"))
 @login_required
-@swag_from("docs/device_settings_api/set_output_type_device_settings.yml")
 def set_output_type_device_settings():
     data_in = request.get_json()
 

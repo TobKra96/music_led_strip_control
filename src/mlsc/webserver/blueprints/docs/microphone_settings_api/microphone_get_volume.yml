@@ -1,0 +1,17 @@
+Return microphone volume
+---
+tags:
+  - Settings
+deprecated: true
+responses:
+  "200":
+    description: OK
+    content:
+      application/json:
+        schema:
+          example:
+            error: str
+            level: int
+            output: str
+            returncode: int
+          type: object

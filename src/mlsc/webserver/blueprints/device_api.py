@@ -1,7 +1,7 @@
-from flask import Blueprint, jsonify, request
-from flask_login import login_required
-from flask_openapi import swag_from
+from flask import jsonify, request
+from flask_openapi3 import APIBlueprint
 
+from mlsc.webserver.auth import login_required
 from mlsc.webserver.executer import Executer
 from mlsc.webserver.executer_base import validate_schema
 from mlsc.webserver.messages import (
@@ -12,23 +12,22 @@ from mlsc.webserver.messages import (
     GroupNotFound,
     UnprocessableEntity,
 )
+from mlsc.webserver.openapi_docs import doc
 from mlsc.webserver.schemas.device_api_schema import CREATE_GROUP_SCHEMA, DELETE_DEVICE_SCHEMA, DELETE_GROUP_SCHEMA
 
-device_api = Blueprint("device_api", __name__)
+device_api = APIBlueprint("device_api", __name__)
 
 
-@device_api.get("/api/system/devices")
+@device_api.get("/api/system/devices", **doc("device_api/get_devices.yml"))
 @login_required
-@swag_from("docs/device_api/get_devices.yml")
 def get_devices():
     data_out = Executer.instance.device_executer.get_devices()
 
     return jsonify(data_out)
 
 
-@device_api.post("/api/system/devices")
+@device_api.post("/api/system/devices", **doc("device_api/create_device.yml"))
 @login_required
-@swag_from("docs/device_api/create_device.yml")
 def create_device():
     data_out = Executer.instance.device_executer.create_new_device()
 
@@ -38,9 +37,8 @@ def create_device():
     return jsonify(data_out)
 
 
-@device_api.delete("/api/system/devices")
+@device_api.delete("/api/system/devices", **doc("device_api/delete_device.yml"))
 @login_required
-@swag_from("docs/device_api/delete_device.yml")
 def delete_device():
     data_in = request.get_json()
 
@@ -55,18 +53,16 @@ def delete_device():
     return jsonify(data_out)
 
 
-@device_api.get("/api/system/groups")
+@device_api.get("/api/system/groups", **doc("device_api/get_groups.yml"))
 @login_required
-@swag_from("docs/device_api/get_groups.yml")
 def get_groups():
     data_out = Executer.instance.device_executer.get_groups()
 
     return jsonify(data_out)
 
 
-@device_api.post("/api/system/groups")
+@device_api.post("/api/system/groups", **doc("device_api/create_group.yml"))
 @login_required
-@swag_from("docs/device_api/create_group.yml")
 def create_group():
     data_in = request.get_json()
 
@@ -84,9 +80,8 @@ def create_group():
     return jsonify(data_out)
 
 
-@device_api.delete("/api/system/groups")
+@device_api.delete("/api/system/groups", **doc("device_api/delete_group.yml"))
 @login_required
-@swag_from("docs/device_api/delete_group.yml")
 def delete_group():
     data_in = request.get_json()
 
@@ -101,9 +96,8 @@ def delete_group():
     return jsonify(data_out)
 
 
-@device_api.patch("/api/system/groups")
+@device_api.patch("/api/system/groups", **doc("device_api/remove_invalid_device_groups.yml"))
 @login_required
-@swag_from("docs/device_api/remove_invalid_device_groups.yml")
 def remove_invalid_device_groups():
     data_out = Executer.instance.device_executer.remove_invalid_device_groups()
 

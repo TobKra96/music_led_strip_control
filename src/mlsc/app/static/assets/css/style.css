@@ -49,11 +49,13 @@ File: style.css
 /**  =====================
      Google Font
 ==========================  **/
-@import url("https://fonts.googleapis.com/css?family=Open+Sans:300,400,600");
 @import url("../plugins/bootstrap/css/bootstrap.min.css");
 @import url("../fonts/feather/css/feather.css");
 @import url("../plugins/jquery-scrollbar/css/jquery.scrollbar.min.css");
 @import url("../fonts/datta/datta-icon.css");
+@font-face { font-family: "Open Sans"; font-style: normal; font-weight: 300; font-display: swap; src: url("../fonts/opensans/OpenSans-Light.ttf") format("truetype"); }
+@font-face { font-family: "Open Sans"; font-style: normal; font-weight: 400; font-display: swap; src: url("../fonts/opensans/OpenSans-Regular.ttf") format("truetype"); }
+@font-face { font-family: "Open Sans"; font-style: normal; font-weight: 600; font-display: swap; src: url("../fonts/opensans/OpenSans-SemiBold.ttf") format("truetype"); }
 /**  =====================
       Custom css start
 ==========================  **/
@@ -877,13 +879,6 @@ p.text-muted {
 
 /* ================================    browser  warning  End  ===================== */
 /* material icon for material datetime picker */
-/* fallback */
-@font-face {
-  font-family: 'Material Icons';
-  font-style: normal;
-  font-weight: 400;
-  src: url("https://fonts.gstatic.com/s/materialicons/v41/flUhRq6tzZclQEJ-Vdg-IuiaDsNc.woff2") format("woff2");
-}
 .material-icons {
   font-family: 'Material Icons';
   font-weight: normal;

@@ -7,14 +7,12 @@ from pathlib import Path
 from typing import TypedDict
 from urllib.parse import urljoin, urlparse
 
-from flask import Flask, Response, redirect, request, session, url_for
-from flask_login import LoginManager, UserMixin, login_user
+from flask import Flask, request
 from loguru import logger
 
 from mlsc import paths
+from mlsc.webserver import auth
 from mlsc.webserver.executer_base import ExecuterBase
-
-login_manager = LoginManager()
 
 
 class PinConfig(TypedDict):
@@ -22,32 +20,6 @@ class PinConfig(TypedDict):
 
     DEFAULT_PIN: str
     USE_PIN_LOCK: bool
-
-
-class User(UserMixin):
-    def __init__(self, user_id: str) -> None:
-        self.id = user_id
-
-
-@login_manager.user_loader
-def user_loader(user_id: str) -> User:
-    if not AuthenticationExecuter.instance.is_pin_active():
-        return None
-    return User(user_id)
-
-
-@login_manager.unauthorized_handler
-def unauthorized() -> Response:
-    # TODO: Do not check amount of url queries, so that an API key can be used.
-    # if request.path.startswith("/api/"):
-    #     error_msg = {
-    #         "error": "Unauthorized",
-    #         "message": "No valid API key provided."
-    #         "status": 401
-    #     }
-    #     return jsonify(error_msg), 401
-    session["next"] = request.path
-    return redirect(url_for("authentication_api.login", next=session.get("next")))
 
 
 class AuthenticationExecuter(ExecuterBase):
@@ -74,11 +46,8 @@ class AuthenticationExecuter(ExecuterBase):
             raise ValueError(msg)
 
         server.secret_key = secrets.token_urlsafe(16)  # Force login on restart.
-        if not self.IS_PIN_ACTIVE:
-            # TODO: LOGIN_DISABLED will be deprecated.
-            # https://github.com/maxcountryman/flask-login/issues/697
-            server.config["LOGIN_DISABLED"] = True
-        login_manager.init_app(server)
+        server.config["AUTH_ENABLED"] = self.IS_PIN_ACTIVE
+        server.config["SESSION_COOKIE_SAMESITE"] = "Lax"
 
         return server
 
@@ -164,9 +133,7 @@ class AuthenticationExecuter(ExecuterBase):
     def login() -> None:
         """Log in the user."""
         logger.debug("Enter login()")
-        user_id = "1001"
-        user = User(user_id)
-        login_user(user)
+        auth.login_user()
 
     def is_pin_active(self) -> bool:
         """Check if PIN is active."""
