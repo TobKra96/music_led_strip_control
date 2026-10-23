@@ -122,7 +122,7 @@ def test_the_publisher_thread_stops_when_asked(publisher):
 def test_the_stats_event_carries_the_performance_and_the_temperature(broker, monkeypatch):
     monkeypatch.setattr("mlsc.webserver.status_publisher.sse.broker", broker)
     system_info = SimpleNamespace(
-        get_system_info_device_status=lambda: ONLINE,
+        get_device_status_event=lambda: ONLINE,
         get_system_info_performance=lambda: {"system": {"cpu_info": {"percent": 3.0}}},
         get_system_info_temperature=lambda: {"system": {"raspi": {"celsius": 40}}},
     )

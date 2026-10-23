@@ -9,6 +9,7 @@ from mlsc.api.v2.auth import auth_api
 from mlsc.api.v2.devices import devices_api
 from mlsc.api.v2.effects import effects_api
 from mlsc.api.v2.errors import API_V2_PREFIX, register_error_handlers
+from mlsc.api.v2.event_payloads import document_events
 from mlsc.api.v2.events import events_api
 from mlsc.api.v2.groups import groups_api
 from mlsc.api.v2.operations import operations_api
@@ -53,6 +54,7 @@ def v2_spec(app: OpenAPI) -> dict:
                 if status == "422":
                     response["content"] = {"application/json": {"schema": problem_ref}}
     spec["components"]["schemas"].pop(FRAMEWORK_VALIDATION_SCHEMA, None)
+    document_events(spec)
     return spec
 
 

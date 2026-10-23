@@ -180,6 +180,13 @@ class SystemInfoExecuter(ExecuterBase):
             "devices": devices
         }
 
+    def get_device_status_event(self: SystemInfoExecuter) -> dict[str, list[dict]]:
+        """Return the `device.status` event payload: the device status plus the Output of each Device, so an Output change is an event too."""
+        status = self.get_system_info_device_status()
+        for entry in status["devices"]:
+            entry["output_type"] = self._config["device_configs"][entry["id"]]["output_type"]
+        return status
+
     @staticmethod
     def check_device_status(address: str) -> bool:
         """Return True if host (str) responds to a ping request.

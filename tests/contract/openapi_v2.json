@@ -136,6 +136,90 @@
         "title": "DeviceOut",
         "type": "object"
       },
+      "DeviceStatusEntry": {
+        "properties": {
+          "connected": {
+            "description": "Whether the Device is reachable. A local Output is always reachable.",
+            "title": "Connected",
+            "type": "boolean"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "output_type": {
+            "description": "The Output of the Device, so an Output change is a new event.",
+            "title": "Output Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "connected",
+          "output_type"
+        ],
+        "title": "DeviceStatusEntry",
+        "type": "object"
+      },
+      "DeviceStatusEvent": {
+        "description": "Sent when a Device goes up or down or its Output changes, and to a client that just connected.",
+        "properties": {
+          "devices": {
+            "items": {
+              "$ref": "#/components/schemas/DeviceStatusEntry"
+            },
+            "title": "Devices",
+            "type": "array"
+          }
+        },
+        "required": [
+          "devices"
+        ],
+        "title": "DeviceStatusEvent",
+        "type": "object"
+      },
+      "DiagnosisEvent": {
+        "description": "The Diagnosis of an Output's health check.",
+        "properties": {
+          "device_id": {
+            "title": "Device Id",
+            "type": "string"
+          },
+          "message": {
+            "description": "Human readable result.",
+            "title": "Message",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "suggested_fix": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Suggested Fix"
+          }
+        },
+        "required": [
+          "device_id",
+          "status",
+          "message",
+          "suggested_fix"
+        ],
+        "title": "DiagnosisEvent",
+        "type": "object"
+      },
       "EffectBody": {
         "properties": {
           "effect": {
@@ -258,6 +342,23 @@
           }
         },
         "title": "LoginBody",
+        "type": "object"
+      },
+      "MicLevelEvent": {
+        "description": "Peak input level of the audio capture, sent only when it changed.",
+        "properties": {
+          "level": {
+            "description": "0 is silence, 1 is full scale.",
+            "maximum": 1,
+            "minimum": 0,
+            "title": "Level",
+            "type": "number"
+          }
+        },
+        "required": [
+          "level"
+        ],
+        "title": "MicLevelEvent",
         "type": "object"
       },
       "MigrationReportOut": {
@@ -494,6 +595,21 @@
         "title": "SettingsPatch",
         "type": "object"
       },
+      "SystemStatsEvent": {
+        "description": "CPU, memory and temperature as reported by the host, sent every few seconds.",
+        "properties": {
+          "system": {
+            "additionalProperties": true,
+            "title": "System",
+            "type": "object"
+          }
+        },
+        "required": [
+          "system"
+        ],
+        "title": "SystemStatsEvent",
+        "type": "object"
+      },
       "VersionsOut": {
         "properties": {
           "versions": {
@@ -508,6 +624,32 @@
           "versions"
         ],
         "title": "VersionsOut",
+        "type": "object"
+      },
+      "WifiStateEvent": {
+        "description": "The current Wi-Fi mode and connection.",
+        "properties": {
+          "connected": {
+            "title": "Connected",
+            "type": "boolean"
+          },
+          "fallback": {
+            "description": "Whether a Setup Fallback hotspot is up.",
+            "title": "Fallback",
+            "type": "boolean"
+          },
+          "mode": {
+            "description": "`client` or `hotspot`.",
+            "title": "Mode",
+            "type": "string"
+          }
+        },
+        "required": [
+          "mode",
+          "connected",
+          "fallback"
+        ],
+        "title": "WifiStateEvent",
         "type": "object"
       }
     },
@@ -1737,7 +1879,45 @@
         "summary": "Subscribe to server events",
         "tags": [
           "Events"
-        ]
+        ],
+        "x-events": {
+          "device.status": {
+            "replayable": true,
+            "schema": {
+              "$ref": "#/components/schemas/DeviceStatusEvent"
+            }
+          },
+          "diagnosis": {
+            "replayable": true,
+            "schema": {
+              "$ref": "#/components/schemas/DiagnosisEvent"
+            }
+          },
+          "mic.level": {
+            "replayable": false,
+            "schema": {
+              "$ref": "#/components/schemas/MicLevelEvent"
+            }
+          },
+          "operation": {
+            "replayable": true,
+            "schema": {
+              "$ref": "#/components/schemas/OperationOut"
+            }
+          },
+          "system.stats": {
+            "replayable": false,
+            "schema": {
+              "$ref": "#/components/schemas/SystemStatsEvent"
+            }
+          },
+          "wifi.state": {
+            "replayable": true,
+            "schema": {
+              "$ref": "#/components/schemas/WifiStateEvent"
+            }
+          }
+        }
       }
     },
     "/api/v2/groups": {

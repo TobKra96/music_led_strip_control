@@ -2,12 +2,17 @@
 import threading
 from collections.abc import Callable
 from dataclasses import dataclass
+from typing import Protocol
 
 from loguru import logger
 
 from mlsc.webserver import sse
 
 POLL_SECONDS = 10.0
+
+
+class Pollable(Protocol):
+    def poll(self) -> None: ...
 
 
 class StatusPublisher:
@@ -51,7 +56,7 @@ class StatusPublisher:
         self._publish("system.stats", stats)
 
 
-def run_status_publisher(publisher: StatusPublisher, wait: Callable[[float], bool], interval: float = POLL_SECONDS) -> None:
+def run_status_publisher(publisher: Pollable, wait: Callable[[float], bool], interval: float = POLL_SECONDS) -> None:
     """Poll every `interval` until `wait` reports a stop. The first poll happens at once."""
     publisher.poll()
     while not wait(interval):
@@ -68,7 +73,7 @@ class StatusPublisherRunner:
         self.thread.join()
 
 
-def start_status_publisher(publisher: StatusPublisher, interval: float = POLL_SECONDS) -> StatusPublisherRunner:
+def start_status_publisher(publisher: Pollable, interval: float = POLL_SECONDS) -> StatusPublisherRunner:
     """Run `run_status_publisher` in a daemon thread."""
     stopped = threading.Event()
     thread = threading.Thread(target=run_status_publisher, args=(publisher, stopped.wait, interval), daemon=True)
@@ -81,7 +86,7 @@ def create_status_publisher(system_info) -> StatusPublisher:
     return StatusPublisher(
         sse.broker.publish,
         sse.broker.has_subscribers,
-        system_info.get_system_info_device_status,
+        system_info.get_device_status_event,
         lambda: read_stats(system_info),
     )
 

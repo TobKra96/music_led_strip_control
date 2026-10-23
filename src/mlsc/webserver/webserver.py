@@ -19,6 +19,8 @@ from mlsc.webserver.blueprints.microphone_settings_api import microphone_setting
 from mlsc.webserver.blueprints.system_info_api import system_info_api
 from mlsc.webserver.deprecation import register_v1_deprecation
 from mlsc.webserver.executer import Executer
+from mlsc.webserver.mic_level_publisher import MIC_LEVEL_POLL_SECONDS
+from mlsc.webserver.mic_level_publisher import create_mic_level_publisher
 from mlsc.webserver.status_publisher import create_status_publisher, start_status_publisher
 
 API_BLUEPRINTS = (
@@ -39,7 +41,7 @@ DEBUG = False
 
 
 class Webserver:
-    def start(self: Webserver, config_lock, notification_queue_in, notification_queue_out, effects_queue, audio_backend) -> None:
+    def start(self: Webserver, config_lock, notification_queue_in, notification_queue_out, effects_queue, audio_backend, mic_level=None) -> None:
         self._config_lock = config_lock
         self.notification_queue_in = notification_queue_in
         self.notification_queue_out = notification_queue_out
@@ -59,11 +61,17 @@ class Webserver:
 
         register_api_blueprints(self.server)
         operations.start_ticker(operations.registry)
-        start_status_publisher(create_status_publisher(Executer.instance.system_info_executer))
+        publishers = [start_status_publisher(create_status_publisher(Executer.instance.system_info_executer))]
+        if mic_level is not None:
+            publishers.append(start_status_publisher(create_mic_level_publisher(mic_level), MIC_LEVEL_POLL_SECONDS))
 
         if DEBUG:
             self.server.run(host="0.0.0.0", port=webserver_port, load_dotenv=False, debug=True)  # ruff: ignore[hardcoded-bind-all-interfaces]
         else:
-            serve(self.server, host="0.0.0.0", port=webserver_port, threads=8, clear_untrusted_proxy_headers=False)  # ruff: ignore[hardcoded-bind-all-interfaces]
+            try:
+                serve(self.server, host="0.0.0.0", port=webserver_port, threads=8, clear_untrusted_proxy_headers=False)  # ruff: ignore[hardcoded-bind-all-interfaces]
+            finally:
+                for publisher in publishers:
+                    publisher.stop()
         while True:
             sleep(10)

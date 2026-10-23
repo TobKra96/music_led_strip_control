@@ -16,11 +16,12 @@ from mlsc.queue_wrapper import QueueWrapper
 
 
 class AudioProcessService:
-    def start(self, config_lock, notification_queue_in, notification_queue_out, audio_queue, audio_backend):
+    def start(self, config_lock, notification_queue_in, notification_queue_out, audio_queue, audio_backend, mic_level=None):
         self._config_lock = config_lock
         self._notification_queue_in = QueueWrapper(notification_queue_in)
         self._notification_queue_out = QueueWrapper(notification_queue_out)
         self._audio_queue = QueueWrapper(audio_queue)
+        self._mic_level = mic_level
 
         self.audio_buffer_queue = QueueWrapper(Queue(2))
         # Built here, inside the audio process: capture objects hold native handles and cannot be pickled.
@@ -78,6 +79,9 @@ class AudioProcessService:
             def callback(in_data):
                 if self._skip_routine:
                     return
+
+                if self._mic_level is not None:
+                    self._mic_level.update(in_data)
 
                 self.audio_buffer_queue.put_none_blocking(in_data)
 

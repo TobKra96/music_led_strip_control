@@ -52,3 +52,14 @@ def test_v2_validation_errors_are_documented_as_problems():
 
     assert login["content"]["application/json"]["schema"] == {"$ref": "#/components/schemas/Problem"}
     assert "ValidationErrorModel" not in spec["components"]["schemas"]
+
+
+def test_v2_spec_documents_the_payload_of_every_event():
+    spec = fetch_spec()
+    events = spec["paths"]["/api/v2/events"]["get"]["x-events"]
+
+    assert set(events) == {"device.status", "diagnosis", "mic.level", "wifi.state", "system.stats", "operation"}
+    assert events["mic.level"]["schema"] == {"$ref": "#/components/schemas/MicLevelEvent"}
+    assert events["mic.level"]["replayable"] is False
+    assert events["device.status"]["replayable"] is True
+    assert spec["components"]["schemas"]["MicLevelEvent"]["properties"]["level"]["maximum"] == 1

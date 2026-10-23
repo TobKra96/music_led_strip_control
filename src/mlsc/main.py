@@ -18,6 +18,7 @@ from mlsc.audio_process_service import AudioProcessService
 from mlsc.config_migration import ConfigMigrationError
 from mlsc.config_service import ConfigService
 from mlsc.device_manager import DeviceManager
+from mlsc.mic_level import MicLevel
 from mlsc.notification_service import NotificationService
 from mlsc.webserver.webserver import Webserver
 
@@ -95,6 +96,9 @@ class Main:
         # Only the backend name crosses the process boundary. Each process builds its own capture object.
         self._audio_backend = "auto"
 
+        # Written by the audio process, read by the webserver process for the `mic.level` events.
+        self._mic_level = MicLevel()
+
         # Prepare the queue for the output
         self._output_queue = Queue(2)
         self._effects_queue = Queue(100)
@@ -147,7 +151,8 @@ class Main:
                 self._notification_queue_webserver_in,
                 self._notification_queue_webserver_out,
                 self._effects_queue,
-                self._audio_backend
+                self._audio_backend,
+                self._mic_level
             ))
         self._webserver_process.start()
 
@@ -160,7 +165,8 @@ class Main:
                 self._notification_queue_audio_in,
                 self._notification_queue_audio_out,
                 self._audio_queue,
-                self._audio_backend
+                self._audio_backend,
+                self._mic_level
             ))
         self._audio_process.start()
 
