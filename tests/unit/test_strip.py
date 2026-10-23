@@ -6,8 +6,13 @@ pytestmark = pytest.mark.unit
 
 
 def test_white_channel_is_read_from_the_device_config():
-    assert has_white_channel({"white_channel": True}) is True
-    assert has_white_channel({"white_channel": False}) is False
+    assert has_white_channel({"chip_family": "sk6812", "white_channel": True}) is True
+    assert has_white_channel({"chip_family": "sk6812", "white_channel": False}) is False
+
+
+@pytest.mark.parametrize("chip_family", ["ws2811", "ws2812"])
+def test_only_sk6812_has_a_white_channel(chip_family):
+    assert has_white_channel({"chip_family": chip_family, "white_channel": True}) is False
 
 
 @pytest.mark.parametrize(("chip_family", "colour_order", "white", "expected"), [

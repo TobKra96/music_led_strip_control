@@ -32,6 +32,11 @@ class AudioInfo:
         logger.debug(f"Found {len(audio_devices)} audio devices.")
         return audio_devices
 
+    def select_audio_device(py_audio, audio_devices, device_name):
+        """Return the device called `device_name`, or the system default when there is no such device."""
+        match = next((device for device in audio_devices if device.name == device_name), None)
+        return match if match is not None else AudioInfo.get_default_audio_device(py_audio)
+
     def get_default_audio_device(py_audio):
         default_device = AudioDevice(0, "Error", 44100)
         try:

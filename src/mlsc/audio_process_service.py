@@ -52,13 +52,9 @@ class AudioProcessService:
 
             # Select the audio device by name. No name means the system default.
             device_name = audio_config["device_name"]
-            self.selected_device = None
-            if device_name is not None:
-                self.selected_device = next((d for d in self._devices if d.name == device_name), None)
-                if self.selected_device is None:
-                    self.log_output(show_output, "ERROR", f"Could not find the mic named {device_name!r}. Using the system default.")
-            if self.selected_device is None:
-                self.selected_device = AudioInfo.get_default_audio_device(self._py_audio)
+            self.selected_device = AudioInfo.select_audio_device(self._py_audio, self._devices, device_name)
+            if device_name is not None and self.selected_device.name != device_name:
+                self.log_output(show_output, "ERROR", f"Could not find the mic named {device_name!r}. Using the system default.")
 
             logger.debug(f"Selected Device: {self.selected_device}")
 

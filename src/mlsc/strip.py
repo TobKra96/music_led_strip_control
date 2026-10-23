@@ -4,7 +4,7 @@ _RGB_INDEX = {"r": 0, "g": 1, "b": 2}
 
 
 def has_white_channel(device_config: dict) -> bool:
-    return bool(device_config["white_channel"])
+    return device_config["chip_family"] == "sk6812" and bool(device_config["white_channel"])
 
 
 def rpi_ws281x_strip_type(chip_family: str, colour_order: str, white_channel: bool) -> str:
