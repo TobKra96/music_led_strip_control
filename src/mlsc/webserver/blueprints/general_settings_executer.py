@@ -26,9 +26,14 @@ class GeneralSettingsExecuter(ExecuterBase):
             "setting_value": self._config["general_settings"]
         }
 
-    def set_general_setting(self, settings: dict) -> dict | NotFound | BadRequest:
-        """Set multiple general settings."""
+    def get_audio_settings(self) -> dict:
+        """Return the audio section."""
+        return self._config["audio"]
+
+    def set_general_setting(self, settings: dict, audio: dict | None = None) -> dict | NotFound | BadRequest:
+        """Set multiple general settings, and optionally some audio settings, with one save and refresh."""
         update(self._config["general_settings"], settings)
+        update(self._config["audio"], audio or {})
 
         self.save_config()
         self.refresh_device(self.all_devices_id)

@@ -6,6 +6,7 @@ from werkzeug.exceptions import HTTPException
 
 from mlsc.api.v2.errors import v2_aware
 from mlsc.webserver import auth
+from mlsc.webserver.deprecation import v1_spec
 from mlsc.webserver.messages import BadRequest, MethodNotAllowed, NotFound, ServerError
 
 API_INFO = Info(
@@ -47,7 +48,7 @@ def register_blueprints(app: OpenAPI) -> None:
 def register_api_docs(app: OpenAPI) -> None:
     @app.get("/openapi.json")
     def openapi_spec() -> dict:
-        return app.api_doc
+        return v1_spec(app)
 
     @app.get("/api/")
     def api_docs() -> str:

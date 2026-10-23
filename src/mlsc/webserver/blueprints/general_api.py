@@ -4,6 +4,7 @@ from flask_openapi3 import APIBlueprint
 from mlsc.webserver.auth import login_required
 from mlsc.webserver.executer import Executer
 from mlsc.webserver.openapi_docs import doc
+from mlsc.webserver.v1_adapter import LED_STRIP_NAMES
 
 general_api = APIBlueprint("general_api", __name__)
 
@@ -27,9 +28,7 @@ def gradients():
 @general_api.get("/api/resources/led-strips", **doc("general_api/led_strips.yml"))
 @login_required
 def led_strips():
-    data_out = Executer.instance.general_executer.get_led_strips()
-
-    return jsonify(data_out)
+    return jsonify(LED_STRIP_NAMES)
 
 
 @general_api.get("/api/resources/logging-levels", **doc("general_api/logging_levels.yml"))

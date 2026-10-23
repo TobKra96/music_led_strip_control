@@ -8,13 +8,12 @@ from mlsc.webserver.messages import DeviceNotFound, SettingNotFound, Unprocessab
 from mlsc.webserver.openapi_docs import doc
 from mlsc.webserver.schemas.device_settings_api_schema import (
     ALL_DEVICE_SETTINGS_SCHEMA,
-    DEVICE_SETTINGS_WITH_EXCL_SCHEMA,
     GET_ALL_OUTPUT_SETTINGS_SCHEMA,
     GET_OUTPUT_SETTING_SCHEMA,
-    ONE_DEVICE_SETTING_SCHEMA,
-    SET_DEVICE_SETTINGS_SCHEMA,
     SET_OUTPUT_SETTINGS_SCHEMA,
 )
+from mlsc.webserver.schemas.v1_schema import DEVICE_SETTINGS_WITH_EXCL_SCHEMA, ONE_DEVICE_SETTING_SCHEMA, SET_DEVICE_SETTINGS_SCHEMA
+from mlsc.webserver.v1_adapter import device_settings_from_v1, device_settings_to_v1
 
 device_settings_api = APIBlueprint("device_settings_api", __name__)
 
@@ -34,31 +33,38 @@ def get_device_settings():
         if data_out is DeviceNotFound:
             return DeviceNotFound.as_response()
 
-        return jsonify(data_out)
+        return jsonify({**data_out, "settings": device_settings_to_v1(data_out["settings"])})
 
     if set(data_in) == {"device", "setting_key"}:  # Get one specific device setting of one device.
 
         if not validate_schema(data_in, ONE_DEVICE_SETTING_SCHEMA):
             return UnprocessableEntity.as_response()
 
-        data_out = Executer.instance.device_settings_executer.get_device_setting(data_in["device"], data_in["setting_key"])
+        data_out = Executer.instance.device_settings_executer.get_device_settings(data_in["device"])
 
         if data_out is DeviceNotFound:
             return DeviceNotFound.as_response()
 
-        return jsonify(data_out)
+        return jsonify({
+            "device": data_in["device"],
+            "setting_key": data_in["setting_key"],
+            "setting_value": device_settings_to_v1(data_out["settings"])[data_in["setting_key"]],
+        })
 
     if set(data_in) == {"device", "excluded_key"}:  # Get all settings of one device excluding a specific setting.
 
         if not validate_schema(data_in, DEVICE_SETTINGS_WITH_EXCL_SCHEMA):
             return UnprocessableEntity.as_response()
 
-        data_out = Executer.instance.device_settings_executer.get_device_settings(data_in["device"], data_in["excluded_key"])
+        data_out = Executer.instance.device_settings_executer.get_device_settings(data_in["device"])
 
         if data_out is DeviceNotFound:
             return DeviceNotFound.as_response()
 
-        return jsonify(data_out)
+        settings = device_settings_to_v1(data_out["settings"])
+        settings.pop(data_in["excluded_key"], None)
+
+        return jsonify({"device": data_in["device"], "excluded_key": data_in["excluded_key"], "settings": settings})
 
     return UnprocessableEntity.as_response()
 
@@ -71,12 +77,12 @@ def set_device_settings():
     if not validate_schema(data_in, SET_DEVICE_SETTINGS_SCHEMA):
         return UnprocessableEntity.as_response()
 
-    data_out = Executer.instance.device_settings_executer.set_device_settings(data_in["device"], data_in["settings"])
+    data_out = Executer.instance.device_settings_executer.set_device_settings(data_in["device"], device_settings_from_v1(data_in["settings"]))
 
     if data_out is DeviceNotFound:
         return DeviceNotFound.as_response()
 
-    return jsonify(data_out)
+    return jsonify({**data_out, "settings": data_in["settings"]})
 
 
 @device_settings_api.get("/api/settings/device/output-type", **doc("device_settings_api/get_output_type_device_settings.yml"))

@@ -142,7 +142,7 @@ def test_spec_documents_the_existing_api():
     assert "200" in colors["responses"]
     assert "requestBody" in spec["paths"]["/api/system/devices"]["delete"]
     assert spec["paths"]["/api/settings/microphone/volume"]["get"]["deprecated"] is True
-    assert "/api/v2/events" in spec["paths"]
+    assert "/api/v2/events" not in spec["paths"]
 
 
 def test_api_docs_page_loads_bundled_swagger_ui():

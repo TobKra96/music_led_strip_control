@@ -33,7 +33,7 @@ responses:
               constant: sk6812_shift_wmask
             sk6812_strip:
               type: string
-              constant: sk6812_strip
+              constant: sk6812_default
             sk6812_strip_bgrw:
               type: string
               constant: sk6812_strip_bgrw
@@ -54,28 +54,28 @@ responses:
               constant: sk6812_strip_rgbw
             sk6812w_strip:
               type: string
-              constant: sk6812w_strip
+              constant: sk6812w_default
             ws2811_strip_bgr:
               type: string
-              constant: ws2811_strip_bgr
+              constant: ws281x_bgr
             ws2811_strip_brg:
               type: string
-              constant: ws2811_strip_brg
+              constant: ws281x_brg
             ws2811_strip_gbr:
               type: string
-              constant: ws2811_strip_gbr
+              constant: ws281x_gbr
             ws2811_strip_grb:
               type: string
-              constant: ws2811_strip_grb
+              constant: ws281x_grb
             ws2811_strip_rbg:
               type: string
-              constant: ws2811_strip_rbg
+              constant: ws281x_rbg
             ws2811_strip_rgb:
               type: string
-              constant: ws2811_strip_rgb
+              constant: ws281x_rgb
             ws2812_strip:
               type: string
-              constant: ws2812_strip
+              constant: ws281x_default
 
         example:
           sk6812_shift_wmask: string

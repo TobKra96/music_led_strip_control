@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 from mlsc.audio_capture import AudioCaptureError, create_capture
+from mlsc.audio_device import AudioDevice
 from mlsc.audio_info import AudioInfo
-from mlsc.config_converter.config_converter_v4 import LED_STRIP_MAPPING
 from mlsc.effects_enum import EffectNames, EffectsEnum
 from mlsc.webserver.executer_base import ExecuterBase
 
@@ -17,21 +17,20 @@ class GeneralExecuter(ExecuterBase):
         """Return gradients."""
         return {key: key for key in self._config["gradients"]}
 
-    def get_led_strips(self) -> dict[str, str]:
-        """Return the legacy LED strip names, kept for the v1 API until its adapters map them."""
-        return {name: name for name in LED_STRIP_MAPPING}
-
     def get_logging_levels(self) -> dict[str, str]:
         """Return logging levels."""
         return dict(self._config["logging_levels"])
 
+    def list_audio_devices(self) -> list[AudioDevice]:
+        """Return the input devices, or none if no audio backend is available."""
+        try:
+            return AudioInfo.get_audio_devices(create_capture(self._audio_backend))
+        except AudioCaptureError:
+            return []
+
     def get_audio_devices(self) -> dict:
         """Return audio devices."""
-        try:
-            audio_devices = AudioInfo.get_audio_devices(create_capture(self._audio_backend))
-        except AudioCaptureError:
-            return {}
-        return {value.device_id: value.to_string() for value in audio_devices}
+        return {value.device_id: value.to_string() for value in self.list_audio_devices()}
 
     @staticmethod
     def get_output_types() -> dict[str, str]:

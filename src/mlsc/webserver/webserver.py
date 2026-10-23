@@ -17,6 +17,7 @@ from mlsc.webserver.blueprints.general_api import general_api
 from mlsc.webserver.blueprints.general_settings_api import general_settings_api
 from mlsc.webserver.blueprints.microphone_settings_api import microphone_settings_api
 from mlsc.webserver.blueprints.system_info_api import system_info_api
+from mlsc.webserver.deprecation import register_v1_deprecation
 from mlsc.webserver.executer import Executer
 
 API_BLUEPRINTS = (
@@ -28,6 +29,7 @@ API_BLUEPRINTS = (
 def register_api_blueprints(server: OpenAPI) -> None:
     for blueprint in API_BLUEPRINTS:
         server.register_api(blueprint)
+    register_v1_deprecation(server)
     register_api_v2(server)
 
 
