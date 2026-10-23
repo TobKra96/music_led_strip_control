@@ -12,7 +12,7 @@ def clean_config_env(monkeypatch):
 
 
 @pytest.fixture
-def config_dir(clean_config_env, tmp_path):  # noqa: ARG001
+def config_dir(clean_config_env, tmp_path):  # ruff: ignore[unused-function-argument]
     """Point MLSC at a temporary config dir."""
     paths.set_config_dir(tmp_path)
     return tmp_path.resolve()
