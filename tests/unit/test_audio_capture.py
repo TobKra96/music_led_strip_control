@@ -1,4 +1,6 @@
 import pickle
+import sys
+import types
 import wave
 
 import numpy as np
@@ -127,3 +129,171 @@ def test_a_capture_is_created_by_backend_name_and_the_name_pickles():
     assert pickle.loads(pickle.dumps("fake")) == "fake"
     with pytest.raises(AudioCaptureError):
         create_capture("nope")
+
+
+def test_a_failing_callback_does_not_break_delivery_or_read():
+    def broken(_):
+        raise ValueError("boom")
+
+    capture = FakeCapture(source=silence())
+    capture.open(capture.default_device(), RATE, BUFFER, on_data=broken)
+
+    capture.feed()
+
+    assert capture.read(timeout=0) is not None
+
+
+class StubSoundDevice(types.ModuleType):
+    """Stands in for the sounddevice module: two devices (one output-only) on one host API."""
+
+    default = types.SimpleNamespace(hostapi=0)
+    streams = []
+
+    def __init__(self):
+        super().__init__("sounddevice")
+        self.streams = []
+        outer = self
+
+        class InputStream:
+            def __init__(self, **kwargs):
+                self.kwargs, self.started, self.closed = kwargs, False, False
+                outer.streams.append(self)
+
+            def start(self):
+                self.started = True
+
+            def stop(self):
+                self.started = False
+
+            def close(self):
+                self.closed = True
+
+        self.InputStream = InputStream
+
+    @staticmethod
+    def query_hostapis(index):
+        return {"devices": [0, 1]}
+
+    @staticmethod
+    def query_devices(index=None, kind=None):
+        devices = [
+            {"name": "Speakers", "max_input_channels": 0, "default_samplerate": 48000.0, "index": 0},
+            {"name": "USB Mic", "max_input_channels": 1, "default_samplerate": 44100.0, "index": 1},
+        ]
+        return devices[1] if kind == "input" else devices[index]
+
+
+@pytest.fixture
+def sounddevice_stub(monkeypatch):
+    stub = StubSoundDevice()
+    monkeypatch.setitem(sys.modules, "sounddevice", stub)
+    monkeypatch.delitem(sys.modules, "mlsc.audio_capture.sounddevice_backend", raising=False)
+    return stub
+
+
+def test_sounddevice_lists_only_input_devices(sounddevice_stub):
+    capture = create_capture("sounddevice")
+
+    assert [(d.device_id, d.name) for d in capture.list_devices()] == [(1, "USB Mic")]
+    assert capture.default_device().name == "USB Mic"
+
+
+def test_sounddevice_streams_int16_mono_buffers_and_closes(sounddevice_stub):
+    capture = create_capture("sounddevice")
+    received = []
+    capture.open(capture.default_device(), RATE, BUFFER, on_data=received.append)
+    stream = sounddevice_stub.streams[0]
+
+    stream.kwargs["callback"](np.arange(4, dtype=np.int16).reshape(4, 1), 4, None, None)
+    capture.close()
+    capture.close()
+
+    assert (stream.kwargs["device"], stream.kwargs["channels"], stream.kwargs["dtype"], stream.kwargs["blocksize"]) == (1, 1, "int16", BUFFER)
+    assert samples(received[0]).tolist() == [0, 1, 2, 3]
+    assert stream.closed and not stream.started
+
+
+class StubMiniaudio(types.ModuleType):
+    def __init__(self):
+        super().__init__("miniaudio")
+        self.devices = []
+        outer = self
+        self.SampleFormat = types.SimpleNamespace(SIGNED16="s16")
+
+        class Devices:
+            @staticmethod
+            def get_captures():
+                return [{"name": "Mic A", "id": "a"}, {"name": "Mic B", "id": "b"}]
+
+        class CaptureDevice:
+            def __init__(self, **kwargs):
+                self.kwargs, self.stopped, self.closed = kwargs, False, False
+                outer.devices.append(self)
+
+            def start(self, generator):
+                self.generator = generator
+
+            def stop(self):
+                self.stopped = True
+
+            def close(self):
+                self.closed = True
+
+        self.Devices, self.CaptureDevice = Devices, CaptureDevice
+
+
+@pytest.fixture
+def miniaudio_stub(monkeypatch):
+    stub = StubMiniaudio()
+    monkeypatch.setitem(sys.modules, "miniaudio", stub)
+    monkeypatch.delitem(sys.modules, "mlsc.audio_capture.miniaudio_backend", raising=False)
+    return stub
+
+
+def test_miniaudio_lists_captures_by_position(miniaudio_stub):
+    capture = create_capture("miniaudio")
+
+    assert [(d.device_id, d.name) for d in capture.list_devices()] == [(0, "Mic A"), (1, "Mic B")]
+    assert capture.default_device().device_id == -1
+
+
+def test_miniaudio_rechunks_to_the_requested_buffer_size(miniaudio_stub):
+    capture = create_capture("miniaudio")
+    capture.open(capture.list_devices()[1], RATE, 4)
+    device = miniaudio_stub.devices[0]
+
+    device.generator.send(b"\x01\x00" * 3)
+    device.generator.send(b"\x02\x00" * 6)
+
+    assert device.kwargs["device_id"] == "b"
+    assert samples(capture.read(timeout=0)).tolist() == [1, 1, 1, 2]
+    assert samples(capture.read(timeout=0)).tolist() == [2, 2, 2, 2]
+    assert capture.read(timeout=0) is None
+    capture.close()
+    assert device.stopped and device.closed
+
+
+def test_miniaudio_default_device_passes_no_device_id(miniaudio_stub):
+    capture = create_capture("miniaudio")
+    capture.open(capture.default_device(), RATE, BUFFER)
+
+    assert miniaudio_stub.devices[0].kwargs["device_id"] is None
+
+
+def test_auto_falls_back_to_miniaudio_without_sounddevice(monkeypatch, miniaudio_stub):
+    monkeypatch.setitem(sys.modules, "sounddevice", None)
+    monkeypatch.delitem(sys.modules, "mlsc.audio_capture.sounddevice_backend", raising=False)
+
+    assert type(create_capture("auto")).__name__ == "MiniaudioCapture"
+    with pytest.raises(AudioCaptureError):
+        create_capture("sounddevice")
+
+
+def test_no_backend_available_is_a_clear_error(monkeypatch):
+    for name in ("sounddevice", "miniaudio"):
+        monkeypatch.setitem(sys.modules, name, None)
+    monkeypatch.delitem(sys.modules, "mlsc.audio_capture.sounddevice_backend", raising=False)
+    monkeypatch.delitem(sys.modules, "mlsc.audio_capture.miniaudio_backend", raising=False)
+
+    with pytest.raises(AudioCaptureError):
+        create_capture("auto")

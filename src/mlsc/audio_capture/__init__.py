@@ -6,9 +6,12 @@ pickled PyAudio copy is dead on arrival). Only the backend name crosses; each pr
 
 from __future__ import annotations
 
+import contextlib
 import queue
 from abc import ABC, abstractmethod
 from collections.abc import Callable
+
+from loguru import logger
 
 from mlsc.audio_device import AudioDevice
 
@@ -56,18 +59,20 @@ class AudioCapture(ABC):
         """Open the stream; the backend calls `_deliver` for each buffer."""
 
     def _deliver(self, data: bytes) -> None:
-        """Hand one buffer to the callback and the read queue, dropping the oldest when nobody reads."""
-        if self._on_data is not None:
-            self._on_data(data)
+        """Queue one buffer for `read` (dropping the oldest when nobody reads), then push it to the callback."""
         while True:
             try:
                 self._buffers.put_nowait(data)
-                return
+                break
             except queue.Full:
-                try:
+                with contextlib.suppress(queue.Empty):
                     self._buffers.get_nowait()
-                except queue.Empty:
-                    pass
+        if self._on_data is not None:
+            try:
+                self._on_data(data)
+            except Exception:
+                # This runs on the native audio thread, where an exception would kill the stream.
+                logger.exception("Error in the audio capture callback.")
 
 
 def create_capture(backend: str = "auto") -> AudioCapture:
