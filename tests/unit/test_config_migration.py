@@ -180,7 +180,8 @@ def test_prepare_config_leaves_a_current_config_alone_without_touching_audio(tar
     (target_dir / "config.json").write_text(json.dumps(current_config()))
 
     def explode():
-        raise AssertionError("audio queried")
+        message = "audio queried"
+        raise AssertionError(message)
 
     assert config_migration.prepare_config(target_dir, audio_devices=explode) is None
     assert [p.name for p in target_dir.iterdir()] == ["config.json"]
@@ -256,16 +257,20 @@ def test_list_audio_devices_maps_input_devices(monkeypatch):
     class FakePyAudio:
         terminated = False
 
-        def get_device_count(self):
+        @staticmethod
+        def get_device_count():
             return 2
 
-        def get_device_info_by_index(self, i):
+        @staticmethod
+        def get_device_info_by_index(i):
             return [{"name": "Out", "maxInputChannels": 0, "hostApi": 0}, {"name": "Mic", "maxInputChannels": 1, "hostApi": 0}][i]
 
-        def get_host_api_info_by_index(self, _):
+        @staticmethod
+        def get_host_api_info_by_index(_):
             return {"name": "ALSA"}
 
-        def terminate(self):
+        @staticmethod
+        def terminate():
             FakePyAudio.terminated = True
 
     monkeypatch.setitem(sys.modules, "pyaudio", types.SimpleNamespace(PyAudio=FakePyAudio))
@@ -325,7 +330,8 @@ def test_cli_config_migrate_reports_failure_and_changes_nothing(config_dir, tmp_
     assert not (config_dir / "config.json").exists()
 
 
-def test_cli_config_migrate_without_any_config(config_dir, tmp_path, monkeypatch, capsys):
+@pytest.mark.usefixtures("config_dir")
+def test_cli_config_migrate_without_any_config(tmp_path, monkeypatch, capsys):
     monkeypatch.chdir(tmp_path)
 
     assert cli.main(["config", "migrate"]) == 1
@@ -341,7 +347,7 @@ def test_cli_config_migrate_in_place(config_dir, tmp_path, monkeypatch):
     assert json.loads((config_dir / "config.json").read_text())["version"] == 4
 
 
-def test_cli_config_reset(config_dir, capsys):
+def test_cli_config_reset(config_dir):
     (config_dir / "config.json").write_text('{"mine": 1}')
 
     assert cli.main(["config", "reset"]) == 0
