@@ -187,8 +187,8 @@ else
         https://github.com/TobKra96/music_led_strip_control.git "$PROJ_DIR"
 fi
 
-# Install/update modules from requirements.txt.
-"$UV_BIN" pip install  --upgrade --requirements "${PROJ_DIR}/requirements.txt" --python "${INST_DIR}/${VENV_NAME}/bin/python"
+# Install/update MLSC and its dependencies from the checkout (the [pi] extra provides rpi_ws281x).
+"$UV_BIN" pip install --upgrade "${PROJ_DIR}[pi]" --python "${INST_DIR}/${VENV_NAME}/bin/python"
 
 
 # Setup microphone:
@@ -246,8 +246,9 @@ After=network.target
 [Service]
 Type=simple
 User=root
-WorkingDirectory=${INST_DIR}/${PROJ_DIR}/server
-ExecStart=${INST_DIR}/${VENV_NAME}/bin/python main.py
+WorkingDirectory=${INST_DIR}/${PROJ_DIR}
+Environment=MLSC_CONFIG_DIR=${INST_DIR}/.mlsc
+ExecStart=${INST_DIR}/${VENV_NAME}/bin/mlsc run
 Restart=on-abnormal
 RestartSec=10
 KillMode=control-group

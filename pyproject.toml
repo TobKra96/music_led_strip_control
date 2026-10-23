@@ -51,7 +51,6 @@ packages = ["src/mlsc"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-norecursedirs = ["legacy_unit_tests"]
 addopts = "--strict-markers"
 markers = [
     "unit: fast tests without I/O",
