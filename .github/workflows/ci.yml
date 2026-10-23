@@ -1,0 +1,55 @@
+name: CI
+
+on:
+  push:
+    branches: [master, dev_3.0]
+  pull_request:
+
+jobs:
+  test:
+    name: ${{ matrix.os }} / Python ${{ matrix.python }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        python: ["3.11", "3.13"]
+    env:
+      # Coverage upload and diff-cover run on one cell only.
+      COVERAGE_CELL: ${{ matrix.os == 'ubuntu-latest' && matrix.python == '3.13' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: astral-sh/setup-uv@v5
+
+      - name: Install system libraries
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y portaudio19-dev
+
+      - name: Install dependencies
+        run: uv sync --python ${{ matrix.python }}
+
+      - name: Lint
+        # src/ still has pre-existing lint debt; widen this once it is cleared.
+        run: uv run ruff check tests
+
+      - name: Test
+        if: env.COVERAGE_CELL != 'true'
+        run: uv run pytest -m "not hardware"
+
+      - name: Test with coverage
+        if: env.COVERAGE_CELL == 'true'
+        run: uv run pytest -m "not hardware" --cov --cov-report=xml --cov-report=term
+
+      - name: Diff coverage (85% on changed code)
+        if: env.COVERAGE_CELL == 'true' && github.event_name == 'pull_request'
+        run: uv run diff-cover coverage.xml --compare-branch=origin/${{ github.base_ref }} --fail-under=85
+
+      - name: Upload coverage
+        if: env.COVERAGE_CELL == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: coverage.xml

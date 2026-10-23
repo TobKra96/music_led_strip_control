@@ -36,6 +36,7 @@ pi = ["rpi_ws281x>=5,<6"]
 dev = [
     "pytest>=8",
     "pytest-cov>=5",
+    "diff-cover>=9",
     "ruff",
 ]
 
@@ -57,3 +58,15 @@ markers = [
     "integration: whole-app tests with fakes",
     "hardware: needs a Pi with a real strip, never run in CI",
 ]
+
+[tool.coverage.run]
+source = ["mlsc"]
+branch = true
+omit = [
+    "*/outputs/output_raspi.py",  # Pi-only GPIO backend, covered by the hardware smoke test
+]
+
+[tool.coverage.report]
+# Floor is the measured baseline and only ratchets up; the long-term goal is 80%.
+fail_under = 24
+skip_covered = true
