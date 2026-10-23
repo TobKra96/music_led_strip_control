@@ -1,4 +1,3 @@
-import pickle
 import sys
 import types
 import wave
@@ -124,16 +123,16 @@ def test_close_stops_delivery_and_is_idempotent():
     assert received == []
 
 
-def test_a_capture_is_created_by_backend_name_and_the_name_pickles():
+def test_a_capture_is_created_by_backend_name():
     assert isinstance(create_capture("fake"), FakeCapture)
-    assert pickle.loads(pickle.dumps("fake")) == "fake"
     with pytest.raises(AudioCaptureError):
         create_capture("nope")
 
 
 def test_a_failing_callback_does_not_break_delivery_or_read():
     def broken(_):
-        raise ValueError("boom")
+        message = "boom"
+        raise ValueError(message)
 
     capture = FakeCapture(source=silence())
     capture.open(capture.default_device(), RATE, BUFFER, on_data=broken)
@@ -146,16 +145,14 @@ def test_a_failing_callback_does_not_break_delivery_or_read():
 class StubSoundDevice(types.ModuleType):
     """Stands in for the sounddevice module: two devices (one output-only) on one host API."""
 
-    default = types.SimpleNamespace(hostapi=0)
-    streams = []
-
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__("sounddevice")
+        self.default = types.SimpleNamespace(hostapi=0)
         self.streams = []
         outer = self
 
         class InputStream:
-            def __init__(self, **kwargs):
+            def __init__(self, **kwargs) -> None:
                 self.kwargs, self.started, self.closed = kwargs, False, False
                 outer.streams.append(self)
 
@@ -171,7 +168,7 @@ class StubSoundDevice(types.ModuleType):
         self.InputStream = InputStream
 
     @staticmethod
-    def query_hostapis(index):
+    def query_hostapis(_index):
         return {"devices": [0, 1]}
 
     @staticmethod
@@ -191,7 +188,8 @@ def sounddevice_stub(monkeypatch):
     return stub
 
 
-def test_sounddevice_lists_only_input_devices(sounddevice_stub):
+@pytest.mark.usefixtures("sounddevice_stub")
+def test_sounddevice_lists_only_input_devices():
     capture = create_capture("sounddevice")
 
     assert [(d.device_id, d.name) for d in capture.list_devices()] == [(1, "USB Mic")]
@@ -210,11 +208,12 @@ def test_sounddevice_streams_int16_mono_buffers_and_closes(sounddevice_stub):
 
     assert (stream.kwargs["device"], stream.kwargs["channels"], stream.kwargs["dtype"], stream.kwargs["blocksize"]) == (1, 1, "int16", BUFFER)
     assert samples(received[0]).tolist() == [0, 1, 2, 3]
-    assert stream.closed and not stream.started
+    assert stream.closed
+    assert not stream.started
 
 
 class StubMiniaudio(types.ModuleType):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__("miniaudio")
         self.devices = []
         outer = self
@@ -226,7 +225,7 @@ class StubMiniaudio(types.ModuleType):
                 return [{"name": "Mic A", "id": "a"}, {"name": "Mic B", "id": "b"}]
 
         class CaptureDevice:
-            def __init__(self, **kwargs):
+            def __init__(self, **kwargs) -> None:
                 self.kwargs, self.stopped, self.closed = kwargs, False, False
                 outer.devices.append(self)
 
@@ -250,7 +249,8 @@ def miniaudio_stub(monkeypatch):
     return stub
 
 
-def test_miniaudio_lists_captures_by_position(miniaudio_stub):
+@pytest.mark.usefixtures("miniaudio_stub")
+def test_miniaudio_lists_captures_by_position():
     capture = create_capture("miniaudio")
 
     assert [(d.device_id, d.name) for d in capture.list_devices()] == [(0, "Mic A"), (1, "Mic B")]
@@ -270,7 +270,8 @@ def test_miniaudio_rechunks_to_the_requested_buffer_size(miniaudio_stub):
     assert samples(capture.read(timeout=0)).tolist() == [2, 2, 2, 2]
     assert capture.read(timeout=0) is None
     capture.close()
-    assert device.stopped and device.closed
+    assert device.stopped
+    assert device.closed
 
 
 def test_miniaudio_default_device_passes_no_device_id(miniaudio_stub):
@@ -280,7 +281,8 @@ def test_miniaudio_default_device_passes_no_device_id(miniaudio_stub):
     assert miniaudio_stub.devices[0].kwargs["device_id"] is None
 
 
-def test_auto_falls_back_to_miniaudio_without_sounddevice(monkeypatch, miniaudio_stub):
+@pytest.mark.usefixtures("miniaudio_stub")
+def test_auto_falls_back_to_miniaudio_without_sounddevice(monkeypatch):
     monkeypatch.setitem(sys.modules, "sounddevice", None)
     monkeypatch.delitem(sys.modules, "mlsc.audio_capture.sounddevice_backend", raising=False)
 

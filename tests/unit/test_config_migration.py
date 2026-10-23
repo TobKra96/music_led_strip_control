@@ -253,7 +253,7 @@ def test_list_audio_devices_never_raises(monkeypatch):
 
 
 def test_list_audio_devices_maps_input_devices(monkeypatch):
-    monkeypatch.setattr("mlsc.audio_capture.create_capture", lambda: FakeCapture())
+    monkeypatch.setattr("mlsc.audio_capture.create_capture", FakeCapture)
 
     assert config_migration.list_audio_devices() == [
         {"index": 0, "name": "Fake Mic", "host_api": None},

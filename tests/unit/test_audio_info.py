@@ -9,12 +9,19 @@ pytestmark = pytest.mark.unit
 DEVICES = [AudioDevice(0, "Built-in Mic", 44100), AudioDevice(3, "USB Mic", 48000)]
 
 
-class BrokenCapture(FakeCapture):
-    def list_devices(self):
-        raise OSError("no audio")
+def raise_no_audio():
+    message = "no audio"
+    raise OSError(message)
 
-    def default_device(self):
-        raise OSError("no audio")
+
+class BrokenCapture(FakeCapture):
+    @staticmethod
+    def list_devices():
+        raise_no_audio()
+
+    @staticmethod
+    def default_device():
+        raise_no_audio()
 
 
 def test_device_is_selected_by_name():
