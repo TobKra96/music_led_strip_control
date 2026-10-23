@@ -40,6 +40,18 @@ _Avoid_: Test mode
 An advisory cap derived from supply amps and per-LED current that warns about, or optionally limits, brightness.
 _Avoid_: Brightness limit
 
+**Hotspot**:
+The Pi's own Wi-Fi network, which the user can choose as a saved mode when no router is available.
+_Avoid_: Access point, AP
+
+**Setup Fallback**:
+An automatic, temporary Hotspot raised when the Pi has no usable connection, so the user can reach the UI and join a network. Never saved as the Wi-Fi mode.
+_Avoid_: Setup mode, rescue AP
+
+**Wi-Fi Rollback**:
+The timed return to the previous Wi-Fi mode when a change to it does not result in a working connection.
+_Avoid_: Undo
+
 **Diagnosis**:
 The structured result of an Output's health check: status, human message and suggested fix.
 _Avoid_: Health check
