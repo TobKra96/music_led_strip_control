@@ -57,6 +57,13 @@ class DeviceExecuter(ExecuterBase):
             for device in self._config["device_configs"]
         ]
 
+    def get_device(self, device_id: str) -> dict[str, str | dict] | DeviceNotFound:
+        """Return one device, or `DeviceNotFound` if the id is unknown."""
+        device = self._config["device_configs"].get(device_id)
+        if device is None:
+            return DeviceNotFound
+        return {"name": device["device_name"], "id": device_id, "assigned_to": device["device_groups"]}
+
     def create_new_device(self) -> dict[str, str] | DeviceLimitReached:
         """Create a new device with default values."""
         max_devices = 100

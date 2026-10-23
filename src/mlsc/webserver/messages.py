@@ -155,6 +155,14 @@ class UnprocessableEntity(_Message):
     _code = HTTPStatus.UNPROCESSABLE_ENTITY.value
 
 
+class ValidationError(UnprocessableEntity):
+    _message = "Request validation failed."
+
+
+class HttpError(_Message):
+    _message = "The request was rejected."
+
+
 class MethodNotAllowed(_Message):
     _message = "Method not allowed for this resource."
     _code = HTTPStatus.METHOD_NOT_ALLOWED.value
@@ -170,6 +178,39 @@ class UnsupportedMediaType(_Message):
     _code = HTTPStatus.UNSUPPORTED_MEDIA_TYPE.value
 
 
+class InvalidPin(Unauthorized):
+    _message = "Invalid PIN."
+
+
+class TooManyAttempts(_Message):
+    _message = "Too many failed attempts. Try again later."
+    _code = HTTPStatus.TOO_MANY_REQUESTS.value
+
+
 class ServerError(_Message):
     _message = "Internal server error."
     _code = HTTPStatus.INTERNAL_SERVER_ERROR.value
+
+
+class TooManyStreams(_Message):
+    _message = "Too many event streams."
+    _code = HTTPStatus.SERVICE_UNAVAILABLE.value
+
+
+def _subclasses(cls: type[_Message]) -> list[type[_Message]]:
+    return [cls, *(sub for child in cls.__subclasses__() for sub in _subclasses(child))]
+
+
+def error_codes() -> list[str]:
+    """Return the `code` of every error message, sorted. This is the full vocabulary of the v2 API."""
+    return sorted({m.__name__ for m in _subclasses(_Message)[1:] if m.code >= HTTPStatus.BAD_REQUEST})
+
+
+_BUILTIN_HTTP_ERRORS = {
+    m.code: m for m in (BadRequest, Unauthorized, NotFound, MethodNotAllowed, UnsupportedMediaType, UnprocessableEntity, ServerError)
+}
+
+
+def message_for_status(status: int) -> type[_Message] | None:
+    """Return the message that names a built-in HTTP error, e.g. `NotFound` for 404."""
+    return _BUILTIN_HTTP_ERRORS.get(status)

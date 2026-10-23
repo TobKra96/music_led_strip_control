@@ -63,3 +63,12 @@ def test_v2_spec_documents_the_payload_of_every_event():
     assert events["mic.level"]["replayable"] is False
     assert events["device.status"]["replayable"] is True
     assert spec["components"]["schemas"]["MicLevelEvent"]["properties"]["level"]["maximum"] == 1
+
+
+def test_v2_problem_schema_lists_every_code_of_the_messages_module():
+    from mlsc.webserver.messages import error_codes
+
+    code = fetch_spec()["components"]["schemas"]["Problem"]["properties"]["code"]
+
+    assert code["enum"] == error_codes()
+    assert {"InvalidPin", "TooManyAttempts", "TooManyStreams", "ValidationError", "NotFound", "MethodNotAllowed"} <= set(code["enum"])

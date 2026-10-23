@@ -4,10 +4,11 @@ from flask import current_app, request
 from flask_openapi3 import APIBlueprint, Tag
 from pydantic import BaseModel, Field
 
-from mlsc.api.v2.errors import InvalidPin, Problem, ProblemError, TooManyAttempts, ValidationError
+from mlsc.api.v2.errors import Problem, ProblemError
 from mlsc.api.v2.security import api_login_required
 from mlsc.webserver import auth
 from mlsc.webserver.executer import Executer
+from mlsc.webserver.messages import InvalidPin, TooManyAttempts, ValidationError
 
 tag = Tag(name="Auth", description="Session login and PIN management")
 auth_api = APIBlueprint("auth_api_v2", __name__, url_prefix="/api/v2/auth", abp_tags=[tag])

@@ -1,10 +1,11 @@
 from flask_openapi3 import APIBlueprint, Tag
 from pydantic import BaseModel, Field, RootModel
 
-from mlsc.api.v2.errors import READ_ERRORS, WRITE_ERRORS, Problem, ProblemError, ValidationError
+from mlsc.api.v2.errors import READ_ERRORS, WRITE_ERRORS, Problem, ProblemError
 from mlsc.api.v2.lookup import check_schema, device_settings, effect_settings, require_devices, require_patch, unwrap
 from mlsc.api.v2.security import api_login_required
 from mlsc.webserver.executer import Executer
+from mlsc.webserver.messages import DeviceNotFound, ValidationError
 from mlsc.webserver.schemas.device_settings_api_schema import SET_DEVICE_SETTINGS_SCHEMA
 
 tag = Tag(name="Devices", description="Configured LED strip devices")
@@ -39,8 +40,10 @@ class SettingsPatch(RootModel[dict]):
 
 
 def _device(device_id: str) -> dict:
-    require_devices([device_id])
-    return next(device for device in Executer.instance.device_executer.get_devices() if device["id"] == device_id)
+    device = Executer.instance.device_executer.get_device(device_id)
+    if device is DeviceNotFound:
+        raise ProblemError(DeviceNotFound, f"Device {device_id} does not exist.")
+    return device
 
 
 @devices_api.get("", summary="List devices", responses={"200": DeviceListOut, "401": Problem})

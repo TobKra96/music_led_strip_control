@@ -1,9 +1,10 @@
 from flask import Response, request, stream_with_context
 from flask_openapi3 import APIBlueprint, Tag
 
-from mlsc.api.v2.errors import Problem, ProblemError, TooManyStreams
+from mlsc.api.v2.errors import Problem, ProblemError
 from mlsc.api.v2.security import api_login_required
 from mlsc.webserver import sse
+from mlsc.webserver.messages import TooManyStreams
 
 tag = Tag(name="Events", description="Server-sent event stream")
 events_api = APIBlueprint("events_api_v2", __name__, url_prefix="/api/v2/events", abp_tags=[tag])

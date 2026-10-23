@@ -7,7 +7,7 @@ from flask import Response, jsonify, request
 from pydantic import BaseModel, Field
 from werkzeug.exceptions import HTTPException
 
-from mlsc.webserver.messages import ServerError, UnprocessableEntity, _Message
+from mlsc.webserver.messages import HttpError, ServerError, ValidationError, _Message, error_codes, message_for_status
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -17,6 +17,7 @@ if TYPE_CHECKING:
 API_V2_PREFIX = "/api/v2/"
 PROBLEM_MIMETYPE = "application/problem+json"
 PROBLEM_TYPE_PREFIX = "urn:mlsc:problem:"
+GENERIC_HTTP_CODE = HttpError.__name__
 
 
 class FieldError(BaseModel):
@@ -31,32 +32,13 @@ class Problem(BaseModel):
     title: str
     status: int
     detail: str | None = None
-    code: str = Field(description="Stable machine-readable error code.")
+    code: str = Field(description="Stable error code; the v1 `message_id` where one exists.", json_schema_extra={"enum": error_codes()})
     errors: list[FieldError] | None = Field(default=None, description="Per-field validation errors.")
 
 
 READ_ERRORS = {"401": Problem, "404": Problem}
 BODY_ERRORS = {"401": Problem, "415": Problem, "422": Problem}
 WRITE_ERRORS = {**READ_ERRORS, **BODY_ERRORS}
-
-
-class InvalidPin(_Message):
-    _message = "Invalid PIN."
-    _code = HTTPStatus.UNAUTHORIZED.value
-
-
-class TooManyAttempts(_Message):
-    _message = "Too many failed attempts. Try again later."
-    _code = HTTPStatus.TOO_MANY_REQUESTS.value
-
-
-class ValidationError(UnprocessableEntity):
-    _message = "Request validation failed."
-
-
-class TooManyStreams(_Message):
-    _message = "Too many event streams."
-    _code = HTTPStatus.SERVICE_UNAVAILABLE.value
 
 
 class ProblemError(Exception):
@@ -98,7 +80,8 @@ def handle_http_exception(e: HTTPException) -> Response:
     status = e.code or ServerError.code
     if status >= HTTPStatus.INTERNAL_SERVER_ERROR:
         return handle_problem_error(ProblemError(ServerError))
-    return problem_response(status, e.name, e.__class__.__name__, e.description)
+    message = message_for_status(status)
+    return problem_response(status, e.name, message.__name__ if message is not None else GENERIC_HTTP_CODE, e.description)
 
 
 def handle_validation_error(e: PydanticValidationError) -> Response:

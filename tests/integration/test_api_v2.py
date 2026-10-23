@@ -6,6 +6,7 @@ from mlsc.api.v2 import register_api_v2
 from mlsc.app import create_app
 from mlsc.webserver import auth, sse
 from mlsc.webserver.executer import Executer
+from mlsc.webserver.messages import DeviceNotFound, error_codes
 from mlsc.webserver.sse import EventBroker
 
 pytestmark = pytest.mark.integration
@@ -58,6 +59,7 @@ def fake_executer(monkeypatch):
         authentication_executer=FakeAuthenticationExecuter(),
         device_executer=SimpleNamespace(
             get_devices=lambda: [{"name": "Desk", "id": "device_0", "assigned_to": {}}],
+            get_device=lambda device_id: {"name": "Desk", "id": "device_0", "assigned_to": {}} if device_id == "device_0" else DeviceNotFound,
         ),
         system_info_executer=SimpleNamespace(get_system_version=lambda: {"versions": [{"name": "mlsc", "version": "3.0.0"}]}),
     )
@@ -312,3 +314,23 @@ def test_login_without_a_pin_is_a_validation_problem_while_the_lock_is_on(client
     body = assert_problem(client.post("/api/v2/auth/login", json={}), 422, "ValidationError")
 
     assert body["errors"] == [{"field": "pin", "detail": "Field required"}]
+
+
+def test_every_code_returned_by_v2_is_a_documented_one(client):
+    log_in(client)
+    responses = [
+        client.get("/api/v2/nope"),
+        client.post("/api/v2/devices"),
+        client.get("/api/v2/devices/device_9"),
+        client.delete("/api/v2/devices"),
+        client.post("/api/v2/auth/login", json={}),
+        client.open("/api/v2/devices", method="TRACE"),
+        client.post("/api/v2/devices", data="x", headers={"Content-Type": "text/plain"}),
+        client.post("/api/v2/devices", data="x" * 10, headers={"Content-Type": "text/plain", "Content-Length": "999999999"}),
+    ]
+    app = client.application
+    app.config["MAX_CONTENT_LENGTH"] = 1
+    responses.append(client.post("/api/v2/devices", data="xx", headers=JSON))
+
+    codes = {response.get_json()["code"] for response in responses}
+    assert codes <= set(error_codes())
