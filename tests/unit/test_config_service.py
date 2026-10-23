@@ -1,6 +1,6 @@
 import json
 import threading
-from pathlib import Path
+from importlib import resources
 
 import pytest
 
@@ -8,7 +8,7 @@ from mlsc.config_service import ConfigService
 
 pytestmark = pytest.mark.unit
 
-TEMPLATE = Path(__file__).parents[2] / "src" / "mlsc" / "config_template.json"
+TEMPLATE = resources.files("mlsc") / "config_template.json"
 
 
 def test_first_start_copies_the_template_into_the_config_dir(config_dir):
