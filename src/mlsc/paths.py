@@ -14,12 +14,14 @@ APP_NAME = "mlsc"
 CONFIG_DIR_ENV = "MLSC_CONFIG_DIR"
 
 
+def _override() -> Path | None:
+    value = os.environ.get(CONFIG_DIR_ENV)
+    return Path(value).expanduser().resolve() if value else None
+
+
 def config_dir() -> Path:
     """Return the directory holding config.json, its backup and security.ini."""
-    override = os.environ.get(CONFIG_DIR_ENV)
-    if override:
-        return Path(override).expanduser().resolve()
-    return user_config_path(APP_NAME)
+    return _override() or user_config_path(APP_NAME)
 
 
 def data_dir() -> Path:
@@ -27,9 +29,7 @@ def data_dir() -> Path:
 
     An explicit config directory keeps everything together in one place.
     """
-    if os.environ.get(CONFIG_DIR_ENV):
-        return config_dir()
-    return user_data_path(APP_NAME)
+    return _override() or user_data_path(APP_NAME)
 
 
 def set_config_dir(path: str | os.PathLike) -> None:
