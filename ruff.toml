@@ -2,9 +2,9 @@ output-format = "grouped"
 
 line-length = 150
 
-target-version = "py39"
+target-version = "py311"
 
-extend-exclude = ["unit_tests", "test"]
+extend-exclude = ["tests/legacy_unit_tests", "test"]
 
 
 [lint]
@@ -64,3 +64,8 @@ max-locals = 15
 
 [lint.mccabe]
 max-complexity = 15
+
+
+[lint.per-file-ignores]
+"tests/**" = ["S101", "PT001", "PT003", "DOC", "PLC0415"]
+"src/mlsc/paths.py" = ["DOC"]

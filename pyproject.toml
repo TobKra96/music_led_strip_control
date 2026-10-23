@@ -1,0 +1,60 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "music-led-strip-control"
+version = "3.0.0.dev0"
+description = "Turn audio into effects and drive LED strips via GPIO or UDP, with a web UI to configure it."
+readme = "README.md"
+license = { file = "LICENSE" }
+requires-python = ">=3.11"
+dependencies = [
+    "numpy>=2.0,<3",
+    "scipy>=1.14,<2",
+    "loguru>=0.7,<1",
+    "platformdirs>=4,<5",
+    "Flask>=3.1,<4",
+    "Werkzeug>=3.1,<4",
+    "Flask-Login>=0.6.3,<1",
+    "Jinja2>=3.1,<4",
+    "waitress>=3,<4",
+    "icmplib>=3,<4",
+    "Flask-OpenAPI3-UI>=2.3,<3",
+    "jsonschema>=4.23,<5",
+    "APScheduler>=3.11,<4",
+    "psutil>=5.9",
+    "PyAudio>=0.2.13",
+    "rpi-ws281x-mock>=0.2.2; sys_platform == 'win32'",
+]
+
+[project.optional-dependencies]
+miniaudio = ["miniaudio>=1.60,<2"]
+pi = ["rpi_ws281x>=5,<6"]
+
+[dependency-groups]
+dev = [
+    "pytest>=8",
+    "pytest-cov>=5",
+    "ruff",
+]
+
+[project.scripts]
+mlsc = "mlsc.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/TobKra96/music_led_strip_control"
+Issues = "https://github.com/TobKra96/music_led_strip_control/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/mlsc"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+norecursedirs = ["legacy_unit_tests"]
+addopts = "--strict-markers"
+markers = [
+    "unit: fast tests without I/O",
+    "integration: whole-app tests with fakes",
+    "hardware: needs a Pi with a real strip, never run in CI",
+]
