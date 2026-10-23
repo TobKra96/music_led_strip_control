@@ -283,3 +283,32 @@ def test_events_beyond_the_stream_limit_get_a_503_problem(client, monkeypatch):
     assert first.status_code == 200
     assert_problem(second, 503, "TooManyStreams")
     first.close()
+
+
+def test_logout_works_without_a_body_but_not_as_a_form_post(client):
+    log_in(client)
+
+    assert_problem(client.post("/api/v2/auth/logout", data={"x": "1"}), 415, "UnsupportedMediaType")
+    assert client.get("/api/v2/devices").status_code == 200
+
+    assert client.post("/api/v2/auth/logout").status_code == 204
+    assert_problem(client.get("/api/v2/devices"), 401, "Unauthorized")
+
+
+def test_other_bodyless_writes_still_need_json(client):
+    assert_problem(client.post("/api/v2/auth/login"), 415, "UnsupportedMediaType")
+
+
+def test_login_needs_no_pin_while_the_lock_is_off():
+    client = build_app(auth_enabled=False).test_client()
+
+    response = client.post("/api/v2/auth/login", json={})
+
+    assert response.status_code == 200
+    assert response.get_json() == {"authenticated": True, "pin_required": False}
+
+
+def test_login_without_a_pin_is_a_validation_problem_while_the_lock_is_on(client):
+    body = assert_problem(client.post("/api/v2/auth/login", json={}), 422, "ValidationError")
+
+    assert body["errors"] == [{"field": "pin", "detail": "Field required"}]

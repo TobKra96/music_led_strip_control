@@ -4,7 +4,7 @@ from flask import render_template, request
 from flask_openapi3 import Info, OpenAPI
 from werkzeug.exceptions import HTTPException
 
-from mlsc.api.v2.errors import handle_http_exception, handle_server_error, is_v2_request
+from mlsc.api.v2.errors import v2_aware
 from mlsc.webserver import auth
 from mlsc.webserver.messages import BadRequest, MethodNotAllowed, NotFound, ServerError
 
@@ -16,31 +16,23 @@ API_INFO = Info(
 )
 
 
-def bad_request(e: HTTPException) -> tuple:
-    if is_v2_request():
-        return handle_http_exception(e)
+def bad_request(_: HTTPException) -> tuple:
     return BadRequest.as_response()
 
 
 def not_found(e: HTTPException) -> tuple:
-    if is_v2_request():
-        return handle_http_exception(e)
     if request.path.startswith("/api/"):
         return NotFound.as_response()
     return render_template("home/error.html", code=e.code, message="Page not found"), e.code
 
 
 def method_not_allowed(e: HTTPException) -> tuple:
-    if is_v2_request():
-        return handle_http_exception(e)
     if request.path.startswith("/api/"):
         return MethodNotAllowed.as_response()
     return render_template("home/error.html", code=e.code, message="Method not allowed"), e.code
 
 
 def server_error(e: HTTPException) -> tuple:
-    if is_v2_request():
-        return handle_server_error()
     if request.path.startswith("/api/"):
         return ServerError.as_response()
     return render_template("home/error.html", code=e.code, message="Server error"), e.code
@@ -63,10 +55,10 @@ def register_api_docs(app: OpenAPI) -> None:
 
 
 def register_errors(app: OpenAPI) -> None:
-    app.register_error_handler(400, bad_request)
-    app.register_error_handler(404, not_found)
-    app.register_error_handler(405, method_not_allowed)
-    app.register_error_handler(500, server_error)
+    app.register_error_handler(400, v2_aware(bad_request))
+    app.register_error_handler(404, v2_aware(not_found))
+    app.register_error_handler(405, v2_aware(method_not_allowed))
+    app.register_error_handler(500, v2_aware(server_error))
 
 
 def create_app() -> OpenAPI:

@@ -8,6 +8,7 @@ from mlsc.api.v2.auth import auth_api
 from mlsc.api.v2.devices import devices_api
 from mlsc.api.v2.errors import API_V2_PREFIX, register_error_handlers
 from mlsc.api.v2.events import events_api
+from mlsc.api.v2.security import require_json_writes
 from mlsc.api.v2.system import system_api
 from mlsc.api.v2.throttle import LoginLimiter
 
@@ -26,6 +27,7 @@ def register_api_v2(app: OpenAPI, clock: Callable[[], float] = time.monotonic) -
     app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
     app.extensions["mlsc_login_limiter"] = LoginLimiter(clock)
     register_error_handlers(app)
+    app.before_request(require_json_writes)
     for blueprint in API_V2_BLUEPRINTS:
         app.register_api(blueprint)
 

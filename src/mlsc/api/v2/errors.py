@@ -5,13 +5,14 @@ from typing import TYPE_CHECKING
 
 from flask import Response, jsonify, request
 from pydantic import BaseModel, Field
-from werkzeug.exceptions import BadRequest as MalformedRequest
 from werkzeug.exceptions import HTTPException
 
-from mlsc.webserver.messages import BadRequest, ServerError, UnprocessableEntity, UnsupportedMediaType, _Message
+from mlsc.webserver.messages import ServerError, UnprocessableEntity, _Message
 
 if TYPE_CHECKING:
-    from pydantic import ValidationError
+    from collections.abc import Callable
+
+    from pydantic import ValidationError as PydanticValidationError
 
 API_V2_PREFIX = "/api/v2/"
 PROBLEM_MIMETYPE = "application/problem+json"
@@ -42,6 +43,10 @@ class InvalidPin(_Message):
 class TooManyAttempts(_Message):
     _message = "Too many failed attempts. Try again later."
     _code = HTTPStatus.TOO_MANY_REQUESTS.value
+
+
+class ValidationError(UnprocessableEntity):
+    _message = "Request validation failed."
 
 
 class TooManyStreams(_Message):
@@ -87,39 +92,29 @@ def handle_http_exception(e: HTTPException) -> Response:
     """Problem for the built-in HTTP errors (404, 405, 400 ...) of a v2 request."""
     status = e.code or ServerError.code
     if status >= HTTPStatus.INTERNAL_SERVER_ERROR:
-        return handle_server_error()
+        return handle_problem_error(ProblemError(ServerError))
     return problem_response(status, e.name, e.__class__.__name__, e.description)
 
 
-def handle_server_error() -> Response:
-    return problem_response(ServerError.code, ServerError.message, ServerError.__name__)
-
-
-def handle_validation_error(e: ValidationError) -> Response:
+def handle_validation_error(e: PydanticValidationError) -> Response:
     errors = [{"field": ".".join(str(part) for part in error["loc"]), "detail": error["msg"]} for error in e.errors()]
-    return problem_response(UnprocessableEntity.code, UnprocessableEntity.message, "ValidationError", errors=errors)
+    return handle_problem_error(ProblemError(ValidationError, errors=errors))
 
 
-def reject_non_json_writes() -> Response | None:
-    """Require `Content-Type: application/json` on writes, which a cross-site form cannot send without a preflight."""
-    if is_v2_request() and request.method in {"POST", "PUT", "PATCH"} and request.mimetype != "application/json":
-        return handle_problem_error(ProblemError(UnsupportedMediaType, "Send the request body as application/json."))
-    if is_v2_request() and request.is_json and request.get_data():
-        try:
-            request.get_json()
-        except MalformedRequest:
-            return problem_response(BadRequest.code, BadRequest.message, BadRequest.__name__, "The request body is not valid JSON.")
-    return None
+def v2_aware(v1_handler: Callable) -> Callable:
+    """Wrap an error handler of the v1 API and the HTML pages so that v2 requests get a problem document instead."""
+    def handler(e):
+        return handle_http_exception(e) if is_v2_request() else v1_handler(e)
+    return handler
 
 
 def register_error_handlers(app) -> None:
     app.register_error_handler(ProblemError, handle_problem_error)
-    app.register_error_handler(HTTPException, lambda e: handle_http_exception(e) if is_v2_request() else e)
-    app.before_request(reject_non_json_writes)
+    app.register_error_handler(HTTPException, v2_aware(lambda e: e))
+    app.validation_error_callback = _v2_validation_callback(app.validation_error_callback)
 
-    default_validation_callback = app.validation_error_callback
 
-    def validation_callback(e):
-        return handle_validation_error(e) if is_v2_request() else default_validation_callback(e)
-
-    app.validation_error_callback = validation_callback
+def _v2_validation_callback(default_callback: Callable) -> Callable:
+    def callback(e):
+        return handle_validation_error(e) if is_v2_request() else default_callback(e)
+    return callback

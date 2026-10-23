@@ -73,14 +73,19 @@
       "LoginBody": {
         "properties": {
           "pin": {
-            "description": "The PIN configured in the security settings.",
-            "title": "Pin",
-            "type": "string"
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "The PIN configured in the security settings. Not needed while the PIN lock is off.",
+            "title": "Pin"
           }
         },
-        "required": [
-          "pin"
-        ],
         "title": "LoginBody",
         "type": "object"
       },
@@ -102,24 +107,6 @@
           "use_pin_lock"
         ],
         "title": "PinSettings",
-        "type": "object"
-      },
-      "PinSettingsOut": {
-        "properties": {
-          "default_pin": {
-            "title": "Default Pin",
-            "type": "string"
-          },
-          "use_pin_lock": {
-            "title": "Use Pin Lock",
-            "type": "boolean"
-          }
-        },
-        "required": [
-          "default_pin",
-          "use_pin_lock"
-        ],
-        "title": "PinSettingsOut",
         "type": "object"
       },
       "Problem": {
@@ -405,7 +392,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PinSettingsOut"
+                  "$ref": "#/components/schemas/PinSettings"
                 }
               }
             },
@@ -447,7 +434,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PinSettingsOut"
+                  "$ref": "#/components/schemas/PinSettings"
                 }
               }
             },
@@ -499,7 +486,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PinSettingsOut"
+                  "$ref": "#/components/schemas/PinSettings"
                 }
               }
             },

@@ -4,7 +4,7 @@ from flask import current_app, request
 from flask_openapi3 import APIBlueprint, Tag
 from pydantic import BaseModel, Field
 
-from mlsc.api.v2.errors import InvalidPin, Problem, ProblemError, TooManyAttempts
+from mlsc.api.v2.errors import InvalidPin, Problem, ProblemError, TooManyAttempts, ValidationError
 from mlsc.api.v2.security import api_login_required
 from mlsc.webserver import auth
 from mlsc.webserver.executer import Executer
@@ -13,11 +13,11 @@ tag = Tag(name="Auth", description="Session login and PIN management")
 auth_api = APIBlueprint("auth_api_v2", __name__, url_prefix="/api/v2/auth", abp_tags=[tag])
 
 PIN_PATTERN = r"^\d{4,8}$"
-PROBLEMS = {"401": Problem, "415": Problem, "422": Problem}
+WRITE_ERRORS = {"401": Problem, "415": Problem, "422": Problem}
 
 
 class LoginBody(BaseModel):
-    pin: str = Field(description="The PIN configured in the security settings.")
+    pin: str | None = Field(default=None, description="The PIN configured in the security settings. Not needed while the PIN lock is off.")
 
 
 class SessionOut(BaseModel):
@@ -27,11 +27,6 @@ class SessionOut(BaseModel):
 
 class PinSettings(BaseModel):
     default_pin: str = Field(pattern=PIN_PATTERN, description="4 to 8 digits.")
-    use_pin_lock: bool
-
-
-class PinSettingsOut(BaseModel):
-    default_pin: str
     use_pin_lock: bool
 
 
@@ -48,7 +43,7 @@ def get_session():
     return _session()
 
 
-@auth_api.post("/login", summary="Log in with the PIN", responses={"200": SessionOut, "429": Problem, **PROBLEMS})
+@auth_api.post("/login", summary="Log in with the PIN", responses={"200": SessionOut, "429": Problem, **WRITE_ERRORS})
 def login(body: LoginBody):
     """Start a session. Repeated failures lock the client out with a growing delay (`Retry-After`)."""
     limiter = current_app.extensions["mlsc_login_limiter"]
@@ -59,7 +54,9 @@ def login(body: LoginBody):
         raise ProblemError(TooManyAttempts, headers={"Retry-After": str(wait)})
 
     executer = Executer.instance.authentication_executer
-    if executer.is_pin_active():
+    if auth.is_auth_enabled():
+        if body.pin is None:
+            raise ProblemError(ValidationError, errors=[{"field": "pin", "detail": "Field required"}])
         if not hmac.compare_digest(body.pin.encode(), executer.USER_PIN.encode()):
             limiter.record_failure(client)
             raise ProblemError(InvalidPin)
@@ -74,13 +71,13 @@ def logout():
     return "", 204
 
 
-@auth_api.get("/pin", summary="Get the PIN settings", responses={"200": PinSettingsOut, "401": Problem})
+@auth_api.get("/pin", summary="Get the PIN settings", responses={"200": PinSettings, "401": Problem})
 @api_login_required
 def get_pin():
     return _pin_out(Executer.instance.authentication_executer.get_pin_setting())
 
 
-@auth_api.put("/pin", summary="Replace the PIN settings", responses={"200": PinSettingsOut, **PROBLEMS})
+@auth_api.put("/pin", summary="Replace the PIN settings", responses={"200": PinSettings, **WRITE_ERRORS})
 @api_login_required
 def set_pin(body: PinSettings):
     executer = Executer.instance.authentication_executer
@@ -88,7 +85,7 @@ def set_pin(body: PinSettings):
     return _pin_out(executer.get_pin_setting())
 
 
-@auth_api.delete("/pin", summary="Reset the PIN settings", responses={"200": PinSettingsOut, "401": Problem})
+@auth_api.delete("/pin", summary="Reset the PIN settings", responses={"200": PinSettings, "401": Problem})
 @api_login_required
 def reset_pin():
     return _pin_out(Executer.instance.authentication_executer.reset_pin_settings())
