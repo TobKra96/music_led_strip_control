@@ -20,6 +20,10 @@ _Avoid_: Driver, GPIO output
 An audio input device that carries audio played by the system or received from a remote source, rather than a microphone.
 _Avoid_: Loopback, Virtual mic
 
+**Browser Microphone**:
+An audio source whose samples are streamed to the server from the microphone of a connected client's browser.
+_Avoid_: Web mic, Remote mic
+
 **Mock Output**:
 An Output that drives no hardware and only feeds the Strip Preview.
 _Avoid_: Dummy
