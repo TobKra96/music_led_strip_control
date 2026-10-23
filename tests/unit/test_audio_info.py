@@ -11,7 +11,8 @@ DEVICES = [AudioDevice(0, "Built-in Mic", 44100), AudioDevice(3, "USB Mic", 4800
 
 
 class FakePyAudio:
-    def get_default_input_device_info(self):
+    @staticmethod
+    def get_default_input_device_info():
         return {"index": 7, "name": "System Default", "defaultSampleRate": 48000}
 
 
