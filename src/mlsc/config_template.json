@@ -1,5 +1,5 @@
 {
-    "version": 3,
+    "version": 4,
     "colors": {
         "black": [
             0,
@@ -387,6 +387,16 @@
                 "udp_client_ip": "127.0.0.1",
                 "udp_client_port": 7777
             }
+        },
+        "chip_family": "ws2812",
+        "colour_order": "grb",
+        "white_channel": false,
+        "gpio_backend": "auto",
+        "power_limit": {
+            "enabled": false,
+            "supply_amps": 5.0,
+            "ma_per_led": 60,
+            "mode": "warn"
         }
     },
     "development_config": {
@@ -667,5 +677,25 @@
         "warning": "Warning",
         "error": "Error",
         "critical": "Critical"
+    },
+    "audio": {
+        "source": "device",
+        "device_name": null,
+        "host_api": null,
+        "gain": 1.0,
+        "sample_rate": 48000,
+        "frames_per_buffer": 512,
+        "min_frequency": 50,
+        "max_frequency": 16000,
+        "min_volume_threshold": 0.001
+    },
+    "wifi": {
+        "hotspot_ssid": "mlsc",
+        "mode": "client",
+        "setup_fallback": true
+    },
+    "id_counters": {
+        "device": 0,
+        "group": 0
     }
 }

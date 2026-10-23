@@ -63,7 +63,8 @@ class ConfigConverterV2(ConfigConverterBase):
     def rename_config(self, json_string):
         rename_map = self.get_rename_map()
 
-        for key, value in rename_map.items():
+        # Longest keys first, so "SK6812_STRIP" does not rename the start of "SK6812_STRIP_GRBW".
+        for key, value in sorted(rename_map.items(), key=lambda item: len(item[0]), reverse=True):
             json_string = json_string.replace(key, value)
 
         return json_string
