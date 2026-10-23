@@ -1,0 +1,125 @@
+from __future__ import annotations
+
+from http import HTTPStatus
+from typing import TYPE_CHECKING
+
+from flask import Response, jsonify, request
+from pydantic import BaseModel, Field
+from werkzeug.exceptions import BadRequest as MalformedRequest
+from werkzeug.exceptions import HTTPException
+
+from mlsc.webserver.messages import BadRequest, ServerError, UnprocessableEntity, UnsupportedMediaType, _Message
+
+if TYPE_CHECKING:
+    from pydantic import ValidationError
+
+API_V2_PREFIX = "/api/v2/"
+PROBLEM_MIMETYPE = "application/problem+json"
+PROBLEM_TYPE_PREFIX = "urn:mlsc:problem:"
+
+
+class FieldError(BaseModel):
+    field: str = Field(description="Dotted path of the offending field.")
+    detail: str
+
+
+class Problem(BaseModel):
+    """RFC 9457 problem details."""
+
+    type: str = Field(description="URI that identifies the problem type.")
+    title: str
+    status: int
+    detail: str | None = None
+    code: str = Field(description="Stable machine-readable error code.")
+    errors: list[FieldError] | None = Field(default=None, description="Per-field validation errors.")
+
+
+class InvalidPin(_Message):
+    _message = "Invalid PIN."
+    _code = HTTPStatus.UNAUTHORIZED.value
+
+
+class TooManyAttempts(_Message):
+    _message = "Too many failed attempts. Try again later."
+    _code = HTTPStatus.TOO_MANY_REQUESTS.value
+
+
+class TooManyStreams(_Message):
+    _message = "Too many event streams."
+    _code = HTTPStatus.SERVICE_UNAVAILABLE.value
+
+
+class ProblemError(Exception):
+    """Raised by v2 code to answer with a problem document. `message` is one of the sentinel classes in `messages.py`."""
+
+    def __init__(self, message: type[_Message], detail: str | None = None, errors: list[dict] | None = None, headers: dict | None = None) -> None:
+        super().__init__(message.message)
+        self.message = message
+        self.detail = detail if detail is not None else message.message
+        self.errors = errors
+        self.headers = headers or {}
+
+
+def is_v2_request() -> bool:
+    return request.path.startswith(API_V2_PREFIX)
+
+
+def problem_response(status: int, title: str, code: str, detail: str | None = None, errors: list[dict] | None = None,
+                     headers: dict | None = None) -> Response:
+    body = {"type": f"{PROBLEM_TYPE_PREFIX}{code}", "title": title, "status": status, "code": code}
+    if detail is not None:
+        body["detail"] = detail
+    if errors is not None:
+        body["errors"] = errors
+    response = jsonify(body)
+    response.status_code = status
+    response.mimetype = PROBLEM_MIMETYPE
+    for name, value in (headers or {}).items():
+        response.headers[name] = value
+    return response
+
+
+def handle_problem_error(e: ProblemError) -> Response:
+    return problem_response(e.message.code, e.message.message, e.message.__name__, e.detail, e.errors, e.headers)
+
+
+def handle_http_exception(e: HTTPException) -> Response:
+    """Problem for the built-in HTTP errors (404, 405, 400 ...) of a v2 request."""
+    status = e.code or ServerError.code
+    if status >= HTTPStatus.INTERNAL_SERVER_ERROR:
+        return handle_server_error()
+    return problem_response(status, e.name, e.__class__.__name__, e.description)
+
+
+def handle_server_error() -> Response:
+    return problem_response(ServerError.code, ServerError.message, ServerError.__name__)
+
+
+def handle_validation_error(e: ValidationError) -> Response:
+    errors = [{"field": ".".join(str(part) for part in error["loc"]), "detail": error["msg"]} for error in e.errors()]
+    return problem_response(UnprocessableEntity.code, UnprocessableEntity.message, "ValidationError", errors=errors)
+
+
+def reject_non_json_writes() -> Response | None:
+    """Require `Content-Type: application/json` on writes, which a cross-site form cannot send without a preflight."""
+    if is_v2_request() and request.method in {"POST", "PUT", "PATCH"} and request.mimetype != "application/json":
+        return handle_problem_error(ProblemError(UnsupportedMediaType, "Send the request body as application/json."))
+    if is_v2_request() and request.is_json and request.get_data():
+        try:
+            request.get_json()
+        except MalformedRequest:
+            return problem_response(BadRequest.code, BadRequest.message, BadRequest.__name__, "The request body is not valid JSON.")
+    return None
+
+
+def register_error_handlers(app) -> None:
+    app.register_error_handler(ProblemError, handle_problem_error)
+    app.register_error_handler(HTTPException, lambda e: handle_http_exception(e) if is_v2_request() else e)
+    app.before_request(reject_non_json_writes)
+
+    default_validation_callback = app.validation_error_callback
+
+    def validation_callback(e):
+        return handle_validation_error(e) if is_v2_request() else default_validation_callback(e)
+
+    app.validation_error_callback = validation_callback

@@ -5,6 +5,7 @@ from time import sleep
 from flask_openapi3 import OpenAPI
 from waitress import serve
 
+from mlsc.api.v2 import register_api_v2
 from mlsc.app import create_app
 from mlsc.webserver.blueprints.authentication_api import authentication_api
 from mlsc.webserver.blueprints.device_api import device_api
@@ -16,17 +17,17 @@ from mlsc.webserver.blueprints.general_settings_api import general_settings_api
 from mlsc.webserver.blueprints.microphone_settings_api import microphone_settings_api
 from mlsc.webserver.blueprints.system_info_api import system_info_api
 from mlsc.webserver.executer import Executer
-from mlsc.webserver.sse import events_api
 
 API_BLUEPRINTS = (
     authentication_api, device_api, device_settings_api, effect_api, effect_settings_api,
-    general_api, general_settings_api, system_info_api, microphone_settings_api, events_api
+    general_api, general_settings_api, system_info_api, microphone_settings_api
 )
 
 
 def register_api_blueprints(server: OpenAPI) -> None:
     for blueprint in API_BLUEPRINTS:
         server.register_api(blueprint)
+    register_api_v2(server)
 
 
 # Flask DEBUG switch.

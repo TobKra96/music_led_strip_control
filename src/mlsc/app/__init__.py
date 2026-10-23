@@ -4,6 +4,7 @@ from flask import render_template, request
 from flask_openapi3 import Info, OpenAPI
 from werkzeug.exceptions import HTTPException
 
+from mlsc.api.v2.errors import handle_http_exception, handle_server_error, is_v2_request
 from mlsc.webserver import auth
 from mlsc.webserver.messages import BadRequest, MethodNotAllowed, NotFound, ServerError
 
@@ -15,23 +16,31 @@ API_INFO = Info(
 )
 
 
-def bad_request(_: HTTPException) -> tuple:
+def bad_request(e: HTTPException) -> tuple:
+    if is_v2_request():
+        return handle_http_exception(e)
     return BadRequest.as_response()
 
 
 def not_found(e: HTTPException) -> tuple:
+    if is_v2_request():
+        return handle_http_exception(e)
     if request.path.startswith("/api/"):
         return NotFound.as_response()
     return render_template("home/error.html", code=e.code, message="Page not found"), e.code
 
 
 def method_not_allowed(e: HTTPException) -> tuple:
+    if is_v2_request():
+        return handle_http_exception(e)
     if request.path.startswith("/api/"):
         return MethodNotAllowed.as_response()
     return render_template("home/error.html", code=e.code, message="Method not allowed"), e.code
 
 
 def server_error(e: HTTPException) -> tuple:
+    if is_v2_request():
+        return handle_server_error()
     if request.path.startswith("/api/"):
         return ServerError.as_response()
     return render_template("home/error.html", code=e.code, message="Server error"), e.code

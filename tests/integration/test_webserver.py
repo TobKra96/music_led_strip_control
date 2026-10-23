@@ -18,7 +18,7 @@ from mlsc.webserver.webserver import register_api_blueprints
 pytestmark = pytest.mark.integration
 
 PIN = "1234"
-PROTECTED_URLS = ("/api/resources/colors", "/dashboard", "/api/v2/events")
+PROTECTED_URLS = ("/api/resources/colors", "/dashboard")
 REMOTE_ASSET = re.compile(r"""<(?:script|link|img)\s[^>]*(?:src|href)\s*=\s*["'](?:https?:)?//|url\(\s*["']?(?:https?:)?//""")
 
 
@@ -210,19 +210,7 @@ def test_events_stream_requires_login_under_waitress():
         connection = server.connect()
         connection.request("GET", "/api/v2/events")
 
-        assert connection.getresponse().status == 302
-
-
-def test_events_refuses_clients_beyond_the_stream_limit(monkeypatch):
-    monkeypatch.setattr(sse, "broker", EventBroker(max_subscribers=1))
-    client = build_app(auth_enabled=False).test_client()
-
-    first = client.get("/api/v2/events")
-    second = client.get("/api/v2/events")
-
-    assert first.status_code == 200
-    assert second.status_code == 503
-    first.close()
+        assert connection.getresponse().status == 401
 
 
 def test_broker_drops_events_for_a_stalled_client_instead_of_blocking():

@@ -1,0 +1,801 @@
+{
+  "components": {
+    "schemas": {
+      "ComponentVersion": {
+        "properties": {
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "version": {
+            "title": "Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "version"
+        ],
+        "title": "ComponentVersion",
+        "type": "object"
+      },
+      "DeviceListOut": {
+        "items": {
+          "$ref": "#/components/schemas/DeviceOut"
+        },
+        "title": "DeviceListOut",
+        "type": "array"
+      },
+      "DeviceOut": {
+        "properties": {
+          "assigned_to": {
+            "additionalProperties": true,
+            "description": "Groups the device belongs to.",
+            "title": "Assigned To",
+            "type": "object"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "assigned_to"
+        ],
+        "title": "DeviceOut",
+        "type": "object"
+      },
+      "FieldError": {
+        "properties": {
+          "detail": {
+            "title": "Detail",
+            "type": "string"
+          },
+          "field": {
+            "description": "Dotted path of the offending field.",
+            "title": "Field",
+            "type": "string"
+          }
+        },
+        "required": [
+          "field",
+          "detail"
+        ],
+        "title": "FieldError",
+        "type": "object"
+      },
+      "LoginBody": {
+        "properties": {
+          "pin": {
+            "description": "The PIN configured in the security settings.",
+            "title": "Pin",
+            "type": "string"
+          }
+        },
+        "required": [
+          "pin"
+        ],
+        "title": "LoginBody",
+        "type": "object"
+      },
+      "PinSettings": {
+        "properties": {
+          "default_pin": {
+            "description": "4 to 8 digits.",
+            "pattern": "^\\d{4,8}$",
+            "title": "Default Pin",
+            "type": "string"
+          },
+          "use_pin_lock": {
+            "title": "Use Pin Lock",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "default_pin",
+          "use_pin_lock"
+        ],
+        "title": "PinSettings",
+        "type": "object"
+      },
+      "PinSettingsOut": {
+        "properties": {
+          "default_pin": {
+            "title": "Default Pin",
+            "type": "string"
+          },
+          "use_pin_lock": {
+            "title": "Use Pin Lock",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "default_pin",
+          "use_pin_lock"
+        ],
+        "title": "PinSettingsOut",
+        "type": "object"
+      },
+      "Problem": {
+        "description": "RFC 9457 problem details.",
+        "properties": {
+          "code": {
+            "description": "Stable machine-readable error code.",
+            "title": "Code",
+            "type": "string"
+          },
+          "detail": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Detail"
+          },
+          "errors": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/FieldError"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Per-field validation errors.",
+            "title": "Errors"
+          },
+          "status": {
+            "title": "Status",
+            "type": "integer"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "type": {
+            "description": "URI that identifies the problem type.",
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "type",
+          "title",
+          "status",
+          "code"
+        ],
+        "title": "Problem",
+        "type": "object"
+      },
+      "SessionOut": {
+        "properties": {
+          "authenticated": {
+            "title": "Authenticated",
+            "type": "boolean"
+          },
+          "pin_required": {
+            "title": "Pin Required",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "authenticated",
+          "pin_required"
+        ],
+        "title": "SessionOut",
+        "type": "object"
+      },
+      "ValidationErrorModel": {
+        "properties": {
+          "ctx": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "An optional object which contains values required to render the error message.",
+            "title": "Error context"
+          },
+          "input": {
+            "description": "The input provided for validation.",
+            "title": "Input"
+          },
+          "loc": {
+            "description": "The error's location as a list.",
+            "items": {},
+            "title": "Location",
+            "type": "array"
+          },
+          "msg": {
+            "description": "A human readable explanation of the error.",
+            "title": "Message",
+            "type": "string"
+          },
+          "type": {
+            "description": "A computer-readable identifier of the error type.",
+            "title": "Error Type",
+            "type": "string"
+          },
+          "url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "The URL to further information about the error.",
+            "title": "URL"
+          }
+        },
+        "required": [
+          "type",
+          "loc",
+          "msg",
+          "input"
+        ],
+        "title": "ValidationErrorModel",
+        "type": "object"
+      },
+      "VersionsOut": {
+        "properties": {
+          "versions": {
+            "items": {
+              "$ref": "#/components/schemas/ComponentVersion"
+            },
+            "title": "Versions",
+            "type": "array"
+          }
+        },
+        "required": [
+          "versions"
+        ],
+        "title": "VersionsOut",
+        "type": "object"
+      }
+    },
+    "securitySchemes": null
+  },
+  "info": {
+    "description": "API for communicating with the MLSC server. The API is based on the OpenAPI 3.1 specification.",
+    "license": {
+      "name": "MIT",
+      "url": "https://github.com/TobKra96/music_led_strip_control/blob/master/LICENSE"
+    },
+    "title": "MLSC API",
+    "version": "2.3.0"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/api/v2/auth/login": {
+      "post": {
+        "description": "Start a session. Repeated failures lock the client out with a growing delay (`Retry-After`).",
+        "operationId": "auth_api_v2_login_login_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionOut"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "415": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unsupported Media Type"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          }
+        },
+        "summary": "Log in with the PIN",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/api/v2/auth/logout": {
+      "post": {
+        "operationId": "auth_api_v2_logout_logout_post",
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "415": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unsupported Media Type"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ValidationErrorModel"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        },
+        "summary": "End the session",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/api/v2/auth/pin": {
+      "delete": {
+        "operationId": "auth_api_v2_reset_pin_pin_delete",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PinSettingsOut"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ValidationErrorModel"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        },
+        "summary": "Reset the PIN settings",
+        "tags": [
+          "Auth"
+        ]
+      },
+      "get": {
+        "operationId": "auth_api_v2_get_pin_pin_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PinSettingsOut"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ValidationErrorModel"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        },
+        "summary": "Get the PIN settings",
+        "tags": [
+          "Auth"
+        ]
+      },
+      "put": {
+        "operationId": "auth_api_v2_set_pin_pin_put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PinSettings"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PinSettingsOut"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "415": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unsupported Media Type"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        },
+        "summary": "Replace the PIN settings",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/api/v2/auth/session": {
+      "get": {
+        "operationId": "auth_api_v2_get_session_session_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionOut"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ValidationErrorModel"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        },
+        "summary": "Show the login state",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/api/v2/devices": {
+      "get": {
+        "operationId": "devices_api_v2_list_devices_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeviceListOut"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ValidationErrorModel"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        },
+        "summary": "List devices",
+        "tags": [
+          "Devices"
+        ]
+      }
+    },
+    "/api/v2/devices/{device_id}": {
+      "get": {
+        "operationId": "devices_api_v2_get_device__device_id__get",
+        "parameters": [
+          {
+            "description": "Stable device id, e.g. `device_0`.",
+            "in": "path",
+            "name": "device_id",
+            "required": true,
+            "schema": {
+              "description": "Stable device id, e.g. `device_0`.",
+              "title": "Device Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeviceOut"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ValidationErrorModel"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        },
+        "summary": "Get a device",
+        "tags": [
+          "Devices"
+        ]
+      }
+    },
+    "/api/v2/events": {
+      "get": {
+        "description": "One multiplexed `text/event-stream` with `device.status`, `diagnosis`, `mic.level`, `wifi.state`, `system.stats` and `operation`.<br/><br/>Notifications only. The low-rate events carry an `id`; reconnect with `Last-Event-ID` to receive the ones missed.",
+        "operationId": "events_api_v2_events_get",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ValidationErrorModel"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "summary": "Subscribe to server events",
+        "tags": [
+          "Events"
+        ]
+      }
+    },
+    "/api/v2/system/version": {
+      "get": {
+        "operationId": "system_api_v2_get_version_version_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionsOut"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ValidationErrorModel"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        },
+        "summary": "Get component versions",
+        "tags": [
+          "System"
+        ]
+      }
+    }
+  },
+  "tags": [
+    {
+      "description": "Session login and PIN management",
+      "name": "Auth"
+    },
+    {
+      "description": "Configured LED strip devices",
+      "name": "Devices"
+    },
+    {
+      "description": "Server and host information",
+      "name": "System"
+    },
+    {
+      "description": "Server-sent event stream",
+      "name": "Events"
+    }
+  ]
+}
