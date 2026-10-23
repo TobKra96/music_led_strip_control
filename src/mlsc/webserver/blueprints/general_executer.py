@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from mlsc.audio_capture import AudioCaptureError, create_capture
 from mlsc.audio_info import AudioInfo
 from mlsc.config_converter.config_converter_v4 import LED_STRIP_MAPPING
 from mlsc.effects_enum import EffectNames, EffectsEnum
@@ -26,7 +27,10 @@ class GeneralExecuter(ExecuterBase):
 
     def get_audio_devices(self) -> dict:
         """Return audio devices."""
-        audio_devices = AudioInfo.get_audio_devices(self._py_audio)
+        try:
+            audio_devices = AudioInfo.get_audio_devices(create_capture(self._audio_backend))
+        except AudioCaptureError:
+            return {}
         return {value.device_id: value.to_string() for value in audio_devices}
 
     @staticmethod

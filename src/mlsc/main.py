@@ -11,7 +11,6 @@ from multiprocessing import Lock, Process, Queue
 from sys import platform
 from time import sleep
 
-import pyaudio
 from loguru import logger
 
 from mlsc import paths
@@ -93,8 +92,8 @@ class Main:
         # Check config compatibility
         self._config_instance.check_compatibility()
 
-        # Init pyaudio
-        self._py_audio = pyaudio.PyAudio()
+        # Only the backend name crosses the process boundary. Each process builds its own capture object.
+        self._audio_backend = "auto"
 
         # Prepare the queue for the output
         self._output_queue = Queue(2)
@@ -148,7 +147,7 @@ class Main:
                 self._notification_queue_webserver_in,
                 self._notification_queue_webserver_out,
                 self._effects_queue,
-                self._py_audio
+                self._audio_backend
             ))
         self._webserver_process.start()
 
@@ -161,7 +160,7 @@ class Main:
                 self._notification_queue_audio_in,
                 self._notification_queue_audio_out,
                 self._audio_queue,
-                self._py_audio
+                self._audio_backend
             ))
         self._audio_process.start()
 

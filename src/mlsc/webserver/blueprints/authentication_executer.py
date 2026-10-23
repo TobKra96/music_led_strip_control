@@ -51,8 +51,8 @@ def unauthorized() -> Response:
 
 
 class AuthenticationExecuter(ExecuterBase):
-    def __init__(self, config_lock, notification_queue_in, notification_queue_out, effects_queue, py_audio) -> None:
-        super().__init__(config_lock, notification_queue_in, notification_queue_out, effects_queue, py_audio)
+    def __init__(self, config_lock, notification_queue_in, notification_queue_out, effects_queue, audio_backend) -> None:
+        super().__init__(config_lock, notification_queue_in, notification_queue_out, effects_queue, audio_backend)
 
         AuthenticationExecuter.instance = self
 

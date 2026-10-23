@@ -111,26 +111,13 @@ def coerce_string_booleans(config: dict, report: MigrationReport) -> None:
 def list_audio_devices() -> list[dict] | None:
     """Return the input devices as `{"index", "name", "host_api"}`, or None when audio cannot be queried."""
     try:
-        import pyaudio  # ruff: ignore[import-outside-top-level] Optional at migration time, and slow to import.
+        # Imported here as it is optional at migration time and slow to import.
+        from mlsc.audio_capture import create_capture  # ruff: ignore[import-outside-top-level]
 
-        py_audio = pyaudio.PyAudio()
+        return [{"index": device.device_id, "name": device.name, "host_api": None} for device in create_capture().list_devices()]
     except Exception:
         logger.warning("Could not query audio devices for the config migration.")
         return None
-
-    try:
-        devices = []
-        for i in range(py_audio.get_device_count()):
-            info = py_audio.get_device_info_by_index(i)
-            if info.get("maxInputChannels", 0) >= 1:
-                host_api = py_audio.get_host_api_info_by_index(info["hostApi"])["name"]
-                devices.append({"index": i, "name": info["name"], "host_api": host_api})
-        return devices
-    except Exception:
-        logger.warning("Could not query audio devices for the config migration.")
-        return None
-    finally:
-        py_audio.terminate()
 
 
 def migrate_data(data: dict, audio_devices: list[dict] | None = None) -> tuple[dict, MigrationReport]:

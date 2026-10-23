@@ -64,12 +64,12 @@ def validate_schema(data: dict, schema: dict) -> bool:
 
 
 class ExecuterBase:
-    def __init__(self, config_lock, notification_queue_in, notification_queue_out, effects_queue, py_audio) -> None:
+    def __init__(self, config_lock, notification_queue_in, notification_queue_out, effects_queue, audio_backend) -> None:
         self._config_lock = config_lock
         self.notification_queue_in = notification_queue_in
         self.notification_queue_out = notification_queue_out
         self.effects_queue = effects_queue
-        self._py_audio = py_audio
+        self._audio_backend = audio_backend
 
         # Initial config load.
         self._config_instance = ConfigService.instance(self._config_lock)

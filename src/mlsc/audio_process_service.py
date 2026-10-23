@@ -3,9 +3,9 @@ from multiprocessing import Queue
 from time import time
 
 import numpy as np
-import pyaudio
 from loguru import logger
 
+from mlsc.audio_capture import create_capture
 from mlsc.audio_info import AudioInfo
 from mlsc.config_service import ConfigService
 from mlsc.dsp import DSP
@@ -16,15 +16,15 @@ from mlsc.queue_wrapper import QueueWrapper
 
 
 class AudioProcessService:
-    def start(self, config_lock, notification_queue_in, notification_queue_out, audio_queue, py_audio):
+    def start(self, config_lock, notification_queue_in, notification_queue_out, audio_queue, audio_backend):
         self._config_lock = config_lock
         self._notification_queue_in = QueueWrapper(notification_queue_in)
         self._notification_queue_out = QueueWrapper(notification_queue_out)
         self._audio_queue = QueueWrapper(audio_queue)
 
         self.audio_buffer_queue = QueueWrapper(Queue(2))
-        self._py_audio = py_audio
-        self.stream = None
+        # Built here, inside the audio process: capture objects hold native handles and cannot be pickled.
+        self._capture = create_capture(audio_backend)
 
         self.init_audio_service(show_output=True)
 
@@ -44,7 +44,7 @@ class AudioProcessService:
             # Init FPS Limiter.
             self._fps_limiter = FPSLimiter(120)
             self._skip_routine = False
-            self._devices = AudioInfo.get_audio_devices(self._py_audio)
+            self._devices = AudioInfo.get_audio_devices(self._capture)
 
             self.log_output(show_output, "INFO", "Found the following audio sources:")
 
@@ -52,7 +52,7 @@ class AudioProcessService:
 
             # Select the audio device by name. No name means the system default.
             device_name = audio_config["device_name"]
-            self.selected_device = AudioInfo.select_audio_device(self._py_audio, self._devices, device_name)
+            self.selected_device = AudioInfo.select_audio_device(self._capture, self._devices, device_name)
             if device_name is not None and self.selected_device.name != device_name:
                 self.log_output(show_output, "ERROR", f"Could not find the mic named {device_name!r}. Using the system default.")
 
@@ -71,15 +71,13 @@ class AudioProcessService:
 
             self._dsp = DSP(self._config)
 
-            self.audio = np.empty((self._frames_per_buffer), dtype="int16")
-
             # Reinit buffer queue
             self.audio_buffer_queue = QueueWrapper(Queue(2))
 
-            # callback function to stream audio, another thread.
-            def callback(in_data, frame_count, time_info, status):
+            # Called from the capture thread with each buffer of int16 samples.
+            def callback(in_data):
                 if self._skip_routine:
-                    return (self.audio, pyaudio.paContinue)
+                    return
 
                 self.audio_buffer_queue.put_none_blocking(in_data)
 
@@ -93,18 +91,8 @@ class AudioProcessService:
 
                 self.start_time_1 = time()
 
-                return (self.audio, pyaudio.paContinue)
-
             self.log_output(show_output, "DEBUG", "Starting Open Audio Stream...")
-            self.stream = self._py_audio.open(
-                format=pyaudio.paInt16,
-                channels=1,
-                rate=self._device_rate,
-                input=True,
-                input_device_index=self.selected_device.device_id,
-                frames_per_buffer=self._frames_per_buffer,
-                stream_callback=callback
-            )
+            self._capture.open(self.selected_device, self._device_rate, self._frames_per_buffer, on_data=callback)
         except Exception:
             logger.exception("Unexpected error in init_audio_service.")
 
@@ -128,9 +116,7 @@ class AudioProcessService:
                 current_notification_item = self._notification_queue_in.get_blocking()
 
                 if current_notification_item.notification_enum is NotificationEnum.config_refresh:
-                    if self.stream is not None:
-                        self.stream.stop_stream()
-                        self.stream.close()
+                    self._capture.close()
                     self.init_audio_service()
                     self._notification_queue_out.put_blocking(NotificationItem(
                         NotificationEnum.config_refresh_finished, current_notification_item.device_id))

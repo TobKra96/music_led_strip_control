@@ -1,57 +1,39 @@
-
 from loguru import logger
 
+from mlsc.audio_capture import AudioCapture
 from mlsc.audio_device import AudioDevice
 
 
 class AudioInfo:
-    def get_audio_devices(py_audio):
+    @staticmethod
+    def get_audio_devices(capture: AudioCapture) -> list[AudioDevice]:
         logger.debug("Get audio devices.")
-        audio_devices = []
-
         try:
-            audio_device_count = py_audio.get_device_count()
-            logger.debug(f"Available audio devices (input and output): {audio_device_count}")
-            try:
-                for i in range(audio_device_count):
-                    raw_audio_device = py_audio.get_device_info_by_host_api_device_index(0, i)
-
-                    if raw_audio_device["maxInputChannels"] >= 1:
-                        audio_device = AudioInfo.parse_raw_audio_device_to_audio_device(raw_audio_device)
-                        logger.debug(f"Found audio Device: {audio_device.to_string()}")
-                        audio_devices.append(audio_device)
-
-            except Exception:
-                logger.exception("Unexpected error in AudioInfo.")
-
+            audio_devices = capture.list_devices()
         except OSError as e:
             logger.error(f"OS error: {e}")
+            return []
         except Exception:
             logger.exception("Unexpected error in AudioInfo.")
+            return []
 
+        for audio_device in audio_devices:
+            logger.debug(f"Found audio Device: {audio_device.to_string()}")
         logger.debug(f"Found {len(audio_devices)} audio devices.")
         return audio_devices
 
-    def select_audio_device(py_audio, audio_devices, device_name):
+    @staticmethod
+    def select_audio_device(capture: AudioCapture, audio_devices: list[AudioDevice], device_name: str | None) -> AudioDevice:
         """Return the device called `device_name`, or the system default when there is no such device."""
         match = next((device for device in audio_devices if device.name == device_name), None)
-        return match if match is not None else AudioInfo.get_default_audio_device(py_audio)
+        return match if match is not None else AudioInfo.get_default_audio_device(capture)
 
-    def get_default_audio_device(py_audio):
-        default_device = AudioDevice(0, "Error", 44100)
+    @staticmethod
+    def get_default_audio_device(capture: AudioCapture) -> AudioDevice:
         try:
-            raw_default_device = py_audio.get_default_input_device_info()
-            default_device = AudioInfo.parse_raw_audio_device_to_audio_device(raw_default_device)
-
+            return capture.default_device()
         except OSError as e:
             logger.error(f"OS error: {e}")
         except Exception:
             logger.error("Unexpected error in AudioInfo get_default_audio_device.")
-
-        return default_device
-
-    def parse_raw_audio_device_to_audio_device(raw_audio_device):
-        device_id = raw_audio_device["index"]
-        name = raw_audio_device["name"]
-        default_sample_rate = raw_audio_device["defaultSampleRate"]
-        return AudioDevice(device_id, name, default_sample_rate)
+        return AudioDevice(0, "Error", 44100)

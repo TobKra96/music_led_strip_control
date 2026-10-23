@@ -120,8 +120,8 @@ sudo apt-get update -qq
 # Install required packages:
 # git: For cloning the MLSC repository.
 # python3-dev / build-essential: For building rpi_ws281x module.
-# python3-pyaudio: For audio input. Avoids needing to build from source.
-sudo apt-get -y --no-install-recommends install git python3-dev python3-pyaudio build-essential
+# libportaudio2: PortAudio runtime that sounddevice uses for audio input.
+sudo apt-get -y --no-install-recommends install git python3-dev libportaudio2 build-essential
 
 # Install uv for managing Python packages and virtual environment:
 if [[ -x "$UV_BIN" ]]; then

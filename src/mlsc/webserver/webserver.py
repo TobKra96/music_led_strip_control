@@ -22,15 +22,15 @@ DEBUG = False
 
 
 class Webserver:
-    def start(self: Webserver, config_lock, notification_queue_in, notification_queue_out, effects_queue, py_audio) -> None:
+    def start(self: Webserver, config_lock, notification_queue_in, notification_queue_out, effects_queue, audio_backend) -> None:
         self._config_lock = config_lock
         self.notification_queue_in = notification_queue_in
         self.notification_queue_out = notification_queue_out
         self.effects_queue = effects_queue
-        self._py_audio = py_audio
+        self._audio_backend = audio_backend
 
         self.webserver_executer = Executer(
-            config_lock, notification_queue_in, notification_queue_out, effects_queue, py_audio)
+            config_lock, notification_queue_in, notification_queue_out, effects_queue, audio_backend)
         Webserver.instance = self
 
         self.server = create_app()

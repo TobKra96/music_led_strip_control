@@ -4,7 +4,7 @@ MLSC runs natively on Windows 11 with the Mock Output, so you can develop and de
 
 ## Setup
 
-Use Python 3.13. Python 3.14 has no PyAudio wheel for Windows and the source build fails.
+Use Python 3.13 or newer. Audio capture uses `sounddevice`, whose Windows wheel bundles PortAudio.
 
 ```powershell
 py install 3.13
@@ -34,6 +34,6 @@ Open the repo in VS Code with the Python Debugger extension. `.vscode/launch.jso
 
 ## Known limitations
 
-- **Audio capture does not work on Windows yet.** The parent process creates one `pyaudio.PyAudio()` and passes it to the child processes. Windows starts children with spawn, so the child gets a copy where PortAudio is not initialised (`OSError [Errno -10000] PortAudio not initialized`). The audio device list is empty and nothing is captured. This is fixed by the capture interface slice, which creates the audio object inside the audio process. Until then, effects that do not need audio work; audio-reactive ones do not.
+- **Audio capture works on Windows.** Each process builds its own capture object (`mlsc.audio_capture.create_capture`), so no native audio handle crosses the spawn boundary.
 - Linux-only code (`fcntl` single-instance lock, `systemctl` check) is skipped on Windows.
 - Port 8080 must be free. A leftover debug session holding it makes `/` answer with a 500 from another server; stop it or change `webserver_port` in the config.

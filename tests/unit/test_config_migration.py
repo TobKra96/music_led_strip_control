@@ -1,13 +1,12 @@
 import copy
 import json
-import sys
 import threading
-import types
 from pathlib import Path
 
 import pytest
 
 from mlsc import cli, config_migration
+from mlsc.audio_capture.fake import FakeCapture
 from mlsc.config_migration import ConfigMigrationError
 from mlsc.config_service import ConfigService
 
@@ -248,35 +247,18 @@ def test_reset_config_keeps_the_replaced_config(target_dir):
 
 
 def test_list_audio_devices_never_raises(monkeypatch):
-    monkeypatch.setitem(sys.modules, "pyaudio", None)  # import raises ImportError
+    monkeypatch.setattr("mlsc.audio_capture.create_capture", lambda: (_ for _ in ()).throw(OSError("no audio")))
 
     assert config_migration.list_audio_devices() is None
 
 
 def test_list_audio_devices_maps_input_devices(monkeypatch):
-    class FakePyAudio:
-        terminated = False
+    monkeypatch.setattr("mlsc.audio_capture.create_capture", lambda: FakeCapture())
 
-        @staticmethod
-        def get_device_count():
-            return 2
-
-        @staticmethod
-        def get_device_info_by_index(i):
-            return [{"name": "Out", "maxInputChannels": 0, "hostApi": 0}, {"name": "Mic", "maxInputChannels": 1, "hostApi": 0}][i]
-
-        @staticmethod
-        def get_host_api_info_by_index(_):
-            return {"name": "ALSA"}
-
-        @staticmethod
-        def terminate():
-            FakePyAudio.terminated = True
-
-    monkeypatch.setitem(sys.modules, "pyaudio", types.SimpleNamespace(PyAudio=FakePyAudio))
-
-    assert config_migration.list_audio_devices() == [{"index": 1, "name": "Mic", "host_api": "ALSA"}]
-    assert FakePyAudio.terminated
+    assert config_migration.list_audio_devices() == [
+        {"index": 0, "name": "Fake Mic", "host_api": None},
+        {"index": 1, "name": "Fake Monitor", "host_api": None},
+    ]
 
 
 def test_config_service_migrates_an_old_config_at_startup(config_dir, monkeypatch):

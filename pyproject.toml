@@ -24,7 +24,7 @@ dependencies = [
     "jsonschema>=4.23,<5",
     "APScheduler>=3.11,<4",
     "psutil>=5.9",
-    "PyAudio>=0.2.13",
+    "sounddevice>=0.5,<1",
     "rpi-ws281x-mock>=0.2.2; sys_platform == 'win32'",
 ]
 
