@@ -22,8 +22,8 @@ def rpi_ws281x_strip_type(chip_family: str, colour_order: str, white_channel: bo
 def udp_channel_order(chip_family: str, colour_order: str) -> tuple[int, int, int]:
     """Indices into an RGB frame in the order the UDP client expects the colour channels.
 
-    A ws2812 strip is sent as plain RGB, because the client's library applies its GRB order itself.
+    ws2812 and sk6812 GRB strips are sent as plain RGB, because the client's library applies their GRB order itself.
     """
-    if chip_family == "ws2812":
+    if colour_order == "grb" and chip_family in ("ws2812", "sk6812"):
         return 0, 1, 2
     return tuple(_RGB_INDEX[channel] for channel in colour_order)

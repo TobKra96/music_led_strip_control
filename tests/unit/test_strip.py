@@ -37,7 +37,9 @@ def test_rpi_ws281x_strip_type_name(chip_family, colour_order, white, expected):
     ("sk6812", "rbg", (0, 2, 1)),
     ("sk6812", "brg", (2, 0, 1)),
     ("sk6812", "gbr", (1, 2, 0)),
-    ("ws2812", "grb", (0, 1, 2)),  # ws2812_strip never reordered on the wire; the client's library does it
+    ("ws2812", "grb", (0, 1, 2)),  # ws2812 and sk6812 GRB are never reordered on the wire; the client's library does it
+    ("sk6812", "grb", (0, 1, 2)),
+    ("ws2812", "bgr", (2, 1, 0)),
 ])
 def test_udp_channel_order(chip_family, colour_order, expected):
     assert udp_channel_order(chip_family, colour_order) == expected

@@ -75,7 +75,7 @@ def test_colour_order_of_three_channel_strips(receiver, led_strip, expected_firs
     [
         ("sk6812_strip_rgbw", (10, 20, 30, 1)),
         ("sk6812_strip_rbgw", (10, 30, 20, 1)),
-        ("sk6812_strip_grbw", (20, 10, 30, 1)),
+        ("sk6812_strip_grbw", (10, 20, 30, 1)),
         ("sk6812_strip_gbrw", (20, 30, 10, 1)),
         ("sk6812_strip_brgw", (30, 10, 20, 1)),
         ("sk6812_strip_bgrw", (30, 20, 10, 1)),
@@ -88,8 +88,9 @@ def test_four_channel_frame_ends_each_pixel_with_white(receiver, led_strip, expe
     assert len(payload) == 12
 
 
-def test_sk6812_strip_receiving_three_channels_keeps_them_in_order(receiver):
-    assert send(receiver, RGB_FRAME, led_strip="sk6812_strip_grbw")[:3] == bytes([20, 10, 30])
+@pytest.mark.parametrize("led_strip", ["ws2812_strip", "sk6812_strip", "sk6812w_strip", "sk6812_shift_wmask", "sk6812_strip_grbw"])
+def test_grb_strips_are_sent_as_plain_rgb(receiver, led_strip):
+    assert send(receiver, RGB_FRAME, led_strip=led_strip)[:3] == bytes([10, 20, 30])
 
 
 def test_brightness_scales_values_and_truncates(receiver):
