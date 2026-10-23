@@ -51,7 +51,6 @@ def test_config_path_prints_the_config_file(capsys, tmp_path):
         ["service", "status"],
         ["service", "restart"],
         ["doctor"],
-        ["config", "migrate"],
     ],
 )
 def test_stub_subcommands_report_not_implemented(argv, capsys):

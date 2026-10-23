@@ -16,6 +16,7 @@ from loguru import logger
 
 from mlsc import paths
 from mlsc.audio_process_service import AudioProcessService
+from mlsc.config_migration import ConfigMigrationError
 from mlsc.config_service import ConfigService
 from mlsc.device_manager import DeviceManager
 from mlsc.notification_service import NotificationService
@@ -184,5 +185,9 @@ class Main:
 
 def run() -> int:
     exit_if_instance_running()
-    Main().start()
+    try:
+        Main().start()
+    except ConfigMigrationError as e:
+        print(f"{RED}Error: {e}", file=sys.stderr)  # ruff: ignore[print]
+        return 1
     return 0

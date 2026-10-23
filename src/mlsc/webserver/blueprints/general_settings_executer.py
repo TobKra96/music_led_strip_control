@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING
 
 from loguru import logger
 
+from mlsc.config_migration import ConfigMigrationError, migrate_data
 from mlsc.webserver.executer_base import ExecuterBase, update
 
 if TYPE_CHECKING:
@@ -61,7 +62,11 @@ class GeneralSettingsExecuter(ExecuterBase):
 
         logger.debug(f"Type of imported config: {type(imported_config)}")
         if isinstance(imported_config, dict):
-            self._config = imported_config
+            try:
+                self._config, _ = migrate_data(imported_config)
+            except ConfigMigrationError as e:
+                logger.error(f"Could not import Config: {e}")
+                return False
             self.save_config()
             self._config_instance.check_compatibility()
             self.refresh_device(self.all_devices_id)

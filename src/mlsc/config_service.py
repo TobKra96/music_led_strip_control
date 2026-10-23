@@ -7,19 +7,21 @@ from __future__ import annotations
 import json
 import sys
 from pathlib import Path
-from shutil import copy, copyfile
+from shutil import copy
 
 from jsonschema.exceptions import ValidationError
 from loguru import logger
 
 from mlsc import paths
 from mlsc.config_converter.config_converter_service import ConfigConverterService
+from mlsc.config_migration import prepare_config
 from mlsc.webserver.schemas.config_validator_service import ConfigValidatorService
 
 
 class ConfigService:
     def __init__(self: ConfigService, config_lock) -> None:
         self.config = None
+        self.fallback_warning = None  # Set when the config was corrupt and the last-good backup is used instead.
 
         # Start with the default logging settings, because the config was not loaded.
         self.setup_logging()
@@ -42,15 +44,8 @@ class ConfigService:
         logger.debug(f"Backup: {self._backup_path}")
         logger.debug(f"Template: {self._template_path}")
 
-        if not Path.exists(self._config_path):
-            if not Path.exists(self._backup_path):
-                # Use the template as config.
-                Path(config_folder).mkdir(parents=True, exist_ok=True)  # Create config directory, ignore if already exists.
-                copyfile(self._template_path, self._config_path)  # Copy config.json from repository to config directory.
-            else:
-                # Use the backup as template.
-                Path(config_folder).mkdir(parents=True, exist_ok=True)  # Create config directory, ignore if already exists.
-                copyfile(self._backup_path, self._config_path)  # Copy config.json from repository to config directory.
+        # Migrate an older config, restore the backup or create it from the template. Raises ConfigMigrationError if it cannot.
+        prepare_config(config_folder)
 
         self.config_lock = config_lock
 
@@ -67,7 +62,8 @@ class ConfigService:
             with Path.open(self._config_path, "r") as read_file:
                 self.config = json.load(read_file)
         except Exception as e:
-            logger.error(f"Could not load config due to exception: {e}")
+            self.fallback_warning = f"The config could not be read ({e}). The last-good backup is used instead."
+            logger.warning(self.fallback_warning)
             self.load_backup()
 
         self.config_lock.release()

@@ -1402,24 +1402,106 @@ effect_schema = {
     }
 }
 
+chip_family_enum = ["ws2811", "ws2812", "sk6812"]
+
+colour_order_enum = ["rgb", "rbg", "grb", "gbr", "brg", "bgr"]
+
+power_limit_schema = {
+    "type": "object",
+    "additionalProperties": False,
+    "maxProperties": 4,
+    "minProperties": 4,
+    "required": ["enabled", "supply_amps", "ma_per_led", "mode"],
+    "properties": {
+        "enabled": {"type": "boolean"},
+        "supply_amps": {"type": "number", "exclusiveMinimum": 0},
+        "ma_per_led": {"type": "number", "exclusiveMinimum": 0},
+        "mode": {"enum": ["warn", "limit"]}
+    }
+}
+
+audio_schema = {
+    "type": "object",
+    "additionalProperties": False,
+    "maxProperties": 9,
+    "minProperties": 9,
+    "required": [
+        "source",
+        "device_name",
+        "host_api",
+        "gain",
+        "sample_rate",
+        "frames_per_buffer",
+        "min_frequency",
+        "max_frequency",
+        "min_volume_threshold"
+    ],
+    "properties": {
+        "source": {"enum": ["device", "browser"]},
+        "device_name": {"type": ["string", "null"]},
+        "host_api": {"type": ["string", "null"]},
+        "gain": {"type": "number", "exclusiveMinimum": 0},
+        "sample_rate": {"type": "integer", "minimum": 1},
+        "frames_per_buffer": {"type": "integer", "minimum": 1},
+        "min_frequency": {"type": "number", "minimum": 0},
+        "max_frequency": {"type": "number", "minimum": 0},
+        "min_volume_threshold": {"type": "number", "minimum": 0}
+    }
+}
+
+wifi_schema = {
+    "type": "object",
+    "additionalProperties": False,
+    "maxProperties": 3,
+    "minProperties": 3,
+    "required": ["hotspot_ssid", "mode", "setup_fallback"],
+    "properties": {
+        "hotspot_ssid": {"type": "string"},
+        "mode": {"type": "string"},
+        "setup_fallback": {"type": "boolean"}
+    }
+}
+
+id_counters_schema = {
+    "type": "object",
+    "additionalProperties": False,
+    "maxProperties": 2,
+    "minProperties": 2,
+    "required": ["device", "group"],
+    "properties": {
+        "device": {"type": "integer", "minimum": 0},
+        "group": {"type": "integer", "minimum": 0}
+    }
+}
+
 device_schema = {
     "type": "object",
     "additionalProperties": False,
-    "maxProperties": 10,
-    "minProperties": 10,
+    "maxProperties": 15,
+    "minProperties": 15,
     "required": [
+        "chip_family",
+        "colour_order",
         "device_groups",
         "device_name",
         "effects",
         "fps",
+        "gpio_backend",
         "led_brightness",
         "led_count",
         "led_mid",
         "led_strip",
         "output",
-        "output_type"
+        "output_type",
+        "power_limit",
+        "white_channel"
     ],
     "properties": {
+        "chip_family": {"enum": chip_family_enum},
+        "colour_order": {"enum": colour_order_enum},
+        "white_channel": {"type": "boolean"},
+        "gpio_backend": {"type": "string"},
+        "power_limit": power_limit_schema,
         "device_groups": {
             "type": "object",
             "additionalProperties": False,
@@ -1871,9 +1953,7 @@ logging_levels_schema = {
 }
 
 version_schema = {
-    "type": "integer",
-    "minimum": 2,
-    "maximum": 3
+    "const": 4
 }
 
 definitions = {
@@ -1893,20 +1973,26 @@ definitions = {
 schema = {
     "type": "object",
     "additionalProperties": False,
-    "maxProperties": 9,
-    "minProperties": 9,
+    "maxProperties": 12,
+    "minProperties": 12,
     "required": [
+        "audio",
         "colors",
         "default_device",
         "development_config",
         "device_configs",
         "general_settings",
         "gradients",
+        "id_counters",
         "led_strips",
         "logging_levels",
-        "version"
+        "version",
+        "wifi"
     ],
     "properties": {
+        "audio": audio_schema,
+        "id_counters": id_counters_schema,
+        "wifi": wifi_schema,
         "colors": colors_schema,
         "default_device": device_schema,
         "development_config": development_config_schema,
@@ -1928,6 +2014,12 @@ class ConfigValidatorService:
     @staticmethod
     def _get_schema() -> dict:
         return schema
+
+    def errors(self: ConfigValidatorService, config, *, allow_unknown_keys: bool = False) -> list[str]:
+        """Return a message per schema violation. `allow_unknown_keys` ignores keys the schema does not know."""
+        schema = remove_unknown_key_limits(self.schema) if allow_unknown_keys else self.schema
+        v = Draft202012Validator(schema, format_checker=Draft202012Validator.FORMAT_CHECKER)
+        return [f"{e.json_path}: {e.message}" for e in sorted(v.iter_errors(config), key=lambda e: e.json_path)]
 
     def validate_config(self: ConfigValidatorService, config):
         v = Draft202012Validator(self.schema, format_checker=Draft202012Validator.FORMAT_CHECKER)
@@ -1955,3 +2047,12 @@ def remove_required_keys(schema: dict | list) -> dict | list:
     # print(type(schema), schema)
     return schema
     # raise TypeError("Schema must be dict or list.")
+
+
+def remove_unknown_key_limits(schema: dict | list) -> dict | list:
+    """Remove `additionalProperties` and `maxProperties` from the config validator schema, so that unknown keys are preserved."""
+    if isinstance(schema, dict):
+        return {key: remove_unknown_key_limits(value) for key, value in schema.items() if key not in {"additionalProperties", "maxProperties"}}
+    if isinstance(schema, list):
+        return [remove_unknown_key_limits(item) for item in schema]
+    return schema
