@@ -71,3 +71,11 @@ _Avoid_: Job, Task
 **Diagnosis**:
 The structured result of an Output's health check: status, human message and suggested fix.
 _Avoid_: Health check
+
+**Config Migration**:
+The one-time, backed-up conversion of an older configuration to the current format, which never alters the original file.
+_Avoid_: Upgrade, converter
+
+**Migration Report**:
+The structured record of what a Config Migration changed and which values could not be carried over exactly.
+_Avoid_: Migration log
