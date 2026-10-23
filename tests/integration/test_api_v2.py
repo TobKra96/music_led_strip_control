@@ -161,7 +161,7 @@ def test_missing_resource_raises_a_coded_problem(client):
     log_in(client)
 
     body = assert_problem(client.get("/api/v2/devices/device_9"), 404, "DeviceNotFound")
-    assert body["detail"] == "Device does not exist."
+    assert body["detail"] == "Device device_9 does not exist."
 
 
 def test_unexpected_errors_are_a_500_problem(client, fake_executer):

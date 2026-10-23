@@ -1,6 +1,62 @@
 {
   "components": {
     "schemas": {
+      "ActiveEffectListOut": {
+        "items": {
+          "$ref": "#/components/schemas/ActiveEffectOut"
+        },
+        "title": "ActiveEffectListOut",
+        "type": "array"
+      },
+      "ActiveEffectOut": {
+        "properties": {
+          "device_id": {
+            "title": "Device Id",
+            "type": "string"
+          },
+          "effect": {
+            "title": "Effect",
+            "type": "string"
+          }
+        },
+        "required": [
+          "device_id",
+          "effect"
+        ],
+        "title": "ActiveEffectOut",
+        "type": "object"
+      },
+      "BulkEffectBody": {
+        "properties": {
+          "device_ids": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "minItems": 1,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "The devices to change. Omit to change all devices.",
+            "title": "Device Ids"
+          },
+          "effect": {
+            "description": "Effect id, or a special effect such as `effect_off` and `effect_random_cycle`.",
+            "title": "Effect",
+            "type": "string"
+          }
+        },
+        "required": [
+          "effect"
+        ],
+        "title": "BulkEffectBody",
+        "type": "object"
+      },
       "ComponentVersion": {
         "properties": {
           "name": {
@@ -17,6 +73,35 @@
           "version"
         ],
         "title": "ComponentVersion",
+        "type": "object"
+      },
+      "ConfigDocument": {
+        "additionalProperties": true,
+        "description": "The whole configuration as stored in `config.json`.",
+        "title": "ConfigDocument",
+        "type": "object"
+      },
+      "DeviceEffectOut": {
+        "properties": {
+          "device_id": {
+            "title": "Device Id",
+            "type": "string"
+          },
+          "effect": {
+            "title": "Effect",
+            "type": "string"
+          },
+          "random_cycle_active": {
+            "title": "Random Cycle Active",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "device_id",
+          "effect",
+          "random_cycle_active"
+        ],
+        "title": "DeviceEffectOut",
         "type": "object"
       },
       "DeviceListOut": {
@@ -51,6 +136,20 @@
         "title": "DeviceOut",
         "type": "object"
       },
+      "EffectBody": {
+        "properties": {
+          "effect": {
+            "description": "Effect id, or a special effect such as `effect_off` and `effect_random_cycle`.",
+            "title": "Effect",
+            "type": "string"
+          }
+        },
+        "required": [
+          "effect"
+        ],
+        "title": "EffectBody",
+        "type": "object"
+      },
       "FieldError": {
         "properties": {
           "detail": {
@@ -68,6 +167,78 @@
           "detail"
         ],
         "title": "FieldError",
+        "type": "object"
+      },
+      "GroupCreate": {
+        "properties": {
+          "name": {
+            "maxLength": 75,
+            "minLength": 1,
+            "pattern": "^[a-zA-Z\u0430-\u044f\u0410-\u042f0-9_ ()-]+$",
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "title": "GroupCreate",
+        "type": "object"
+      },
+      "GroupListOut": {
+        "items": {
+          "$ref": "#/components/schemas/GroupOut"
+        },
+        "title": "GroupListOut",
+        "type": "array"
+      },
+      "GroupMembers": {
+        "properties": {
+          "device_ids": {
+            "description": "Exactly these devices are members afterwards.",
+            "items": {
+              "type": "string"
+            },
+            "title": "Device Ids",
+            "type": "array"
+          }
+        },
+        "required": [
+          "device_ids"
+        ],
+        "title": "GroupMembers",
+        "type": "object"
+      },
+      "GroupOut": {
+        "properties": {
+          "device_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Device Ids",
+            "type": "array"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "device_ids"
+        ],
+        "title": "GroupOut",
+        "type": "object"
+      },
+      "InfoOut": {
+        "additionalProperties": true,
+        "description": "Information as reported by the host.",
+        "title": "InfoOut",
         "type": "object"
       },
       "LoginBody": {
@@ -168,6 +339,12 @@
         "title": "Problem",
         "type": "object"
       },
+      "ResourceOut": {
+        "additionalProperties": true,
+        "description": "Id to display name.",
+        "title": "ResourceOut",
+        "type": "object"
+      },
       "SessionOut": {
         "properties": {
           "authenticated": {
@@ -184,6 +361,18 @@
           "pin_required"
         ],
         "title": "SessionOut",
+        "type": "object"
+      },
+      "SettingsOut": {
+        "additionalProperties": true,
+        "description": "All settings of the owner, as stored in the configuration.",
+        "title": "SettingsOut",
+        "type": "object"
+      },
+      "SettingsPatch": {
+        "additionalProperties": true,
+        "description": "A partial update: only the given settings change, nested objects are merged.",
+        "title": "SettingsPatch",
         "type": "object"
       },
       "VersionsOut": {
@@ -492,6 +681,110 @@
         ]
       }
     },
+    "/api/v2/config": {
+      "get": {
+        "operationId": "settings_api_v2_export_config_config_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConfigDocument"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        },
+        "summary": "Export the configuration",
+        "tags": [
+          "Settings"
+        ]
+      },
+      "put": {
+        "description": "Older configuration versions are migrated. An unusable document changes nothing.",
+        "operationId": "settings_api_v2_import_config_config_put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfigDocument"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "415": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unsupported Media Type"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        },
+        "summary": "Import a configuration",
+        "tags": [
+          "Settings"
+        ]
+      }
+    },
     "/api/v2/devices": {
       "get": {
         "operationId": "devices_api_v2_list_devices_get",
@@ -531,9 +824,123 @@
         "tags": [
           "Devices"
         ]
+      },
+      "post": {
+        "operationId": "devices_api_v2_create_device_post",
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeviceOut"
+                }
+              }
+            },
+            "description": "Created"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "415": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unsupported Media Type"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        },
+        "summary": "Create a device with default settings",
+        "tags": [
+          "Devices"
+        ]
       }
     },
     "/api/v2/devices/{device_id}": {
+      "delete": {
+        "operationId": "devices_api_v2_delete_device__device_id__delete",
+        "parameters": [
+          {
+            "description": "Stable device id, e.g. `device_0`.",
+            "in": "path",
+            "name": "device_id",
+            "required": true,
+            "schema": {
+              "description": "Stable device id, e.g. `device_0`.",
+              "title": "Device Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        },
+        "summary": "Delete a device",
+        "tags": [
+          "Devices"
+        ]
+      },
       "get": {
         "operationId": "devices_api_v2_get_device__device_id__get",
         "parameters": [
@@ -597,6 +1004,578 @@
         ]
       }
     },
+    "/api/v2/devices/{device_id}/effect": {
+      "get": {
+        "operationId": "effects_api_v2_get_device_effect_devices__device_id__effect_get",
+        "parameters": [
+          {
+            "description": "Stable device id, e.g. `device_0`.",
+            "in": "path",
+            "name": "device_id",
+            "required": true,
+            "schema": {
+              "description": "Stable device id, e.g. `device_0`.",
+              "title": "Device Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeviceEffectOut"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        },
+        "summary": "Get the active effect of a device",
+        "tags": [
+          "Effects"
+        ]
+      },
+      "put": {
+        "operationId": "effects_api_v2_set_device_effect_devices__device_id__effect_put",
+        "parameters": [
+          {
+            "description": "Stable device id, e.g. `device_0`.",
+            "in": "path",
+            "name": "device_id",
+            "required": true,
+            "schema": {
+              "description": "Stable device id, e.g. `device_0`.",
+              "title": "Device Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EffectBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeviceEffectOut"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "415": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unsupported Media Type"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        },
+        "summary": "Set the effect of a device",
+        "tags": [
+          "Effects"
+        ]
+      }
+    },
+    "/api/v2/devices/{device_id}/effects/{effect}/settings": {
+      "get": {
+        "operationId": "devices_api_v2_get_effect_settings__device_id__effects__effect__settings_get",
+        "parameters": [
+          {
+            "description": "Stable device id, e.g. `device_0`.",
+            "in": "path",
+            "name": "device_id",
+            "required": true,
+            "schema": {
+              "description": "Stable device id, e.g. `device_0`.",
+              "title": "Device Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Effect id, e.g. `effect_single`.",
+            "in": "path",
+            "name": "effect",
+            "required": true,
+            "schema": {
+              "description": "Effect id, e.g. `effect_single`.",
+              "title": "Effect",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SettingsOut"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        },
+        "summary": "Get the settings of one effect of a device",
+        "tags": [
+          "Devices"
+        ]
+      },
+      "patch": {
+        "operationId": "devices_api_v2_patch_effect_settings__device_id__effects__effect__settings_patch",
+        "parameters": [
+          {
+            "description": "Stable device id, e.g. `device_0`.",
+            "in": "path",
+            "name": "device_id",
+            "required": true,
+            "schema": {
+              "description": "Stable device id, e.g. `device_0`.",
+              "title": "Device Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Effect id, e.g. `effect_single`.",
+            "in": "path",
+            "name": "effect",
+            "required": true,
+            "schema": {
+              "description": "Effect id, e.g. `effect_single`.",
+              "title": "Effect",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SettingsPatch"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SettingsOut"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "415": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unsupported Media Type"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        },
+        "summary": "Update some settings of one effect of a device",
+        "tags": [
+          "Devices"
+        ]
+      }
+    },
+    "/api/v2/devices/{device_id}/settings": {
+      "get": {
+        "operationId": "devices_api_v2_get_device_settings__device_id__settings_get",
+        "parameters": [
+          {
+            "description": "Stable device id, e.g. `device_0`.",
+            "in": "path",
+            "name": "device_id",
+            "required": true,
+            "schema": {
+              "description": "Stable device id, e.g. `device_0`.",
+              "title": "Device Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SettingsOut"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        },
+        "summary": "Get the settings of a device",
+        "tags": [
+          "Devices"
+        ]
+      },
+      "patch": {
+        "description": "Output settings are updated the same way, nested under `output`.",
+        "operationId": "devices_api_v2_patch_device_settings__device_id__settings_patch",
+        "parameters": [
+          {
+            "description": "Stable device id, e.g. `device_0`.",
+            "in": "path",
+            "name": "device_id",
+            "required": true,
+            "schema": {
+              "description": "Stable device id, e.g. `device_0`.",
+              "title": "Device Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SettingsPatch"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SettingsOut"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "415": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unsupported Media Type"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        },
+        "summary": "Update some settings of a device",
+        "tags": [
+          "Devices"
+        ]
+      }
+    },
+    "/api/v2/effect": {
+      "get": {
+        "operationId": "effects_api_v2_get_active_effects_effect_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActiveEffectListOut"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        },
+        "summary": "Get the active effect of every device",
+        "tags": [
+          "Effects"
+        ]
+      },
+      "put": {
+        "description": "All-or-nothing: every target is checked first, and the 404 names the unknown device.",
+        "operationId": "effects_api_v2_set_active_effects_effect_put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BulkEffectBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActiveEffectListOut"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "415": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unsupported Media Type"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        },
+        "summary": "Set the effect of several devices at once",
+        "tags": [
+          "Effects"
+        ]
+      }
+    },
     "/api/v2/events": {
       "get": {
         "description": "One multiplexed `text/event-stream` with `device.status`, `diagnosis`, `mic.level`, `wifi.state`, `system.stats` and `operation`.<br/><br/>Notifications only. The low-rate events carry an `id`; reconnect with `Last-Event-ID` to receive the ones missed.",
@@ -639,6 +1618,871 @@
         "summary": "Subscribe to server events",
         "tags": [
           "Events"
+        ]
+      }
+    },
+    "/api/v2/groups": {
+      "get": {
+        "operationId": "groups_api_v2_list_groups_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GroupListOut"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        },
+        "summary": "List groups",
+        "tags": [
+          "Groups"
+        ]
+      },
+      "post": {
+        "operationId": "groups_api_v2_create_group_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GroupCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GroupOut"
+                }
+              }
+            },
+            "description": "Created"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "415": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unsupported Media Type"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        },
+        "summary": "Create a group",
+        "tags": [
+          "Groups"
+        ]
+      }
+    },
+    "/api/v2/groups/{group_id}": {
+      "delete": {
+        "operationId": "groups_api_v2_delete_group__group_id__delete",
+        "parameters": [
+          {
+            "description": "Stable group id, e.g. `group_0`.",
+            "in": "path",
+            "name": "group_id",
+            "required": true,
+            "schema": {
+              "description": "Stable group id, e.g. `group_0`.",
+              "title": "Group Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        },
+        "summary": "Delete a group",
+        "tags": [
+          "Groups"
+        ]
+      },
+      "get": {
+        "operationId": "groups_api_v2_get_group__group_id__get",
+        "parameters": [
+          {
+            "description": "Stable group id, e.g. `group_0`.",
+            "in": "path",
+            "name": "group_id",
+            "required": true,
+            "schema": {
+              "description": "Stable group id, e.g. `group_0`.",
+              "title": "Group Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GroupOut"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        },
+        "summary": "Get a group",
+        "tags": [
+          "Groups"
+        ]
+      }
+    },
+    "/api/v2/groups/{group_id}/devices": {
+      "put": {
+        "description": "All-or-nothing: if any id is unknown, the 404 names it and no membership changes.",
+        "operationId": "groups_api_v2_set_group_devices__group_id__devices_put",
+        "parameters": [
+          {
+            "description": "Stable group id, e.g. `group_0`.",
+            "in": "path",
+            "name": "group_id",
+            "required": true,
+            "schema": {
+              "description": "Stable group id, e.g. `group_0`.",
+              "title": "Group Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GroupMembers"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GroupOut"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "415": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unsupported Media Type"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        },
+        "summary": "Replace the members of a group",
+        "tags": [
+          "Groups"
+        ]
+      }
+    },
+    "/api/v2/resources/audio-devices": {
+      "get": {
+        "operationId": "resources_api_v2_audio_devices_audio_devices_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResourceOut"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        },
+        "summary": "List the audio input devices",
+        "tags": [
+          "Resources"
+        ]
+      }
+    },
+    "/api/v2/resources/colors": {
+      "get": {
+        "operationId": "resources_api_v2_colors_colors_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResourceOut"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        },
+        "summary": "List the colours",
+        "tags": [
+          "Resources"
+        ]
+      }
+    },
+    "/api/v2/resources/effects": {
+      "get": {
+        "description": "List the effect ids as `non_music`, `music` and `special`, plus their display `order`.",
+        "operationId": "resources_api_v2_effects_effects_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResourceOut"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        },
+        "summary": "List the effects by kind",
+        "tags": [
+          "Resources"
+        ]
+      }
+    },
+    "/api/v2/resources/gradients": {
+      "get": {
+        "operationId": "resources_api_v2_gradients_gradients_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResourceOut"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        },
+        "summary": "List the gradients",
+        "tags": [
+          "Resources"
+        ]
+      }
+    },
+    "/api/v2/resources/logging-levels": {
+      "get": {
+        "operationId": "resources_api_v2_logging_levels_logging_levels_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResourceOut"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        },
+        "summary": "List the logging levels",
+        "tags": [
+          "Resources"
+        ]
+      }
+    },
+    "/api/v2/resources/output-types": {
+      "get": {
+        "operationId": "resources_api_v2_output_types_output_types_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResourceOut"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        },
+        "summary": "List the output types",
+        "tags": [
+          "Resources"
+        ]
+      }
+    },
+    "/api/v2/settings": {
+      "delete": {
+        "description": "Reset everything, not only the global settings: devices and groups are removed too.",
+        "operationId": "settings_api_v2_reset_settings_settings_delete",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SettingsOut"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        },
+        "summary": "Reset the whole configuration to the defaults",
+        "tags": [
+          "Settings"
+        ]
+      },
+      "get": {
+        "operationId": "settings_api_v2_get_settings_settings_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SettingsOut"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        },
+        "summary": "Get the global settings",
+        "tags": [
+          "Settings"
+        ]
+      },
+      "patch": {
+        "operationId": "settings_api_v2_patch_settings_settings_patch",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SettingsPatch"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SettingsOut"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "415": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unsupported Media Type"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        },
+        "summary": "Update some global settings",
+        "tags": [
+          "Settings"
+        ]
+      }
+    },
+    "/api/v2/system/device-status": {
+      "get": {
+        "operationId": "system_api_v2_get_device_status_device_status_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InfoOut"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        },
+        "summary": "Check whether each device is reachable",
+        "tags": [
+          "System"
+        ]
+      }
+    },
+    "/api/v2/system/performance": {
+      "get": {
+        "operationId": "system_api_v2_get_performance_performance_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InfoOut"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        },
+        "summary": "Get CPU, memory, disk and network usage",
+        "tags": [
+          "System"
+        ]
+      }
+    },
+    "/api/v2/system/services": {
+      "get": {
+        "operationId": "system_api_v2_get_services_services_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InfoOut"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        },
+        "summary": "Get the status of the system services",
+        "tags": [
+          "System"
+        ]
+      }
+    },
+    "/api/v2/system/temperature": {
+      "get": {
+        "operationId": "system_api_v2_get_temperature_temperature_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InfoOut"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        },
+        "summary": "Get the CPU temperature",
+        "tags": [
+          "System"
         ]
       }
     },
@@ -692,6 +2536,22 @@
     {
       "description": "Configured LED strip devices",
       "name": "Devices"
+    },
+    {
+      "description": "Named sets of devices",
+      "name": "Groups"
+    },
+    {
+      "description": "The effect shown on each device",
+      "name": "Effects"
+    },
+    {
+      "description": "Lists of the values that settings can take",
+      "name": "Resources"
+    },
+    {
+      "description": "Global settings and the configuration file",
+      "name": "Settings"
     },
     {
       "description": "Server and host information",

@@ -156,6 +156,18 @@ class DeviceExecuter(ExecuterBase):
         self.refresh_device(self.all_devices_id)
         return self.get_groups()
 
+    def set_group_devices(self, group_id: str, device_ids: list[str]) -> None:
+        """Make exactly `device_ids` the members of a group. The caller has checked that the group and the devices exist."""
+        group_name = self._config["general_settings"]["device_groups"][group_id]
+        for device_id, device in self._config["device_configs"].items():
+            if device_id in device_ids:
+                device["device_groups"][group_id] = group_name
+            else:
+                device["device_groups"].pop(group_id, None)
+
+        self.save_config()
+        self.refresh_device(self.all_devices_id)
+
     def remove_invalid_device_groups(self) -> dict[str, dict[str, str]]:
         """Compare device groups with global groups and remove any that do not exist.
 

@@ -7,14 +7,18 @@ from flask_openapi3 import OpenAPI
 
 from mlsc.api.v2.auth import auth_api
 from mlsc.api.v2.devices import devices_api
+from mlsc.api.v2.effects import effects_api
 from mlsc.api.v2.errors import API_V2_PREFIX, register_error_handlers
 from mlsc.api.v2.events import events_api
+from mlsc.api.v2.groups import groups_api
+from mlsc.api.v2.resources import resources_api
 from mlsc.api.v2.security import require_json_writes
+from mlsc.api.v2.settings import settings_api
 from mlsc.api.v2.system import system_api
 from mlsc.api.v2.throttle import LoginLimiter
 
 SPEC_PATH = f"{API_V2_PREFIX}openapi.json"
-API_V2_BLUEPRINTS = (auth_api, devices_api, system_api, events_api)
+API_V2_BLUEPRINTS = (auth_api, devices_api, groups_api, effects_api, resources_api, settings_api, system_api, events_api)
 
 
 # Fixed response descriptions: the stdlib phrases differ between Python versions (422 is "Unprocessable Entity" before 3.13).

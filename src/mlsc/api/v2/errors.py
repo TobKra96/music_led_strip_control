@@ -35,6 +35,10 @@ class Problem(BaseModel):
     errors: list[FieldError] | None = Field(default=None, description="Per-field validation errors.")
 
 
+READ_ERRORS = {"401": Problem, "404": Problem}
+WRITE_ERRORS = {**READ_ERRORS, "415": Problem, "422": Problem}
+
+
 class InvalidPin(_Message):
     _message = "Invalid PIN."
     _code = HTTPStatus.UNAUTHORIZED.value

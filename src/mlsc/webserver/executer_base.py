@@ -73,7 +73,6 @@ class ExecuterBase:
 
         # Initial config load.
         self._config_instance = ConfigService.instance(self._config_lock)
-        self._config = self._config_instance.config
 
         self.export_config_path = self._config_instance.get_config_path()
 
@@ -84,6 +83,15 @@ class ExecuterBase:
             self.scheduler.start()
 
         atexit.register(self.shutdown_scheduler)
+
+    @property
+    def _config(self) -> dict:
+        """The live config. Read through the service, so that an import or reset is seen by every executer."""
+        return self._config_instance.config
+
+    @_config.setter
+    def _config(self, config: dict) -> None:
+        self._config_instance.config = config
 
     def shutdown_scheduler(self):
         if self.scheduler.running:
