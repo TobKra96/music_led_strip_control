@@ -10,6 +10,7 @@ import numpy as np
 import pytest
 from conftest import FakeDevice
 
+from mlsc.config_converter.config_converter_v4 import LED_STRIP_MAPPING
 from mlsc.outputs.output_udp import OutputUDP
 
 pytestmark = pytest.mark.contract
@@ -17,6 +18,8 @@ pytestmark = pytest.mark.contract
 # Pixel 0 is (R, G, B) = (10, 20, 30), pixel 1 is (40, 50, 60), pixel 2 is (70, 80, 90).
 RGB_FRAME = np.array([[10, 40, 70], [20, 50, 80], [30, 60, 90]], dtype=float)
 RGBW_FRAME = np.vstack([RGB_FRAME, [[1, 2, 3]]])
+
+LED_STRIPS = {name: mapping[:3] for name, mapping in LED_STRIP_MAPPING.items()}
 
 
 @pytest.fixture
@@ -29,8 +32,11 @@ def receiver():
 
 
 def make_output(receiver, led_strip="ws2811_strip_rgb", brightness=100):
+    chip_family, colour_order, white_channel = LED_STRIPS[led_strip]
     config = {
-        "led_strip": led_strip,
+        "chip_family": chip_family,
+        "colour_order": colour_order,
+        "white_channel": white_channel,
         "led_brightness": brightness,
         "output": {"output_udp": {"udp_client_ip": "127.0.0.1", "udp_client_port": str(receiver.getsockname()[1])}},
     }

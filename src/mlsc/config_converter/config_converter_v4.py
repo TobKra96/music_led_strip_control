@@ -75,6 +75,7 @@ class ConfigConverterV4(ConfigConverterBase):
         general_settings = config.setdefault("general_settings", {})
         self.convert_devices(config, report)
         self.add_audio_section(config, general_settings, audio_devices, report)
+        self.drop_legacy_keys(config, general_settings, report)
         config.setdefault("wifi", copy.deepcopy(DEFAULT_WIFI))
         config["id_counters"] = self.id_counters(config)
         config["version"] = 4
@@ -98,10 +99,13 @@ class ConfigConverterV4(ConfigConverterBase):
 
     @staticmethod
     def convert_led_strip(device: dict, path: str, report: MigrationReport) -> None:
+        led_strip = device.pop("led_strip", None)
+        if led_strip is not None:
+            report.add("info", "led_strip_removed", f"{path}.led_strip", f"Replaced LED strip {led_strip!r} by chip family, colour order and white channel.", led_strip)
+
         if "chip_family" in device:
             return
 
-        led_strip = device.get("led_strip")
         mapping = LED_STRIP_MAPPING.get(led_strip)
 
         if mapping is None:
@@ -159,6 +163,14 @@ class ConfigConverterV4(ConfigConverterBase):
             "max_frequency": general_settings.get("max_frequency", 16000),
             "min_volume_threshold": general_settings.get("min_volume_threshold", 0.001),
         }
+
+    @staticmethod
+    def drop_legacy_keys(config: dict, general_settings: dict, report: MigrationReport) -> None:
+        if "led_strips" in config:
+            report.add("info", "led_strips_removed", "led_strips", "Removed the LED strip table, which chip family and colour order replace.", config.pop("led_strips"))
+        if "device_id" in general_settings:
+            report.add("info", "device_id_removed", "general_settings.device_id",
+                       "Removed the microphone index, which the audio device name replaces.", general_settings.pop("device_id"))
 
     @staticmethod
     def id_counters(config: dict) -> dict:

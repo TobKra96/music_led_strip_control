@@ -12,7 +12,6 @@ ONE_GENERAL_SETTING_SCHEMA = {
             "enum": [
                 "default_sample_rate",
                 "device_groups",
-                "device_id",
                 "frames_per_buffer",
                 "log_file_enabled",
                 "log_level_console",

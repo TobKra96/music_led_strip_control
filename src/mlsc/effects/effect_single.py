@@ -1,6 +1,7 @@
 import numpy as np
 
 from mlsc.effects.effect import Effect
+from mlsc.strip import has_white_channel
 
 
 class EffectSingle(Effect):
@@ -8,12 +9,12 @@ class EffectSingle(Effect):
         """Show one single color."""
         # Get the config of the current effect.
         effect_config = self.get_effect_config("effect_single")
-        self._led_strip = self._device.device_config["led_strip"]
+        white_channel = has_white_channel(self._device.device_config)
         # Set Fallback Strip
         # self._led_strip_translated = ws.WS2811_STRIP_RGB
 
         # Build an empty array.
-        if "sk6812" in self._led_strip:
+        if white_channel:
             output_array = np.zeros((4, self._device.device_config["led_count"]))
         else:
             output_array = np.zeros((3, self._device.device_config["led_count"]))
@@ -28,7 +29,7 @@ class EffectSingle(Effect):
             output_array[1][:] = self._config_colours[effect_config["color"]][1]
             output_array[2][:] = self._config_colours[effect_config["color"]][2]
 
-        if "sk6812" in self._led_strip:
+        if white_channel:
             output_array[3][:] = effect_config["white"]
 
         # Add the output array to the queue.

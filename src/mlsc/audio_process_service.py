@@ -48,48 +48,22 @@ class AudioProcessService:
 
             self.log_output(show_output, "INFO", "Found the following audio sources:")
 
-            # Select the audio device you want to use.
-            selected_device_list_index = 0
-            try:
-                mic_id = self._config["general_settings"]["device_id"]
-                # -1 means no mic available, we can return now to prevent further load
-                if mic_id == -1:
-                    return
-                selected_device_list_index = int(mic_id)
-            except Exception:
-                logger.exception("Could not parse audio id.")
+            audio_config = self._config["audio"]
 
-            # Check if the index is inside the list.
+            # Select the audio device by name. No name means the system default.
+            device_name = audio_config["device_name"]
             self.selected_device = None
-            # For each audio device, add to list of devices.
-            for current_audio_device in self._devices:
-
-                if current_audio_device.device_id == selected_device_list_index:
-                    self.selected_device = current_audio_device
+            if device_name is not None:
+                self.selected_device = next((d for d in self._devices if d.name == device_name), None)
+                if self.selected_device is None:
+                    self.log_output(show_output, "ERROR", f"Could not find the mic named {device_name!r}. Using the system default.")
+            if self.selected_device is None:
+                self.selected_device = AudioInfo.get_default_audio_device(self._py_audio)
 
             logger.debug(f"Selected Device: {self.selected_device}")
 
-            # Could not find a mic with the selected mic id, so I will use the first device I found.
-            if self.selected_device is None:
-                self.log_output(show_output, "ERROR",
-                                "********************************************************")
-                self.log_output(show_output, "ERROR",
-                                "*                      Error                           *")
-                self.log_output(show_output, "ERROR",
-                                "********************************************************")
-                self.log_output(show_output, "ERROR",
-                                f"Could not find the mic with the id: {selected_device_list_index}")
-                self.log_output(show_output, "ERROR",
-                                "Using the first mic as fallback.")
-                self.log_output(show_output, "ERROR",
-                                "Please change the id of the mic inside the config.")
-                try:
-                    self.selected_device = self._devices[0]
-                except IndexError:
-                    self.selected_device = AudioInfo.get_default_audio_device(self._py_audio)
-
-            self._device_rate = self._config["general_settings"]["default_sample_rate"]
-            self._frames_per_buffer = self._config["general_settings"]["frames_per_buffer"]
+            self._device_rate = audio_config["sample_rate"]
+            self._frames_per_buffer = audio_config["frames_per_buffer"]
             self.n_fft_bins = self._config["general_settings"]["n_fft_bins"]
             self.log_output(show_output, "INFO", f"Selected Device: {self.selected_device.to_string()}")
 
@@ -187,7 +161,7 @@ class AudioProcessService:
             audio_datas = self._dsp.update(y)
 
             # Check if value is higher than min value.
-            if audio_datas["vol"] < self._config["general_settings"]["min_volume_threshold"]:
+            if audio_datas["vol"] < self._config["audio"]["min_volume_threshold"]:
                 # Fill the array with zeros, to fade out the effect.
                 audio_datas["mel"] = np.zeros(self.n_fft_bins)
 

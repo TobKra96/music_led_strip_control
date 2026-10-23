@@ -3,6 +3,7 @@ from time import time
 import numpy as np
 
 from mlsc.effects.effect import Effect
+from mlsc.strip import has_white_channel
 
 
 class EffectStrobe(Effect):
@@ -22,7 +23,7 @@ class EffectStrobe(Effect):
     def run(self):
         # Get the config of the current effect.
         effect_config = self.get_effect_config("effect_strobe")
-        self._led_strip = self._device.device_config["led_strip"]
+        white_channel = has_white_channel(self._device.device_config)
 
         speed = effect_config["speed"]
 
@@ -33,7 +34,7 @@ class EffectStrobe(Effect):
             self.current_state = not self.current_state
 
         # Build an empty array.
-        if "sk6812" in self._led_strip:
+        if white_channel:
             output_array = np.zeros((4, self._device.device_config["led_count"]))
         else:
             output_array = np.zeros((3, self._device.device_config["led_count"]))
@@ -47,7 +48,7 @@ class EffectStrobe(Effect):
         for i in range(3):
             output_array[i][:] = color[i]
 
-        if "sk6812" in self._led_strip:
+        if white_channel:
             output_array[3][:] = effect_config["white"]
 
         # Add the output array to the queue.

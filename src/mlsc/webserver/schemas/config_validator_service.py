@@ -65,25 +65,6 @@ gradient_enum = [
     "sunset"
 ]
 
-led_strips_enum = [
-    "sk6812_shift_wmask",
-    "sk6812_strip",
-    "sk6812_strip_bgrw",
-    "sk6812_strip_brgw",
-    "sk6812_strip_gbrw",
-    "sk6812_strip_grbw",
-    "sk6812_strip_rbgw",
-    "sk6812_strip_rgbw",
-    "sk6812w_strip",
-    "ws2811_strip_bgr",
-    "ws2811_strip_brg",
-    "ws2811_strip_gbr",
-    "ws2811_strip_grb",
-    "ws2811_strip_rbg",
-    "ws2811_strip_rgb",
-    "ws2812_strip"
-]
-
 log_level_enum = [
     "notset",
     "debug",
@@ -1477,8 +1458,8 @@ id_counters_schema = {
 device_schema = {
     "type": "object",
     "additionalProperties": False,
-    "maxProperties": 15,
-    "minProperties": 15,
+    "maxProperties": 14,
+    "minProperties": 14,
     "required": [
         "chip_family",
         "colour_order",
@@ -1490,7 +1471,6 @@ device_schema = {
         "led_brightness",
         "led_count",
         "led_mid",
-        "led_strip",
         "output",
         "output_type",
         "power_limit",
@@ -1537,9 +1517,6 @@ device_schema = {
         "led_mid": {
             "type": "integer",
             "minimum": 1
-        },
-        "led_strip": {
-            "enum": led_strips_enum
         },
         "output": {
             "type": "object",
@@ -1698,12 +1675,11 @@ device_configs_schema = {
 general_settings_schema = {
     "type": "object",
     "additionalProperties": False,
-    "maxProperties": 13,
-    "minProperties": 13,
+    "maxProperties": 12,
+    "minProperties": 12,
     "required": [
         "default_sample_rate",
         "device_groups",
-        "device_id",
         "frames_per_buffer",
         "log_file_enabled",
         "log_level_console",
@@ -1730,11 +1706,6 @@ general_settings_schema = {
             "patternProperties": {
                 valid_group_id: valid_name_type
             }
-        },
-        "device_id": {
-            "type": "integer",
-            "minimum": -1,
-            "maximum": 100
         },
         "frames_per_buffer": {
             "type": "integer",
@@ -1866,64 +1837,6 @@ gradients_schema = {
     }
 }
 
-led_strips_schema = {
-    "type": "object",
-    "additionalProperties": False,
-    "maxProperties": 16,
-    "minProperties": 16,
-    "required": led_strips_enum,
-    "properties": {
-        "sk6812_shift_wmask": {
-            "const": "sk6812_shift_wmask"
-        },
-        "sk6812_strip": {
-            "const": "sk6812_default"
-        },
-        "sk6812_strip_bgrw": {
-            "const": "sk6812_strip_bgrw"
-        },
-        "sk6812_strip_brgw": {
-            "const": "sk6812_strip_brgw"
-        },
-        "sk6812_strip_gbrw": {
-            "const": "sk6812_strip_gbrw"
-        },
-        "sk6812_strip_grbw": {
-            "const": "sk6812_strip_grbw"
-        },
-        "sk6812_strip_rbgw": {
-            "const": "sk6812_strip_rbgw"
-        },
-        "sk6812_strip_rgbw": {
-            "const": "sk6812_strip_rgbw"
-        },
-        "sk6812w_strip": {
-            "const": "sk6812w_default"
-        },
-        "ws2811_strip_bgr": {
-            "const": "ws281x_bgr"
-        },
-        "ws2811_strip_brg": {
-            "const": "ws281x_brg"
-        },
-        "ws2811_strip_gbr": {
-            "const": "ws281x_gbr"
-        },
-        "ws2811_strip_grb": {
-            "const": "ws281x_grb"
-        },
-        "ws2811_strip_rbg": {
-            "const": "ws281x_rbg"
-        },
-        "ws2811_strip_rgb": {
-            "const": "ws281x_rgb"
-        },
-        "ws2812_strip": {
-            "const": "ws281x_default"
-        },
-    }
-}
-
 logging_levels_schema = {
     "type": "object",
     "additionalProperties": False,
@@ -1973,8 +1886,8 @@ definitions = {
 schema = {
     "type": "object",
     "additionalProperties": False,
-    "maxProperties": 12,
-    "minProperties": 12,
+    "maxProperties": 11,
+    "minProperties": 11,
     "required": [
         "audio",
         "colors",
@@ -1984,7 +1897,6 @@ schema = {
         "general_settings",
         "gradients",
         "id_counters",
-        "led_strips",
         "logging_levels",
         "version",
         "wifi"
@@ -1999,7 +1911,6 @@ schema = {
         "device_configs": device_configs_schema,
         "general_settings": general_settings_schema,
         "gradients": gradients_schema,
-        "led_strips": led_strips_schema,
         "logging_levels": logging_levels_schema,
         "version": version_schema
     },

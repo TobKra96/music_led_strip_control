@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from mlsc.audio_info import AudioInfo
+from mlsc.config_converter.config_converter_v4 import LED_STRIP_MAPPING
 from mlsc.effects_enum import EffectNames, EffectsEnum
 from mlsc.webserver.executer_base import ExecuterBase
 
@@ -16,8 +17,8 @@ class GeneralExecuter(ExecuterBase):
         return {key: key for key in self._config["gradients"]}
 
     def get_led_strips(self) -> dict[str, str]:
-        """Return LED strips."""
-        return dict(self._config["led_strips"])
+        """Return the legacy LED strip names, kept for the v1 API until its adapters map them."""
+        return {name: name for name in LED_STRIP_MAPPING}
 
     def get_logging_levels(self) -> dict[str, str]:
         """Return logging levels."""

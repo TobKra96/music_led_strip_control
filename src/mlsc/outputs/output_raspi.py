@@ -2,6 +2,7 @@ import numpy as np
 from loguru import logger
 
 from mlsc.outputs.output import Output
+from mlsc.strip import has_white_channel, rpi_ws281x_strip_type
 
 
 class OutputRaspi(Output):
@@ -25,35 +26,15 @@ class OutputRaspi(Output):
         self._led_brightness = int(self._device_config["led_brightness"])  # Set to '0' for darkest and 100 for brightest.
         self._led_invert = int(self._device_config["output"][output_id]["led_invert"])          # Set to 'True' to invert the signal (when using NPN transistor level shift).
         self._led_channel = int(self._device_config["output"][output_id]["led_channel"])        # set to '1' for GPIOs 13, 19, 41, 45 or 53.
-        self._led_strip = self._device_config["led_strip"]
+        self._white_channel = has_white_channel(self._device_config)
 
         # Set Fallback Strip
         self._led_strip_translated = ws.WS2811_STRIP_RGB
 
-        self._led_strip_mapper = {
-            "sk6812_strip_rgbw": ws.SK6812_STRIP_RGBW,
-            "sk6812_strip_rbgw": ws.SK6812_STRIP_RBGW,
-            "sk6812_strip_grbw": ws.SK6812_STRIP_GRBW,
-            "sk6812_strip_gbrw": ws.SK6812_STRIP_GBRW,
-            "sk6812_strip_brgw": ws.SK6812_STRIP_BRGW,
-            "sk6812_strip_bgrw": ws.SK6812_STRIP_BGRW,
-            "sk6812_shift_wmask": ws.SK6812_SHIFT_WMASK,
-            "ws2811_strip_rgb": ws.WS2811_STRIP_RGB,
-            "ws2811_strip_rbg": ws.WS2811_STRIP_RBG,
-            "ws2811_strip_grb": ws.WS2811_STRIP_GRB,
-            "ws2811_strip_gbr": ws.WS2811_STRIP_GBR,
-            "ws2811_strip_brg": ws.WS2811_STRIP_BRG,
-            "ws2811_strip_bgr": ws.WS2811_STRIP_BGR,
-            "ws2812_strip": ws.WS2812_STRIP,
-            "sk6812_strip": ws.SK6812_STRIP,
-            "sk6812w_strip": ws.SK6812W_STRIP
-        }
-
         try:
-            led_strip = self._led_strip_mapper[self._led_strip]
-            if led_strip is not None:
-                self._led_strip_translated = led_strip
-                logger.debug(f"Found Led Strip {self._led_strip}")
+            strip_type = rpi_ws281x_strip_type(self._device_config["chip_family"], self._device_config["colour_order"], self._white_channel)
+            self._led_strip_translated = getattr(ws, strip_type)
+            logger.debug(f"Found Led Strip {strip_type}")
         except Exception as e:
             logger.exception(f"Could not find LED Strip Type. Exception: {e}")
 
@@ -92,7 +73,7 @@ class OutputRaspi(Output):
         output_array = output_array.clip(0, 255).astype(int)
 
         # Check if we have a white channel or not.
-        if len(output_array[:]) == 4 and "SK6812" in self._led_strip:
+        if len(output_array[:]) == 4 and self._white_channel:
             # Sort the colors as RGB type.
             g = np.left_shift(output_array[1][:].astype(int), 24)
             r = np.left_shift(output_array[0][:].astype(int), 16)

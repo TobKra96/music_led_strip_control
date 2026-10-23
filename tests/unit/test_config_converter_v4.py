@@ -92,10 +92,21 @@ def test_unknown_led_strip_falls_back_with_a_warning_and_never_fails():
     assert any(e["code"] == "led_strip_unknown" and e["original"] == "bogus" for e in report.entries)
 
 
-def test_legacy_led_strip_key_is_kept_so_existing_outputs_keep_working():
-    config, _ = upgrade(v3_config(led_strip="sk6812_strip_rgbw"))
+def test_legacy_keys_are_dropped_and_their_originals_kept_in_the_report():
+    old = v3_config(led_strip="sk6812_strip_rgbw")
+    old["led_strips"] = {"ws2812_strip": "ws281x_default"}
+    old["general_settings"]["device_id"] = 3
 
-    assert config["device_configs"]["device_0"]["led_strip"] == "sk6812_strip_rgbw"
+    config, report = upgrade(old)
+
+    assert "led_strip" not in config["device_configs"]["device_0"]
+    assert "led_strip" not in config["default_device"]
+    assert "led_strips" not in config
+    assert "device_id" not in config["general_settings"]
+    originals = {e["path"]: e["original"] for e in report.entries if e["code"].endswith("_removed")}
+    assert originals["device_configs.device_0.led_strip"] == "sk6812_strip_rgbw"
+    assert originals["led_strips"] == {"ws2812_strip": "ws281x_default"}
+    assert originals["general_settings.device_id"] == 3
 
 
 def test_default_device_is_converted_too():

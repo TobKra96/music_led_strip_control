@@ -10,13 +10,14 @@ from mlsc.output_enum import OutputsEnum
 from mlsc.outputs.output_dummy import OutputDummy
 from mlsc.outputs.output_raspi import OutputRaspi
 from mlsc.outputs.output_udp import OutputUDP
+from mlsc.strip import has_white_channel
 
 
 class OutputService:
     def start(self, device):
 
         self._device = device
-        self._led_strip = self._device.device_config["led_strip"]
+        self._white_channel = has_white_channel(self._device.device_config)
 
         logger.info(f'Starting Output service... Device: {self._device.device_config["device_name"]}')
 
@@ -88,7 +89,7 @@ class OutputService:
         if not self._output_queue.empty():
             current_output_array = self._output_queue.get_blocking()
             # Add another Array of LEDS for White Channel
-            if "sk6812" in self._led_strip and len(current_output_array) == 3:
+            if self._white_channel and len(current_output_array) == 3:
                 current_output_array = np.vstack(
                     (current_output_array, np.zeros(self._device.device_config["led_count"])))
 

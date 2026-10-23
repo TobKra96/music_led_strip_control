@@ -75,10 +75,17 @@ def test_invalid_power_limit_values_are_rejected(config, key, value):
     assert errors(config)
 
 
-def test_legacy_keys_are_still_accepted(config):
-    device = next(iter(config["device_configs"].values()))
-    assert "led_strip" in device
-    assert errors(config) == []
+def test_legacy_strip_and_microphone_keys_are_rejected(config):
+    next(iter(config["device_configs"].values()))["led_strip"] = "ws2812_strip"
+    assert errors(config)
+
+    config = load("config_v2_real_v4.json")
+    config["led_strips"] = {}
+    assert errors(config)
+
+    config = load("config_v2_real_v4.json")
+    config["general_settings"]["device_id"] = 3
+    assert errors(config)
 
 
 def test_missing_v4_section_is_rejected(config):

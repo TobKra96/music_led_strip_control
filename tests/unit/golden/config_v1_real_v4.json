@@ -56,7 +56,6 @@
         "fps": 60,
         "led_count": 124,
         "led_mid": 64,
-        "led_strip": "ws2812_strip",
         "led_brightness": 100,
         "output_type": "output_raspi",
         "effects": {
@@ -615,7 +614,6 @@
             "fps": 60,
             "led_count": 124,
             "led_mid": 64,
-            "led_strip": "sk6812_strip_grbw",
             "led_brightness": 100,
             "output_type": "output_raspi",
             "effects": {
@@ -909,7 +907,6 @@
             "fps": 60,
             "led_count": 124,
             "led_mid": 64,
-            "led_strip": "ws2811_strip_brg",
             "led_brightness": 100,
             "output_type": "output_raspi",
             "effects": {
@@ -1201,7 +1198,6 @@
     },
     "general_settings": {
         "default_sample_rate": 48000,
-        "device_id": 3,
         "frames_per_buffer": 512,
         "log_file_enabled": false,
         "log_level_console": "info",
@@ -1429,24 +1425,6 @@
                 0
             ]
         ]
-    },
-    "led_strips": {
-        "sk6812w_strip": "sk6812w_default",
-        "sk6812_shift_wmask": "sk6812_shift_wmask",
-        "sk6812_strip": "sk6812_default",
-        "sk6812_strip_bgrw": "sk6812_strip_bgrw",
-        "sk6812_strip_brgw": "sk6812_strip_brgw",
-        "sk6812_strip_gbrw": "sk6812_strip_gbrw",
-        "sk6812_strip_grbw": "sk6812_strip_grbw",
-        "sk6812_strip_rbgw": "sk6812_strip_rbgw",
-        "sk6812_strip_rgbw": "sk6812_strip_rgbw",
-        "ws2811_strip_bgr": "ws281x_bgr",
-        "ws2811_strip_brg": "ws281x_brg",
-        "ws2811_strip_gbr": "ws281x_gbr",
-        "ws2811_strip_grb": "ws281x_grb",
-        "ws2811_strip_rbg": "ws281x_rbg",
-        "ws2811_strip_rgb": "ws281x_rgb",
-        "ws2812_strip": "ws281x_default"
     },
     "logging_levels": {
         "notset": "Not Set",
