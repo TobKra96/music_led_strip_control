@@ -12,6 +12,10 @@ _Avoid_: Controller, strip (when meaning the configuration)
 The backend that delivers pixel frames of a Device: local GPIO, UDP, or Mock.
 _Avoid_: Driver, sink
 
+**GPIO Backend**:
+The library or driver that a local GPIO Output uses to push pixel frames to the strip on a given Pi model.
+_Avoid_: Driver, GPIO output
+
 **Monitor Device**:
 An audio input device that carries audio played by the system or received from a remote source, rather than a microphone.
 _Avoid_: Loopback, Virtual mic
