@@ -38,6 +38,7 @@ dev = [
     "pytest-cov>=5",
     "diff-cover>=9",
     "ruff>=0.17,<0.18",
+    "debugpy>=1.8",
 ]
 
 [project.scripts]

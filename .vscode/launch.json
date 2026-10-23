@@ -1,0 +1,25 @@
+{
+    // Debugging on Windows: see docs/debugging-windows.md
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "MLSC: run",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "mlsc",
+            "args": ["run"],
+            "console": "integratedTerminal",
+            // The server spawns the webserver, audio and device manager as child processes.
+            "subProcess": true,
+            "justMyCode": false
+        },
+        {
+            "name": "MLSC: attach (debugpy)",
+            "type": "debugpy",
+            "request": "attach",
+            "connect": { "host": "localhost", "port": 5678 },
+            "subProcess": true,
+            "justMyCode": false
+        }
+    ]
+}

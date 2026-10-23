@@ -33,4 +33,5 @@ package-lock.json
 .vscode/symbols.json
 
 server/libs/config_.json
-.vscode/
+.vscode/*
+!.vscode/launch.json
