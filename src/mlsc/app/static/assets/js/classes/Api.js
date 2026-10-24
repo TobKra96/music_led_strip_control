@@ -1,3 +1,5 @@
+import { redirectToLogin } from './Login.js';
+
 const API_V2 = '/api/v2';
 
 /** An RFC 9457 problem document returned by the API, or a failed request without one. */
@@ -55,7 +57,7 @@ const request = async (method, path, body) => {
     if (response.ok) return payload;
 
     if (response.status === 401) {
-        window.location.href = `/login?next=${encodeURIComponent(window.location.pathname)}`;
+        redirectToLogin();
     }
     throw new ApiError(response.status, payload);
 };

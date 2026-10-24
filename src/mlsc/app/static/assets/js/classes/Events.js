@@ -1,11 +1,15 @@
+import { redirectToLogin } from './Login.js';
+
 const EVENTS_URL = '/api/v2/events';
+const SESSION_URL = '/api/v2/auth/session';
 const RETRY_MS = 5000;
 // Raised by this class itself, not by the server.
 const LOCAL_EVENTS = ['ready', 'disconnected'];
 
 /**
  * The one server-sent event stream of the page. The browser reconnects on its own after a network error
- * and sends `Last-Event-ID`; only a refused connection (`401`, `503`) closes the stream, so that one is retried here.
+ * and sends `Last-Event-ID`; only a refused connection (`401`, `503`) closes the stream, so that one is retried here,
+ * unless the session has ended: then the browser goes to the login page.
  */
 class EventStream {
     constructor() {
@@ -46,10 +50,29 @@ class EventStream {
             this._emit('disconnected');
             if (this._source.readyState === EventSource.CLOSED) {
                 this._source = null;
-                clearTimeout(this._retryTimer);
-                this._retryTimer = setTimeout(() => this.connect(), RETRY_MS);
+                this._retryUnlessLoggedOut();
             }
         };
+    }
+
+    /**
+     * `EventSource` does not expose the status of a refused connection, so ask the session endpoint whether it was a `401`.
+     * An unreachable server counts as not logged out.
+     */
+    async _retryUnlessLoggedOut() {
+        clearTimeout(this._retryTimer);
+        try {
+            const response = await fetch(SESSION_URL, { headers: { Accept: 'application/json' }, credentials: 'same-origin' });
+            const session = await response.json();
+            if (session.pin_required && !session.authenticated) {
+                redirectToLogin();
+                return;
+            }
+        } catch (e) {
+            // Server restarting or unreachable: retry below.
+        }
+        clearTimeout(this._retryTimer);
+        this._retryTimer = setTimeout(() => this.connect(), RETRY_MS);
     }
 
     _deliver(event, raw) {
