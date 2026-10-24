@@ -335,3 +335,8 @@ select.gradients {
 .mlsc-banner .close {
     line-height: 1;
 }
+
+/* Keep the placeholder and datalist arrow of the Device Groups tag input readable. */
+#device_group_pills .tagin-input:not(.tagin-input-hidden) {
+    min-width: 140px;
+}

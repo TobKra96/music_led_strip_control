@@ -9,7 +9,7 @@ $(() => {
     $('.navbar-content').trigger('mouseover');
 
     $('#settings_list').slideDown();
-    $('.tagin-input').prop('disabled', true);
+    $(tagin.input).attr({ list: 'device_group_options', placeholder: 'Add a group' });
 
     let outputTypes = {};
 
@@ -202,20 +202,16 @@ $(() => {
     }
 
     /**
-     * Add group back to dropdown of global groups when group is removed from device.
-     * @param {string} groupId
+     * Suggest the global groups that are not yet assigned to the device.
      */
-    const _addGroupOption = (groupId) => {
-        $(`#device_group_dropdown option[tag-id='${groupId}']`).show();
-    }
-
-    /**
-     * Remove group from dropdown of global groups when group is added to device.
-     * @param {JQuery} groupItem Dropdown item as a jQuery object.
-     */
-    const _removeGroupOption = (groupItem) => {
-        groupItem.hide();
-        groupItem.parent().get(0).selectedIndex = 0;  // Keep dropdown at 'Select a group' option.
+    const _refreshGroupSuggestions = () => {
+        const assigned = tagin.getTags();
+        const datalist = $('#device_group_options').empty();
+        $.each(jinja_groups.groups, (groupId, globalGroup) => {
+            if (!assigned.includes(globalGroup)) {
+                datalist.append($('<option>').val(globalGroup));
+            }
+        });
     }
 
     /**
@@ -259,31 +255,19 @@ $(() => {
         _filterChars(e, /[^0-9.]/gi);
     });
 
-    // Show/hide "Device Groups" tag section on tag input change.
-    $('.tagin').on('change', () => {
-        if (!tagin.getTags().length) {
-            $('#device_group_pills').addClass('d-none');
-            return;
-        }
-        $('#device_group_pills').removeClass('d-none');
-    });
+    // Keep the suggestions in sync with the groups assigned to the device.
+    $('.tagin').on('change', _refreshGroupSuggestions);
 
-    // Add new group pill on dropdown option click.
-    $('#device_group_dropdown').on('change', e => {
-        const dropdownItem = $(e.currentTarget.selectedOptions[0]);
-        _removeGroupOption(dropdownItem);
-
-        const tagId = dropdownItem.attr('tag-id');
-        tagin.addTag(dropdownItem.val(), tagId);
-    });
-
-    // Add group to dropdown on 'x' click.
-    $('.tagin-wrapper').on('click', e => {
-        if (e.target.closest('.tagin-tag-remove')) {
-            const groupId = $(e.target).parent().attr('tag-id');
-            _addGroupOption(groupId);
+    // Add the group right away when a suggestion is picked.
+    $(tagin.input).on('input', e => {
+        const isPicked = !e.originalEvent.inputType || e.originalEvent.inputType === 'insertReplacementText';
+        if (isPicked && tagin.resolve(tagin.input.value)) {
+            tagin.appendTag(true);
         }
     });
+
+    // Without any global groups there is nothing to pick from.
+    $('#device_group_hint').toggleClass('d-none', Object.keys(jinja_groups.groups).length > 0);
 
     // Set LED strip brightness slider badge.
     $('input[type=range]').on('input', e => {

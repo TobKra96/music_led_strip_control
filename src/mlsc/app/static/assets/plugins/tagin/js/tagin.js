@@ -19,6 +19,7 @@ class Tagin {
     transform;
     enter;
     maximum;
+    resolve;
     constructor(inputElement, options) {
         this.target = inputElement;
         this.separator = options?.separator || inputElement.dataset.taginSeparator || ',';
@@ -27,6 +28,7 @@ class Tagin {
         this.transform = options?.transform || inputElement.dataset.taginTransform || 'input => input';
         this.enter = options?.enter || inputElement.dataset.taginEnter !== undefined;
         this.maximum = options?.maximum || inputElement.dataset.taginMaximum || undefined;
+        this.resolve = options?.resolve;  // Custom: returns the tag id of an allowed value, or a falsy value to reject it.
         this.createWrapper();
         this.autowidth();
         this.addEventListener();
@@ -159,7 +161,12 @@ class Tagin {
                         this.alertExist(val);
                     }
                     else {
-                        input.insertAdjacentHTML('beforebegin', this.createTag(val, this.tagIds[index]));
+                        let tagId = this.tagIds[index];
+                        if (tagId === undefined && this.resolve) {
+                            tagId = this.resolve(val);
+                            if (!tagId) return;  // Not an allowed value, discard it.
+                        }
+                        input.insertAdjacentHTML('beforebegin', this.createTag(val, tagId));
                         this.updateValue();
                     }
                 });

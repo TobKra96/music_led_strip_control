@@ -6,7 +6,12 @@ const effectManager = new EffectManager();
 
 // Do not init tagin if it is not on the page.
 const taginEl = document.querySelector('.tagin');
-const tagin = taginEl ? new Tagin(taginEl) : null;
+// Only groups defined in General Settings are allowed as device groups.
+const taginOptions = {
+    enter: true,
+    resolve: (name) => Object.keys(jinja_groups.groups).find(groupId => jinja_groups.groups[groupId] === name)
+};
+const tagin = taginEl ? new Tagin(taginEl, taginOptions) : null;
 
 
 // classes/Device.js
@@ -231,7 +236,6 @@ class Device {
                     $(`span[for='${key}']`).text(value);
                 } else if (el.is("[type='option']")) {
                     _populateDeviceGroups(value);
-                    _populateGlobalGroups(Object.values(value));
                 } else {
                     el.val(value);
                 }
@@ -260,31 +264,6 @@ class Device {
 const _populateDeviceGroups = (deviceGroups) => {
     tagin.clearTags();
     tagin.addTag(deviceGroups);
-}
-
-/**
- * Populate global device groups dropdown on Device Settings page.
- * @param {Array.<string>} deviceGroups
- */
-const _populateGlobalGroups = (deviceGroups) => {
-    const dropdown = $('#device_group_dropdown');
-
-    // Clear all dropdown group options.
-    dropdown.empty();
-
-    // Populate device group dropdown with all available groups.
-    $.each(jinja_groups.groups, (groupId, globalGroup) => {
-        const dropdownItem = $(`<option tag-id="${groupId}" value="${globalGroup}">${globalGroup}</option>`)
-        dropdown.append(dropdownItem);
-
-        if (deviceGroups.includes(globalGroup)) {
-            dropdownItem.hide();
-        }
-    });
-
-    // Add placeholder option on top.
-    dropdown.prepend('<option value="placeholder" disabled selected>Select a group</option>');
-    dropdown.get(0).selectedIndex = 0;
 }
 
 export { Device, tagin };
