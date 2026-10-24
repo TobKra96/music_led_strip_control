@@ -57,7 +57,7 @@ class AuthenticationExecuter(ExecuterBase):
         with Path.open(self.config_path, "w") as configfile:
             self.config.write(configfile)
             if platform.system().lower() == "linux":
-                Path.chmod(self.config_path, 775)
+                Path.chmod(self.config_path, 0o775)
         logger.debug("Pin saved to file.")
 
     def reset_config(self) -> None:
