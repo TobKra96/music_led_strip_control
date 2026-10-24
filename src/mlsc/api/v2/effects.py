@@ -48,7 +48,7 @@ class DeviceEffectOut(ActiveEffectOut):
     random_cycle_active: bool
 
 
-def _active_effects() -> list[dict]:
+def active_effects() -> list[dict]:
     return [{"device_id": item["device"], "effect": item["effect"]}
             for item in Executer.instance.effect_executer.get_active_effects()["devices"]]
 
@@ -65,7 +65,7 @@ def _device_effect(device_id: str) -> dict:
 @effects_api.get("/effect", summary="Get the active effect of every device", responses={"200": ActiveEffectListOut, "401": Problem})
 @api_login_required
 def get_active_effects():
-    return _active_effects()
+    return active_effects()
 
 
 @effects_api.put("/effect", summary="Set the effect of several devices at once", responses={"200": ActiveEffectListOut, **WRITE_ERRORS})
@@ -80,7 +80,7 @@ def set_active_effects(body: BulkEffectBody):
         require_devices(body.device_ids)
         targets = [d for d in device_ids() if d in body.device_ids]
         executer.set_active_effect_for_multiple([{"device": d, "effect": body.effect} for d in targets])
-    return [item for item in _active_effects() if item["device_id"] in targets]
+    return [item for item in active_effects() if item["device_id"] in targets]
 
 
 @effects_api.get("/devices/<device_id>/effect", summary="Get the active effect of a device", responses={"200": DeviceEffectOut, **READ_ERRORS})

@@ -284,3 +284,65 @@ def test_a_v1_config_import_is_seen_by_every_executer(client, executer, device_i
     assert [d["id"] for d in v1.get("/api/system/devices").get_json()] == [device_id]
     assert v1.get(f"/api/effect/active?device={device_id}").get_json()["device"] == device_id
     assert executer.effect_executer.get_active_effect(device_id)["device"] == device_id
+
+
+@pytest.fixture
+def group_of_two(client):
+    first, second = (client.post("/api/v2/devices", json={}).get_json()["id"] for _ in range(2))
+    group_id = client.post("/api/v2/groups", json={"name": "Desk"}).get_json()["id"]
+    client.put(f"/api/v2/groups/{group_id}/devices", json={"device_ids": [first, second]})
+    return group_id, [first, second]
+
+
+def test_a_group_can_be_renamed_and_its_devices_follow(client, group_of_two):
+    group_id, members = group_of_two
+
+    response = client.patch(f"/api/v2/groups/{group_id}", json={"name": "Shelf"})
+
+    assert response.status_code == 200
+    assert response.get_json() == {"id": group_id, "name": "Shelf", "device_ids": members}
+    assert client.get(f"/api/v2/devices/{members[0]}").get_json()["assigned_to"] == {group_id: "Shelf"}
+    assert client.patch(f"/api/v2/groups/{group_id}", json={"name": "Shelf"}).status_code == 200
+
+
+def test_renaming_a_group_rejects_taken_bad_and_unknown(client, group_of_two):
+    group_id, _ = group_of_two
+    other = client.post("/api/v2/groups", json={"name": "Other"}).get_json()["id"]
+
+    assert_problem(client.patch(f"/api/v2/groups/{group_id}", json={"name": "Other"}), 409, "GroupAlreadyExists")
+    assert_problem(client.patch(f"/api/v2/groups/{group_id}", json={"name": "bad/name"}), 422, "ValidationError")
+    assert_problem(client.patch("/api/v2/groups/group_9", json={"name": "X"}), 404, "GroupNotFound")
+    assert client.get(f"/api/v2/groups/{group_id}").get_json()["name"] == "Desk"
+    assert client.get(f"/api/v2/groups/{other}").get_json()["name"] == "Other"
+
+
+def test_setting_the_effect_of_a_group_changes_exactly_its_members(client, group_of_two):
+    group_id, members = group_of_two
+    outsider = client.post("/api/v2/devices", json={}).get_json()["id"]
+    before = client.get(f"/api/v2/devices/{outsider}/effect").get_json()["effect"]
+
+    response = client.put(f"/api/v2/groups/{group_id}/effect", json={"effect": "effect_fade"})
+
+    expected = [{"device_id": d, "effect": "effect_fade"} for d in members]
+    assert response.get_json() == {"group_id": group_id, "effect": "effect_fade", "devices": expected}
+    assert client.get(f"/api/v2/groups/{group_id}/effect").get_json() == response.get_json()
+    assert client.get(f"/api/v2/devices/{outsider}/effect").get_json()["effect"] == before
+
+
+def test_the_group_effect_is_null_when_members_differ_or_there_are_none(client, group_of_two):
+    group_id, members = group_of_two
+    client.put(f"/api/v2/devices/{members[0]}/effect", json={"effect": "effect_fade"})
+    client.put(f"/api/v2/devices/{members[1]}/effect", json={"effect": "effect_bars"})
+    empty = client.post("/api/v2/groups", json={"name": "Empty"}).get_json()["id"]
+
+    assert client.get(f"/api/v2/groups/{group_id}/effect").get_json()["effect"] is None
+    assert client.get(f"/api/v2/groups/{empty}/effect").get_json() == {"group_id": empty, "effect": None, "devices": []}
+    assert client.put(f"/api/v2/groups/{empty}/effect", json={"effect": "effect_fade"}).get_json()["devices"] == []
+
+
+def test_the_group_effect_rejects_unknown_groups_and_effects(client, group_of_two):
+    group_id, _ = group_of_two
+
+    assert_problem(client.get("/api/v2/groups/group_9/effect"), 404, "GroupNotFound")
+    assert_problem(client.put("/api/v2/groups/group_9/effect", json={"effect": "effect_fade"}), 404, "GroupNotFound")
+    assert_problem(client.put(f"/api/v2/groups/{group_id}/effect", json={"effect": "effect_nope"}), 422, "ValidationError")

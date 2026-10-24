@@ -163,6 +163,21 @@ class DeviceExecuter(ExecuterBase):
         self.refresh_device(self.all_devices_id)
         return self.get_groups()
 
+    def rename_group(self, group_id: str, new_name: str) -> dict[str, dict] | GroupAlreadyExists:
+        """Rename a global group, and the copy of its name kept on each member device. The caller has checked that the group exists."""
+        device_groups = self._config["general_settings"]["device_groups"]
+        if any(name == new_name for other_id, name in device_groups.items() if other_id != group_id):
+            return GroupAlreadyExists
+
+        device_groups[group_id] = new_name
+        for device in self._config["device_configs"].values():
+            if group_id in device["device_groups"]:
+                device["device_groups"][group_id] = new_name
+
+        self.save_config()
+        self.refresh_device(self.all_devices_id)
+        return self.get_groups()
+
     def set_group_devices(self, group_id: str, device_ids: list[str]) -> None:
         """Make exactly `device_ids` the members of a group. The caller has checked that the group and the devices exist."""
         group_name = self._config["general_settings"]["device_groups"][group_id]

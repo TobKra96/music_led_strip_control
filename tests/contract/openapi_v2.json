@@ -269,6 +269,40 @@
         "title": "GroupCreate",
         "type": "object"
       },
+      "GroupEffectOut": {
+        "properties": {
+          "devices": {
+            "items": {
+              "$ref": "#/components/schemas/ActiveEffectOut"
+            },
+            "title": "Devices",
+            "type": "array"
+          },
+          "effect": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The effect all members show, or null if they differ or the group has no members.",
+            "title": "Effect"
+          },
+          "group_id": {
+            "title": "Group Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "group_id",
+          "effect",
+          "devices"
+        ],
+        "title": "GroupEffectOut",
+        "type": "object"
+      },
       "GroupListOut": {
         "items": {
           "$ref": "#/components/schemas/GroupOut"
@@ -317,6 +351,22 @@
           "device_ids"
         ],
         "title": "GroupOut",
+        "type": "object"
+      },
+      "GroupRename": {
+        "properties": {
+          "name": {
+            "maxLength": 75,
+            "minLength": 1,
+            "pattern": "^[a-zA-Z\u0430-\u044f\u0410-\u042f0-9_ ()-]+$",
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "title": "GroupRename",
         "type": "object"
       },
       "InfoOut": {
@@ -2176,6 +2226,88 @@
         "tags": [
           "Groups"
         ]
+      },
+      "patch": {
+        "operationId": "groups_api_v2_rename_group__group_id__patch",
+        "parameters": [
+          {
+            "description": "Stable group id, e.g. `group_0`.",
+            "in": "path",
+            "name": "group_id",
+            "required": true,
+            "schema": {
+              "description": "Stable group id, e.g. `group_0`.",
+              "title": "Group Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GroupRename"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GroupOut"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "415": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unsupported Media Type"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        },
+        "summary": "Rename a group",
+        "tags": [
+          "Groups"
+        ]
       }
     },
     "/api/v2/groups/{group_id}/devices": {
@@ -2258,6 +2390,152 @@
           }
         },
         "summary": "Replace the members of a group",
+        "tags": [
+          "Groups"
+        ]
+      }
+    },
+    "/api/v2/groups/{group_id}/effect": {
+      "get": {
+        "operationId": "groups_api_v2_get_group_effect__group_id__effect_get",
+        "parameters": [
+          {
+            "description": "Stable group id, e.g. `group_0`.",
+            "in": "path",
+            "name": "group_id",
+            "required": true,
+            "schema": {
+              "description": "Stable group id, e.g. `group_0`.",
+              "title": "Group Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GroupEffectOut"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        },
+        "summary": "Get the active effect of a group",
+        "tags": [
+          "Groups"
+        ]
+      },
+      "put": {
+        "operationId": "groups_api_v2_set_group_effect__group_id__effect_put",
+        "parameters": [
+          {
+            "description": "Stable group id, e.g. `group_0`.",
+            "in": "path",
+            "name": "group_id",
+            "required": true,
+            "schema": {
+              "description": "Stable group id, e.g. `group_0`.",
+              "title": "Group Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EffectBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GroupEffectOut"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "415": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unsupported Media Type"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        },
+        "summary": "Set the effect of every device in a group",
         "tags": [
           "Groups"
         ]
