@@ -2,11 +2,11 @@ from flask_openapi3 import APIBlueprint, Tag
 from pydantic import BaseModel, Field, RootModel
 
 from mlsc.api.v2.errors import READ_ERRORS, WRITE_ERRORS, Problem, ProblemError
-from mlsc.api.v2.lookup import device_settings, effect_settings, require_devices, require_patch, unwrap
+from mlsc.api.v2.lookup import device_settings, effect_settings, require_device, require_devices, require_patch, unwrap
 from mlsc.api.v2.security import api_login_required
 from mlsc.api.v2.settings_models import DeviceSettingsPatch, EffectSettingsPatches
 from mlsc.webserver.executer import Executer
-from mlsc.webserver.messages import DeviceNotFound, EffectNotFound
+from mlsc.webserver.messages import EffectNotFound
 
 tag = Tag(name="Devices", description="Configured LED strip devices")
 devices_api = APIBlueprint("devices_api_v2", __name__, url_prefix="/api/v2/devices", abp_tags=[tag])
@@ -34,13 +34,6 @@ class SettingsOut(RootModel[dict]):
     """All settings of the owner, as stored in the configuration."""
 
 
-def _device(device_id: str) -> dict:
-    device = Executer.instance.device_executer.get_device(device_id)
-    if device is DeviceNotFound:
-        raise ProblemError(DeviceNotFound, f"Device {device_id} does not exist.")
-    return device
-
-
 @devices_api.get("", summary="List devices", responses={"200": DeviceListOut, "401": Problem})
 @api_login_required
 def list_devices():
@@ -51,13 +44,13 @@ def list_devices():
 @api_login_required
 def create_device():
     created = unwrap(Executer.instance.device_executer.create_new_device())
-    return _device(created["device_id"]), 201
+    return require_device(created["device_id"]), 201
 
 
 @devices_api.get("/<device_id>", summary="Get a device", responses={"200": DeviceOut, **READ_ERRORS})
 @api_login_required
 def get_device(path: DevicePath):
-    return _device(path.device_id)
+    return require_device(path.device_id)
 
 
 @devices_api.delete("/<device_id>", summary="Delete a device", responses={"204": None, **READ_ERRORS})

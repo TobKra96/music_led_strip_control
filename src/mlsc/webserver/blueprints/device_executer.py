@@ -48,20 +48,17 @@ class DeviceExecuter(ExecuterBase):
 
     def get_devices(self) -> list[dict[str, str | dict]]:
         """Return all devices. If no devices exist, return empty list."""
-        return [
-            {
-                "name": self._config["device_configs"][device]["device_name"],
-                "id": device,
-                "assigned_to": self._config["device_configs"][device]["device_groups"]
-            }
-            for device in self._config["device_configs"]
-        ]
+        return [self._device_view(device_id, device) for device_id, device in self._config["device_configs"].items()]
 
     def get_device(self, device_id: str) -> dict[str, str | dict] | DeviceNotFound:
         """Return one device, or `DeviceNotFound` if the id is unknown."""
         device = self._config["device_configs"].get(device_id)
         if device is None:
             return DeviceNotFound
+        return self._device_view(device_id, device)
+
+    @staticmethod
+    def _device_view(device_id: str, device: dict) -> dict[str, str | dict]:
         return {"name": device["device_name"], "id": device_id, "assigned_to": device["device_groups"]}
 
     def create_new_device(self) -> dict[str, str] | DeviceLimitReached:

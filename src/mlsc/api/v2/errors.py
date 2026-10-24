@@ -32,7 +32,7 @@ class Problem(BaseModel):
     title: str
     status: int
     detail: str | None = None
-    code: str = Field(description="Stable error code; the v1 `message_id` where one exists.", json_schema_extra={"enum": error_codes()})
+    code: str = Field(description="Stable error code; the v1 `message_id` where one exists.", json_schema_extra=lambda schema: schema.update(enum=error_codes()))
     errors: list[FieldError] | None = Field(default=None, description="Per-field validation errors.")
 
 

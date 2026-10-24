@@ -23,6 +23,14 @@ def require_devices(ids: list[str]) -> None:
             raise ProblemError(DeviceNotFound, f"Device {device_id} does not exist.")
 
 
+def require_device(device_id: str) -> dict:
+    """Return a device, or raise a 404."""
+    device = Executer.instance.device_executer.get_device(device_id)
+    if device is DeviceNotFound:
+        raise ProblemError(DeviceNotFound, f"Device {device_id} does not exist.")
+    return device
+
+
 def require_group(group_id: str) -> str:
     """Return the name of a group, or raise a 404."""
     groups = Executer.instance.device_executer.get_groups()["groups"]
