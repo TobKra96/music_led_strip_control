@@ -6264,6 +6264,51 @@
         ]
       }
     },
+    "/api/v2/config/reset": {
+      "post": {
+        "description": "Devices and groups are removed too.",
+        "operationId": "settings_api_v2_reset_config_config_reset_post",
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "415": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unsupported Media Type"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        },
+        "summary": "Reset the whole configuration to the defaults",
+        "tags": [
+          "Settings"
+        ]
+      }
+    },
     "/api/v2/devices": {
       "get": {
         "operationId": "devices_api_v2_list_devices_get",
@@ -10281,7 +10326,7 @@
     },
     "/api/v2/settings": {
       "delete": {
-        "description": "Reset everything, not only the global settings: devices and groups are removed too.",
+        "description": "Devices and groups are kept; `POST /config/reset` resets the whole configuration.",
         "operationId": "settings_api_v2_reset_settings_settings_delete",
         "responses": {
           "200": {
@@ -10315,7 +10360,7 @@
             "description": "Unprocessable Content"
           }
         },
-        "summary": "Reset the whole configuration to the defaults",
+        "summary": "Reset the global settings to the defaults",
         "tags": [
           "Settings"
         ]

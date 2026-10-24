@@ -39,11 +39,11 @@ def patch_settings(body: GeneralSettingsPatch):
     return _settings()
 
 
-@settings_api.delete("/settings", summary="Reset the whole configuration to the defaults", responses={"200": SettingsOut, "401": Problem})
+@settings_api.delete("/settings", summary="Reset the global settings to the defaults", responses={"200": SettingsOut, "401": Problem})
 @api_login_required
 def reset_settings():
-    """Reset everything, not only the global settings: devices and groups are removed too."""
-    Executer.instance.general_settings_executer.reset_settings()
+    """Devices and groups are kept; `POST /config/reset` resets the whole configuration."""
+    Executer.instance.general_settings_executer.reset_general_settings()
     return _settings()
 
 
@@ -76,3 +76,11 @@ def patch_config(body: ConfigDocument):
         return Executer.instance.general_settings_executer.patch_config(patch)
     except ConfigMigrationError as e:
         raise ProblemError(InvalidConfigFile, str(e)) from e
+
+
+@settings_api.post("/config/reset", summary="Reset the whole configuration to the defaults", responses={"204": None, "401": Problem, "415": Problem})
+@api_login_required
+def reset_config():
+    """Devices and groups are removed too."""
+    Executer.instance.general_settings_executer.reset_settings()
+    return "", 204

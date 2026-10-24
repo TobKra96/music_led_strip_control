@@ -205,12 +205,12 @@ $(() => {
     }
 
     /**
-     * Call API to reset all settings to default values.
+     * Call API to reset the whole configuration, devices and groups included, to default values.
      */
     const resetSettings = () => {
-        Promise.all([api.delete('/settings'), api.delete('/auth/pin')]).then(() => {
+        Promise.all([api.post('/config/reset'), api.delete('/auth/pin')]).then(() => {
             getLocalSettings();
-            new Toast('General settings reset to default.').success();
+            new Toast('Configuration reset to default.').success();
         }).catch((error) => {
             new Toast(`Error while resetting settings. ${error.summary}`).error();
         });

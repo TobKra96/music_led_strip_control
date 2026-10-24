@@ -226,12 +226,31 @@ def test_general_settings_are_patched_partially_and_validated(client):
 
 
 @pytest.mark.usefixtures("device_id")
-def test_deleting_the_settings_resets_the_configuration(client):
+def test_deleting_the_settings_resets_only_the_global_settings(client):
     client.patch("/api/v2/settings", json={"min_frequency": 60})
 
     response = client.delete("/api/v2/settings")
 
     assert response.get_json()["min_frequency"] == 50
+    assert len(client.get("/api/v2/devices").get_json()) == 1
+
+
+def test_resetting_the_settings_keeps_the_groups(client):
+    group_id = client.post("/api/v2/groups", json={"name": "A"}).get_json()["id"]
+
+    client.delete("/api/v2/settings")
+
+    assert [g["id"] for g in client.get("/api/v2/groups").get_json()] == [group_id]
+
+
+@pytest.mark.usefixtures("device_id")
+def test_resetting_the_config_restores_the_defaults_and_removes_devices(client):
+    client.patch("/api/v2/settings", json={"min_frequency": 60})
+
+    response = client.post("/api/v2/config/reset", json={})
+
+    assert response.status_code == 204
+    assert client.get("/api/v2/settings").get_json()["min_frequency"] == 50
     assert client.get("/api/v2/devices").get_json() == []
 
 

@@ -49,8 +49,17 @@ class GeneralSettingsExecuter(ExecuterBase):
             return self._config["general_settings"]["webserver_port"]
         return 8080
 
+    def reset_general_settings(self) -> None:
+        """Reset the general settings to their defaults. Device groups, devices and the audio section stay as they are."""
+        defaults = copy.deepcopy(self._config_instance.load_template()["general_settings"])
+        defaults["device_groups"] = self._config["general_settings"].get("device_groups", {})
+        self._config["general_settings"] = defaults
+
+        self.save_config()
+        self.refresh_device(self.all_devices_id)
+
     def reset_settings(self) -> dict:
-        """Reset all general settings to default."""
+        """Reset the whole configuration to default, devices and groups included."""
         self._reset_config()
         self.refresh_device(self.all_devices_id)
         return {}
