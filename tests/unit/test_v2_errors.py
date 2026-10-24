@@ -1,7 +1,7 @@
 import gc
 
 from mlsc.api.v2.errors import Problem
-from mlsc.webserver.messages import _Message  # noqa: PLC2701
+from mlsc.webserver.messages import _Message  # ruff: ignore[import-private-name]
 
 
 def test_problem_code_enum_includes_a_message_defined_after_the_errors_module_was_imported():
