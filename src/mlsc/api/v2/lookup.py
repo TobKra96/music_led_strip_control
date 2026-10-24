@@ -41,7 +41,7 @@ def require_group(group_id: str) -> str:
 
 def device_settings(device_id: str) -> dict:
     """Return the live settings of a device."""
-    require_devices([device_id])
+    require_device(device_id)
     return Executer.instance.device_settings_executer.get_device_settings(device_id)["settings"]
 
 
