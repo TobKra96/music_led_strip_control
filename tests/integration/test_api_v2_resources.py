@@ -397,3 +397,37 @@ def test_an_invalid_config_patch_is_a_400_and_changes_nothing(client):
 
 def test_an_empty_config_patch_is_a_422(client):
     assert_problem(client.patch("/api/v2/config", json={}), 422, "ValidationError")
+
+
+def test_settings_errors_name_the_nested_field(client, device_id):
+    url = f"/api/v2/devices/{device_id}/settings"
+
+    body = assert_problem(client.patch(url, json={"effects": {"effect_single": {"color": "nope"}}, "fps": 0}), 422, "ValidationError")
+
+    fields = {error["field"] for error in body["errors"]}
+    assert any(field.endswith("effects.effect_single.color") for field in fields)
+    assert any(field.endswith("fps") for field in fields)
+
+
+@pytest.mark.parametrize("patch", [{"led_count": True}, {"led_count": "7"}, {"fps": 30.5}, {"output": {"output_udp": {"udp_client_ip": "1.2.3"}}}])
+def test_settings_are_not_coerced(client, device_id, patch):
+    assert_problem(client.patch(f"/api/v2/devices/{device_id}/settings", json=patch), 422, "ValidationError")
+
+
+def test_device_settings_accept_nested_effect_settings(client, device_id):
+    response = client.patch(f"/api/v2/devices/{device_id}/settings", json={"effects": {"effect_single": {"color": "red"}}})
+
+    assert response.get_json()["effects"]["effect_single"]["color"] == "red"
+
+
+def test_global_settings_reject_the_groups(client):
+    assert_problem(client.patch("/api/v2/settings", json={"device_groups": {}}), 422, "ValidationError")
+
+
+def test_every_effect_has_its_own_settings_route(client, device_id):
+    effects = client.get(f"/api/v2/devices/{device_id}/settings").get_json()["effects"]
+    spec = client.get("/api/v2/openapi.json").get_json()
+
+    for effect, settings in effects.items():
+        if isinstance(settings, dict):
+            assert "patch" in spec["paths"][f"/api/v2/devices/{{device_id}}/effects/{effect}/settings"]

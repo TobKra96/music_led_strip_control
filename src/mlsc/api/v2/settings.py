@@ -2,24 +2,17 @@ from flask import send_file
 from flask_openapi3 import APIBlueprint, Tag
 from pydantic import RootModel
 
-from mlsc.api.v2.devices import SettingsOut, SettingsPatch
+from mlsc.api.v2.devices import SettingsOut
 from mlsc.api.v2.errors import BODY_ERRORS, Problem, ProblemError
-from mlsc.api.v2.lookup import check_schema, require_patch
+from mlsc.api.v2.lookup import require_patch
 from mlsc.api.v2.security import api_login_required
+from mlsc.api.v2.settings_models import GeneralSettingsPatch
 from mlsc.config_migration import ConfigMigrationError
 from mlsc.webserver.executer import Executer
 from mlsc.webserver.messages import InvalidConfigFile
-from mlsc.webserver.schemas.general_settings_api_schema import SET_GENERAL_SETTINGS_SCHEMA
 
 tag = Tag(name="Settings", description="Global settings and the configuration file")
 settings_api = APIBlueprint("settings_api_v2", __name__, url_prefix="/api/v2", abp_tags=[tag])
-
-# Groups have their own resource.
-_GENERAL_SETTINGS = SET_GENERAL_SETTINGS_SCHEMA["properties"]["settings"]
-GENERAL_PROPERTIES = {
-    **_GENERAL_SETTINGS,
-    "properties": {key: schema for key, schema in _GENERAL_SETTINGS["properties"].items() if key != "device_groups"},
-}
 
 
 class ConfigDocument(RootModel[dict]):
@@ -40,9 +33,8 @@ def get_settings():
 
 @settings_api.patch("/settings", summary="Update some global settings", responses={"200": SettingsOut, **BODY_ERRORS})
 @api_login_required
-def patch_settings(body: SettingsPatch):
-    patch = require_patch(body.root)
-    check_schema(patch, GENERAL_PROPERTIES)
+def patch_settings(body: GeneralSettingsPatch):
+    patch = require_patch(body.model_dump(exclude_unset=True))
     Executer.instance.general_settings_executer.set_general_setting(patch)
     return _settings()
 

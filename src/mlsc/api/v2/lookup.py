@@ -1,6 +1,4 @@
 """Helpers that turn the sentinel results of the executers into problem documents."""
-from jsonschema import Draft202012Validator
-
 from mlsc.api.v2.errors import ProblemError
 from mlsc.webserver.executer import Executer
 from mlsc.webserver.messages import DeviceNotFound, EffectNotFound, GroupNotFound, ValidationError, _Message
@@ -61,12 +59,3 @@ def unique_ids(ids: list[str]) -> list[str]:
         msg = f"Each id may be listed only once: {', '.join(repeated)}."
         raise ValueError(msg)
     return ids
-
-
-def check_schema(instance: dict, schema: dict) -> None:
-    """Raise a 422 that lists every violation of `schema`."""
-    errors = sorted(Draft202012Validator(schema).iter_errors(instance), key=lambda error: list(map(str, error.absolute_path)))
-    if errors:
-        raise ProblemError(ValidationError, errors=[
-            {"field": ".".join(str(part) for part in error.absolute_path) or "(body)", "detail": error.message} for error in errors
-        ])

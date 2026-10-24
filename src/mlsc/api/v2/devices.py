@@ -2,16 +2,15 @@ from flask_openapi3 import APIBlueprint, Tag
 from pydantic import BaseModel, Field, RootModel
 
 from mlsc.api.v2.errors import READ_ERRORS, WRITE_ERRORS, Problem, ProblemError
-from mlsc.api.v2.lookup import check_schema, device_settings, effect_settings, require_devices, require_patch, unwrap
+from mlsc.api.v2.lookup import device_settings, effect_settings, require_devices, require_patch, unwrap
 from mlsc.api.v2.security import api_login_required
+from mlsc.api.v2.settings_models import DeviceSettingsPatch, EffectSettingsPatches
 from mlsc.webserver.executer import Executer
-from mlsc.webserver.messages import DeviceNotFound, ValidationError
-from mlsc.webserver.schemas.device_settings_api_schema import SET_DEVICE_SETTINGS_SCHEMA
+from mlsc.webserver.messages import DeviceNotFound, EffectNotFound
 
 tag = Tag(name="Devices", description="Configured LED strip devices")
 devices_api = APIBlueprint("devices_api_v2", __name__, url_prefix="/api/v2/devices", abp_tags=[tag])
 
-DEVICE_PROPERTIES = SET_DEVICE_SETTINGS_SCHEMA["properties"]["settings"]
 
 class DevicePath(BaseModel):
     device_id: str = Field(description="Stable device id, e.g. `device_0`.")
@@ -33,10 +32,6 @@ class DeviceListOut(RootModel[list[DeviceOut]]):
 
 class SettingsOut(RootModel[dict]):
     """All settings of the owner, as stored in the configuration."""
-
-
-class SettingsPatch(RootModel[dict]):
-    """A partial update: only the given settings change, nested objects are merged."""
 
 
 def _device(device_id: str) -> dict:
@@ -80,11 +75,10 @@ def get_device_settings(path: DevicePath):
 
 @devices_api.patch("/<device_id>/settings", summary="Update some settings of a device", responses={"200": SettingsOut, **WRITE_ERRORS})
 @api_login_required
-def patch_device_settings(path: DevicePath, body: SettingsPatch):
-    """Output settings are updated the same way, nested under `output`."""
-    patch = require_patch(body.root)
+def patch_device_settings(path: DevicePath, body: DeviceSettingsPatch):
+    """Only the given settings change, nested objects are merged. Output settings are updated the same way, nested under `output`."""
+    patch = require_patch(body.model_dump(exclude_unset=True))
     require_devices([path.device_id])
-    check_schema(patch, DEVICE_PROPERTIES)
     unwrap(Executer.instance.device_settings_executer.set_device_settings(path.device_id, patch))
     return device_settings(path.device_id)
 
@@ -96,15 +90,26 @@ def get_effect_settings(path: EffectSettingsPath):
     return effect_settings(path.device_id, path.effect)
 
 
-@devices_api.patch("/<device_id>/effects/<effect>/settings", summary="Update some settings of one effect of a device",
-                   responses={"200": SettingsOut, **WRITE_ERRORS})
+@devices_api.patch("/<device_id>/effects/<effect>/settings", doc_ui=False)
 @api_login_required
-def patch_effect_settings(path: EffectSettingsPath, body: SettingsPatch):
-    patch = require_patch(body.root)
-    current = effect_settings(path.device_id, path.effect)
-    unknown = [key for key in patch if key not in current]
-    if unknown:
-        raise ProblemError(ValidationError, errors=[{"field": key, "detail": "Unknown setting."} for key in unknown])
-    check_schema({"effects": {path.effect: patch}}, DEVICE_PROPERTIES)
-    unwrap(Executer.instance.effect_settings_executer.set_effect_settings(path.device_id, path.effect, patch))
-    return effect_settings(path.device_id, path.effect)
+def patch_unknown_effect_settings(path: EffectSettingsPath):
+    """Every known effect has a route of its own with its own body; this one only answers for the others."""
+    effect_settings(path.device_id, path.effect)
+    raise ProblemError(EffectNotFound, f"Effect {path.effect} does not exist.")
+
+
+def _add_effect_settings_route(effect: str, patch_model: type[BaseModel]) -> None:
+    def patch_effect_settings(path: DevicePath, body: patch_model):
+        patch = require_patch(body.model_dump(exclude_unset=True))
+        effect_settings(path.device_id, effect)
+        unwrap(Executer.instance.effect_settings_executer.set_effect_settings(path.device_id, effect, patch))
+        return effect_settings(path.device_id, effect)
+
+    patch_effect_settings.__name__ = f"patch_{effect}_settings"
+    patch_effect_settings.__doc__ = "Only the given settings change."
+    devices_api.patch(f"/<device_id>/effects/{effect}/settings", summary=f"Update some settings of {effect} of a device",
+                      responses={"200": SettingsOut, **WRITE_ERRORS})(api_login_required(patch_effect_settings))
+
+
+for _effect, _patch_model in EffectSettingsPatches.items():
+    _add_effect_settings_route(_effect, _patch_model)
