@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import TypedDict
 from urllib.parse import urljoin, urlparse
 
-from flask import Flask, request
+from flask import Flask, current_app, request
 from loguru import logger
 
 from mlsc import paths
@@ -83,7 +83,7 @@ class AuthenticationExecuter(ExecuterBase):
 
         logger.debug(f"PIN config: {self.config}, dataset: {dataset}")
 
-        if self.config_path.as_posix() in dataset:
+        if str(self.config_path) in dataset:
             try:
                 new_values: PinConfig = {
                     "DEFAULT_PIN": self.config["SECURITY"].get("DEFAULT_PIN"),
@@ -117,6 +117,7 @@ class AuthenticationExecuter(ExecuterBase):
         logger.debug("Enter set_pin_setting()")
         self.config["SECURITY"] = data
         self.save_config()
+        self._apply_saved_settings()
 
     def get_pin_setting(self) -> PinConfig:
         """Interface to get PIN settings from API."""
@@ -127,7 +128,18 @@ class AuthenticationExecuter(ExecuterBase):
         """Interface to reset PIN settings from API."""
         logger.debug("Enter reset_pin_settings()")
         self.reset_config()
+        self._apply_saved_settings()
         return self.read_config()
+
+    def _apply_saved_settings(self) -> None:
+        """Make the saved PIN settings take effect now instead of at the next start."""
+        previous_pin, was_active = self.USER_PIN, self.IS_PIN_ACTIVE
+        saved = self.read_config()
+        self.USER_PIN = saved["DEFAULT_PIN"]
+        self.IS_PIN_ACTIVE = saved["USE_PIN_LOCK"]
+        current_app.config["AUTH_ENABLED"] = self.IS_PIN_ACTIVE
+        if self.USER_PIN != previous_pin or (self.IS_PIN_ACTIVE and not was_active):
+            auth.bump_epoch()
 
     @staticmethod
     def login() -> None:

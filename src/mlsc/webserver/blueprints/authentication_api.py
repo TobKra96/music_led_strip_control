@@ -82,7 +82,11 @@ def set_pin_setting():
             "DEFAULT_PIN": data_in["DEFAULT_PIN"],
             "USE_PIN_LOCK": data_in["USE_PIN_LOCK"]
         }
+        if data_out["USE_PIN_LOCK"] and not Executer.instance.authentication_executer.validate_pin(str(data_out["DEFAULT_PIN"])):
+            return "PIN must be from 4 to 8 digits.", 400
         Executer.instance.authentication_executer.set_pin_setting(data_out)
+        if Executer.instance.authentication_executer.get_pin_setting()["USE_PIN_LOCK"]:
+            auth.login_user()  # Keep this session in; other sessions have to log in.
         return jsonify(data_out)
 
     return "Unauthorized", 401

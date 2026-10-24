@@ -83,7 +83,10 @@ def get_pin():
 def set_pin(body: PinSettings):
     executer = Executer.instance.authentication_executer
     executer.set_pin_setting({"DEFAULT_PIN": body.default_pin, "USE_PIN_LOCK": body.use_pin_lock})
-    return _pin_out(executer.get_pin_setting())
+    saved = executer.get_pin_setting()
+    if saved["USE_PIN_LOCK"]:
+        auth.login_user()  # Keep this session in; other sessions have to log in.
+    return _pin_out(saved)
 
 
 @auth_api.delete("/pin", summary="Reset the PIN settings", responses={"200": PinSettings, "401": Problem})

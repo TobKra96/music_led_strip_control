@@ -3,6 +3,7 @@ from functools import wraps
 from flask import current_app, redirect, request, session, url_for
 
 SESSION_KEY = "authenticated"
+EPOCH_KEY = "auth_epoch"
 
 
 def is_auth_enabled() -> bool:
@@ -10,16 +11,27 @@ def is_auth_enabled() -> bool:
     return current_app.config.get("AUTH_ENABLED", True)
 
 
+def _epoch() -> int:
+    return current_app.config.get("AUTH_EPOCH", 0)
+
+
+def bump_epoch() -> None:
+    """Log out every session that was started before now. Used when the PIN lock is enabled or the PIN changes."""
+    current_app.config["AUTH_EPOCH"] = _epoch() + 1
+
+
 def is_authenticated() -> bool:
-    return bool(session.get(SESSION_KEY))
+    return bool(session.get(SESSION_KEY)) and session.get(EPOCH_KEY) == _epoch()
 
 
 def login_user() -> None:
     session[SESSION_KEY] = True
+    session[EPOCH_KEY] = _epoch()
 
 
 def logout_user() -> None:
     session.pop(SESSION_KEY, None)
+    session.pop(EPOCH_KEY, None)
 
 
 def login_required(func):
