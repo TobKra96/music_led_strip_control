@@ -47,6 +47,16 @@ def update(orig: dict, new: dict) -> dict:
     return orig
 
 
+def merge(orig: dict, patch: dict) -> dict:
+    """Merge `patch` into `orig` recursively: mappings are merged, every other value (lists too) replaces the old one."""
+    for k, v in patch.items():
+        if isinstance(v, Mapping) and isinstance(orig.get(k), dict):
+            merge(orig[k], v)
+        else:
+            orig[k] = v
+    return orig
+
+
 def validate_schema(data: dict, schema: dict) -> bool:
     """Validate the request data against a JSON schema.
 

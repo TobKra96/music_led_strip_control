@@ -1061,8 +1061,78 @@
           "Settings"
         ]
       },
+      "patch": {
+        "description": "Send only the sections to change; objects are merged, anything else is replaced.<br/><br/>A result that is not a usable configuration changes nothing and is a `400` that says why.",
+        "operationId": "settings_api_v2_patch_config_config_patch",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfigDocument"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConfigDocument"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "415": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unsupported Media Type"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        },
+        "summary": "Update part of the configuration",
+        "tags": [
+          "Settings"
+        ]
+      },
       "put": {
-        "description": "Older configuration versions are migrated. An unusable document changes nothing.",
+        "description": "Older configuration versions are migrated. An unusable document changes nothing and is a `400` that says why.",
         "operationId": "settings_api_v2_import_config_config_put",
         "requestBody": {
           "content": {

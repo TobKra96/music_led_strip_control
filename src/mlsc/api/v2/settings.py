@@ -6,6 +6,7 @@ from mlsc.api.v2.devices import SettingsOut, SettingsPatch
 from mlsc.api.v2.errors import BODY_ERRORS, Problem, ProblemError
 from mlsc.api.v2.lookup import check_schema, require_patch
 from mlsc.api.v2.security import api_login_required
+from mlsc.config_migration import ConfigMigrationError
 from mlsc.webserver.executer import Executer
 from mlsc.webserver.messages import InvalidConfigFile
 from mlsc.webserver.schemas.general_settings_api_schema import SET_GENERAL_SETTINGS_SCHEMA
@@ -63,7 +64,23 @@ def export_config():
 @settings_api.put("/config", summary="Import a configuration", responses={"204": None, "400": Problem, **BODY_ERRORS})
 @api_login_required
 def import_config(body: ConfigDocument):
-    """Older configuration versions are migrated. An unusable document changes nothing."""
-    if not Executer.instance.general_settings_executer.import_config(body.root):
-        raise ProblemError(InvalidConfigFile)
+    """Older configuration versions are migrated. An unusable document changes nothing and is a `400` that says why."""
+    try:
+        Executer.instance.general_settings_executer.replace_config(body.root)
+    except ConfigMigrationError as e:
+        raise ProblemError(InvalidConfigFile, str(e)) from e
     return "", 204
+
+
+@settings_api.patch("/config", summary="Update part of the configuration", responses={"200": ConfigDocument, "400": Problem, **BODY_ERRORS})
+@api_login_required
+def patch_config(body: ConfigDocument):
+    """Send only the sections to change; objects are merged, anything else is replaced.
+
+    A result that is not a usable configuration changes nothing and is a `400` that says why.
+    """
+    patch = require_patch(body.root)
+    try:
+        return Executer.instance.general_settings_executer.patch_config(patch)
+    except ConfigMigrationError as e:
+        raise ProblemError(InvalidConfigFile, str(e)) from e

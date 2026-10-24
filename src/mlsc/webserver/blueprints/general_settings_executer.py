@@ -1,11 +1,12 @@
 from __future__ import annotations
 
+import copy
 from typing import TYPE_CHECKING
 
 from loguru import logger
 
 from mlsc.config_migration import ConfigMigrationError, migrate_data
-from mlsc.webserver.executer_base import ExecuterBase, update
+from mlsc.webserver.executer_base import ExecuterBase, merge, update
 
 if TYPE_CHECKING:
     from mlsc.webserver.messages import BadRequest, NotFound
@@ -60,7 +61,7 @@ class GeneralSettingsExecuter(ExecuterBase):
         self._config = self._config_instance.config
 
     def import_config(self, imported_config: dict) -> bool:
-        """Import a new config and load it."""
+        """Import a new config and load it. The live config is only replaced once the new one is valid and complete."""
         if imported_config is None:
             logger.error("Could not import Config. Config is None.")
             return False
@@ -68,13 +69,27 @@ class GeneralSettingsExecuter(ExecuterBase):
         logger.debug(f"Type of imported config: {type(imported_config)}")
         if isinstance(imported_config, dict):
             try:
-                self._config, _ = migrate_data(imported_config)
+                self.replace_config(imported_config)
             except ConfigMigrationError as e:
                 logger.error(f"Could not import Config: {e}")
                 return False
-            self.save_config()
-            self._config_instance.check_compatibility()
-            self.refresh_device(self.all_devices_id)
             return True
         logger.error("Unknown Type.")
         return False
+
+    def patch_config(self, patch: dict) -> dict:
+        """Merge a partial config into the live one, all or nothing. Raises ConfigMigrationError and changes nothing on failure."""
+        return copy.deepcopy(self.replace_config(merge(copy.deepcopy(self._config), patch)))
+
+    def replace_config(self, candidate: dict) -> dict:
+        """Migrate and complete `candidate`, then swap it in and save. Raises ConfigMigrationError and changes nothing on failure."""
+        try:
+            config, _ = migrate_data(candidate)
+            config = self._config_instance.make_compatible(config)
+        except (KeyError, TypeError, ValueError, AttributeError) as e:
+            msg = f"The config is incomplete or malformed: {e!r}"
+            raise ConfigMigrationError(msg) from e
+        self._config = config
+        self._config_instance.check_compatibility()
+        self.refresh_device(self.all_devices_id)
+        return self._config

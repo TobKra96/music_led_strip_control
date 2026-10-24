@@ -346,3 +346,54 @@ def test_the_group_effect_rejects_unknown_groups_and_effects(client, group_of_tw
     assert_problem(client.get("/api/v2/groups/group_9/effect"), 404, "GroupNotFound")
     assert_problem(client.put("/api/v2/groups/group_9/effect", json={"effect": "effect_fade"}), 404, "GroupNotFound")
     assert_problem(client.put(f"/api/v2/groups/{group_id}/effect", json={"effect": "effect_nope"}), 422, "ValidationError")
+
+
+def test_importing_a_partial_config_is_refused_and_changes_nothing(client, device_id):
+    body = assert_problem(client.put("/api/v2/config", json={"version": 4}), 400, "InvalidConfigFile")
+
+    assert body["detail"]
+    assert [d["id"] for d in client.get("/api/v2/devices").get_json()] == [device_id]
+    assert client.get("/api/v2/settings").status_code == 200
+
+
+def test_a_failing_import_leaves_the_live_config_and_the_file_untouched(client, executer, device_id, monkeypatch):
+    def fail(_config):
+        key = "device_configs"
+        raise KeyError(key)
+
+    monkeypatch.setattr(executer.general_settings_executer._config_instance, "make_compatible", fail)  # ruff: ignore[private-member-access]
+    before = client.get("/api/v2/config").get_json()
+
+    assert_problem(client.put("/api/v2/config", json={"version": 4}), 400, "InvalidConfigFile")
+
+    assert client.get("/api/v2/config").get_json() == before
+    assert [d["id"] for d in client.get("/api/v2/devices").get_json()] == [device_id]
+
+
+def test_importing_an_unusable_config_names_the_reason(client):
+    body = assert_problem(client.put("/api/v2/config", json={"version": 999}), 400, "InvalidConfigFile")
+
+    assert "999" in body["detail"]
+
+
+def test_config_can_be_patched_partially(client, device_id):
+    response = client.patch("/api/v2/config", json={"general_settings": {"min_frequency": 60}})
+
+    assert response.status_code == 200
+    document = response.get_json()
+    assert document["general_settings"]["min_frequency"] == 60
+    assert device_id in document["device_configs"]
+    assert client.get("/api/v2/settings").get_json()["min_frequency"] == 60
+    assert client.get("/api/v2/config").get_json() == document
+
+
+def test_an_invalid_config_patch_is_a_400_and_changes_nothing(client):
+    before = client.get("/api/v2/config").get_json()
+
+    assert_problem(client.patch("/api/v2/config", json={"version": 999}), 400, "InvalidConfigFile")
+
+    assert client.get("/api/v2/config").get_json() == before
+
+
+def test_an_empty_config_patch_is_a_422(client):
+    assert_problem(client.patch("/api/v2/config", json={}), 422, "ValidationError")

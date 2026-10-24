@@ -125,27 +125,30 @@ class ConfigService:
             except json.JSONDecodeError:
                 return None
 
-    def check_compatibility(self):
-        loaded_config = self.config
+    def make_compatible(self, config):
+        """Return `config` upgraded and completed from the template. The live config is not touched."""
         template_config = self.load_template()
 
         config_converter_service = ConfigConverterService()
-        loaded_config = config_converter_service.upgrade(loaded_config)
+        config = config_converter_service.upgrade(config)
 
         # Loop through the root.
         for key in template_config:
             if key == "device_configs":
                 continue
 
-            if key not in loaded_config:
-                loaded_config[key] = template_config[key]
+            if key not in config:
+                config[key] = template_config[key]
                 continue
 
-            self.check_leaf(loaded_config[key], template_config[key])
+            self.check_leaf(config[key], template_config[key])
 
-        self.check_devices(loaded_config["device_configs"], template_config["default_device"])
+        self.check_devices(config["device_configs"], template_config["default_device"])
 
-        self.config = loaded_config
+        return config
+
+    def check_compatibility(self):
+        self.config = self.make_compatible(self.config)
 
         # TODO: Figure out how to validate default groups.
 
