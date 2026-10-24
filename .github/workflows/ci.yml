@@ -35,6 +35,10 @@ jobs:
         # src/ still has pre-existing lint debt; widen this once it is cleared.
         run: uv run ruff check tests
 
+      - name: OpenAPI snapshot
+        # Regenerate with: UPDATE_OPENAPI_SNAPSHOT=1 uv run pytest tests/contract/test_openapi_v2.py
+        run: uv run pytest tests/contract/test_openapi_v2.py
+
       - name: Test
         if: env.COVERAGE_CELL != 'true'
         run: uv run pytest -m "not hardware"
