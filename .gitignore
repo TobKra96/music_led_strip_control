@@ -29,7 +29,7 @@ _static
 _templates
 
 # javascript
-package-lock.json
+node_modules/
 .vscode/symbols.json
 
 server/libs/config_.json

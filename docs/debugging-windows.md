@@ -13,6 +13,15 @@ uv sync --python 3.13        # or: py -3.13 -m venv .venv; .venv\Scripts\python 
 
 `rpi-ws281x-mock` is installed automatically on Windows, so every strip uses the Mock Output.
 
+## JavaScript tests
+
+The browser JavaScript is tested with Vitest and jsdom. Node.js (current LTS) is a dev prerequisite; nothing in the app itself needs it.
+
+```powershell
+npm ci        # once, installs the dev tooling from package-lock.json
+npm test      # vitest run; tests live in tests/js/<Module>.test.js
+```
+
 ## Run
 
 ```powershell
