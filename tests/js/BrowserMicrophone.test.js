@@ -132,13 +132,13 @@ describe('streaming', () => {
         for (let i = 1; i <= 40; i++) port.onmessage({ data: new Int16Array(1920).fill(i) });
         await vi.waitFor(() => expect(releases).toHaveLength(1));
 
-        expect(microphone.queued).toHaveLength(15);
-        expect(microphone.stats.dropped).toBe(24);
-        expect(microphone.backlog).toBe(16);
+        expect(microphone.queued).toHaveLength(14);
+        expect(microphone.stats.dropped).toBe(25);
+        expect(microphone.backlog).toBe(15);
         releases.shift()();
         await vi.waitFor(() => expect(releases).toHaveLength(1));
-        // The newest 15 chunks (26..40) remain, sent as batches of at most 10.
-        expect(fetch.mock.calls[1][1].body[0]).toBe(26);
+        // The newest 14 chunks (27..40) remain, sent as batches of at most 10.
+        expect(fetch.mock.calls[1][1].body[0]).toBe(27);
         expect(fetch.mock.calls[1][1].body.length).toBe(10 * 1920);
     });
 

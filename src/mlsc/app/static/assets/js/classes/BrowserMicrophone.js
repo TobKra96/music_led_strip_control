@@ -4,6 +4,10 @@ const CHUNK_SECONDS = 0.04;
 const MAX_BATCH_SECONDS = 0.4;
 /** Audio waiting for a request is cut to this much, oldest first, so a slow connection does not add latency without limit. */
 const MAX_QUEUED_SECONDS = 0.6;
+const MAX_BATCH_CHUNKS = Math.round(MAX_BATCH_SECONDS / CHUNK_SECONDS);
+const MAX_QUEUED_CHUNKS = Math.round(MAX_QUEUED_SECONDS / CHUNK_SECONDS);
+/** Browsers refuse a `keepalive` request body above 64 KiB, so a batch stays below it. */
+const MAX_BATCH_BYTES = 60000;
 
 const STOP_REASONS = {
     401: 'Your session ended. Sign in again to stream.',
@@ -76,6 +80,7 @@ export class BrowserMicrophone {
             this.sequence = 0;
             this.queued = [];
             this.sending = false;
+            this.session = {};
             this.stats = emptyStats();
             this.inFlight = 0;
             this.lastBlockAt = undefined;
@@ -111,7 +116,7 @@ export class BrowserMicrophone {
         while (this.pendingSamples >= this.chunkSamples) {
             const chunk = this.take(this.chunkSamples);
             this.queued.push(chunk);
-            if (this.queued.length > MAX_QUEUED_SECONDS / CHUNK_SECONDS) {
+            if (this.backlog > MAX_QUEUED_CHUNKS) {
                 this.queued.shift();
                 this.stats.dropped++;
             }
@@ -132,14 +137,27 @@ export class BrowserMicrophone {
     async pump() {
         if (this.sending) return;
         this.sending = true;
-        while (this.queued.length && this.state === 'streaming') {
-            const batch = this.queued.splice(0, Math.max(1, Math.round(MAX_BATCH_SECONDS / CHUNK_SECONDS)));
-            this.inFlight = batch.length;
-            await this.send(batch.length === 1 ? batch[0] : this.join(batch), this.sequence++);
-            this.inFlight = 0;
+        const { session } = this;
+        try {
+            while (this.queued.length && this.state === 'streaming' && this.session === session) {
+                const batch = this.queued.splice(0, this.batchSize());
+                this.inFlight = batch.length;
+                await this.send(this.join(batch), this.sequence++);
+                if (this.session === session) this.inFlight = 0;
+            }
+        } finally {
+            // A stream started meanwhile owns these fields, and its own pump.
+            if (this.session === session) {
+                if (this.state !== 'streaming') this.queued = [];
+                this.sending = false;
+            }
         }
-        this.queued = [];
-        this.sending = false;
+    }
+
+    /** How many queued chunks go in the next request. */
+    batchSize() {
+        const bytes = this.queued[0].byteLength;
+        return Math.max(1, Math.min(MAX_BATCH_CHUNKS, Math.floor(MAX_BATCH_BYTES / bytes)));
     }
 
     join(chunks) {
