@@ -102,6 +102,10 @@ class MixerNotFound(NotFound):
     _message = "The microphone has no hardware gain."
 
 
+class RecordingNotFound(NotFound):
+    _message = "There is no recording of the microphone test."
+
+
 class SettingNotFound(NotFound):
     _message = "Setting does not exist."
 
@@ -142,6 +146,10 @@ class GroupAlreadyExists(AlreadyExists):
 
 class BrowserStreamBusy(AlreadyExists):
     _message = "Another browser is already streaming its microphone."
+
+
+class TestInProgress(AlreadyExists):
+    _message = "A microphone test is already running."
 
 
 class BrowserMicrophoneNotSelected(AlreadyExists):

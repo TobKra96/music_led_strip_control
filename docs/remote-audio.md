@@ -173,6 +173,7 @@ The Pi now shows up as a Spotify Connect device in the Spotify app.
 
 ## Troubleshooting
 
+- **Hear what MLSC hears.** After a successful **Test microphone** on the Microphone page, press play under **Play recording: what MLSC hears**. It is the 2 seconds of the test after the device, sample rate and gain, before the effects. It stays in memory, the next test replaces it, and a restart discards it.
 - **No device tagged Monitor.** Check `aplay -l | grep Loopback`, then restart MLSC so it reads the device list again.
 - **The meter stays flat.** Make sure the receiver plays to `hw:Loopback,0` (playback side) and MLSC listens on the device ending in `,1` (capture side). Something must be playing on the remote device.
 - **"Device or resource busy" from the receiver.** Only one program can play to `hw:Loopback,0` at a time, so only one receiver can feed MLSC. Stop the other receiver.

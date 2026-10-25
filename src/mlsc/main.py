@@ -21,6 +21,7 @@ from mlsc.config_migration import ConfigMigrationError
 from mlsc.config_service import ConfigService
 from mlsc.device_manager import DeviceManager
 from mlsc.mic_level import MicLevel
+from mlsc.mic_recording import MicRecording
 from mlsc.notification_service import NotificationService
 from mlsc.webserver.webserver import Webserver
 
@@ -100,6 +101,8 @@ class Main:
 
         # Written by the audio process, read by the webserver process for the `mic.level` events.
         self._mic_level = MicLevel()
+        # The clip of the microphone test: written by the audio process while the webserver process has it armed.
+        self._mic_recording = MicRecording()
         # Written by the audio process, read by the webserver process for the Microphone page and the `audio.status` events.
         self._audio_status = AudioStatus()
 
@@ -161,7 +164,8 @@ class Main:
                 self._audio_backend,
                 self._mic_level,
                 self._audio_status,
-                self._browser_audio_queue
+                self._browser_audio_queue,
+                self._mic_recording
             ))
         self._webserver_process.start()
 
@@ -177,7 +181,8 @@ class Main:
                 self._audio_backend,
                 self._mic_level,
                 self._audio_status,
-                self._browser_audio_queue
+                self._browser_audio_queue,
+                self._mic_recording
             ))
         self._audio_process.start()
 

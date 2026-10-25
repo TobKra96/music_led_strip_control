@@ -132,6 +132,10 @@
                                 <small id="status_text" class="form-text text-muted mb-3"></small>
                                 <button type="button" id="test_btn" class="btn btn-outline-primary btn-block">Test microphone</button>
                                 <div id="test_result" class="alert mt-3 mb-0 d-none" role="status"></div>
+                                <div id="test_recording" class="mt-3 d-none">
+                                    <label for="test_audio" class="d-block mb-1"><small>Play recording: what MLSC hears</small></label>
+                                    <audio id="test_audio" controls preload="none" class="w-100"></audio>
+                                </div>
                             </div>
                         </div>
                     </div>

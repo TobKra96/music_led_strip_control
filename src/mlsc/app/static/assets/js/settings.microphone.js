@@ -232,6 +232,7 @@ const test = async () => {
             .empty()
             .append($('<strong class="d-block"></strong>').text(result.message));
         if (result.hint) $result.append($('<span></span>').text(result.hint));
+        showRecording(result);
     } catch (error) {
         new Toast(`Could not test the microphone. ${error.summary || ''}`).error();
     } finally {

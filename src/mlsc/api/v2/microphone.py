@@ -9,15 +9,17 @@ from mlsc.api.v2.security import api_login_required
 from mlsc.api.v2.settings_models import MicrophonePatch
 from mlsc.browser_stream import BrowserStreamError
 from mlsc.mixer import MixerError
-from mlsc.webserver.blueprints.microphone_settings_executer import FRAMES_PER_BUFFER_CHOICES
+from mlsc.webserver.blueprints.microphone_settings_executer import FRAMES_PER_BUFFER_CHOICES, MicrophoneTestBusy
 from mlsc.webserver.executer import Executer
 from mlsc.webserver.messages import (
     BrowserMicrophoneNotSelected,
     BrowserStreamBusy,
     InvalidChunk,
     MixerNotFound,
+    RecordingNotFound,
     ServerError,
     StreamGone,
+    TestInProgress,
     ValidationError,
 )
 
@@ -84,6 +86,8 @@ class MicrophoneTestOut(BaseModel):
     hint: str | None = Field(description="How to fix the problem.")
     peak: float = Field(description="Highest input level seen, 0 to 1.")
     device: str | None
+    recording: bool = Field(description="Whether the test kept a clip of what it heard, to play back from `/recording`. Only an `ok` test does.")
+    recording_id: int = Field(description="Counts up with every kept clip. Use it to tell a new clip from the old one.")
 
 
 class MixerOut(BaseModel):
@@ -129,11 +133,33 @@ def get_devices():
     return {"devices": _executer().list_devices(), "frames_per_buffer": list(FRAMES_PER_BUFFER_CHOICES)}
 
 
-@microphone_api.post("/test", summary="Test the microphone", responses={"200": MicrophoneTestOut, "401": Problem, "415": Problem})
+@microphone_api.post("/test", summary="Test the microphone", responses={"200": MicrophoneTestOut, "401": Problem, "409": Problem, "415": Problem})
 @api_login_required
 def test_microphone():
-    """Watches the live input for two seconds and reports silence, no device or permission denied, with a hint to fix it."""
-    return _executer().test()
+    """Watches the live input for two seconds and reports silence, no device or permission denied, with a hint to fix it.
+
+    A working microphone also leaves a clip of what it heard, see `/recording`. `409` while another test runs.
+    """
+    try:
+        return _executer().test()
+    except MicrophoneTestBusy as e:
+        raise ProblemError(TestInProgress) from e
+
+
+@microphone_api.get(
+    "/recording", summary="Play back the audio of the last microphone test",
+    responses={"200": {"description": "16-bit mono WAV at the rate of the captured stream.", "content": {"audio/wav": {}}}, "401": Problem, "404": Problem},
+)
+@api_login_required
+def get_recording():
+    """What MLSC heard during the last successful test: after the device, sample rate and software gain, before the effects.
+
+    Kept in memory only, replaced by the next test and gone on restart. `404` when there is no clip or while a test runs.
+    """
+    wav = _executer().get_recording()
+    if wav is None:
+        raise ProblemError(RecordingNotFound)
+    return Response(wav, mimetype="audio/wav", headers={"Cache-Control": "no-store"})
 
 
 @microphone_api.get("/mixer", summary="Get the hardware gain", responses={"200": MixerOut, "401": Problem})

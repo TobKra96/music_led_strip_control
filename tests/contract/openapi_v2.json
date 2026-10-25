@@ -5919,6 +5919,16 @@
             "title": "Peak",
             "type": "number"
           },
+          "recording": {
+            "description": "Whether the test kept a clip of what it heard, to play back from `/recording`. Only an `ok` test does.",
+            "title": "Recording",
+            "type": "boolean"
+          },
+          "recording_id": {
+            "description": "Counts up with every kept clip. Use it to tell a new clip from the old one.",
+            "title": "Recording Id",
+            "type": "integer"
+          },
           "result": {
             "description": "`ok`, `silence`, `no_device`, `permission_denied`, `waiting_for_browser` or `error`.",
             "title": "Result",
@@ -5930,7 +5940,9 @@
           "message",
           "hint",
           "peak",
-          "device"
+          "device",
+          "recording",
+          "recording_id"
         ],
         "title": "MicrophoneTestOut",
         "type": "object"
@@ -6128,9 +6140,11 @@
               "MixerNotFound",
               "NotFound",
               "OperationNotFound",
+              "RecordingNotFound",
               "ServerError",
               "SettingNotFound",
               "StreamGone",
+              "TestInProgress",
               "TooManyAttempts",
               "TooManyStreams",
               "Unauthorized",
@@ -10988,6 +11002,54 @@
         ]
       }
     },
+    "/api/v2/microphone/recording": {
+      "get": {
+        "description": "What MLSC heard during the last successful test: after the device, sample rate and software gain, before the effects.<br/><br/>Kept in memory only, replaced by the next test and gone on restart. `404` when there is no clip or while a test runs.",
+        "operationId": "microphone_api_v2_get_recording_recording_get",
+        "responses": {
+          "200": {
+            "content": {
+              "audio/wav": {}
+            },
+            "description": "OK"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        },
+        "summary": "Play back the audio of the last microphone test",
+        "tags": [
+          "Microphone"
+        ]
+      }
+    },
     "/api/v2/microphone/status": {
       "get": {
         "operationId": "microphone_api_v2_get_status_status_get",
@@ -11031,7 +11093,7 @@
     },
     "/api/v2/microphone/test": {
       "post": {
-        "description": "Watches the live input for two seconds and reports silence, no device or permission denied, with a hint to fix it.",
+        "description": "Watches the live input for two seconds and reports silence, no device or permission denied, with a hint to fix it.<br/><br/>A working microphone also leaves a clip of what it heard, see `/recording`. `409` while another test runs.",
         "operationId": "microphone_api_v2_test_microphone_test_post",
         "responses": {
           "200": {
@@ -11053,6 +11115,16 @@
               }
             },
             "description": "Unauthorized"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Conflict"
           },
           "415": {
             "content": {

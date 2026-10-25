@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import copy
+import threading
 import time
 from collections.abc import Callable
 
@@ -13,6 +14,7 @@ from mlsc.audio_info import AudioInfo
 from mlsc.audio_status import AudioStatus
 from mlsc.browser_stream import BrowserStream, BrowserStreamError
 from mlsc.mic_level import MicLevel
+from mlsc.mic_recording import TEST_SECONDS, MicRecording
 from mlsc.mixer import Mixer, MixerError, find_mixer
 from mlsc.notification_enum import NotificationEnum
 from mlsc.operations import Operation, RetryPolicy
@@ -23,7 +25,6 @@ FRAMES_PER_BUFFER_CHOICES = (256, 512, 1024, 2048, 4096)
 STREAM_ONLY_KEYS = frozenset({"source", "device_name", "host_api", "gain"})
 # How long an applied change may take until audio arrives from the new device.
 APPLY_SECONDS = 8.0
-TEST_SECONDS = 2.0
 POLL_SECONDS = 0.1
 # Peak level below which the test counts the input as silent.
 SILENCE_LEVEL = 0.01
@@ -64,17 +65,28 @@ class MicrophoneApplyError(Exception):
     """Why an applied microphone change did not work."""
 
 
+class MicrophoneTestBusy(Exception):
+    """Another microphone test is still running."""
+
+
 class MicrophoneSettingsExecuter(ExecuterBase):
     _mic_level: MicLevel | None = None
+    _mic_recording: MicRecording | None = None
+    _test_lock = threading.Lock()
+    _testing = False
+    # Counts the kept clips, so the player can tell a new one from the old one.
+    _recording_id = 0
     _audio_status: AudioStatus | None = None
     _browser_stream: BrowserStream | None = None
     # Injectable for tests, so the apply and test waits never sleep for real.
     _clock: Callable[[], float] = staticmethod(time.monotonic)
     _sleep: Callable[[float], None] = staticmethod(time.sleep)
 
-    def connect_audio(self, mic_level: MicLevel | None, audio_status: AudioStatus | None, browser_queue=None) -> None:
-        """Give access to the level and status that the audio process shares, and the queue that feeds it the Browser Microphone."""
+    def connect_audio(self, mic_level: MicLevel | None, audio_status: AudioStatus | None, browser_queue=None,
+                      mic_recording: MicRecording | None = None) -> None:
+        """Give access to the level, status and test clip that the audio process shares, and the queue that feeds it the Browser Microphone."""
         self._mic_level = mic_level
+        self._mic_recording = mic_recording
         self._audio_status = audio_status
         self._browser_stream = BrowserStream(browser_queue) if browser_queue is not None else None
 
@@ -191,13 +203,30 @@ class MicrophoneSettingsExecuter(ExecuterBase):
     # Test
 
     def test(self) -> dict:
-        """Watch the live input for a moment and say whether it works, and if not, how to fix it."""
+        """Watch the live input for a moment and say whether it works, and if not, how to fix it. Keeps what it heard as the clip."""
+        if not self._test_lock.acquire(blocking=False):
+            raise MicrophoneTestBusy
+        self._testing = True
+        try:
+            result = self._run_test()
+        finally:
+            self._testing = False
+            self._test_lock.release()
+        return result
+
+    def _run_test(self) -> dict:
         peak = 0.0
+        if self._mic_recording is not None:
+            self._mic_recording.arm()
         deadline = self._clock() + TEST_SECONDS
-        while self._clock() < deadline and self.get_status().get("state") != "error":
-            if self._mic_level is not None:
-                peak = max(peak, self._mic_level.read())
-            self._sleep(POLL_SECONDS)
+        try:
+            while self._clock() < deadline and self.get_status().get("state") != "error":
+                if self._mic_level is not None:
+                    peak = max(peak, self._mic_level.read())
+                self._sleep(POLL_SECONDS)
+        finally:
+            if self._mic_recording is not None:
+                self._mic_recording.disarm()
 
         status = self.get_status()
         if status.get("state") == "error":
@@ -210,8 +239,20 @@ class MicrophoneSettingsExecuter(ExecuterBase):
             result = "silence"
         else:
             result = "ok"
+        recording = result == "ok" and self._mic_recording is not None and self._mic_recording.wav() is not None
+        if recording:
+            self._recording_id += 1
+        elif self._mic_recording is not None:
+            self._mic_recording.clear()
         message, hint = TEST_RESULTS[result]
-        return {"result": result, "message": message, "hint": hint, "peak": round(peak, 3), "device": status.get("device")}
+        return {"result": result, "message": message, "hint": hint, "peak": round(peak, 3), "device": status.get("device"),
+                "recording": recording, "recording_id": self._recording_id}
+
+    def get_recording(self) -> bytes | None:
+        """Return the clip of the last successful test as a WAV file, or None while there is none or a test runs."""
+        if self._testing or self._mic_recording is None:
+            return None
+        return self._mic_recording.wav()
 
     # Browser Microphone
 
