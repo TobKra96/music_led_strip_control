@@ -25,6 +25,9 @@ _PERMISSION_MARKERS = ("permission", "errno 13", "access is denied", "access den
 _NO_DEVICE_MARKERS = ("no input device", "device unavailable", "no such device", "invalid device", "-9996", "-9985")
 
 WAITING_MESSAGE = "Waiting for browser"
+# The stutter counters of the Browser Microphone are published at most this often, so a bad connection does not flood the event stream.
+STATS_INTERVAL_SECONDS = 1.0
+_EMPTY_BROWSER_STATS = {"unstable": False, "underruns": 0, "trims": 0, "lost_ms": 0, "longest_gap_ms": 0}
 
 _EMPTY_STATUS = {"device": None, "host_api": None, "sample_rate": None, "fallback": False}
 
@@ -63,6 +66,7 @@ class MicSupervisor:
         self._retry_at: float | None = None
         self._last_audio_at = 0.0
         self._restarts = 0
+        self._stats_at = 0.0
 
     def start(self, audio: dict) -> None:
         """Open the device that `audio` (the config section) selects. A failure is reported and retried by `poll`."""
@@ -88,16 +92,24 @@ class MicSupervisor:
             self._set_status({**self.status, "state": "ok", "kind": None, "message": None})
         elif not streaming and self.status["state"] == "ok":
             self._set_status({**self.status, "state": "waiting", "kind": "waiting_for_browser", "message": WAITING_MESSAGE})
-        if unstable != self.status["unstable"]:
-            self._set_status({**self.status, "unstable": unstable, "underruns": self._browser.underruns})
+        stats = {
+            "unstable": unstable, "underruns": self._browser.underruns, "trims": self._browser.trims,
+            "lost_ms": round(self._browser.lost_seconds * 1000), "longest_gap_ms": round(self._browser.longest_gap * 1000),
+        }
+        now = self._clock()
+        changed = any(stats[key] != self.status.get(key) for key in stats)
+        if unstable != self.status["unstable"] or (changed and now - self._stats_at >= STATS_INTERVAL_SECONDS):
+            self._stats_at = now
+            self._set_status({**self.status, **stats})
 
     def _open_browser(self) -> None:
         sample_rate = self._audio["sample_rate"] or DEFAULT_SAMPLE_RATE
         self._set_status({
             "state": "waiting", "device": BROWSER_DEVICE_NAME, "host_api": BROWSER_HOST_API, "sample_rate": sample_rate, "fallback": False,
             "message": WAITING_MESSAGE, "kind": "waiting_for_browser", "retry_in": None, "restarts": self._restarts,
-            "unstable": False, "underruns": 0,
+            **_EMPTY_BROWSER_STATS,
         })
+        self._stats_at = self._clock()
         self._browser.open(self._browser.device(sample_rate), sample_rate, self._audio["frames_per_buffer"], on_data=self._receive)
 
     def _open(self) -> None:

@@ -219,6 +219,13 @@ const showStatus = (status) => {
     else if (status.state === 'error') text = 'No audio. See the message at the top of the page.';
     else if (status.state === 'waiting') text = 'Waiting for browser';
     if (status.unstable) text += ' Unstable connection: audio from the browser keeps dropping out.';
+    if (status.underruns || status.trims || status.lost_ms || status.longest_gap_ms > 150) {
+        text += ` Dropouts: ${status.underruns}, audio cut: ${status.trims}, behind real time: ${status.lost_ms} ms, longest wait for audio: ${status.longest_gap_ms} ms.`;
+    }
+    if (browserMicrophone.state === 'streaming') {
+        const { slowestBlockGap, slowestRequest, deepestBacklog } = browserMicrophone.stats;
+        text += ` This browser: slowest audio block ${Math.round(slowestBlockGap)} ms, slowest request ${Math.round(slowestRequest)} ms, requests waiting ${deepestBacklog}.`;
+    }
     $('#status_text').text(text.trim());
 };
 

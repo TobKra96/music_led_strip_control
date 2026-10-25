@@ -243,3 +243,22 @@ def test_without_a_browser_capture_the_device_stays_in_use(supervisor, capture):
     capture.feed()
 
     assert supervisor.status["state"] == "ok"
+
+
+def test_the_stutter_counters_are_published_at_most_once_a_second(browser_supervisor, browser, fake_clock, reports):
+    browser_supervisor.start(browser_audio())
+    stream_chunks(browser, [0, 1, 2])
+    browser_supervisor.poll()
+    reports.clear()
+
+    fake_clock.advance(0.5)
+    stream_chunks(browser, [3, 5])
+    browser_supervisor.poll()
+    assert not reports
+
+    fake_clock.advance(0.6)
+    browser_supervisor.poll()
+
+    assert reports[-1]["underruns"] == 1
+    assert reports[-1]["longest_gap_ms"] == 500
+    assert {"trims", "lost_ms"} <= reports[-1].keys()

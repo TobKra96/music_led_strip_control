@@ -149,6 +149,18 @@
             "description": "`no_device`, `permission_denied` or `open_failed` while `state` is `error`, `waiting_for_browser` while it is `waiting`.",
             "title": "Kind"
           },
+          "longest_gap_ms": {
+            "default": 0,
+            "description": "The longest wait between two chunks of the Browser Microphone, in milliseconds.",
+            "title": "Longest Gap Ms",
+            "type": "integer"
+          },
+          "lost_ms": {
+            "default": 0,
+            "description": "Milliseconds the Browser Microphone fell behind real time and did not make up for, so audio is dropped later.",
+            "title": "Lost Ms",
+            "type": "integer"
+          },
           "message": {
             "anyOf": [
               {
@@ -205,9 +217,15 @@
             "description": "`starting`, `ok`, `waiting` (for the Browser Microphone to stream) or `error`; missing before the audio process has started.",
             "title": "State"
           },
+          "trims": {
+            "default": 0,
+            "description": "How often the Browser Microphone cut its buffer down because chunks piled up, which drops audio.",
+            "title": "Trims",
+            "type": "integer"
+          },
           "underruns": {
             "default": 0,
-            "description": "How often the Browser Microphone ran dry when the status last changed.",
+            "description": "How often the Browser Microphone ran dry or missed a chunk since it opened, updated about once a second.",
             "title": "Underruns",
             "type": "integer"
           },

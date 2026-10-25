@@ -81,6 +81,9 @@ class JitterBuffer:
         self._resampler = LinearResampler()
         self._underruns: deque[float] = deque()
         self.underruns = 0
+        # Why the stream stutters, beside `underruns`: audio cut at the maximum, and the longest wait between two chunks.
+        self.trims = 0
+        self.longest_gap = 0.0
         self.last_chunk_at: float | None = None
         self.reset()
 
@@ -103,7 +106,11 @@ class JitterBuffer:
                 gap = min(missing * len(samples) * self.sample_rate // source_rate, self._max)
                 self._append(np.zeros(gap, dtype=np.int16))
         self._next_sequence = sequence + 1
-        self.last_chunk_at = self._clock()
+        now = self._clock()
+        # A pause longer than a stall is the stream stopping, not a slow connection.
+        if self.last_chunk_at is not None and now - self.last_chunk_at < STALL_SECONDS:
+            self.longest_gap = max(self.longest_gap, now - self.last_chunk_at)
+        self.last_chunk_at = now
         self._append(self._resampler.process(samples, source_rate, self.sample_rate))
 
     def pull(self, frames: int) -> np.ndarray:
@@ -142,6 +149,7 @@ class JitterBuffer:
     def _append(self, samples: np.ndarray) -> None:
         self._buffer = np.concatenate((self._buffer, samples))
         if len(self._buffer) > self._max:
+            self.trims += 1
             self._buffer = self._buffer[-self._target:]
 
 
@@ -160,6 +168,8 @@ class BrowserCapture(AudioCapture):
         self._frames = 0
         self._thread: threading.Thread | None = None
         self._stop = threading.Event()
+        # Real time the ticks fell behind and did not make up for, so that much less audio was played than arrived.
+        self.lost_seconds = 0.0
 
     def list_devices(self) -> list[AudioDevice]:
         return [self.device(DEFAULT_SAMPLE_RATE)]
@@ -178,6 +188,14 @@ class BrowserCapture(AudioCapture):
     @property
     def underruns(self) -> int:
         return self._jitter.underruns if self._jitter is not None else 0
+
+    @property
+    def trims(self) -> int:
+        return self._jitter.trims if self._jitter is not None else 0
+
+    @property
+    def longest_gap(self) -> float:
+        return self._jitter.longest_gap if self._jitter is not None else 0.0
 
     @property
     def unstable(self) -> bool:
@@ -201,6 +219,7 @@ class BrowserCapture(AudioCapture):
 
     def _start(self, device: AudioDevice, sample_rate: int, frames_per_buffer: int) -> None:
         self._jitter = JitterBuffer(sample_rate, self._clock, frames=frames_per_buffer)
+        self.lost_seconds = 0.0
         self._discard_queued()
         self._frames = frames_per_buffer
         if self._source is not None:
@@ -228,7 +247,9 @@ class BrowserCapture(AudioCapture):
                 continue
             self.tick()
             # A late tick does not try to catch up with a burst of buffers.
-            next_tick = max(next_tick + period, self._clock())
+            now = self._clock()
+            self.lost_seconds += max(0.0, now - (next_tick + period))
+            next_tick = max(next_tick + period, now)
 
     def close(self) -> None:
         self._stop.set()

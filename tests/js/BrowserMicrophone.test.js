@@ -160,3 +160,29 @@ describe('ending', () => {
         expect(microphone.state).toBe('streaming');
     });
 });
+
+describe('stats', () => {
+    it('keeps the slowest block gap, the slowest request and the deepest backlog', async () => {
+        let time = 0;
+        const releases = [];
+        const fetch = vi.fn(() => new Promise(resolve => releases.push(() => { time += 90; resolve({ status: 204 }); })));
+        const { microphone, port } = setup({ fetch, now: () => time });
+        await microphone.start();
+
+        // Blocks 3 ms apart, then one 40 ms late: the worklet or the tab was held up.
+        for (const gap of [0, 3, 3, 40]) {
+            time += gap;
+            port.onmessage({ data: new Int16Array(960).fill(1000) });
+        }
+        // Two chunks wait behind the first request, which is slow.
+        await vi.waitFor(() => expect(releases).toHaveLength(1));
+        expect(microphone.stats.deepestBacklog).toBe(2);
+        releases.shift()();
+        await vi.waitFor(() => expect(releases).toHaveLength(1));
+        releases.shift()();
+        await vi.waitFor(() => expect(microphone.stats.requests).toBe(2));
+
+        expect(microphone.stats).toMatchObject({ blocks: 4, slowestBlockGap: 40, slowestRequest: 90 });
+        expect(microphone.backlog).toBe(0);
+    });
+});

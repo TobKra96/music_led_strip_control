@@ -1,4 +1,6 @@
+import math
 import queue
+import threading
 
 import numpy as np
 import pytest
@@ -224,3 +226,121 @@ def test_opening_discards_chunks_left_in_the_queue():
     capture.close()
 
     assert source.empty()
+
+
+def test_cutting_the_buffer_at_the_maximum_is_counted(jitter):
+    for sequence in range(10):
+        jitter.push(sequence, RATE, chunk())
+
+    assert jitter.trims == 1
+
+
+def test_the_longest_wait_between_chunks_is_kept(jitter, fake_clock):
+    jitter.push(0, RATE, chunk())
+    fake_clock.advance(0.04)
+    jitter.push(1, RATE, chunk())
+    fake_clock.advance(0.3)
+    jitter.push(2, RATE, chunk())
+    fake_clock.advance(0.04)
+    jitter.push(3, RATE, chunk())
+
+    assert jitter.longest_gap == pytest.approx(0.3)
+
+
+class TimerSource:
+    """A chunk source on a fake clock whose waits end on a timer tick, like `queue.get(timeout=...)` on Windows (about 15.6 ms)."""
+
+    def __init__(self, clock, rate, seconds, granularity=0.0, chunk_seconds=0.04, stall=None) -> None:
+        self.clock, self.seconds, self.granularity = clock, seconds, granularity
+        self.rate, self.chunk_seconds, self.stall = rate, chunk_seconds, stall
+        self.sent = 0
+        self.stop = threading.Event()
+
+    def arrival(self, sequence):
+        """When chunk `sequence` reaches the audio process: on time, or all held back by `stall` = (start, length)."""
+        due = sequence * self.chunk_seconds
+        if self.stall and self.stall[0] <= due < self.stall[0] + self.stall[1]:
+            return self.stall[0] + self.stall[1]
+        return due
+
+    def get(self, timeout):
+        wake = self.clock.now + (math.ceil(timeout / self.granularity) * self.granularity if self.granularity else timeout)
+        arrives = self.arrival(self.sent)
+        if arrives <= wake:
+            self.clock.now = max(self.clock.now, arrives)
+            message = ("chunk", self.sent, self.rate, chunk(1000, int(self.rate * self.chunk_seconds)).tobytes())
+            self.sent += 1
+            return message
+        self.clock.now = wake
+        if wake >= self.seconds:
+            self.stop.set()
+        raise queue.Empty
+
+    def get_nowait(self):
+        raise queue.Empty
+
+
+def run_real_time(fake_clock, source, rate, frames):
+    """Run the capture's own loop against `source` and return it with the audio it delivered, in seconds."""
+    capture = BrowserCapture(None, fake_clock.time)
+    delivered = []
+    capture.open(capture.device(rate), rate, frames, on_data=delivered.append)
+    capture._source = source  # ruff: ignore[private-member-access]
+    capture._run(source.stop, frames / rate)  # ruff: ignore[private-member-access]
+    return capture, delivered
+
+
+@pytest.fixture
+def clock_at_start(fake_clock):
+    fake_clock.now = 0.0
+    return fake_clock
+
+
+def test_a_timer_that_wakes_on_time_delivers_audio_in_real_time_and_counts_nothing_lost(clock_at_start):
+    source = TimerSource(clock_at_start, 44100, seconds=10)
+
+    capture, delivered = run_real_time(clock_at_start, source, 44100, 512)
+
+    assert len(delivered) * 512 / 44100 == pytest.approx(10, rel=0.01)
+    assert capture.lost_seconds == pytest.approx(0, abs=0.02)
+    assert capture.trims == 0
+
+
+def test_ticks_that_fall_behind_are_counted_as_lost_time(clock_at_start):
+    source = TimerSource(clock_at_start, 44100, seconds=10, granularity=0.015625)
+
+    capture, _ = run_real_time(clock_at_start, source, 44100, 256)
+
+    assert capture.lost_seconds > 1
+
+
+@pytest.mark.xfail(strict=True, reason="#302: on a coarse timer (Windows, about 15.6 ms) the 5.8 ms ticks are late and never made up, "
+                   "so less audio is played than arrives and the buffer is cut at its maximum again and again")
+def test_small_buffers_are_played_in_real_time_on_a_coarse_timer(clock_at_start):
+    source = TimerSource(clock_at_start, 44100, seconds=20, granularity=0.015625)
+
+    capture, delivered = run_real_time(clock_at_start, source, 44100, 256)
+
+    assert len(delivered) * 256 / 44100 >= 0.98 * 20
+    assert capture.trims == 0
+
+
+def test_a_stall_the_buffer_can_absorb_is_not_heard(clock_at_start):
+    rate, frames = 44100, 512
+    source = TimerSource(clock_at_start, rate, seconds=6, stall=(3.0, 0.06))
+
+    capture, _ = run_real_time(clock_at_start, source, rate, frames)
+
+    assert capture.underruns == 0
+    assert capture.trims == 0
+
+
+def test_a_stall_longer_than_the_buffer_runs_it_dry_once_and_the_catch_up_is_cut(clock_at_start):
+    rate, frames = 44100, 512
+    source = TimerSource(clock_at_start, rate, seconds=6, stall=(3.0, 0.25))
+
+    capture, _ = run_real_time(clock_at_start, source, rate, frames)
+
+    assert capture.underruns == 1
+    assert capture.trims == 1
+    assert capture.longest_gap >= 0.25

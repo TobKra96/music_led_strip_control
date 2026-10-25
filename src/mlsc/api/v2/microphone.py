@@ -62,7 +62,10 @@ class AudioStatusOut(BaseModel):
     retry_in: float | None = Field(default=None, description="Seconds until the next try to open the device.")
     restarts: int = 0
     unstable: bool = Field(default=False, description="Whether the Browser Microphone connection keeps running dry, so audio drops out.")
-    underruns: int = Field(default=0, description="How often the Browser Microphone ran dry when the status last changed.")
+    underruns: int = Field(default=0, description="How often the Browser Microphone ran dry or missed a chunk since it opened, updated about once a second.")
+    trims: int = Field(default=0, description="How often the Browser Microphone cut its buffer down because chunks piled up, which drops audio.")
+    lost_ms: int = Field(default=0, description="Milliseconds the Browser Microphone fell behind real time and did not make up for, so audio is dropped later.")
+    longest_gap_ms: int = Field(default=0, description="The longest wait between two chunks of the Browser Microphone, in milliseconds.")
 
 
 class AudioDeviceOut(BaseModel):

@@ -8,6 +8,9 @@ const STOP_REASONS = {
     410: 'The server released the stream after it stopped receiving audio.',
 };
 
+/** What `BrowserMicrophone.stats` counts to tell where a stutter comes from, in milliseconds. */
+const emptyStats = () => ({ blocks: 0, slowestBlockGap: 0, requests: 0, slowestRequest: 0, deepestBacklog: 0 });
+
 const CONSTRAINTS = { audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false } };
 
 /**
@@ -28,10 +31,12 @@ export class BrowserMicrophone {
      * @param {function(): Promise.<{stream_id: string}>} deps.openStream
      * @param {function(string, object): Promise.<{status: number}>} deps.fetch
      * @param {function(string, string=): void} deps.onState Called with the new state and a detail for the user.
+     * @param {function(): number=} deps.now Milliseconds on a monotonic clock, for `stats`.
      */
     constructor(deps) {
         this.deps = deps;
         this.state = 'idle';
+        this.stats = emptyStats();
     }
 
     setState(state, detail = '') {
@@ -66,6 +71,9 @@ export class BrowserMicrophone {
             this.pendingSamples = 0;
             this.sequence = 0;
             this.queue = Promise.resolve();
+            this.stats = emptyStats();
+            this.backlog = 0;
+            this.lastBlockAt = undefined;
             this.streamId = (await deps.openStream()).stream_id;
             node.port.onmessage = ({ data }) => this.collect(data);
         } catch (error) {
@@ -89,13 +97,28 @@ export class BrowserMicrophone {
     /** @param {Int16Array} block Mono samples from the worklet. */
     collect(block) {
         if (this.state !== 'streaming') return;
+        const now = this.now();
+        if (this.lastBlockAt !== undefined) this.stats.slowestBlockGap = Math.max(this.stats.slowestBlockGap, now - this.lastBlockAt);
+        this.lastBlockAt = now;
+        this.stats.blocks++;
         this.pending.push(block);
         this.pendingSamples += block.length;
         while (this.pendingSamples >= this.chunkSamples) {
             const chunk = this.take(this.chunkSamples);
             const sequence = this.sequence++;
-            this.queue = this.queue.then(() => this.send(chunk, sequence));
+            this.backlog++;
+            this.stats.deepestBacklog = Math.max(this.stats.deepestBacklog, this.backlog);
+            this.queue = this.queue.then(() => this.send(chunk, sequence)).finally(() => this.backlog--);
         }
+    }
+
+    countRequest(startedAt) {
+        this.stats.requests++;
+        this.stats.slowestRequest = Math.max(this.stats.slowestRequest, this.now() - startedAt);
+    }
+
+    now() {
+        return this.deps.now ? this.deps.now() : performance.now();
     }
 
     /** Remove the first `count` samples from the pending blocks. */
@@ -118,14 +141,17 @@ export class BrowserMicrophone {
         if (this.state !== 'streaming') return;
         const url = `/api/v2/microphone/browser/stream/${this.streamId}/chunks?sequence=${sequence}&sample_rate=${this.sampleRate}`;
         let response;
+        const startedAt = this.now();
         try {
             response = await this.deps.fetch(url, {
                 method: 'POST', headers: { 'Content-Type': 'application/octet-stream' }, body: chunk, keepalive: true, credentials: 'same-origin',
             });
         } catch {
+            this.countRequest(startedAt);
             await this.end('error', 'The connection to the server was lost.');
             return;
         }
+        this.countRequest(startedAt);
         if (response.status === 204) return;
         await this.end('stopped', STOP_REASONS[response.status] || `The server refused the audio (${response.status}).`);
     }
