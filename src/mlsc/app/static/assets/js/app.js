@@ -26,8 +26,8 @@ events.on('ready', () => {
 });
 
 /**
- * A Diagnosis is `{device_id, status, message, fix}`. Anything but `ok` keeps a banner up for that device.
- * @param {{device_id: string, status: string, message: string, fix?: string}} diagnosis
+ * A Diagnosis is `{device_id, status, message, suggested_fix}`. Anything but `ok` keeps a banner up for that device.
+ * @param {{device_id: string, status: string, message: string, suggested_fix: string | null}} diagnosis
  */
 events.on('diagnosis', (diagnosis) => {
     const banner = new Banner(`diagnosis-${diagnosis.device_id}`);
@@ -38,7 +38,7 @@ events.on('diagnosis', (diagnosis) => {
     banner.show({
         level: diagnosis.status === 'warning' ? 'warning' : 'error',
         title: `Problem with ${diagnosis.device_id}`,
-        message: diagnosis.fix ? `${diagnosis.message} ${diagnosis.fix}` : diagnosis.message,
+        message: diagnosis.suggested_fix ? `${diagnosis.message} ${diagnosis.suggested_fix}` : diagnosis.message,
     });
 });
 
