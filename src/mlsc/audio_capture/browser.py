@@ -23,6 +23,10 @@ BROWSER_HOST_API = "Browser"
 DEFAULT_SAMPLE_RATE = 44100
 TARGET_SECONDS = 0.1
 MAX_SECONDS = 0.25
+# A missing chunk is bridged by this much faded-out audio at most, so a lost chunk does not add a long silence.
+BRIDGE_SECONDS = 0.02
+# The length of the crossfade that hides the seam where audio past the maximum was cut out.
+FADE_SECONDS = 0.005
 # A stream that sent nothing for this long has stopped, and the capture reports it so the banner can say so.
 STALL_SECONDS = 2.0
 # Underruns this recent and this many make the connection count as unstable.
@@ -67,8 +71,10 @@ class LinearResampler:
 class JitterBuffer:
     """Smooths chunks that arrive unevenly into the steady buffers the effects expect.
 
-    Waits until `target_seconds` of audio is queued before it starts, drops the oldest audio past `max_seconds`,
-    and fills with silence when it runs dry or a chunk is missing. Each of those silences counts as an underrun.
+    Waits until `target_seconds` of audio is queued before it starts. Past `max_seconds` it cuts the buffer back to the
+    middle between target and maximum, with a crossfade over the seam. When it runs short it plays silence without
+    touching what is queued and carries on as soon as one full buffer is there again; a missing chunk is bridged with a
+    short fade-out. Each of those counts as an underrun.
     """
 
     def __init__(self, sample_rate: int, clock: Callable[[], float] = time.monotonic,
@@ -91,6 +97,7 @@ class JitterBuffer:
         """Forget the stream, for a new one that numbers its chunks from the start."""
         self._buffer = np.zeros(0, dtype=np.int16)
         self._primed = False
+        self._starved = False
         self._next_sequence: int | None = None
         self._resampler.reset()
         self.last_chunk_at = None
@@ -103,8 +110,8 @@ class JitterBuffer:
             missing = sequence - self._next_sequence
             if missing:
                 self._count_underrun()
-                gap = min(missing * len(samples) * self.sample_rate // source_rate, self._max)
-                self._append(np.zeros(gap, dtype=np.int16))
+                gap = min(missing * len(samples) * self.sample_rate // source_rate, int(BRIDGE_SECONDS * self.sample_rate))
+                self._append(self._bridge(gap))
         self._next_sequence = sequence + 1
         now = self._clock()
         # A pause longer than a stall is the stream stopping, not a slow connection.
@@ -119,11 +126,17 @@ class JitterBuffer:
             self._primed = True
         if not self._primed:
             return np.zeros(frames, dtype=np.int16)
-        if len(self._buffer) < frames:
+        if len(self._buffer) < frames + (self._target // 2 if self._starved else 0):
+            # Wait for half the target on top of one buffer instead of all of it: the queued audio stays and plays after.
             if self.streaming:
-                self._count_underrun()
-            self._primed = False
+                if not self._starved:
+                    self._count_underrun()
+                self._starved = True
+            else:
+                # The stream stopped: what is queued is stale, so start over with the full target when it resumes.
+                self._primed = self._starved = False
             return np.zeros(frames, dtype=np.int16)
+        self._starved = False
         out, self._buffer = self._buffer[:frames], self._buffer[frames:]
         return out
 
@@ -146,11 +159,24 @@ class JitterBuffer:
         self.underruns += 1
         self._underruns.append(self._clock())
 
+    def _bridge(self, length: int) -> np.ndarray:
+        """`length` samples to cover a lost chunk: the last queued sample fading out, silence if there is none."""
+        if not len(self._buffer):
+            return np.zeros(length, dtype=np.int16)
+        return np.rint(self._buffer[-1] * np.linspace(1.0, 0.0, length)).astype(np.int16)
+
     def _append(self, samples: np.ndarray) -> None:
         self._buffer = np.concatenate((self._buffer, samples))
         if len(self._buffer) > self._max:
             self.trims += 1
-            self._buffer = self._buffer[-self._target:]
+            self._buffer = self._cut(self._buffer, len(self._buffer) - (self._target + self._max) // 2)
+
+    def _cut(self, buffer: np.ndarray, drop: int) -> np.ndarray:
+        """Skip `drop` samples at the front, crossfading the audio after them in so the seam does not click."""
+        fade = min(int(FADE_SECONDS * self.sample_rate), len(buffer) - drop)
+        weight = np.linspace(0.0, 1.0, fade)
+        seam = buffer[:fade] * (1.0 - weight) + buffer[drop:drop + fade] * weight
+        return np.concatenate((np.rint(seam).astype(np.int16), buffer[drop + fade:]))
 
 
 class BrowserCapture(AudioCapture):

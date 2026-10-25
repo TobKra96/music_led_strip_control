@@ -36,6 +36,9 @@ Open `https://mlsc.example.com`. The proxy must not buffer request bodies for `/
 
 - **Delay.** The audio travels as small HTTP requests (about 40 ms each) through a buffer of about 100 ms.
   Expect 150 to 250 ms from sound to LEDs, more than with a USB microphone on the server.
+  When a request is late, MLSC plays silence for a moment and carries on as soon as about 60 ms of audio is back, without
+  waiting for the whole 100 ms again. A lost chunk is bridged with a short fade-out. If the buffer passes 250 ms, it is cut
+  back to about 175 ms with a short crossfade instead of an abrupt jump.
 - **Keep the page open.** Phones pause background tabs and lock screens. MLSC asks the browser to keep the screen on where it can.
 - **Unstable connection.** The Microphone page says so when audio keeps dropping out. Move closer to the router or use 5 GHz Wi-Fi.
 - **Sign-in.** When PIN or login protection is on, the stream needs the same session. If it ends, MLSC stops capturing and shows why.

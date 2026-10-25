@@ -38,7 +38,7 @@ def test_silence_until_the_buffer_holds_the_target_then_audio(jitter):
     assert (jitter.pull(FRAMES) == 1000).all()
 
 
-def test_running_dry_fills_silence_counts_an_underrun_and_refills_before_resuming(jitter):
+def test_running_dry_plays_silence_counts_an_underrun_and_resumes_with_the_next_full_buffer(jitter):
     fill(jitter, chunks=3)
     while jitter.buffered_seconds * RATE >= FRAMES:
         jitter.pull(FRAMES)
@@ -53,12 +53,40 @@ def test_running_dry_fills_silence_counts_an_underrun_and_refills_before_resumin
     assert (jitter.pull(FRAMES) == 1000).all()
 
 
+def test_a_short_pull_keeps_the_queued_audio_and_resumes_before_the_whole_target_is_back(jitter):
+    fill(jitter, chunks=3)
+    while jitter.buffered_seconds * RATE >= FRAMES:
+        jitter.pull(FRAMES)
+    left = jitter.buffered_seconds
+
+    assert not jitter.pull(FRAMES).any()
+    assert jitter.buffered_seconds == left
+
+    # Resumes with 20 ms chunks coming in, before the whole 100 ms target is back.
+    sequence = 3
+    while not jitter.pull(FRAMES).any():
+        jitter.push(sequence, RATE, chunk(1000, CHUNK // 2))
+        sequence += 1
+    assert jitter.buffered_seconds < 0.1
+
+
 def test_a_missing_chunk_is_filled_with_silence_and_counted(jitter):
     jitter.push(0, RATE, chunk())
     jitter.push(2, RATE, chunk())
 
     assert jitter.underruns == 1
-    assert jitter.buffered_seconds == pytest.approx(0.12)
+    # The lost chunk is bridged by 20 ms, not by a full 40 ms of silence.
+    assert jitter.buffered_seconds == pytest.approx(0.10)
+
+
+def test_a_missing_chunk_is_bridged_with_a_fade_out_from_the_last_sample(jitter):
+    jitter.push(0, RATE, chunk())
+    jitter.push(2, RATE, chunk(2000))
+
+    bridge = jitter._buffer[CHUNK:CHUNK + RATE // 50]  # ruff: ignore[private-member-access]
+    assert bridge[0] == 1000
+    assert (np.diff(bridge.astype(int)) <= 0).all()
+    assert abs(int(bridge[-1])) < 100
 
 
 def test_late_and_repeated_chunks_are_dropped(jitter):
@@ -77,7 +105,7 @@ def test_overflow_drops_the_oldest_audio(jitter):
 
     assert jitter.buffered_seconds <= 0.25
     pulled = jitter.pull(FRAMES)
-    assert pulled[0] >= 5000
+    assert pulled[-1] >= 5000
 
 
 def test_a_new_stream_starts_its_numbering_over(jitter):
@@ -98,6 +126,17 @@ def test_streaming_ends_when_chunks_stop(jitter, fake_clock):
     fake_clock.advance(STALL_SECONDS)
 
     assert not jitter.streaming
+
+
+def test_a_stream_that_stopped_starts_over_with_the_full_target(jitter, fake_clock):
+    fill(jitter, chunks=3)
+    fake_clock.advance(STALL_SECONDS)
+    for _ in range(10):
+        jitter.pull(FRAMES)
+
+    jitter.push(3, RATE, chunk())
+
+    assert not jitter.pull(FRAMES).any()
 
 
 def test_a_stopped_stream_is_silence_not_an_underrun(jitter, fake_clock):
@@ -232,7 +271,68 @@ def test_cutting_the_buffer_at_the_maximum_is_counted(jitter):
     for sequence in range(10):
         jitter.push(sequence, RATE, chunk())
 
-    assert jitter.trims == 1
+    assert jitter.trims == 2
+
+
+def test_cutting_the_buffer_keeps_most_of_it_and_does_not_click(jitter):
+    wave = (8000 * np.sin(2 * np.pi * 200 * np.arange(CHUNK * 10) / RATE)).astype(np.int16)
+    for sequence in range(10):
+        jitter.push(sequence, RATE, wave[sequence * CHUNK:(sequence + 1) * CHUNK])
+
+    assert 0.15 < jitter.buffered_seconds <= 0.25
+    audio = jitter._buffer  # ruff: ignore[private-member-access]
+    # A 200 Hz tone at this amplitude moves about 630 per sample; a bare splice would jump by thousands.
+    assert np.abs(np.diff(audio.astype(int))).max() < 1500
+
+
+def uneven(jitter, arrivals, frames=FRAMES, seconds=2.4, clock=None):
+    """Feed 40 ms chunks of a sine at the given arrival times and pull a buffer every 32 ms; return the audio played."""
+    wave = (8000 * np.sin(2 * np.pi * 200 * np.arange(int(RATE * (seconds + 1))) / RATE)).astype(np.int16)
+    played, pending = [], sorted(arrivals)
+    step = frames / RATE
+    for tick in range(int(seconds / step)):
+        now = tick * step
+        clock.now = now
+        while pending and pending[0][0] <= now:
+            _, sequence = pending.pop(0)
+            jitter.push(sequence, RATE, wave[sequence * CHUNK:(sequence + 1) * CHUNK])
+        played.append(jitter.pull(frames))
+    return np.concatenate(played)
+
+
+def bursts():
+    """Chunks every 40 ms, but every fourth one is held back 50 ms and the next arrives right behind it, in order."""
+    arrivals, previous = [], 0.0
+    for sequence in range(70):
+        previous = max(previous, sequence * 0.04 + (0.05 if sequence % 4 == 3 else 0))
+        arrivals.append((previous, sequence))
+    return arrivals
+
+
+def test_bursts_and_short_delays_play_smoothly(jitter, fake_clock):
+    fake_clock.now = 0.0
+    audio = uneven(jitter, bursts(), clock=fake_clock)
+
+    started = np.flatnonzero(audio)[0]
+    assert jitter.underruns <= 1
+    assert jitter.trims == 0
+    # Once audio plays, the only gaps are the first silence and at most the one underrun.
+    zeros = np.flatnonzero(audio[started:] == 0)
+    assert len(zeros) < 2 * FRAMES + 40
+    # Nothing jumps further than the tone itself moves between two samples.
+    assert np.abs(np.diff(audio[started:].astype(int))).max() < 8000
+
+
+def test_the_buffer_survives_a_late_chunk_without_waiting_for_the_target_again(jitter, fake_clock):
+    fake_clock.now = 0.0
+    arrivals = [(sequence * 0.04, sequence) for sequence in range(60)]
+    arrivals[30] = (30 * 0.04 + 0.12, 30)
+    audio = uneven(jitter, arrivals, clock=fake_clock)
+
+    silent = (audio == 0).sum() / RATE
+    # Start-up wait (about the target) plus one short stretch, not a second wait of 100 ms.
+    assert silent < 0.1 + 0.07 + 0.05
+    assert jitter.underruns <= 1
 
 
 def test_the_longest_wait_between_chunks_is_kept(jitter, fake_clock):
