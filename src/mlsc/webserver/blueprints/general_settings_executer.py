@@ -49,6 +49,10 @@ class GeneralSettingsExecuter(ExecuterBase):
             return self._config["general_settings"]["webserver_port"]
         return 8080
 
+    def get_https_port(self) -> int | None:
+        """Return the port of the opt-in HTTPS server, or `None` when it is off."""
+        return self._config["general_settings"].get("https_port")
+
     def reset_general_settings(self) -> None:
         """Reset the general settings to their defaults. Device groups, devices and the audio section stay as they are."""
         defaults = copy.deepcopy(self._config_instance.load_template()["general_settings"])

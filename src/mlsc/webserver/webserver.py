@@ -6,6 +6,7 @@ from flask_openapi3 import OpenAPI
 from waitress import serve
 
 from mlsc import operations
+from mlsc.https_server import start_https
 from mlsc.api.v2 import register_api_v2
 from mlsc.app import create_app
 from mlsc.webserver.blueprints.authentication_api import authentication_api
@@ -76,6 +77,7 @@ class Webserver:
         if DEBUG:
             self.server.run(host="0.0.0.0", port=webserver_port, load_dotenv=False, debug=True)  # ruff: ignore[hardcoded-bind-all-interfaces]
         else:
+            start_https(self.server, Executer.instance.general_settings_executer.get_https_port(), webserver_port)
             try:
                 # The lookahead keeps reading a connection while its request runs, so an event stream notices a closed page.
                 serve(self.server, host="0.0.0.0", port=webserver_port, threads=8, clear_untrusted_proxy_headers=False,

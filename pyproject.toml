@@ -31,6 +31,7 @@ dependencies = [
 [project.optional-dependencies]
 miniaudio = ["miniaudio>=1.60,<2"]
 pi = ["rpi_ws281x>=5,<6"]
+https = ["cheroot>=10,<12", "cryptography>=43"]
 
 [dependency-groups]
 dev = [

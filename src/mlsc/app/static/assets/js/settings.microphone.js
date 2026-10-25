@@ -2,6 +2,7 @@ import { api } from './classes/Api.js';
 import { events } from './classes/Events.js';
 import Toast from './classes/Toast.js';
 import UnsavedChanges from './classes/UnsavedChanges.js';
+import { BrowserMicrophone } from './classes/BrowserMicrophone.js';
 
 const unsaved = new UnsavedChanges(document.getElementById('settingsForm'));
 
@@ -65,7 +66,8 @@ const fillSampleRates = (selected) => {
 
 const showDeviceInfo = () => {
     const device = selectedDevice();
-    const info = device && device.missing ? 'This device is not connected. MLSC uses the system default until it is back.'
+    const info = settings.source === 'browser' ? 'The Browser Microphone is selected. Save a device here to switch back to a microphone on the server.'
+        : device && device.missing ? 'This device is not connected. MLSC uses the system default until it is back.'
         : device && device.monitor ? 'Monitor Device: carries audio played on this computer or received from a remote source.'
             : '';
     $('#device_info').text(info);
@@ -88,6 +90,7 @@ const populate = (values) => {
 const collectChanges = () => {
     const device = $('#device').val() ? deviceChoices.get($('#device').val()) : null;
     const form = {
+        source: 'device',
         device_name: device ? device.name : null,
         host_api: device ? device.host_api : null,
         gain: Number($('#gain').val()),
@@ -136,6 +139,56 @@ const save = async () => {
     } finally {
         $button.prop('disabled', false).text('Save');
     }
+};
+
+const BROWSER_STATES = {
+    starting: ['alert-info', 'Starting…'],
+    streaming: ['alert-success', 'Streaming from this browser. Keep this page open.'],
+    insecure: ['alert-warning', 'The browser only allows microphone access on HTTPS or localhost. See the details link for how to enable HTTPS.'],
+    denied: ['alert-danger', 'Microphone access was denied. Allow it for this site in the browser, then try again.'],
+    no_device: ['alert-danger', 'This device has no microphone.'],
+    stopped: ['alert-warning', ''],
+    error: ['alert-danger', ''],
+};
+
+const showBrowserState = (state, detail) => {
+    const [level, text] = BROWSER_STATES[state] || [];
+    const streaming = state === 'streaming';
+    $('#browser_btn').prop('disabled', state === 'starting').text(streaming ? 'Stop streaming' : 'Stream from this browser');
+    $('#browser_status').toggleClass('d-none', !text && !detail)
+        .removeClass('alert-info alert-success alert-warning alert-danger').addClass(level || '')
+        .text([text, detail].filter(Boolean).join(' '));
+};
+
+const browserMicrophone = new BrowserMicrophone({
+    isSecureContext: window.isSecureContext,
+    mediaDevices: navigator.mediaDevices,
+    createContext: () => new AudioContext(),
+    createWorkletNode: context => new AudioWorkletNode(context, 'mono-int16', { numberOfInputs: 1, numberOfOutputs: 1, channelCount: 1 }),
+    workletUrl: '/static/assets/js/browser-microphone.worklet.js',
+    wakeLock: navigator.wakeLock,
+    openStream: () => api.post('/microphone/browser/stream'),
+    fetch: (url, options) => fetch(url, options),
+    onState: showBrowserState,
+});
+
+/** Select the Browser Microphone if it is not yet, so the server accepts the stream. */
+const toggleBrowserStream = async () => {
+    if (browserMicrophone.state === 'streaming') {
+        await browserMicrophone.stop();
+        return;
+    }
+    try {
+        if (settings.source !== 'browser') {
+            const operation = await waitForOperation(await api.patch('/microphone', { source: 'browser' }));
+            if (operation.state !== 'confirmed') throw new Error(operation.error || 'The Browser Microphone could not be selected.');
+            await load();
+        }
+    } catch (error) {
+        new Toast(`Could not select the Browser Microphone. ${error.summary || error.message}`).error();
+        return;
+    }
+    await browserMicrophone.start();
 };
 
 const showMixer = (mixer) => {
@@ -217,4 +270,7 @@ $(() => {
     });
     $('#save_btn').on('click', save);
     $('#test_btn').on('click', test);
+    $('#browser_btn').on('click', toggleBrowserStream);
+    // Give the claim back instead of leaving the server to time out. `keepalive` lets the request outlive the page.
+    window.addEventListener('pagehide', () => { browserMicrophone.stop(); });
 });

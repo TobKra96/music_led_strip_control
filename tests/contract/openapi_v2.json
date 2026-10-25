@@ -5466,6 +5466,19 @@
             "title": "Frames Per Buffer",
             "type": "integer"
           },
+          "https_port": {
+            "anyOf": [
+              {
+                "maximum": 65535,
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Https Port"
+          },
           "log_file_enabled": {
             "title": "Log File Enabled",
             "type": "boolean"

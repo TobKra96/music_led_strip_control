@@ -1675,7 +1675,7 @@ device_configs_schema = {
 general_settings_schema = {
     "type": "object",
     "additionalProperties": False,
-    "maxProperties": 12,
+    "maxProperties": 13,
     "minProperties": 12,
     "required": [
         "default_sample_rate",
@@ -1744,6 +1744,11 @@ general_settings_schema = {
         "webserver_port": {
             "type": "integer",
             "minimum": 0,
+            "maximum": 65535
+        },
+        "https_port": {
+            "type": ["integer", "null"],
+            "minimum": 1,
             "maximum": 65535
         },
     }
