@@ -5,7 +5,7 @@ import wave
 import numpy as np
 import pytest
 
-from mlsc.audio_capture import AudioCaptureError, create_capture
+from mlsc.audio_capture import AudioCaptureError, backend_from_environment, create_capture
 from mlsc.audio_capture.fake import FakeCapture, clipping, silence, sine_sweep, wav_file
 
 pytestmark = pytest.mark.unit
@@ -299,3 +299,45 @@ def test_no_backend_available_is_a_clear_error(monkeypatch):
 
     with pytest.raises(AudioCaptureError):
         create_capture("auto")
+
+
+def test_miniaudio_reports_the_real_sample_rate_of_each_device(miniaudio_stub):
+    miniaudio_stub.Devices.get_captures = staticmethod(lambda: [
+        {"name": "Mic A", "id": "a", "formats": [("s16", 1, 48000, 0), ("s16", 2, 96000, 0)]},
+        {"name": "Mic B", "id": "b"}])
+
+    assert [d.default_sample_rate for d in create_capture("miniaudio").list_devices()] == [48000, 44100]
+
+
+def test_miniaudio_resolves_the_device_by_name_when_positions_shift(miniaudio_stub):
+    capture = create_capture("miniaudio")
+    listed = capture.list_devices()[1]
+    miniaudio_stub.Devices.get_captures = staticmethod(lambda: [
+        {"name": "Mic New", "id": "n"}, {"name": "Mic A", "id": "a"}, {"name": "Mic B", "id": "b"}])
+
+    capture.open(listed, RATE, BUFFER)
+
+    assert miniaudio_stub.devices[0].kwargs["device_id"] == "b"
+
+
+def test_miniaudio_open_fails_clearly_when_the_device_is_gone(miniaudio_stub):
+    capture = create_capture("miniaudio")
+    listed = capture.list_devices()[1]
+    miniaudio_stub.Devices.get_captures = staticmethod(lambda: [{"name": "Mic A", "id": "a"}])
+
+    with pytest.raises(AudioCaptureError, match="Mic B"):
+        capture.open(listed, RATE, BUFFER)
+
+
+def test_the_backend_comes_from_the_environment(monkeypatch):
+    monkeypatch.delenv("MLSC_AUDIO_BACKEND", raising=False)
+    assert backend_from_environment() == "auto"
+    monkeypatch.setenv("MLSC_AUDIO_BACKEND", " Miniaudio ")
+    assert backend_from_environment() == "miniaudio"
+
+
+def test_an_unknown_backend_in_the_environment_is_an_error(monkeypatch):
+    monkeypatch.setenv("MLSC_AUDIO_BACKEND", "alsa")
+
+    with pytest.raises(AudioCaptureError, match="alsa"):
+        backend_from_environment()

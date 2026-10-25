@@ -7,6 +7,7 @@ pickled PyAudio copy is dead on arrival). Only the backend name crosses; each pr
 from __future__ import annotations
 
 import contextlib
+import os
 import queue
 from abc import ABC, abstractmethod
 from collections.abc import Callable
@@ -16,6 +17,7 @@ from loguru import logger
 from mlsc.audio_device import AudioDevice
 
 BACKENDS = ("auto", "sounddevice", "miniaudio", "fake")
+BACKEND_ENV_VAR = "MLSC_AUDIO_BACKEND"
 
 
 class AudioCaptureError(Exception):
@@ -77,6 +79,16 @@ class AudioCapture(ABC):
             except Exception:
                 # This runs on the native audio thread, where an exception would kill the stream.
                 logger.exception("Error in the audio capture callback.")
+
+
+def backend_from_environment() -> str:
+    """Return the backend name chosen by `MLSC_AUDIO_BACKEND` (default `auto`). Raises AudioCaptureError for an unknown name."""
+    backend = os.environ.get(BACKEND_ENV_VAR, "").strip().lower() or "auto"
+    if backend not in BACKENDS:
+        message = f"Unknown audio backend {backend!r} in {BACKEND_ENV_VAR}. Use one of {', '.join(BACKENDS)}."
+        logger.error(message)
+        raise AudioCaptureError(message)
+    return backend
 
 
 def create_capture(backend: str = "auto") -> AudioCapture:

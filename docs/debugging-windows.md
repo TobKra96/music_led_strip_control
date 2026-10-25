@@ -44,5 +44,7 @@ Open the repo in VS Code with the Python Debugger extension. `.vscode/launch.jso
 ## Known limitations
 
 - **Audio capture works on Windows.** Each process builds its own capture object (`mlsc.audio_capture.create_capture`), so no native audio handle crosses the spawn boundary.
+- **Choosing the audio backend.** Set `MLSC_AUDIO_BACKEND` to `auto` (default), `sounddevice`, `miniaudio` or `fake` before `mlsc run`. The audio process and the web device list both use it. An unknown value stops startup with an `AudioCaptureError` and a log message.
+- **Verified by hand on Windows 11 (2026-10-25)** with `MLSC_AUDIO_BACKEND=sounddevice`: the device list was non-empty (2 inputs, including `Mikrofon (Realtek(R) Audio)`), and a spawned child process opened the default device and received 20 of 20 buffers of 512 frames (1024 bytes each).
 - Linux-only code (`fcntl` single-instance lock, `systemctl` check) is skipped on Windows.
 - Port 8080 must be free. A leftover debug session holding it makes `/` answer with a 500 from another server; stop it or change `webserver_port` in the config.

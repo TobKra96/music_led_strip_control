@@ -14,6 +14,7 @@ from time import sleep
 from loguru import logger
 
 from mlsc import paths
+from mlsc.audio_capture import AudioCaptureError, backend_from_environment
 from mlsc.audio_process_service import AudioProcessService
 from mlsc.audio_status import AudioStatus
 from mlsc.config_migration import ConfigMigrationError
@@ -95,7 +96,7 @@ class Main:
         self._config_instance.check_compatibility()
 
         # Only the backend name crosses the process boundary. Each process builds its own capture object.
-        self._audio_backend = "auto"
+        self._audio_backend = backend_from_environment()
 
         # Written by the audio process, read by the webserver process for the `mic.level` events.
         self._mic_level = MicLevel()
@@ -202,7 +203,7 @@ def run() -> int:
     exit_if_instance_running()
     try:
         Main().start()
-    except ConfigMigrationError as e:
+    except (ConfigMigrationError, AudioCaptureError) as e:
         print(f"{RED}Error: {e}", file=sys.stderr)  # ruff: ignore[print]
         return 1
     return 0

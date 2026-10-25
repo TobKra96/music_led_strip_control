@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from loguru import logger
+
 from mlsc.audio_capture import AudioCaptureError, create_capture
 from mlsc.audio_device import AudioDevice
 from mlsc.audio_info import AudioInfo
@@ -24,9 +26,14 @@ class GeneralExecuter(ExecuterBase):
     def list_audio_devices(self) -> list[AudioDevice]:
         """Return the input devices, or none if no audio backend is available."""
         try:
-            return AudioInfo.get_audio_devices(create_capture(self._audio_backend))
-        except AudioCaptureError:
+            capture = create_capture(self._audio_backend)
+        except AudioCaptureError as e:
+            logger.warning(f"Cannot list the audio devices: {e}")
             return []
+        try:
+            return AudioInfo.get_audio_devices(capture)
+        finally:
+            capture.close()
 
     def get_audio_devices(self) -> dict:
         """Return audio devices."""

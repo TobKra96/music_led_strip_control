@@ -14,6 +14,21 @@ def raise_no_audio():
     raise OSError(message)
 
 
+def raise_unexpected():
+    message = "boom"
+    raise RuntimeError(message)
+
+
+class CrashingCapture(FakeCapture):
+    @staticmethod
+    def list_devices():
+        raise_unexpected()
+
+    @staticmethod
+    def default_device():
+        raise_unexpected()
+
+
 class BrokenCapture(FakeCapture):
     @staticmethod
     def list_devices():
@@ -45,3 +60,11 @@ def test_unreadable_system_default_still_returns_a_device():
 
 def test_unreadable_device_list_is_empty():
     assert AudioInfo.get_audio_devices(BrokenCapture()) == []
+
+
+def test_unexpected_error_in_the_device_list_is_empty():
+    assert AudioInfo.get_audio_devices(CrashingCapture()) == []
+
+
+def test_unexpected_error_in_the_system_default_still_returns_a_device():
+    assert AudioInfo.get_default_audio_device(CrashingCapture()).name == "Error"

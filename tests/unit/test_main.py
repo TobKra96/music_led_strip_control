@@ -64,3 +64,12 @@ def test_run_starts_the_server(monkeypatch):
 
     assert main.run() == 0
     assert started == [True]
+
+
+def test_run_reports_an_unknown_audio_backend(monkeypatch, capsys):
+    monkeypatch.setenv("MLSC_AUDIO_BACKEND", "alsa")
+    monkeypatch.setattr(main, "exit_if_instance_running", lambda: None)
+    monkeypatch.setattr(main.Main, "start", lambda _: main.backend_from_environment())
+
+    assert main.run() == 1
+    assert "alsa" in capsys.readouterr().err

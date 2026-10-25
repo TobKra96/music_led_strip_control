@@ -112,9 +112,9 @@ def list_audio_devices() -> list[dict] | None:
     """Return the input devices as `{"index", "name", "host_api"}`, or None when audio cannot be queried."""
     try:
         # Imported here as it is optional at migration time and slow to import.
-        from mlsc.audio_capture import create_capture  # ruff: ignore[import-outside-top-level]
+        from mlsc.audio_capture import backend_from_environment, create_capture  # ruff: ignore[import-outside-top-level]
 
-        return [{"index": device.device_id, "name": device.name, "host_api": None} for device in create_capture().list_devices()]
+        return [{"index": device.device_id, "name": device.name, "host_api": None} for device in create_capture(backend_from_environment()).list_devices()]
     except Exception:
         logger.warning("Could not query audio devices for the config migration.")
         return None

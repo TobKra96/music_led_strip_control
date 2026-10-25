@@ -94,19 +94,22 @@ class MicrophoneSettingsExecuter(ExecuterBase):
         except AudioCaptureError as e:
             logger.warning(f"No audio backend: {e}")
             return []
-        default = AudioInfo.get_default_audio_device(capture)
-        devices = [
-            {
-                "source": "device",
-                "name": device.name,
-                "host_api": device.host_api,
-                "default_sample_rate": int(device.default_sample_rate),
-                "sample_rates": capture.supported_sample_rates(device),
-                "monitor": device.is_monitor,
-                "default": device.matches(default.name, default.host_api),
-            }
-            for device in AudioInfo.get_audio_devices(capture)
-        ]
+        try:
+            default = AudioInfo.get_default_audio_device(capture)
+            devices = [
+                {
+                    "source": "device",
+                    "name": device.name,
+                    "host_api": device.host_api,
+                    "default_sample_rate": int(device.default_sample_rate),
+                    "sample_rates": capture.supported_sample_rates(device),
+                    "monitor": device.is_monitor,
+                    "default": device.matches(default.name, default.host_api),
+                }
+                for device in AudioInfo.get_audio_devices(capture)
+            ]
+        finally:
+            capture.close()
         # Always listed, so it can be picked before any browser streams. Streaming is a separate step the browser starts.
         devices.append({
             "source": "browser",
