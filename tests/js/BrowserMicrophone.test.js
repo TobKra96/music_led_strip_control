@@ -102,6 +102,60 @@ describe('streaming', () => {
         release();
         await vi.waitFor(() => expect(fetch).toHaveBeenCalledTimes(2));
     });
+
+    it('sends the chunks that piled up behind a slow request together, in order and numbered on', async () => {
+        const releases = [];
+        const fetch = vi.fn(() => new Promise(resolve => releases.push(() => resolve({ status: 204 }))));
+        const { microphone, port } = setup({ fetch });
+        await microphone.start();
+
+        // Five chunks of 1920 samples, each marked by its value: the first goes out, four wait.
+        for (let i = 1; i <= 5; i++) port.onmessage({ data: new Int16Array(1920).fill(i) });
+        await vi.waitFor(() => expect(releases).toHaveLength(1));
+        releases.shift()();
+        await vi.waitFor(() => expect(releases).toHaveLength(1));
+
+        expect(fetch).toHaveBeenCalledTimes(2);
+        const [url, { body }] = fetch.mock.calls[1];
+        expect(url).toContain('sequence=1&');
+        expect(body.byteLength).toBe(4 * 1920 * 2);
+        expect([body[0], body[1920], body[2 * 1920], body[3 * 1920]]).toEqual([2, 3, 4, 5]);
+        expect(body.byteLength / 2 / 48000).toBeLessThanOrEqual(1);
+    });
+
+    it('drops the oldest audio instead of queueing without limit when the connection stalls', async () => {
+        const releases = [];
+        const fetch = vi.fn(() => new Promise(resolve => releases.push(() => resolve({ status: 204 }))));
+        const { microphone, port } = setup({ fetch });
+        await microphone.start();
+
+        for (let i = 1; i <= 40; i++) port.onmessage({ data: new Int16Array(1920).fill(i) });
+        await vi.waitFor(() => expect(releases).toHaveLength(1));
+
+        expect(microphone.queued).toHaveLength(15);
+        expect(microphone.stats.dropped).toBe(24);
+        expect(microphone.backlog).toBe(16);
+        releases.shift()();
+        await vi.waitFor(() => expect(releases).toHaveLength(1));
+        // The newest 15 chunks (26..40) remain, sent as batches of at most 10.
+        expect(fetch.mock.calls[1][1].body[0]).toBe(26);
+        expect(fetch.mock.calls[1][1].body.length).toBe(10 * 1920);
+    });
+
+    it('stops sending queued audio once the stream has ended', async () => {
+        const releases = [];
+        const fetch = vi.fn(() => new Promise(resolve => releases.push(resolve)));
+        const { microphone, port } = setup({ fetch });
+        await microphone.start();
+
+        for (let i = 1; i <= 3; i++) port.onmessage({ data: new Int16Array(1920).fill(i) });
+        await vi.waitFor(() => expect(releases).toHaveLength(1));
+        releases.shift()({ status: 410 });
+        await vi.waitFor(() => expect(microphone.state).toBe('stopped'));
+
+        expect(fetch).toHaveBeenCalledTimes(1);
+        expect(microphone.queued).toHaveLength(0);
+    });
 });
 
 describe('ending', () => {
@@ -174,7 +228,7 @@ describe('stats', () => {
             time += gap;
             port.onmessage({ data: new Int16Array(960).fill(1000) });
         }
-        // Two chunks wait behind the first request, which is slow.
+        // The first chunk goes out at 3 ms and the second waits behind it: that request lasts 133 ms, the clock being advanced by the late block and the 90 ms release.
         await vi.waitFor(() => expect(releases).toHaveLength(1));
         expect(microphone.stats.deepestBacklog).toBe(2);
         releases.shift()();
@@ -182,7 +236,7 @@ describe('stats', () => {
         releases.shift()();
         await vi.waitFor(() => expect(microphone.stats.requests).toBe(2));
 
-        expect(microphone.stats).toMatchObject({ blocks: 4, slowestBlockGap: 40, slowestRequest: 90 });
+        expect(microphone.stats).toMatchObject({ blocks: 4, slowestBlockGap: 40, slowestRequest: 133 });
         expect(microphone.backlog).toBe(0);
     });
 });

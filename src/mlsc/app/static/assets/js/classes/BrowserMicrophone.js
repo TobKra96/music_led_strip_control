@@ -1,5 +1,9 @@
 /** Length of the audio sent per request. */
 const CHUNK_SECONDS = 0.04;
+/** Chunks that wait behind a slow request are sent together, up to this much audio. The server accepts at most one second. */
+const MAX_BATCH_SECONDS = 0.4;
+/** Audio waiting for a request is cut to this much, oldest first, so a slow connection does not add latency without limit. */
+const MAX_QUEUED_SECONDS = 0.6;
 
 const STOP_REASONS = {
     401: 'Your session ended. Sign in again to stream.',
@@ -9,7 +13,7 @@ const STOP_REASONS = {
 };
 
 /** What `BrowserMicrophone.stats` counts to tell where a stutter comes from, in milliseconds. */
-const emptyStats = () => ({ blocks: 0, slowestBlockGap: 0, requests: 0, slowestRequest: 0, deepestBacklog: 0 });
+const emptyStats = () => ({ blocks: 0, slowestBlockGap: 0, requests: 0, slowestRequest: 0, deepestBacklog: 0, dropped: 0 });
 
 const CONSTRAINTS = { audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false } };
 
@@ -70,9 +74,10 @@ export class BrowserMicrophone {
             this.pending = [];
             this.pendingSamples = 0;
             this.sequence = 0;
-            this.queue = Promise.resolve();
+            this.queued = [];
+            this.sending = false;
             this.stats = emptyStats();
-            this.backlog = 0;
+            this.inFlight = 0;
             this.lastBlockAt = undefined;
             this.streamId = (await deps.openStream()).stream_id;
             node.port.onmessage = ({ data }) => this.collect(data);
@@ -105,11 +110,46 @@ export class BrowserMicrophone {
         this.pendingSamples += block.length;
         while (this.pendingSamples >= this.chunkSamples) {
             const chunk = this.take(this.chunkSamples);
-            const sequence = this.sequence++;
-            this.backlog++;
-            this.stats.deepestBacklog = Math.max(this.stats.deepestBacklog, this.backlog);
-            this.queue = this.queue.then(() => this.send(chunk, sequence)).finally(() => this.backlog--);
+            this.queued.push(chunk);
+            if (this.queued.length > MAX_QUEUED_SECONDS / CHUNK_SECONDS) {
+                this.queued.shift();
+                this.stats.dropped++;
+            }
         }
+        this.stats.deepestBacklog = Math.max(this.stats.deepestBacklog, this.backlog);
+        this.pump();
+    }
+
+    /** Chunks waiting or on their way to the server. */
+    get backlog() {
+        return this.queued.length + this.inFlight;
+    }
+
+    /**
+     * Send one request at a time, so the server receives the chunks in order. Chunks that piled up behind a slow
+     * request go out together in the next one instead of as a burst.
+     */
+    async pump() {
+        if (this.sending) return;
+        this.sending = true;
+        while (this.queued.length && this.state === 'streaming') {
+            const batch = this.queued.splice(0, Math.max(1, Math.round(MAX_BATCH_SECONDS / CHUNK_SECONDS)));
+            this.inFlight = batch.length;
+            await this.send(batch.length === 1 ? batch[0] : this.join(batch), this.sequence++);
+            this.inFlight = 0;
+        }
+        this.queued = [];
+        this.sending = false;
+    }
+
+    join(chunks) {
+        const joined = new Int16Array(chunks.reduce((total, chunk) => total + chunk.length, 0));
+        let offset = 0;
+        for (const chunk of chunks) {
+            joined.set(chunk, offset);
+            offset += chunk.length;
+        }
+        return joined;
     }
 
     countRequest(startedAt) {
