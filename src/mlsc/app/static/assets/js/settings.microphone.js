@@ -222,9 +222,20 @@ const showStatus = (status) => {
     $('#status_text').text(text.trim());
 };
 
+// The clip is replaced by every test, so it is hidden and unloaded while one runs.
+const showRecording = (result) => {
+    const audio = $('#test_audio')[0];
+    audio.pause();
+    $('#test_recording').toggleClass('d-none', !result?.recording);
+    if (result?.recording) audio.src = `/api/v2/microphone/recording?v=${result.recording_id}`;
+    else audio.removeAttribute('src');
+    audio.load();
+};
+
 const test = async () => {
     const $button = $('#test_btn').prop('disabled', true).text('Listening…');
     const $result = $('#test_result').addClass('d-none');
+    showRecording(null);
     try {
         const result = await api.post('/microphone/test');
         $result.removeClass('d-none alert-success alert-warning alert-danger')
