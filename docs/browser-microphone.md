@@ -1,8 +1,9 @@
 # Browser Microphone
 
 Use the microphone of the device you browse with, for example a phone, as MLSC's audio input.
-Open **Settings → Microphone** in that browser and press **Stream from this browser**. MLSC selects the Browser Microphone for you.
-To go back to a microphone on the server, pick a device on the same page and press **Save**.
+Open **Settings → Microphone** in that browser, choose the source **This browser** and press **Stream from this browser**. MLSC selects the Browser Microphone for you.
+To go back to a microphone on the server, choose the source **Server device**, pick a device and press **Save**.
+The line at the top of the Input card always says what MLSC listens to, for example **Listening to: this browser (not streaming yet)**.
 
 Capture never starts by itself. After a reload or a closed tab, press the button again. Only one browser can stream at a time.
 

@@ -15,7 +15,7 @@ phone / laptop ──► receiver on the Pi ──► ALSA loopback ──► ML
 
 1. A receiver program on the Pi plays the audio to the playback side of the ALSA loopback, `hw:Loopback,0`.
 2. The loopback hands the same audio to its capture side, `hw:Loopback,1`.
-3. On the **Microphone** page you select that capture side, the Monitor Device, which is tagged **Monitor**.
+3. On the **Microphone** page you set the source to **Server device** and select that capture side, the Monitor Device, which is tagged **Monitor**.
 
 MLSC runs as a system service under `root`, so it cannot open the sound server of a logged-in desktop user. Routing the audio into the ALSA loopback works the same with or without a desktop.
 
@@ -40,7 +40,7 @@ MLSC reads the device list when it starts, so restart it:
 sudo systemctl restart mlsc
 ```
 
-On the **Microphone** page, pick the device named like `Loopback: PCM (hw:2,1)`, the one ending in `,1`, tagged **Monitor**. Press **Test**, play something on the remote device and watch the meter, then **Save**.
+On the **Microphone** page, choose the source **Server device**, then pick the device named like `Loopback: PCM (hw:2,1)`, the one ending in `,1`, tagged **Monitor**. Press **Test**, play something on the remote device and watch the meter, then **Save**.
 
 ### Hear it on your speakers too
 

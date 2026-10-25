@@ -20,6 +20,10 @@ _Avoid_: Driver, GPIO output
 An audio input device that carries audio played by the system or received from a remote source, rather than a microphone.
 _Avoid_: Loopback, Virtual mic
 
+**Audio Source**:
+Where MLSC takes its audio from: a Server Device (an audio device on the machine MLSC runs on) or the Browser Microphone. Chosen on the Microphone page as "Server device" or "This browser".
+_Avoid_: Input type
+
 **Browser Microphone**:
 An audio source whose samples are streamed to the server from the microphone of a connected client's browser.
 _Avoid_: Web mic, Remote mic

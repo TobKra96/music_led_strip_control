@@ -39,7 +39,24 @@
                                     <h5>Input</h5>
                                 </div>
                                 <div class="card-block">
+                                    <div id="listening_to" class="alert alert-info" role="status" data-unsaved-ignore></div>
+
                                     <div class="form-group">
+                                        <label class="d-block">Source</label>
+                                        <div role="radiogroup" aria-label="Audio source">
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" name="source" id="source_device" value="device">
+                                                <label class="form-check-label" for="source_device">Server device</label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" name="source" id="source_browser" value="browser">
+                                                <label class="form-check-label" for="source_browser">This browser</label>
+                                            </div>
+                                        </div>
+                                        <small class="form-text text-muted">Where the audio comes from: a microphone or audio device on the server, or the microphone of the browser you are using now.</small>
+                                    </div>
+
+                                    <div id="server_device_group" class="form-group">
                                         <label for="device">Device</label>
                                         <select id="device" class="form-control">
                                             <option value="">System default</option>
@@ -107,12 +124,12 @@
                     </div>
 
                     <div class="col-md-12 col-lg-4">
-                        <div class="card">
+                        <div id="browser_card" class="card d-none">
                             <div class="card-header">
-                                <h5>Browser Microphone</h5>
+                                <h5>This browser</h5>
                             </div>
                             <div class="card-block">
-                                <p class="text-muted">Use the microphone of this device, for example a phone, instead of one connected to the server.</p>
+                                <p class="text-muted">Use the microphone of the device you are on, for example a phone, instead of one connected to the server.</p>
                                 <button type="button" id="browser_btn" class="btn btn-outline-primary btn-block">Stream from this browser</button>
                                 <div id="browser_status" class="alert mt-3 mb-0 d-none" role="status"></div>
                                 <small class="form-text text-muted">

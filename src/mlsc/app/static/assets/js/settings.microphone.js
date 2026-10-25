@@ -3,6 +3,7 @@ import { events } from './classes/Events.js';
 import Toast from './classes/Toast.js';
 import UnsavedChanges from './classes/UnsavedChanges.js';
 import { BrowserMicrophone } from './classes/BrowserMicrophone.js';
+import { BROWSER_NATIVE_RATE, BROWSER_SAMPLE_RATES, listeningTo, sectionsFor } from './classes/AudioSource.js';
 
 const unsaved = new UnsavedChanges(document.getElementById('settingsForm'));
 
@@ -12,6 +13,8 @@ let deviceChoices = new Map();
 let devices = [];
 /** The settings as last loaded or saved. */
 let settings = {};
+/** The latest audio status, for the line that tells what MLSC listens to. */
+let lastStatus = null;
 
 const NUMBER_FIELDS = ['min_frequency', 'max_frequency', 'min_volume_threshold'];
 const TEST_LEVELS = { ok: 'alert-success', silence: 'alert-warning' };
@@ -53,12 +56,17 @@ const fillDevices = () => {
     }
 };
 
-/** Offer the native rate plus the rates the selected device supports. */
+/** The source picked in the form, which is not saved before Save. */
+const selectedSource = () => $('input[name=source]:checked').val();
+
+/** Offer the native rate plus the rates the selected device supports, or the common ones for the browser. */
 const fillSampleRates = (selected) => {
-    const device = selectedDevice();
+    const browser = selectedSource() === 'browser';
+    const device = browser ? null : selectedDevice();
     const $select = $('#sample_rate').empty();
-    $select.append($('<option value="">Native</option>').text(device && device.default_sample_rate ? `Native (${device.default_sample_rate} Hz)` : 'Native'));
-    const rates = new Set(device ? device.sample_rates : []);
+    const native = browser ? BROWSER_NATIVE_RATE : device && device.default_sample_rate;
+    $select.append($('<option value="">Native</option>').text(native ? `Native (${native} Hz)` : 'Native'));
+    const rates = new Set(browser ? BROWSER_SAMPLE_RATES : device ? device.sample_rates : []);
     if (selected) rates.add(selected);
     [...rates].sort((a, b) => a - b).forEach(rate => $select.append($('<option></option>').val(rate).text(`${rate} Hz`)));
     $select.val(selected ? String(selected) : '');
@@ -66,23 +74,34 @@ const fillSampleRates = (selected) => {
 
 const showDeviceInfo = () => {
     const device = selectedDevice();
-    const info = settings.source === 'browser' ? 'The Browser Microphone is selected. Save a device here to switch back to a microphone on the server.'
-        : device && device.missing ? 'This device is not connected. MLSC uses the system default until it is back.'
+    const info = device && device.missing ? 'This device is not connected. MLSC uses the system default until it is back.'
         : device && device.monitor ? 'Monitor Device: carries audio played on this computer or received from a remote source.'
             : '';
     $('#device_info').text(info);
+};
+
+const showListeningTo = () => $('#listening_to').text(listeningTo(settings, lastStatus));
+
+/** Show the Device dropdown for a server device and the stream button for this browser. */
+const showSource = () => {
+    const sections = sectionsFor(selectedSource());
+    $('#server_device_group').toggleClass('d-none', !sections.device);
+    $('#browser_card').toggleClass('d-none', !sections.browser);
 };
 
 const populate = (values) => {
     settings = values;
     fillDevices();
     $('#device').val(deviceKey(settings.device_name, settings.host_api));
+    $(`input[name=source][value=${settings.source === 'browser' ? 'browser' : 'device'}]`).prop('checked', true);
+    showSource();
     fillSampleRates(settings.sample_rate);
     $('#frames_per_buffer').val(String(settings.frames_per_buffer));
     $('#gain').val(settings.gain);
     $("span[for='gain']").text(`${Number(settings.gain).toFixed(1)}×`);
     NUMBER_FIELDS.forEach(key => $(`#${key}`).val(settings[key]));
     showDeviceInfo();
+    showListeningTo();
     unsaved.markClean();
 };
 
@@ -90,7 +109,7 @@ const populate = (values) => {
 const collectChanges = () => {
     const device = $('#device').val() ? deviceChoices.get($('#device').val()) : null;
     const form = {
-        source: 'device',
+        source: selectedSource(),
         device_name: device ? device.name : null,
         host_api: device ? device.host_api : null,
         gain: Number($('#gain').val()),
@@ -213,11 +232,14 @@ const load = async () => {
 };
 
 const showStatus = (status) => {
+    lastStatus = status;
+    showListeningTo();
+    const device = settings.source === 'browser' || status.state === 'waiting' ? 'this browser' : status.device;
     let text = '';
-    if (status.state === 'ok') text = `Listening to ${status.device} at ${status.sample_rate} Hz.`;
-    else if (status.state === 'starting') text = `Opening ${status.device}…`;
+    if (status.state === 'ok') text = `Receiving ${device} at ${status.sample_rate} Hz.`;
+    else if (status.state === 'starting') text = `Opening ${device}…`;
     else if (status.state === 'error') text = 'No audio. See the message at the top of the page.';
-    else if (status.state === 'waiting') text = 'Waiting for browser';
+    else if (status.state === 'waiting') text = 'Waiting for this browser to stream.';
     if (status.unstable) text += ' Unstable connection: audio from the browser keeps dropping out.';
     if (status.underruns || status.trims || status.lost_ms || status.longest_gap_ms > 150) {
         text += ` Dropouts: ${status.underruns}, audio cut: ${status.trims}, behind real time: ${status.lost_ms} ms, longest wait for audio: ${status.longest_gap_ms} ms.`;
@@ -273,6 +295,10 @@ $(() => {
         loadMixer();
     });
 
+    $('input[name=source]').on('change', () => {
+        showSource();
+        fillSampleRates(null);
+    });
     $('#device').on('change', () => {
         fillSampleRates(null);
         showDeviceInfo();
