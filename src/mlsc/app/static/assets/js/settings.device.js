@@ -1,6 +1,7 @@
 import { api } from './classes/Api.js';
 import { Device, tagin } from './classes/Device.js';
 import Toast from './classes/Toast.js';
+import UnsavedChanges from './classes/UnsavedChanges.js';
 
 
 // Init and load all settings.
@@ -13,37 +14,47 @@ $(() => {
 
     let outputTypes = {};
 
-    const promises = [  // Preload dropdown values.
+    const unsaved = new UnsavedChanges(document.getElementById('settingsForm'));
 
-        api.get('/resources/output-types').then((data) => {
-            outputTypes = data;
-            $.each(data, (key, value) => {
-                $('.output_type').append(`<option value='${key}'>${value}</option>`);
-            });
-        })
-
-    ]
+    // Preload dropdown values.
+    const optionsLoaded = api.get('/resources/output-types').then((data) => {
+        outputTypes = data;
+        $.each(data, (key, value) => {
+            $('.output_type').append(`<option value='${key}'>${value}</option>`);
+        });
+    });
 
     /** @type {Array.<Device>} */
     let devices = jinja_devices.map(d => new Device(d));
 
     /** Device manager to keep track of the current device. */
     const dm = {
+        _selection: 0,
+
         /** @return {Device | null} */
         get current() {
             return this._current;
         },
 
-        /** @param {Device} device */
-        set current(device) {
+        /**
+         * Make the device current and show its settings. The form counts as saved once it is populated.
+         * @param {Device | null} device
+         * @return {Promise}
+         */
+        select(device) {
             this._current = device;
-            if (device) device.refreshConfig();
+            const selection = ++this._selection;
+            if (!device) return Promise.resolve();
+            // Only the latest selection may mark the form clean, and a failed load leaves it as it is.
+            return device.refreshConfig(optionsLoaded)
+                .then(() => selection === this._selection && unsaved.markClean())
+                .catch(() => { });
         }
     };
 
-    dm.current = devices.find(d => d.id === localStorage.getItem('lastDevice')) || devices[0] || null;
+    dm._current = devices.find(d => d.id === localStorage.getItem('lastDevice')) || devices[0] || null;
 
-    Promise.all(promises).then(() => {
+    optionsLoaded.then(() => {
 
         if (!jinja_devices.length) {
             $('#noDeviceFound').removeClass('d-none');
@@ -56,8 +67,9 @@ $(() => {
         const urlParams = new URLSearchParams(window.location.search);
         const selectedDevice = devices.find(device => device.id === urlParams.get('id'));
         if (selectedDevice) {
-            dm.current = selectedDevice;
+            dm._current = selectedDevice;
         }
+        const loaded = dm.select(dm.current);
 
         $('#selected_device_txt').text(dm.current.name);
         $(`a[data-device-id=${dm.current.id}`).tab('show');
@@ -66,10 +78,11 @@ $(() => {
         // Add behavior to device bar.
         devices.forEach(device => {
             $(device.link).on('click', () => {
-                dm.current = device;
+                dm.select(device);
             });
         });
 
+        return loaded;
     }).catch((error) => {
         new Toast(`Error while loading settings. ${error.summary}`).error();
     });
@@ -78,11 +91,13 @@ $(() => {
      * Call API to create new default device.
      */
     const createDevice = () => {
+        if (!unsaved.guard()) return;
+
         api.post('/devices').then((/** @type {DeviceFromApi} */ data) => {
             const newDevice = new Device(data);
             devices.push(newDevice);
 
-            dm.current = newDevice;
+            dm.select(newDevice);
             localStorage.setItem('lastDevice', dm.current.id);
 
             _reloadDeviceBar(devices);
@@ -105,10 +120,11 @@ $(() => {
             devices = devices.filter(d => d.id !== deleted.id);
 
             if (devices.length) {
-                dm.current = devices[devices.length - 1];
+                dm.select(devices[devices.length - 1]);
                 localStorage.setItem('lastDevice', dm.current.id);
             } else {
-                dm.current = null;
+                dm.select(null);
+                unsaved.markClean();
                 localStorage.removeItem('lastDevice');
             }
 
@@ -156,6 +172,7 @@ $(() => {
         api.patch(`/devices/${dm.current.id}/settings`, { ...serializedDeviceForm, output }).then((data) => {
             dm.current.name = data.device_name;
             $('#selected_device_txt').text(data.device_name);
+            unsaved.markClean();
             new Toast(`Device '${dm.current.name}' saved.`).success();
         }).catch((error) => {
             new Toast(`Error while saving device '${dm.current.name}'. ${error.summary}`).error();
@@ -178,7 +195,7 @@ $(() => {
             const link = device.createPill(dm.current.id);
 
             $(link).on('click', () => {
-                dm.current = device;
+                dm.select(device);
                 $('#selected_device_txt').text(device.name);
             });
 
@@ -228,6 +245,15 @@ $(() => {
         }
         e.currentTarget.setSelectionRange(position, position);
     };
+
+    // Ask before a pill click switches away from edited settings. Runs first, so no other handler sees a refused click.
+    document.getElementById('device_tab_id').addEventListener('click', (e) => {
+        const pill = e.target.closest('a[data-device-id]');
+        if (pill && dm.current && pill.getAttribute('data-device-id') !== dm.current.id && !unsaved.guard()) {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+        }
+    }, true);
 
     $('#create1_btn, #create2_btn').on('click', () => {
         createDevice();

@@ -224,9 +224,11 @@ class Device {
 
     /**
      * Populate device settings forms with data from config.
+     * @param {Promise} [ready] Resolves once the form can take values, e.g. after the dropdown options are loaded.
+     * @return {Promise} Resolves after the form is populated. Rejects after showing an error toast if loading failed.
      */
-    refreshConfig() {
-        this.getSettings().then(({ effects, output, ...settings }) => {
+    refreshConfig(ready = Promise.resolve()) {
+        return Promise.all([this.getSettings(), ready]).then(([{ effects, output, ...settings }]) => {
             $.each(settings, (key, value) => {
                 const el = $(`#${key}`);
                 if (el.is(':checkbox')) {
@@ -252,7 +254,10 @@ class Device {
                 }
                 el.trigger('change');
             });
-        }).catch(error => new Toast(`Error while loading the device settings. ${error.summary}`).error());
+        }).catch((error) => {
+            new Toast(`Error while loading the device settings. ${error.summary}`).error();
+            throw error;
+        });
     }
 
 }
