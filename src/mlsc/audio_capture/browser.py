@@ -32,6 +32,8 @@ STALL_SECONDS = 2.0
 # Underruns this recent and this many make the connection count as unstable.
 UNSTABLE_WINDOW_SECONDS = 10.0
 UNSTABLE_UNDERRUNS = 3
+# Longest lag in seconds the ticks make up for; more is given up and counted as lost.
+MAX_CATCH_UP = 0.1
 
 FULL_SCALE = np.iinfo(np.int16).max
 
@@ -272,10 +274,13 @@ class BrowserCapture(AudioCapture):
                     pass
                 continue
             self.tick()
-            # A late tick does not try to catch up with a burst of buffers.
+            # A late tick is followed by the missing ones, but only up to MAX_CATCH_UP: after a longer pause
+            # (a sleeping laptop) the rest is given up instead of played as a burst.
+            next_tick += period
             now = self._clock()
-            self.lost_seconds += max(0.0, now - (next_tick + period))
-            next_tick = max(next_tick + period, now)
+            if now - next_tick > MAX_CATCH_UP:
+                self.lost_seconds += now - next_tick
+                next_tick = now
 
     def close(self) -> None:
         self._stop.set()

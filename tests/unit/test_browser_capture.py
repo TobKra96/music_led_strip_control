@@ -368,6 +368,8 @@ class TimerSource:
         arrives = self.arrival(self.sent)
         if arrives <= wake:
             self.clock.now = max(self.clock.now, arrives)
+            if self.clock.now >= self.seconds:
+                self.stop.set()
             message = ("chunk", self.sent, self.rate, chunk(1000, int(self.rate * self.chunk_seconds)).tobytes())
             self.sent += 1
             return message
@@ -407,16 +409,14 @@ def test_a_timer_that_wakes_on_time_delivers_audio_in_real_time_and_counts_nothi
     assert capture.trims == 0
 
 
-def test_ticks_that_fall_behind_are_counted_as_lost_time(clock_at_start):
-    source = TimerSource(clock_at_start, 44100, seconds=10, granularity=0.015625)
+def test_ticks_that_fall_too_far_behind_are_given_up_and_counted_as_lost_time(clock_at_start):
+    source = TimerSource(clock_at_start, 44100, seconds=10, granularity=0.5, stall=(3.0, 1.0))
 
     capture, _ = run_real_time(clock_at_start, source, 44100, 256)
 
-    assert capture.lost_seconds > 1
+    assert capture.lost_seconds > 0.3
 
 
-@pytest.mark.xfail(strict=True, reason="#302: on a coarse timer (Windows, about 15.6 ms) the 5.8 ms ticks are late and never made up, "
-                   "so less audio is played than arrives and the buffer is cut at its maximum again and again")
 def test_small_buffers_are_played_in_real_time_on_a_coarse_timer(clock_at_start):
     source = TimerSource(clock_at_start, 44100, seconds=20, granularity=0.015625)
 
@@ -424,6 +424,16 @@ def test_small_buffers_are_played_in_real_time_on_a_coarse_timer(clock_at_start)
 
     assert len(delivered) * 256 / 44100 >= 0.98 * 20
     assert capture.trims == 0
+
+
+def test_default_buffers_are_played_in_real_time_on_a_coarse_timer(clock_at_start):
+    source = TimerSource(clock_at_start, 44100, seconds=20, granularity=0.015625)
+
+    capture, delivered = run_real_time(clock_at_start, source, 44100, 512)
+
+    assert len(delivered) * 512 / 44100 >= 0.98 * 20
+    assert capture.trims == 0
+    assert capture.lost_seconds == pytest.approx(0, abs=0.02)
 
 
 def test_a_stall_the_buffer_can_absorb_is_not_heard(clock_at_start):
