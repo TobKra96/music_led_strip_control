@@ -69,7 +69,7 @@ def test_a_second_streamer_gets_a_conflict(client):
 
 
 def test_opening_needs_the_browser_microphone_to_be_selected(client, executer):
-    executer._config["audio"]["source"] = "device"
+    executer._config["audio"]["source"] = "device"  # ruff: ignore[private-member-access]
 
     response = open_stream(client)
 
@@ -136,7 +136,7 @@ def test_the_device_list_always_contains_the_browser_microphone(executer, monkey
 
 
 def test_selecting_the_browser_source_needs_no_device_checks(executer, monkeypatch):
-    executer._config["audio"] = {
+    executer._config["audio"] = {  # ruff: ignore[private-member-access]
         "source": "device", "device_name": "Gone", "host_api": None, "gain": 1.0, "sample_rate": 12345,
         "frames_per_buffer": 512, "min_frequency": 20, "max_frequency": 20000, "min_volume_threshold": 0.0}
     monkeypatch.setattr(executer, "_audio_backend", "fake", raising=False)
