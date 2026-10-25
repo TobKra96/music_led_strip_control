@@ -2,6 +2,7 @@ import { initPickr, formatRGB, parseRGB } from './classes/Pickr.js';
 import { api } from './classes/Api.js';
 import { Device } from './classes/Device.js';
 import Toast from './classes/Toast.js';
+import UnsavedChanges from './classes/UnsavedChanges.js';
 
 
 // Init and load all settings.
@@ -16,6 +17,8 @@ $(() => {
         $('#save_btn').prop('disabled', true);
         return;
     }
+
+    const unsaved = new UnsavedChanges(document.getElementById('settingsForm'));
 
     // Init Pickr if available.
     if (window.Pickr) {
@@ -101,6 +104,8 @@ $(() => {
             $('#settingsForm').get(0).reset();
             $('#settingsForm span.badge').text('');
             $('#color_picker').css('background-color', 'rgb(255, 255, 255)');
+            // A group view has nothing to save, so it never warns.
+            unsaved.markClean();
             return;
         }
 
@@ -119,6 +124,7 @@ $(() => {
                 }
                 el.trigger('change');
             });
+            unsaved.markClean();
         }).catch(error => new Toast(`Error while loading effect settings. ${error.summary}`).error());
     }
 
@@ -145,6 +151,7 @@ $(() => {
 
         // Save effect settings to config.
         api.patch(`/devices/${dm.current.id}/effects/${effectIdentifier}/settings`, serializedForm).then(() => {
+            unsaved.markClean();
             new Toast('Effect settings saved.').success();
         }).catch((error) => {
             new Toast(`Error while saving effect settings. ${error.summary}`).error();
@@ -177,6 +184,15 @@ $(() => {
         console.log(data);
         new Toast('Error while loading effect settings.').error();
     });
+
+    // Ask before a pill click switches away from edited settings. Runs first, so no other handler sees a refused click.
+    document.getElementById('device_tab_id').addEventListener('click', (e) => {
+        const pill = e.target.closest('a[data-device-id]');
+        if (pill && dm.current && pill.getAttribute('data-device-id') !== dm.current.id && !unsaved.guard()) {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+        }
+    }, true);
 
     [...devices, ...groups].forEach(item => {
         $(item.link).on('click', () => {
