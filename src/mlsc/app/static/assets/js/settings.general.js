@@ -1,5 +1,6 @@
 import { api } from './classes/Api.js';
 import Toast from './classes/Toast.js';
+import UnsavedChanges from './classes/UnsavedChanges.js';
 import Tagin from '../plugins/tagin/js/tagin.js';
 
 /** @type {Tagin} */
@@ -27,6 +28,8 @@ $(() => {
         maximum: 100
     };
     tagin = new Tagin(document.querySelector('.tagin'), taginOptions);
+
+    const unsaved = new UnsavedChanges(document.getElementById('settingsForm'));
 
     /** The PIN stored on the server. The v2 API cannot save the lock without a PIN, so this stands in for an emptied field. */
     let savedPin = '';
@@ -104,7 +107,10 @@ $(() => {
 
         ]
 
-        Promise.all(settingsPromises).catch((error) => {
+        // The form counts as saved once it is populated. Reset and import come through here as well.
+        Promise.all(settingsPromises).then(() => {
+            unsaved.markClean();
+        }).catch((error) => {
             new Toast(`Error while getting general settings. ${error.summary || ''}`).error();
         });
     }
@@ -205,6 +211,7 @@ $(() => {
         });
 
         Promise.all([setGeneralSettings(serializedForm), setPinSettings(serializedPinForm)]).then(() => {
+            unsaved.markClean();
             new Toast('General settings saved.').success();
         }).catch((error) => {
             new Toast(`Error while saving general settings. ${error.summary || ''}`).error();
