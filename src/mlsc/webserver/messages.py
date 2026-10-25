@@ -140,6 +140,14 @@ class GroupAlreadyExists(AlreadyExists):
     _message = "Group with this name already exists."
 
 
+class BrowserStreamBusy(AlreadyExists):
+    _message = "Another browser is already streaming its microphone."
+
+
+class BrowserMicrophoneNotSelected(AlreadyExists):
+    _message = "The Browser Microphone is not the selected audio source."
+
+
 class DuplicateItem(AlreadyExists):
     _message = "Same item used more than once."
     _code = HTTPStatus.CONFLICT.value
@@ -180,6 +188,16 @@ class Unauthorized(_Message):
 class UnsupportedMediaType(_Message):
     _message = "Unsupported media type."
     _code = HTTPStatus.UNSUPPORTED_MEDIA_TYPE.value
+
+
+class StreamGone(_Message):
+    _message = "The stream is not open or has expired."
+    _code = HTTPStatus.GONE.value
+
+
+class InvalidChunk(_Message):
+    _message = "The audio chunk is invalid."
+    _code = HTTPStatus.BAD_REQUEST.value
 
 
 class InvalidPin(Unauthorized):

@@ -12,6 +12,7 @@ import numpy as np
 from loguru import logger
 
 from mlsc.audio_capture import AudioCapture
+from mlsc.audio_capture.browser import BROWSER_DEVICE_NAME, BROWSER_HOST_API, DEFAULT_SAMPLE_RATE, BrowserCapture
 from mlsc.audio_device import AudioDevice
 
 FULL_SCALE = np.iinfo(np.int16).max
@@ -22,6 +23,8 @@ STALL_SECONDS = 2.0
 
 _PERMISSION_MARKERS = ("permission", "errno 13", "access is denied", "access denied")
 _NO_DEVICE_MARKERS = ("no input device", "device unavailable", "no such device", "invalid device", "-9996", "-9985")
+
+WAITING_MESSAGE = "Waiting for browser"
 
 _EMPTY_STATUS = {"device": None, "host_api": None, "sample_rate": None, "fallback": False}
 
@@ -40,10 +43,15 @@ class MicSupervisor:
     """Status `state` is `starting` until the first buffer arrives, then `ok`, or `error` with a `kind` and `retry_in` seconds.
 
     `restarts` counts the configs applied with `start`, so whoever applied one can tell when its status arrives.
+
+    The Browser Microphone is the other source: there is no device to retry, so its state is `waiting` (kind `waiting_for_browser`)
+    until the browser streams, and `unstable` is set while its connection keeps running dry.
     """
 
     def __init__(self, capture: AudioCapture, on_buffer: Callable[[bytes], None], report: Callable[[dict], None] = lambda _status: None,
-                 clock: Callable[[], float] = time.monotonic) -> None:
+                 clock: Callable[[], float] = time.monotonic, browser: BrowserCapture | None = None) -> None:
+        self._device_capture = capture
+        self._browser = browser
         self._capture = capture
         self._on_buffer = on_buffer
         self._report = report
@@ -65,16 +73,42 @@ class MicSupervisor:
 
     def poll(self) -> None:
         """Call regularly from the audio process: notices a stalled stream and retries a failed device once its backoff has passed."""
+        if self._capture is self._browser:
+            self._poll_browser()
+            return
         now = self._clock()
         if self._retry_at is not None and now >= self._retry_at:
             self._open()
         elif self.status.get("state") in {"starting", "ok"} and now - self._last_audio_at >= STALL_SECONDS:
             self._fail(f"No audio from {self.status['device']!r} for {STALL_SECONDS:g} s. It may have been unplugged.", "no_device")
 
+    def _poll_browser(self) -> None:
+        streaming, unstable = self._browser.streaming, self._browser.unstable
+        if streaming and self.status["state"] == "waiting":
+            self._set_status({**self.status, "state": "ok", "kind": None, "message": None})
+        elif not streaming and self.status["state"] == "ok":
+            self._set_status({**self.status, "state": "waiting", "kind": "waiting_for_browser", "message": WAITING_MESSAGE})
+        if unstable != self.status["unstable"]:
+            self._set_status({**self.status, "unstable": unstable, "underruns": self._browser.underruns})
+
+    def _open_browser(self) -> None:
+        sample_rate = self._audio["sample_rate"] or DEFAULT_SAMPLE_RATE
+        self._set_status({
+            "state": "waiting", "device": BROWSER_DEVICE_NAME, "host_api": BROWSER_HOST_API, "sample_rate": sample_rate, "fallback": False,
+            "message": WAITING_MESSAGE, "kind": "waiting_for_browser", "retry_in": None, "restarts": self._restarts,
+            "unstable": False, "underruns": 0,
+        })
+        self._browser.open(self._browser.device(sample_rate), sample_rate, self._audio["frames_per_buffer"], on_data=self._receive)
+
     def _open(self) -> None:
         self._retry_at = None
         self._capture.close()
         self._gain = self._audio["gain"]
+        if self._audio.get("source") == "browser" and self._browser is not None:
+            self._capture = self._browser
+            self._open_browser()
+            return
+        self._capture = self._device_capture
         try:
             device, message = self._select(self._audio["device_name"], self._audio["host_api"])
             sample_rate = self._audio["sample_rate"] or int(device.default_sample_rate)
@@ -114,10 +148,15 @@ class MicSupervisor:
         self._report(dict(status))
 
     def _receive(self, data: bytes) -> None:
+        if self._capture is self._browser:
+            # Silence while nothing streams still reaches the effects; `poll` decides when the status is `ok`.
+            self._on_buffer(data if self._gain == 1.0 else self._apply_gain(data))
+            return
         self._last_audio_at = self._clock()
         if self.status.get("state") != "ok":
             self._set_status({**self.status, "state": "ok"})
-        if self._gain != 1.0:
-            samples = np.frombuffer(data, dtype=np.int16) * self._gain
-            data = np.clip(samples, -FULL_SCALE, FULL_SCALE).astype(np.int16).tobytes()
-        self._on_buffer(data)
+        self._on_buffer(self._apply_gain(data) if self._gain != 1.0 else data)
+
+    def _apply_gain(self, data: bytes) -> bytes:
+        samples = np.frombuffer(data, dtype=np.int16) * self._gain
+        return np.clip(samples, -FULL_SCALE, FULL_SCALE).astype(np.int16).tobytes()

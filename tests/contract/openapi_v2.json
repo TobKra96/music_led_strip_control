@@ -58,9 +58,15 @@
             },
             "title": "Sample Rates",
             "type": "array"
+          },
+          "source": {
+            "description": "`device`, or `browser` for the Browser Microphone entry, which is always listed.",
+            "title": "Source",
+            "type": "string"
           }
         },
         "required": [
+          "source",
           "name",
           "host_api",
           "default_sample_rate",
@@ -140,7 +146,7 @@
               }
             ],
             "default": null,
-            "description": "`no_device`, `permission_denied` or `open_failed` while `state` is `error`.",
+            "description": "`no_device`, `permission_denied` or `open_failed` while `state` is `error`, `waiting_for_browser` while it is `waiting`.",
             "title": "Kind"
           },
           "message": {
@@ -196,11 +202,37 @@
               }
             ],
             "default": null,
-            "description": "`starting`, `ok` or `error`; missing before the audio process has started.",
+            "description": "`starting`, `ok`, `waiting` (for the Browser Microphone to stream) or `error`; missing before the audio process has started.",
             "title": "State"
+          },
+          "underruns": {
+            "default": 0,
+            "description": "How often the Browser Microphone ran dry when the status last changed.",
+            "title": "Underruns",
+            "type": "integer"
+          },
+          "unstable": {
+            "default": false,
+            "description": "Whether the Browser Microphone connection keeps running dry, so audio drops out.",
+            "title": "Unstable",
+            "type": "boolean"
           }
         },
         "title": "AudioStatusOut",
+        "type": "object"
+      },
+      "BrowserStreamOut": {
+        "properties": {
+          "stream_id": {
+            "description": "Send with every chunk. Valid until the stream is closed or sends nothing for 5 seconds.",
+            "title": "Stream Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "stream_id"
+        ],
+        "title": "BrowserStreamOut",
         "type": "object"
       },
       "BulkEffectBody": {
@@ -5723,7 +5755,7 @@
             "title": "Sample Rate"
           },
           "source": {
-            "description": "`device`, or `browser` for the Browser Microphone.",
+            "description": "`device`, or `browser` for the Browser Microphone, which streams from a browser.",
             "title": "Source",
             "type": "string"
           }
@@ -5827,6 +5859,14 @@
               }
             ],
             "title": "Sample Rate"
+          },
+          "source": {
+            "enum": [
+              "device",
+              "browser"
+            ],
+            "title": "Source",
+            "type": "string"
           }
         },
         "title": "MicrophonePatch",
@@ -5867,7 +5907,7 @@
             "type": "number"
           },
           "result": {
-            "description": "`ok`, `silence`, `no_device`, `permission_denied` or `error`.",
+            "description": "`ok`, `silence`, `no_device`, `permission_denied`, `waiting_for_browser` or `error`.",
             "title": "Result",
             "type": "string"
           }
@@ -6054,6 +6094,8 @@
             "enum": [
               "AlreadyExists",
               "BadRequest",
+              "BrowserMicrophoneNotSelected",
+              "BrowserStreamBusy",
               "ConfigFileNotFound",
               "DeviceAlreadyExists",
               "DeviceLimitReached",
@@ -6064,6 +6106,7 @@
               "GroupLimitReached",
               "GroupNotFound",
               "HttpError",
+              "InvalidChunk",
               "InvalidConfigFile",
               "InvalidPin",
               "LimitReached",
@@ -6074,6 +6117,7 @@
               "OperationNotFound",
               "ServerError",
               "SettingNotFound",
+              "StreamGone",
               "TooManyAttempts",
               "TooManyStreams",
               "Unauthorized",
@@ -10577,6 +10621,203 @@
           }
         },
         "summary": "Change the microphone settings",
+        "tags": [
+          "Microphone"
+        ]
+      }
+    },
+    "/api/v2/microphone/browser/stream": {
+      "post": {
+        "description": "Claims the single stream and returns its id. `409` while another browser streams or when the source is not `browser`.<br/><br/>Then send about 40 ms of 16-bit little-endian mono PCM per request to the chunks endpoint.<br/>A stream that sends nothing for about 5 seconds is released. Nothing resumes by itself: open a new stream.",
+        "operationId": "microphone_api_v2_open_browser_stream_browser_stream_post",
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BrowserStreamOut"
+                }
+              }
+            },
+            "description": "Created"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        },
+        "summary": "Start streaming the Browser Microphone",
+        "tags": [
+          "Microphone"
+        ]
+      }
+    },
+    "/api/v2/microphone/browser/stream/{stream_id}": {
+      "delete": {
+        "description": "Releases the claim. Closing a stream that is already gone is not an error.",
+        "operationId": "microphone_api_v2_close_browser_stream_browser_stream__stream_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "stream_id",
+            "required": true,
+            "schema": {
+              "title": "Stream Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        },
+        "summary": "Stop streaming the Browser Microphone",
+        "tags": [
+          "Microphone"
+        ]
+      }
+    },
+    "/api/v2/microphone/browser/stream/{stream_id}/chunks": {
+      "post": {
+        "description": "The body is raw 16-bit little-endian mono PCM, sent as `application/octet-stream`. `410` when the stream expired.",
+        "operationId": "microphone_api_v2_post_browser_chunk_browser_stream__stream_id__chunks_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "stream_id",
+            "required": true,
+            "schema": {
+              "title": "Stream Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Number of the chunk, counted from 0 for each stream. A gap is filled with silence.",
+            "in": "query",
+            "name": "sequence",
+            "required": true,
+            "schema": {
+              "description": "Number of the chunk, counted from 0 for each stream. A gap is filled with silence.",
+              "minimum": 0.0,
+              "title": "Sequence",
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Sample rate of the chunk in Hz, the browser's own. The server resamples.",
+            "in": "query",
+            "name": "sample_rate",
+            "required": true,
+            "schema": {
+              "description": "Sample rate of the chunk in Hz, the browser's own. The server resamples.",
+              "title": "Sample Rate",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "410": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Gone"
+          },
+          "415": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unsupported Media Type"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        },
+        "summary": "Send a chunk of the Browser Microphone",
         "tags": [
           "Microphone"
         ]

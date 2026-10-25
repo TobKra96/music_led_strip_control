@@ -6,6 +6,7 @@ import numpy as np
 from loguru import logger
 
 from mlsc.audio_capture import create_capture
+from mlsc.audio_capture.browser import BrowserCapture
 from mlsc.audio_info import AudioInfo
 from mlsc.config_service import ConfigService
 from mlsc.dsp import DSP
@@ -17,7 +18,7 @@ from mlsc.queue_wrapper import QueueWrapper
 
 
 class AudioProcessService:
-    def start(self, config_lock, notification_queue_in, notification_queue_out, audio_queue, audio_backend, mic_level=None, audio_status=None):
+    def start(self, config_lock, notification_queue_in, notification_queue_out, audio_queue, audio_backend, mic_level=None, audio_status=None, browser_queue=None):
         self._config_lock = config_lock
         self._notification_queue_in = QueueWrapper(notification_queue_in)
         self._notification_queue_out = QueueWrapper(notification_queue_out)
@@ -28,7 +29,8 @@ class AudioProcessService:
         # Built here, inside the audio process: capture objects hold native handles and cannot be pickled.
         self._capture = create_capture(audio_backend)
         self._supervisor = MicSupervisor(
-            self._capture, on_buffer=self._on_buffer, report=audio_status.write if audio_status is not None else lambda status: None)
+            self._capture, on_buffer=self._on_buffer, report=audio_status.write if audio_status is not None else lambda status: None,
+            browser=BrowserCapture(browser_queue) if browser_queue is not None else None)
 
         self.init_audio_service(show_output=True)
 

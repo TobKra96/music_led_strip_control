@@ -102,6 +102,9 @@ class Main:
         # Written by the audio process, read by the webserver process for the Microphone page and the `audio.status` events.
         self._audio_status = AudioStatus()
 
+        # Chunks of the Browser Microphone, from the webserver process to the audio process.
+        self._browser_audio_queue = Queue(100)
+
         # Prepare the queue for the output
         self._output_queue = Queue(2)
         self._effects_queue = Queue(100)
@@ -156,7 +159,8 @@ class Main:
                 self._effects_queue,
                 self._audio_backend,
                 self._mic_level,
-                self._audio_status
+                self._audio_status,
+                self._browser_audio_queue
             ))
         self._webserver_process.start()
 
@@ -171,7 +175,8 @@ class Main:
                 self._audio_queue,
                 self._audio_backend,
                 self._mic_level,
-                self._audio_status
+                self._audio_status,
+                self._browser_audio_queue
             ))
         self._audio_process.start()
 

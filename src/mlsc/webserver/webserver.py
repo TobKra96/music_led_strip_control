@@ -46,7 +46,7 @@ DEBUG = False
 
 class Webserver:
     def start(self: Webserver, config_lock, notification_queue_in, notification_queue_out, effects_queue, audio_backend, mic_level=None,
-              audio_status=None) -> None:
+              audio_status=None, browser_queue=None) -> None:
         self._config_lock = config_lock
         self.notification_queue_in = notification_queue_in
         self.notification_queue_out = notification_queue_out
@@ -56,7 +56,7 @@ class Webserver:
         self.webserver_executer = Executer(
             config_lock, notification_queue_in, notification_queue_out, effects_queue, audio_backend)
         Webserver.instance = self
-        Executer.instance.microphone_settings_executer.connect_audio(mic_level, audio_status)
+        Executer.instance.microphone_settings_executer.connect_audio(mic_level, audio_status, browser_queue)
 
         self.server = create_app()
 

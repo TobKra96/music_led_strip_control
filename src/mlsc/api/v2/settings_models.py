@@ -77,11 +77,7 @@ GeneralSettingsPatch = _model("GeneralSettingsPatch", {
     "properties": {key: value for key, value in general_settings_schema["properties"].items() if key != "device_groups"},
 })
 DeviceSettingsPatch = _model("DeviceSettingsPatch", device_schema)
-MicrophonePatch = _model("MicrophonePatch", {
-    **audio_schema,
-    # The Browser Microphone has its own flow.
-    "properties": {key: value for key, value in audio_schema["properties"].items() if key != "source"},
-})
+MicrophonePatch = _model("MicrophonePatch", audio_schema)
 
 EFFECT_SCHEMAS = {
     effect: schema

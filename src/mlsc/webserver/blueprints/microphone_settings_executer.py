@@ -8,8 +8,10 @@ from loguru import logger
 
 from mlsc import operations
 from mlsc.audio_capture import AudioCaptureError, create_capture
+from mlsc.audio_capture.browser import BROWSER_DEVICE_NAME, BROWSER_HOST_API, DEFAULT_SAMPLE_RATE
 from mlsc.audio_info import AudioInfo
 from mlsc.audio_status import AudioStatus
+from mlsc.browser_stream import BrowserStream, BrowserStreamError
 from mlsc.mic_level import MicLevel
 from mlsc.mixer import Mixer, MixerError, find_mixer
 from mlsc.notification_enum import NotificationEnum
@@ -18,7 +20,7 @@ from mlsc.webserver.executer_base import ExecuterBase, merge
 
 FRAMES_PER_BUFFER_CHOICES = (256, 512, 1024, 2048, 4096)
 # Changing only these reopens the audio stream; anything else also reaches the effects, so every process reloads the config.
-STREAM_ONLY_KEYS = frozenset({"device_name", "host_api", "gain"})
+STREAM_ONLY_KEYS = frozenset({"source", "device_name", "host_api", "gain"})
 # How long an applied change may take until audio arrives from the new device.
 APPLY_SECONDS = 8.0
 TEST_SECONDS = 2.0
@@ -46,6 +48,10 @@ TEST_RESULTS = {
             "On Windows or macOS, allow microphone access for Python in the privacy settings."
         ),
     ),
+    "waiting_for_browser": (
+        "No browser is streaming its microphone.",
+        "Open the Microphone page in the browser you want to use and press Stream from this browser.",
+    ),
     "error": ("The microphone could not be opened.", "Pick another device or a different sample rate, then apply."),
 }
 
@@ -61,14 +67,16 @@ class MicrophoneApplyError(Exception):
 class MicrophoneSettingsExecuter(ExecuterBase):
     _mic_level: MicLevel | None = None
     _audio_status: AudioStatus | None = None
+    _browser_stream: BrowserStream | None = None
     # Injectable for tests, so the apply and test waits never sleep for real.
     _clock: Callable[[], float] = staticmethod(time.monotonic)
     _sleep: Callable[[float], None] = staticmethod(time.sleep)
 
-    def connect_audio(self, mic_level: MicLevel | None, audio_status: AudioStatus | None) -> None:
-        """Give access to the level and status that the audio process shares."""
+    def connect_audio(self, mic_level: MicLevel | None, audio_status: AudioStatus | None, browser_queue=None) -> None:
+        """Give access to the level and status that the audio process shares, and the queue that feeds it the Browser Microphone."""
         self._mic_level = mic_level
         self._audio_status = audio_status
+        self._browser_stream = BrowserStream(browser_queue) if browser_queue is not None else None
 
     # Settings and devices
 
@@ -87,8 +95,9 @@ class MicrophoneSettingsExecuter(ExecuterBase):
             logger.warning(f"No audio backend: {e}")
             return []
         default = AudioInfo.get_default_audio_device(capture)
-        return [
+        devices = [
             {
+                "source": "device",
                 "name": device.name,
                 "host_api": device.host_api,
                 "default_sample_rate": int(device.default_sample_rate),
@@ -98,6 +107,17 @@ class MicrophoneSettingsExecuter(ExecuterBase):
             }
             for device in AudioInfo.get_audio_devices(capture)
         ]
+        # Always listed, so it can be picked before any browser streams. Streaming is a separate step the browser starts.
+        devices.append({
+            "source": "browser",
+            "name": BROWSER_DEVICE_NAME,
+            "host_api": BROWSER_HOST_API,
+            "default_sample_rate": DEFAULT_SAMPLE_RATE,
+            "sample_rates": [DEFAULT_SAMPLE_RATE],
+            "monitor": False,
+            "default": False,
+        })
+        return devices
 
     def validate(self, patch: dict) -> list[dict]:
         """Return a field error for each value of `patch` that the selected device cannot use."""
@@ -107,11 +127,11 @@ class MicrophoneSettingsExecuter(ExecuterBase):
             errors.append({"field": "frames_per_buffer", "detail": f"Must be one of {', '.join(map(str, FRAMES_PER_BUFFER_CHOICES))}."})
         if target["min_frequency"] >= target["max_frequency"]:
             errors.append({"field": "min_frequency", "detail": "Must be lower than max_frequency."})
-        if not {"device_name", "host_api", "sample_rate"} & patch.keys():
+        if target.get("source") == "browser" or not {"source", "device_name", "host_api", "sample_rate"} & patch.keys():
             return errors
         selects_device = bool({"device_name", "host_api"} & patch.keys())
 
-        devices = self.list_devices()
+        devices = [d for d in self.list_devices() if d["source"] == "device"]
         if target["device_name"] is None:
             device = next((d for d in devices if d["default"]), None)
         else:
@@ -146,7 +166,8 @@ class MicrophoneSettingsExecuter(ExecuterBase):
                 status = self.get_status()
                 if status.get("restarts", 0) > restarts_before:
                     fallback = status["fallback"] and fallback_fails
-                    if status["state"] == "ok" and not fallback:
+                    # The Browser Microphone is applied once it waits for the browser; nothing streams until the user starts it.
+                    if status["state"] in {"ok", "waiting"} and not fallback:
                         return True
                     if status["state"] == "error" or fallback:
                         raise MicrophoneApplyError(status["message"])
@@ -178,6 +199,8 @@ class MicrophoneSettingsExecuter(ExecuterBase):
         status = self.get_status()
         if status.get("state") == "error":
             result = status["kind"] if status["kind"] in TEST_RESULTS else "error"
+        elif status.get("state") == "waiting":
+            result = "waiting_for_browser"
         elif status.get("state") != "ok":
             result = "no_device"
         elif peak < SILENCE_LEVEL:
@@ -186,6 +209,23 @@ class MicrophoneSettingsExecuter(ExecuterBase):
             result = "ok"
         message, hint = TEST_RESULTS[result]
         return {"result": result, "message": message, "hint": hint, "peak": round(peak, 3), "device": status.get("device")}
+
+    # Browser Microphone
+
+    def open_browser_stream(self) -> str:
+        """Claim the stream for one browser and return its id. Needs the Browser Microphone to be the selected source."""
+        if self._browser_stream is None or self.get_settings().get("source") != "browser":
+            raise BrowserStreamError("not_selected", "Select the Browser Microphone as the audio source first.")
+        return self._browser_stream.open()
+
+    def send_browser_chunk(self, stream_id: str, sequence: int, sample_rate: int, pcm: bytes) -> None:
+        if self._browser_stream is None:
+            raise BrowserStreamError("unknown_stream", "The Browser Microphone is not available.")
+        self._browser_stream.chunk(stream_id, sequence, sample_rate, pcm)
+
+    def close_browser_stream(self, stream_id: str) -> None:
+        if self._browser_stream is not None:
+            self._browser_stream.close(stream_id)
 
     # Hardware gain
 

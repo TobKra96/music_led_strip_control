@@ -150,7 +150,8 @@ const loadMixer = () => api.get('/microphone/mixer').then(showMixer).catch(() =>
 
 const load = async () => {
     const [values, deviceList] = await Promise.all([api.get('/microphone'), api.get('/microphone/devices')]);
-    devices = deviceList.devices;
+    // The Browser Microphone entry is picked by the browser streaming client, not through the device list.
+    devices = deviceList.devices.filter(d => d.source !== 'browser');
     const $frames = $('#frames_per_buffer').empty();
     const choices = new Set([...deviceList.frames_per_buffer, values.frames_per_buffer]);
     [...choices].sort((a, b) => a - b).forEach(frames => $frames.append($('<option></option>').val(frames).text(frames)));
@@ -163,7 +164,9 @@ const showStatus = (status) => {
     if (status.state === 'ok') text = `Listening to ${status.device} at ${status.sample_rate} Hz.`;
     else if (status.state === 'starting') text = `Opening ${status.device}…`;
     else if (status.state === 'error') text = 'No audio. See the message at the top of the page.';
-    $('#status_text').text(text);
+    else if (status.state === 'waiting') text = 'Waiting for browser';
+    if (status.unstable) text += ' Unstable connection: audio from the browser keeps dropping out.';
+    $('#status_text').text(text.trim());
 };
 
 const test = async () => {

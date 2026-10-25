@@ -1,6 +1,7 @@
 import numpy as np
 import pytest
 
+from mlsc.audio_capture.browser import STALL_SECONDS, BrowserCapture
 from mlsc.audio_capture.fake import FULL_SCALE, FakeCapture, clipping, sine_sweep
 from mlsc.audio_device import AudioDevice
 from mlsc.mic_supervisor import MicSupervisor
@@ -160,3 +161,85 @@ def test_no_input_device_at_all_is_reported_as_no_device(received, reports, fake
         "state": "error", "device": None, "host_api": None, "sample_rate": None, "fallback": False,
         "message": "There is no input device.", "kind": "no_device", "retry_in": 1.0, "restarts": 1,
     }
+
+
+# Browser Microphone
+
+def browser_audio(**overrides):
+    return audio(source="browser", device_name=None, host_api=None, sample_rate=16000, frames_per_buffer=512, **overrides)
+
+
+@pytest.fixture
+def browser(fake_clock):
+    return BrowserCapture(None, fake_clock.time)
+
+
+@pytest.fixture
+def browser_supervisor(capture, browser, received, reports, fake_clock):
+    return MicSupervisor(capture, on_buffer=received.append, report=reports.append, clock=fake_clock.time, browser=browser)
+
+
+def stream_chunks(browser, sequences):
+    for sequence in sequences:
+        browser.ingest(("chunk", sequence, 16000, np.full(640, 1000, dtype=np.int16).tobytes()))
+
+
+def test_the_browser_source_waits_for_the_browser_and_opens_no_device(browser_supervisor, capture):
+    browser_supervisor.start(browser_audio())
+
+    assert capture.opened is None
+    assert {key: browser_supervisor.status[key] for key in ("state", "kind", "message", "device", "sample_rate")} == {
+        "state": "waiting", "kind": "waiting_for_browser", "message": "Waiting for browser", "device": "Browser Microphone",
+        "sample_rate": 16000}
+
+
+def test_the_status_is_ok_while_the_browser_streams_and_waiting_again_when_it_stops(browser_supervisor, browser, fake_clock):
+    browser_supervisor.start(browser_audio())
+
+    stream_chunks(browser, [0])
+    browser_supervisor.poll()
+    assert browser_supervisor.status["state"] == "ok"
+    assert browser_supervisor.status["message"] is None
+
+    fake_clock.advance(STALL_SECONDS)
+    browser_supervisor.poll()
+    assert (browser_supervisor.status["state"], browser_supervisor.status["kind"]) == ("waiting", "waiting_for_browser")
+
+
+def test_silence_still_reaches_the_effects_while_waiting_and_gain_applies(browser_supervisor, browser, received):
+    browser_supervisor.start(browser_audio(gain=2.0))
+
+    browser.tick()
+    stream_chunks(browser, [0, 1, 2])
+    browser.tick()
+
+    assert not np.frombuffer(received[0], dtype=np.int16).any()
+    assert (np.frombuffer(received[1], dtype=np.int16) == 2000).all()
+
+
+def test_a_connection_that_keeps_running_dry_is_reported_as_unstable(browser_supervisor, browser):
+    browser_supervisor.start(browser_audio())
+
+    stream_chunks(browser, [0, 2, 4, 6])
+    browser_supervisor.poll()
+
+    assert browser_supervisor.status["unstable"] is True
+    assert browser_supervisor.status["underruns"] == 3
+
+
+def test_switching_back_to_a_device_closes_the_browser_and_opens_the_device(browser_supervisor, browser, capture):
+    browser_supervisor.start(browser_audio())
+
+    browser_supervisor.start(audio())
+    capture.feed()
+
+    assert browser_supervisor.status["device"] == "USB Mic"
+    assert browser_supervisor.status["state"] == "ok"
+    assert not browser.streaming
+
+
+def test_without_a_browser_capture_the_device_stays_in_use(supervisor, capture):
+    supervisor.start(browser_audio())
+    capture.feed()
+
+    assert supervisor.status["state"] == "ok"

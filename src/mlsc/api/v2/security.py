@@ -10,6 +10,9 @@ from mlsc.webserver.messages import BadRequest, Unauthorized, UnsupportedMediaTy
 WRITE_METHODS = frozenset({"POST", "PUT", "PATCH"})
 # Writes that take no body. Without a Content-Type they cannot be sent by a cross-site form, which always sets one.
 BODYLESS_WRITES = frozenset({"auth_api_v2.logout"})
+# Writes that carry raw audio. A cross-site form cannot send this Content-Type without a preflight either.
+BINARY_WRITES = frozenset({"microphone_api_v2.post_browser_chunk"})
+BINARY_MIMETYPE = "application/octet-stream"
 
 
 def api_login_required(func):
@@ -29,6 +32,10 @@ def _is_bodyless(endpoint: str | None) -> bool:
 def require_json_writes() -> Response | None:
     """Require `Content-Type: application/json` on writes, which a cross-site form cannot send without a preflight."""
     if not is_v2_request():
+        return None
+    if request.endpoint in BINARY_WRITES:
+        if request.mimetype != BINARY_MIMETYPE:
+            return handle_problem_error(ProblemError(UnsupportedMediaType, f"Send the request body as {BINARY_MIMETYPE}."))
         return None
     if request.method in WRITE_METHODS and request.mimetype != "application/json" and not _is_bodyless(request.endpoint):
         return handle_problem_error(ProblemError(UnsupportedMediaType, "Send the request body as application/json."))
