@@ -276,7 +276,8 @@ class TimerSource:
             self.stop.set()
         raise queue.Empty
 
-    def get_nowait(self):
+    @staticmethod
+    def get_nowait():
         raise queue.Empty
 
 
