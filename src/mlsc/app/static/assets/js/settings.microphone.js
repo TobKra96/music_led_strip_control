@@ -9,7 +9,7 @@ const unsaved = new UnsavedChanges(document.getElementById('settingsForm'));
 let deviceChoices = new Map();
 /** @type {Array.<{name: string, host_api: string, default_sample_rate: number, sample_rates: Array.<number>, monitor: boolean, default: boolean}>} */
 let devices = [];
-/** The settings as last loaded or applied. */
+/** The settings as last loaded or saved. */
 let settings = {};
 
 const NUMBER_FIELDS = ['min_frequency', 'max_frequency', 'min_volume_threshold'];
@@ -44,7 +44,7 @@ const fillDevices = () => {
         $select.append($('<option></option>').val(key).text(deviceLabel(device)));
     });
 
-    // Keep a stored device that is not plugged in selectable, so applying other changes does not drop it.
+    // Keep a stored device that is not plugged in selectable, so saving other changes does not drop it.
     if (settings.device_name !== null && !devices.some(d => d.name === settings.device_name && [null, d.host_api].includes(settings.host_api))) {
         const key = deviceKey(settings.device_name, settings.host_api);
         deviceChoices.set(key, { name: settings.device_name, host_api: settings.host_api, sample_rates: [], missing: true });
@@ -116,25 +116,25 @@ const waitForOperation = operation => new Promise((resolve) => {
     finish(operation);
 });
 
-const apply = async () => {
+const save = async () => {
     const changes = collectChanges();
     if (!Object.keys(changes).length) {
-        new Toast('Nothing to apply.').info();
+        new Toast('Nothing to save.').info();
         return;
     }
-    const $button = $('#apply_btn').prop('disabled', true).text('Applying…');
+    const $button = $('#save_btn').prop('disabled', true).text('Saving…');
     try {
         const operation = await waitForOperation(await api.patch('/microphone', changes));
         if (operation.state === 'confirmed') {
-            new Toast('Microphone settings applied.').success();
+            new Toast('Microphone settings saved.').success();
         } else {
             new Toast(`The new settings did not work and were rolled back. ${operation.error || ''}`).error();
         }
         await load();
     } catch (error) {
-        new Toast(`Could not apply the microphone settings. ${error.summary || ''}`).error();
+        new Toast(`Could not save the microphone settings. ${error.summary || ''}`).error();
     } finally {
-        $button.prop('disabled', false).text('Apply');
+        $button.prop('disabled', false).text('Save');
     }
 };
 
@@ -212,6 +212,6 @@ $(() => {
             .then(showMixer)
             .catch(error => new Toast(`Could not set the hardware gain. ${error.summary || ''}`).error());
     });
-    $('#apply_btn').on('click', apply);
+    $('#save_btn').on('click', save);
     $('#test_btn').on('click', test);
 });
