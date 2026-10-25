@@ -1,3 +1,8 @@
+import Toast from './classes/Toast.js';
+import UnsavedChanges from './classes/UnsavedChanges.js';
+
+const unsaved = new UnsavedChanges(document.getElementById('settingsForm'));
+
 // Init and load all settings
 $(() => {
     var settingsIdentifier = $("#settingsIdentifier").val();
@@ -9,6 +14,7 @@ $(() => {
             $('#output').val(response["output"]);
             // Set initial effect slider values
             $("span[for='level']").text(response["level"]);
+            unsaved.markClean();
         })
 
     ]).then(() => {
@@ -24,7 +30,7 @@ $(() => {
  * @param {number} level
  */
 function setMicrophoneLevel(level) {
-    data = {};
+    const data = {};
     data["level"] = level
     $.ajax({
         url: "/api/settings/microphone/volume",
@@ -33,6 +39,7 @@ function setMicrophoneLevel(level) {
         contentType: 'application/json;charset=UTF-8'
     }).done(response => {
         $('#output').val(response["output"]);
+        unsaved.markClean();
         // todo toasts
         console.log("Effect settings set successfully. Response:\n\n" + JSON.stringify(response, null, '\t'));
     }).fail(response => {
@@ -42,7 +49,7 @@ function setMicrophoneLevel(level) {
 }
 
 document.getElementById("save_btn").addEventListener("click", function () {
-    level = $('#level').val();
+    const level = $('#level').val();
     setMicrophoneLevel(level);
 
 });
