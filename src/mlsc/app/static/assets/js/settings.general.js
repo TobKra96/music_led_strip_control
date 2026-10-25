@@ -28,6 +28,9 @@ $(() => {
     };
     tagin = new Tagin(document.querySelector('.tagin'), taginOptions);
 
+    /** The PIN stored on the server. The v2 API cannot save the lock without a PIN, so this stands in for an emptied field. */
+    let savedPin = '';
+
     // Preload dropdown values.
     const promises = [
 
@@ -71,8 +74,9 @@ $(() => {
      * @param {PinSettings} settings
      */
     const populatePinSettings = (settings) => {
-        $('#DASHBOARD_PIN').val(settings.DEFAULT_PIN);
-        $('#PIN_LOCK_ENABLED').prop('checked', settings.USE_PIN_LOCK);
+        savedPin = settings.default_pin;
+        $('#DASHBOARD_PIN').val(settings.default_pin);
+        $('#PIN_LOCK_ENABLED').prop('checked', settings.use_pin_lock);
     }
 
     /**
@@ -159,12 +163,15 @@ $(() => {
      * @return {Promise}
      */
     const setPinSettings = (settings) => {
-        // The API only accepts 4 to 8 digits. An empty PIN is only allowed while the lock is off: nothing to save then.
-        if (!settings.DASHBOARD_PIN) return Promise.resolve();
+        // The API only accepts 4 to 8 digits. An empty PIN is only allowed while the lock is off: keep the saved PIN then.
+        const pin = settings.DASHBOARD_PIN || savedPin;
+        if (!pin) return Promise.resolve();
 
         return api.put('/auth/pin', {
-            default_pin: settings.DASHBOARD_PIN,
+            default_pin: pin,
             use_pin_lock: settings.PIN_LOCK_ENABLED
+        }).then((saved) => {
+            savedPin = saved.default_pin;
         });
     }
 
@@ -304,6 +311,6 @@ $('#MODIFY_GLOBAL_GROUP_TOOLTIP').attr('data-original-title', 'Add or remove gro
 
 /**
  * @typedef {object} PinSettings
- * @property {string} DEFAULT_PIN
- * @property {string} USE_PIN_LOCK
+ * @property {string} default_pin
+ * @property {boolean} use_pin_lock
  */
