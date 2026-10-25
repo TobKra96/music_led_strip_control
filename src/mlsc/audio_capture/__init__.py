@@ -37,6 +37,10 @@ class AudioCapture(ABC):
     def default_device(self) -> AudioDevice:
         """Return the system default input device."""
 
+    def supported_sample_rates(self, device: AudioDevice) -> list[int]:
+        """Return the rates `device` can capture at. Backends that cannot ask the device report only its native rate."""
+        return [int(device.default_sample_rate)]
+
     def open(self, device: AudioDevice, sample_rate: int, frames_per_buffer: int, on_data: Callable[[bytes], None] | None = None) -> None:
         """Start capturing from `device`. Closes a previously opened stream first."""
         self.close()

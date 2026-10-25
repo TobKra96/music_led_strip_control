@@ -14,7 +14,7 @@ SUBSCRIBER_BACKLOG = 64
 
 # Events that are rare and must not be missed get an id and are replayed to a client that reconnects with `Last-Event-ID`.
 # The rest (meters, stats) are continuous: a reconnecting client just waits for the next one.
-REPLAYABLE_EVENTS = frozenset({"device.status", "diagnosis", "wifi.state", "operation"})
+REPLAYABLE_EVENTS = frozenset({"device.status", "diagnosis", "wifi.state", "operation", "audio.status"})
 REPLAY_BUFFER = 32
 
 

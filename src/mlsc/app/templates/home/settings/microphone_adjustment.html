@@ -1,6 +1,6 @@
 {% extends "layouts/base.html" %}
 
-{% block title %} Microphone Adjustment {% endblock %}
+{% block title %} Microphone {% endblock %}
 
 <!-- Specific CSS goes HERE -->
 {% block stylesheets %}{% endblock stylesheets %}
@@ -15,12 +15,12 @@
                 <div class="row align-items-center">
                     <div class="col-md-12">
                         <div class="page-header-title">
-                            <h5 class="m-b-10">Microphone Adjustment</h5>
+                            <h5 class="m-b-10">Microphone</h5>
                         </div>
                         <ul class="breadcrumb">
                             <li class="breadcrumb-item"><a href="{{ url_for('home_blueprint.index') }}"><i class="feather icon-home"></i></a></li>
                             <li class="breadcrumb-item"><a href="javascript:">Settings</a></li>
-                            <li class="breadcrumb-item"><a href="javascript:">Microphone Adjustment</a></li>
+                            <li class="breadcrumb-item"><a href="javascript:">Microphone</a></li>
                         </ul>
                     </div>
                 </div>
@@ -36,28 +36,89 @@
                         <form id="settingsForm" action method="post" novalidate autocomplete="off">
                             <div class="card">
                                 <div class="card-header">
-                                    <h5>Microphone Level</h5>
+                                    <h5>Input</h5>
                                 </div>
                                 <div class="card-block">
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label>Microphone Level <span for="level" class="mb-0 badge badge-secondary"></span></label>
-                                                <input id="level" type="range" class="custom-range mt-3 setting_input" min="0" max="100" step="1" required>
+                                    <div class="form-group">
+                                        <label for="device">Device</label>
+                                        <select id="device" class="form-control">
+                                            <option value="">System default</option>
+                                        </select>
+                                        <small id="device_info" class="form-text text-muted"></small>
+                                        <small class="form-text text-muted">
+                                            Using remote audio (AirPlay, Bluetooth, Spotify)? Select its <strong>Monitor</strong> device.
+                                            <a href="https://github.com/TobKra96/music_led_strip_control/wiki/Remote-Audio" target="_blank" rel="noopener noreferrer">How to set it up</a>
+                                        </small>
+                                    </div>
+
+                                    <div id="hardware_gain_group" class="form-group d-none" data-unsaved-ignore>
+                                        <label for="hardware_gain">Hardware Gain <span for="hardware_gain" class="mb-0 badge badge-secondary"></span></label>
+                                        <input id="hardware_gain" type="range" class="custom-range mt-2" min="0" max="100" step="1">
+                                        <small id="hardware_gain_info" class="form-text text-muted"></small>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="gain">Software Gain <span for="gain" class="mb-0 badge badge-secondary"></span></label>
+                                        <input id="gain" type="range" class="custom-range mt-2" min="0.1" max="10" step="0.1">
+                                        <small class="form-text text-muted">Amplifies the signal before the effects. Use it when the device has no hardware gain.</small>
+                                    </div>
+
+                                    <a class="d-inline-block mb-3" data-toggle="collapse" href="#advanced" role="button" aria-expanded="false" aria-controls="advanced">
+                                        <i class="feather icon-sliders"></i> Advanced
+                                    </a>
+                                    <div id="advanced" class="collapse">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="sample_rate">Sample Rate</label>
+                                                    <select id="sample_rate" class="form-control"></select>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="frames_per_buffer">Frames Per Buffer</label>
+                                                    <select id="frames_per_buffer" class="form-control"></select>
+                                                    <small class="form-text text-muted">More frames: lower frame rate, smoother effects. Default 512.</small>
+                                                </div>
                                             </div>
-                                            <div class="form-group">
-                                                <label for="output">Console Output</label>
-                                                <textarea class="form-control" id="output" rows="8" disabled="true" spellcheck="false"></textarea>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="min_frequency">Minimum Frequency (Hz)</label>
+                                                    <input id="min_frequency" type="number" class="form-control" min="0" step="1">
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="max_frequency">Maximum Frequency (Hz)</label>
+                                                    <input id="max_frequency" type="number" class="form-control" min="0" step="1">
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="min_volume_threshold">Minimum Volume Threshold</label>
+                                                    <input id="min_volume_threshold" type="number" class="form-control" min="0" step="0.0001">
+                                                    <small class="form-text text-muted">Quieter input is ignored, to filter background noise. Default 0.001.</small>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="mt-4 d-flex flex-md-row flex-column justify-content-md-end">
-                                        <button type="button" id="save_btn" class="btn btn-success m-0 mb-3 mb-md-0">Save</button>
+
+                                    <div class="mt-2 d-flex flex-md-row flex-column justify-content-md-end">
+                                        <button type="button" id="apply_btn" class="btn btn-success m-0">Apply</button>
                                     </div>
                                 </div>
-
                             </div>
                         </form>
+                    </div>
+
+                    <div class="col-md-12 col-lg-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5>Level</h5>
+                            </div>
+                            <div class="card-block">
+                                <div class="progress mb-2" style="height: 16px;" role="progressbar" aria-label="Input level" aria-valuemin="0" aria-valuemax="100">
+                                    <div id="level_meter" class="progress-bar bg-success" style="width: 0%; transition: width 0.1s linear;"></div>
+                                </div>
+                                <small id="status_text" class="form-text text-muted mb-3"></small>
+                                <button type="button" id="test_btn" class="btn btn-outline-primary btn-block">Test microphone</button>
+                                <div id="test_result" class="alert mt-3 mb-0 d-none" role="status"></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 

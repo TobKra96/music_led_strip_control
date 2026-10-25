@@ -8,3 +8,4 @@ class NotificationEnum(Enum):
     process_stop = 4
     process_pause = 5
     process_continue = 6
+    audio_restart = 7

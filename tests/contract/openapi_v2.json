@@ -26,6 +26,183 @@
         "title": "ActiveEffectOut",
         "type": "object"
       },
+      "AudioDeviceOut": {
+        "properties": {
+          "default": {
+            "description": "Whether it is the system default.",
+            "title": "Default",
+            "type": "boolean"
+          },
+          "default_sample_rate": {
+            "description": "The native rate.",
+            "title": "Default Sample Rate",
+            "type": "integer"
+          },
+          "host_api": {
+            "title": "Host Api",
+            "type": "string"
+          },
+          "monitor": {
+            "description": "Whether it is a Monitor Device, which carries played or remote audio.",
+            "title": "Monitor",
+            "type": "boolean"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "sample_rates": {
+            "description": "Rates the device reports as supported.",
+            "items": {
+              "type": "integer"
+            },
+            "title": "Sample Rates",
+            "type": "array"
+          }
+        },
+        "required": [
+          "name",
+          "host_api",
+          "default_sample_rate",
+          "sample_rates",
+          "monitor",
+          "default"
+        ],
+        "title": "AudioDeviceOut",
+        "type": "object"
+      },
+      "AudioDevicesOut": {
+        "properties": {
+          "devices": {
+            "items": {
+              "$ref": "#/components/schemas/AudioDeviceOut"
+            },
+            "title": "Devices",
+            "type": "array"
+          },
+          "frames_per_buffer": {
+            "description": "The valid choices for `frames_per_buffer`.",
+            "items": {
+              "type": "integer"
+            },
+            "title": "Frames Per Buffer",
+            "type": "array"
+          }
+        },
+        "required": [
+          "devices",
+          "frames_per_buffer"
+        ],
+        "title": "AudioDevicesOut",
+        "type": "object"
+      },
+      "AudioStatusOut": {
+        "description": "Status of the audio stream. Also pushed as the `audio.status` event.",
+        "properties": {
+          "device": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "The device in use.",
+            "title": "Device"
+          },
+          "fallback": {
+            "default": false,
+            "description": "Whether the stored device was not found and the system default is used.",
+            "title": "Fallback",
+            "type": "boolean"
+          },
+          "host_api": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Host Api"
+          },
+          "kind": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "`no_device`, `permission_denied` or `open_failed` while `state` is `error`.",
+            "title": "Kind"
+          },
+          "message": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "What went wrong, or why the system default is used.",
+            "title": "Message"
+          },
+          "restarts": {
+            "default": 0,
+            "title": "Restarts",
+            "type": "integer"
+          },
+          "retry_in": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Seconds until the next try to open the device.",
+            "title": "Retry In"
+          },
+          "sample_rate": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Sample Rate"
+          },
+          "state": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "`starting`, `ok` or `error`; missing before the audio process has started.",
+            "title": "State"
+          }
+        },
+        "title": "AudioStatusOut",
+        "type": "object"
+      },
       "BulkEffectBody": {
         "properties": {
           "device_ids": {
@@ -5486,6 +5663,225 @@
         "title": "MicLevelEvent",
         "type": "object"
       },
+      "MicrophoneOut": {
+        "properties": {
+          "device_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Stored device name; `null` is the system default.",
+            "title": "Device Name"
+          },
+          "frames_per_buffer": {
+            "title": "Frames Per Buffer",
+            "type": "integer"
+          },
+          "gain": {
+            "description": "Software gain, applied to the samples before the effects.",
+            "title": "Gain",
+            "type": "number"
+          },
+          "host_api": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Host API of the stored device; `null` matches any.",
+            "title": "Host Api"
+          },
+          "max_frequency": {
+            "title": "Max Frequency",
+            "type": "number"
+          },
+          "min_frequency": {
+            "title": "Min Frequency",
+            "type": "number"
+          },
+          "min_volume_threshold": {
+            "title": "Min Volume Threshold",
+            "type": "number"
+          },
+          "sample_rate": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "`null` is the native rate of the device.",
+            "title": "Sample Rate"
+          },
+          "source": {
+            "description": "`device`, or `browser` for the Browser Microphone.",
+            "title": "Source",
+            "type": "string"
+          }
+        },
+        "required": [
+          "source",
+          "device_name",
+          "host_api",
+          "gain",
+          "sample_rate",
+          "frames_per_buffer",
+          "min_frequency",
+          "max_frequency",
+          "min_volume_threshold"
+        ],
+        "title": "MicrophoneOut",
+        "type": "object"
+      },
+      "MicrophonePatch": {
+        "additionalProperties": false,
+        "properties": {
+          "device_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Device Name"
+          },
+          "frames_per_buffer": {
+            "minimum": 1.0,
+            "title": "Frames Per Buffer",
+            "type": "integer"
+          },
+          "gain": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Gain"
+          },
+          "host_api": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Host Api"
+          },
+          "max_frequency": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Max Frequency"
+          },
+          "min_frequency": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Min Frequency"
+          },
+          "min_volume_threshold": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Min Volume Threshold"
+          },
+          "sample_rate": {
+            "anyOf": [
+              {
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sample Rate"
+          }
+        },
+        "title": "MicrophonePatch",
+        "type": "object"
+      },
+      "MicrophoneTestOut": {
+        "properties": {
+          "device": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Device"
+          },
+          "hint": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "How to fix the problem.",
+            "title": "Hint"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          },
+          "peak": {
+            "description": "Highest input level seen, 0 to 1.",
+            "title": "Peak",
+            "type": "number"
+          },
+          "result": {
+            "description": "`ok`, `silence`, `no_device`, `permission_denied` or `error`.",
+            "title": "Result",
+            "type": "string"
+          }
+        },
+        "required": [
+          "result",
+          "message",
+          "hint",
+          "peak",
+          "device"
+        ],
+        "title": "MicrophoneTestOut",
+        "type": "object"
+      },
       "MigrationReportOut": {
         "properties": {
           "entries": {
@@ -5510,6 +5906,72 @@
           "entries"
         ],
         "title": "MigrationReportOut",
+        "type": "object"
+      },
+      "MixerIn": {
+        "properties": {
+          "level": {
+            "maximum": 100,
+            "minimum": 0.0,
+            "title": "Level",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "level"
+        ],
+        "title": "MixerIn",
+        "type": "object"
+      },
+      "MixerOut": {
+        "properties": {
+          "available": {
+            "description": "Whether the device has a hardware capture gain. Without one, use the software `gain`.",
+            "title": "Available",
+            "type": "boolean"
+          },
+          "card": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Card"
+          },
+          "control": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Control"
+          },
+          "level": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Hardware capture level in percent.",
+            "title": "Level"
+          }
+        },
+        "required": [
+          "available",
+          "card",
+          "control",
+          "level"
+        ],
+        "title": "MixerOut",
         "type": "object"
       },
       "OperationOut": {
@@ -5607,6 +6069,7 @@
               "LimitReached",
               "MethodNotAllowed",
               "MigrationReportNotFound",
+              "MixerNotFound",
               "NotFound",
               "OperationNotFound",
               "ServerError",
@@ -9389,7 +9852,7 @@
     },
     "/api/v2/events": {
       "get": {
-        "description": "One multiplexed `text/event-stream` with `device.status`, `diagnosis`, `mic.level`, `wifi.state`, `system.stats` and `operation`.<br/><br/>Notifications only. The low-rate events carry an `id`; reconnect with `Last-Event-ID` to receive the ones missed.",
+        "description": "One multiplexed `text/event-stream` with `device.status`, `diagnosis`, `mic.level`, `audio.status`, `wifi.state`, `system.stats` and `operation`.<br/><br/>Notifications only. The low-rate events carry an `id`; reconnect with `Last-Event-ID` to receive the ones missed.",
         "operationId": "events_api_v2_events_get",
         "responses": {
           "200": {
@@ -9431,6 +9894,12 @@
           "Events"
         ],
         "x-events": {
+          "audio.status": {
+            "replayable": true,
+            "schema": {
+              "$ref": "#/components/schemas/AudioStatusOut"
+            }
+          },
           "device.status": {
             "replayable": true,
             "schema": {
@@ -10009,6 +10478,352 @@
         "summary": "Set the effect of every device in a group",
         "tags": [
           "Groups"
+        ]
+      }
+    },
+    "/api/v2/microphone": {
+      "get": {
+        "operationId": "microphone_api_v2_get_microphone_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MicrophoneOut"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        },
+        "summary": "Get the microphone settings",
+        "tags": [
+          "Microphone"
+        ]
+      },
+      "patch": {
+        "description": "Run as an Operation: the audio stream restarts with the new settings and rolls back to the last working ones when no audio arrives.<br/><br/>A `sample_rate` must be one the device supports, `frames_per_buffer` one of the listed choices.",
+        "operationId": "microphone_api_v2_patch_microphone_patch",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MicrophonePatch"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OperationOut"
+                }
+              }
+            },
+            "description": "Accepted"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "415": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unsupported Media Type"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        },
+        "summary": "Change the microphone settings",
+        "tags": [
+          "Microphone"
+        ]
+      }
+    },
+    "/api/v2/microphone/devices": {
+      "get": {
+        "operationId": "microphone_api_v2_get_devices_devices_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AudioDevicesOut"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        },
+        "summary": "List the audio input devices",
+        "tags": [
+          "Microphone"
+        ]
+      }
+    },
+    "/api/v2/microphone/mixer": {
+      "get": {
+        "operationId": "microphone_api_v2_get_mixer_mixer_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MixerOut"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        },
+        "summary": "Get the hardware gain",
+        "tags": [
+          "Microphone"
+        ]
+      },
+      "put": {
+        "description": "`404` when the device has no hardware gain; use the software `gain` instead. Takes effect at once, without an Operation.",
+        "operationId": "microphone_api_v2_put_mixer_mixer_put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MixerIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MixerOut"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "415": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unsupported Media Type"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        },
+        "summary": "Set the hardware gain",
+        "tags": [
+          "Microphone"
+        ]
+      }
+    },
+    "/api/v2/microphone/status": {
+      "get": {
+        "operationId": "microphone_api_v2_get_status_status_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AudioStatusOut"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        },
+        "summary": "Get the status of the audio stream",
+        "tags": [
+          "Microphone"
+        ]
+      }
+    },
+    "/api/v2/microphone/test": {
+      "post": {
+        "description": "Watches the live input for two seconds and reports silence, no device or permission denied, with a hint to fix it.",
+        "operationId": "microphone_api_v2_test_microphone_test_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MicrophoneTestOut"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "415": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unsupported Media Type"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        },
+        "summary": "Test the microphone",
+        "tags": [
+          "Microphone"
         ]
       }
     },
@@ -10781,6 +11596,10 @@
     {
       "description": "The effect shown on each device",
       "name": "Effects"
+    },
+    {
+      "description": "The audio input: device, gain, level test and hardware gain",
+      "name": "Microphone"
     },
     {
       "description": "Lists of the values that settings can take",

@@ -84,57 +84,9 @@
                                         <div class="col-md-12">
                                             <hr>
                                             <h5>Audio</h5>
+                                            <p class="text-muted">The input device, gain and sample rate are set on the <a href="/settings/microphone_adjustment">Microphone</a> page.</p>
                                         </div>
                                         <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label class="row m-0 mb-2 p-0">
-                                                    Audio Device
-                                                    <div id="DEVICE_ID_TOOLTIP" class="pl-1" data-toggle="tooltip" data-placement="top" data-html="true">
-                                                        <i class="feather icon-help-circle"></i>
-                                                    </div>
-                                                </label>
-                                                <select name="device_id:number" id="device_id" class="form-control audio_devices setting_input" type="number">
-                                                    <option value="-1">No microphone available</option>
-                                                </select>
-                                            </div>
-                                            <div class="form-group">
-                                                <label class="row m-0 mb-2 p-0">
-                                                    Default Sample Rate
-                                                    <div id="DEFAULT_SAMPLE_RATE_TOOLTIP" class="pl-1" data-toggle="tooltip" data-placement="top" data-html="true">
-                                                        <i class="feather icon-help-circle"></i>
-                                                    </div>
-                                                </label>
-                                                <input name="default_sample_rate:number" id="default_sample_rate" class="form-control setting_input" onkeypress="return event.charCode >= 48 && event.charCode <= 57" type="number" required>
-                                            </div>
-                                            <div class="form-group">
-                                                <label class="row m-0 mb-2 p-0">
-                                                    Minimum Frequency
-                                                    <div id="MIN_FREQUENCY_TOOLTIP" class="pl-1" data-toggle="tooltip" data-placement="top" data-html="true">
-                                                        <i class="feather icon-help-circle"></i>
-                                                    </div>
-                                                </label>
-                                                <input name="min_frequency:number" id="min_frequency" class="form-control setting_input" onkeypress="return event.charCode >= 48 && event.charCode <= 57" type="number" required>
-                                            </div>
-                                            <div class="form-group">
-                                                <label class="row m-0 mb-2 p-0">
-                                                    Maximum Frequency
-                                                    <div id="MAX_FREQUENCY_TOOLTIP" class="pl-1" data-toggle="tooltip" data-placement="top" data-html="true">
-                                                        <i class="feather icon-help-circle"></i>
-                                                    </div>
-                                                </label>
-                                                <input name="max_frequency:number" id="max_frequency" class="form-control setting_input" onkeypress="return event.charCode >= 48 && event.charCode <= 57" type="number" required>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label class="row m-0 mb-2 p-0">
-                                                    Minimum Volume Threshold
-                                                    <div id="MIN_VOLUME_THRESHOLD_TOOLTIP" class="pl-1" data-toggle="tooltip" data-placement="top" data-html="true">
-                                                        <i class="feather icon-help-circle"></i>
-                                                    </div>
-                                                </label>
-                                                <input name="min_volume_threshold:number" id="min_volume_threshold" class="form-control setting_input" onkeypress="return event.charCode >= 48 && event.charCode <= 57" type="number" required>
-                                            </div>
                                             <div class="form-group">
                                                 <label class="row m-0 mb-2 p-0">
                                                     Rolling History
@@ -144,15 +96,8 @@
                                                 </label>
                                                 <input name="n_rolling_history:number" id="n_rolling_history" class="form-control setting_input" onkeypress="return event.charCode >= 48 && event.charCode <= 57" type="number" required>
                                             </div>
-                                            <div class="form-group">
-                                                <label class="row m-0 mb-2 p-0">
-                                                    Frames Per Buffer
-                                                    <div id="FRAMES_PER_BUFFER_TOOLTIP" class="pl-1" data-toggle="tooltip" data-placement="top" data-html="true">
-                                                        <i class="feather icon-help-circle"></i>
-                                                    </div>
-                                                </label>
-                                                <input name="frames_per_buffer:number" id="frames_per_buffer" class="form-control setting_input" onkeypress="return event.charCode >= 48 && event.charCode <= 57" type="number" required>
-                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
                                             <div class="form-group">
                                                 <label class="row m-0 mb-2 p-0">
                                                     FFT BINS

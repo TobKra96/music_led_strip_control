@@ -1422,7 +1422,7 @@ audio_schema = {
         "device_name": {"type": ["string", "null"]},
         "host_api": {"type": ["string", "null"]},
         "gain": {"type": "number", "exclusiveMinimum": 0},
-        "sample_rate": {"type": "integer", "minimum": 1},
+        "sample_rate": {"type": ["integer", "null"], "minimum": 1},
         "frames_per_buffer": {"type": "integer", "minimum": 1},
         "min_frequency": {"type": "number", "minimum": 0},
         "max_frequency": {"type": "number", "minimum": 0},

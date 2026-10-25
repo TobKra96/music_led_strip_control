@@ -42,6 +42,33 @@ events.on('diagnosis', (diagnosis) => {
     });
 });
 
+const audioBanner = new Banner('audio');
+const AUDIO_HINTS = {
+    no_device: 'Plug the microphone in or pick another device on the Microphone page.',
+    permission_denied: 'MLSC is not allowed to open the microphone. Use "Test microphone" on the Microphone page for the fix.',
+};
+
+/**
+ * The status of the audio stream. A failed or vanished device, or a fallback to the system default, keeps a banner up until it is fixed.
+ * @param {{state?: string, device?: string, fallback?: boolean, message?: string, kind?: string, retry_in?: number}} status
+ */
+const showAudioStatus = (status) => {
+    if (status.state === 'error') {
+        const retry = status.retry_in ? ` Retrying in ${Math.round(status.retry_in)} s.` : '';
+        audioBanner.show({
+            level: 'error',
+            title: 'No audio input',
+            message: `${status.message}${retry} ${AUDIO_HINTS[status.kind] || ''}`.trim(),
+        });
+    } else if (status.fallback) {
+        audioBanner.show({ level: 'warning', title: 'Microphone not found', message: `${status.message} (${status.device})` });
+    } else {
+        audioBanner.hide();
+    }
+};
+
+events.on('audio.status', showAudioStatus);
+
 /** Show the Migration Report of a Config Migration once, until the user dismisses it. */
 const showMigrationReport = async () => {
     let report;
@@ -69,4 +96,6 @@ const showMigrationReport = async () => {
 $(() => {
     events.connect();
     showMigrationReport();
+    // The event only comes when the status changes, so a page opened later asks once.
+    api.get('/microphone/status').then(showAudioStatus).catch(() => {});
 });

@@ -10,13 +10,14 @@ from mlsc.audio_info import AudioInfo
 from mlsc.config_service import ConfigService
 from mlsc.dsp import DSP
 from mlsc.fps_limiter import FPSLimiter
+from mlsc.mic_supervisor import MicSupervisor
 from mlsc.notification_enum import NotificationEnum
 from mlsc.notification_item import NotificationItem
 from mlsc.queue_wrapper import QueueWrapper
 
 
 class AudioProcessService:
-    def start(self, config_lock, notification_queue_in, notification_queue_out, audio_queue, audio_backend, mic_level=None):
+    def start(self, config_lock, notification_queue_in, notification_queue_out, audio_queue, audio_backend, mic_level=None, audio_status=None):
         self._config_lock = config_lock
         self._notification_queue_in = QueueWrapper(notification_queue_in)
         self._notification_queue_out = QueueWrapper(notification_queue_out)
@@ -26,6 +27,8 @@ class AudioProcessService:
         self.audio_buffer_queue = QueueWrapper(Queue(2))
         # Built here, inside the audio process: capture objects hold native handles and cannot be pickled.
         self._capture = create_capture(audio_backend)
+        self._supervisor = MicSupervisor(
+            self._capture, on_buffer=self._on_buffer, report=audio_status.write if audio_status is not None else lambda status: None)
 
         self.init_audio_service(show_output=True)
 
@@ -45,24 +48,12 @@ class AudioProcessService:
             # Init FPS Limiter.
             self._fps_limiter = FPSLimiter(120)
             self._skip_routine = False
-            self._devices = AudioInfo.get_audio_devices(self._capture)
 
-            self.log_output(show_output, "INFO", "Found the following audio sources:")
+            if show_output:
+                for device in AudioInfo.get_audio_devices(self._capture):
+                    logger.info(f"Found audio source: {device.to_string()} ({device.host_api})")
 
-            audio_config = self._config["audio"]
-
-            # Select the audio device by name. No name means the system default.
-            device_name = audio_config["device_name"]
-            self.selected_device = AudioInfo.select_audio_device(self._capture, self._devices, device_name)
-            if device_name is not None and self.selected_device.name != device_name:
-                self.log_output(show_output, "ERROR", f"Could not find the mic named {device_name!r}. Using the system default.")
-
-            logger.debug(f"Selected Device: {self.selected_device}")
-
-            self._device_rate = audio_config["sample_rate"]
-            self._frames_per_buffer = audio_config["frames_per_buffer"]
             self.n_fft_bins = self._config["general_settings"]["n_fft_bins"]
-            self.log_output(show_output, "INFO", f"Selected Device: {self.selected_device.to_string()}")
 
             # Init Timer
             self.start_time_1 = time()
@@ -70,35 +61,41 @@ class AudioProcessService:
             self.start_time_2 = time()
             self.ten_seconds_counter_2 = time()
 
-            self._dsp = DSP(self._config)
-
             # Reinit buffer queue
             self.audio_buffer_queue = QueueWrapper(Queue(2))
 
-            # Called from the capture thread with each buffer of int16 samples.
-            def callback(in_data):
-                if self._skip_routine:
-                    return
-
-                if self._mic_level is not None:
-                    self._mic_level.update(in_data)
-
-                self.audio_buffer_queue.put_none_blocking(in_data)
-
-                self.end_time_1 = time()
-
-                if time() - self.ten_seconds_counter_1 > 10:
-                    self.ten_seconds_counter_1 = time()
-                    time_dif = self.end_time_1 - self.start_time_1
-                    fps = 1 / time_dif
-                    logger.info(f"Callback | FPS: {fps:.2f}")
-
-                self.start_time_1 = time()
-
             self.log_output(show_output, "DEBUG", "Starting Open Audio Stream...")
-            self._capture.open(self.selected_device, self._device_rate, self._frames_per_buffer, on_data=callback)
+            # Selects the device by name and host API, falls back to the system default and keeps retrying a failed one.
+            self._supervisor.start(self._config["audio"])
+            status = self._supervisor.status
+            self.log_output(show_output, "INFO", f"Selected Device: {status['device']} ({status['host_api']}) at {status['sample_rate']} Hz")
+            if status["message"]:
+                self.log_output(show_output, "ERROR", status["message"])
+
+            self._dsp = DSP(self._config, sample_rate=status["sample_rate"])
+            self._dsp_sample_rate = status["sample_rate"]
         except Exception:
             logger.exception("Unexpected error in init_audio_service.")
+
+    def _on_buffer(self, in_data):
+        """Called from the capture thread with each buffer of int16 samples, after the software gain."""
+        if self._skip_routine:
+            return
+
+        if self._mic_level is not None:
+            self._mic_level.update(in_data)
+
+        self.audio_buffer_queue.put_none_blocking(in_data)
+
+        self.end_time_1 = time()
+
+        if time() - self.ten_seconds_counter_1 > 10:
+            self.ten_seconds_counter_1 = time()
+            time_dif = self.end_time_1 - self.start_time_1
+            fps = 1 / time_dif
+            logger.info(f"Callback | FPS: {fps:.2f}")
+
+        self.start_time_1 = time()
 
     @staticmethod
     def log_output(show_output, log_level, message) -> None:
@@ -120,10 +117,12 @@ class AudioProcessService:
                 current_notification_item = self._notification_queue_in.get_blocking()
 
                 if current_notification_item.notification_enum is NotificationEnum.config_refresh:
-                    self._capture.close()
                     self.init_audio_service()
                     self._notification_queue_out.put_blocking(NotificationItem(
                         NotificationEnum.config_refresh_finished, current_notification_item.device_id))
+                elif current_notification_item.notification_enum is NotificationEnum.audio_restart:
+                    # Only the audio stream restarts; the Device Manager keeps running.
+                    self.init_audio_service()
                 elif current_notification_item.notification_enum is NotificationEnum.process_continue:
                     self._skip_routine = False
                 elif current_notification_item.notification_enum is NotificationEnum.process_pause:
@@ -131,6 +130,13 @@ class AudioProcessService:
 
             if self._skip_routine:
                 return
+
+            self._supervisor.poll()
+            # A retry may have opened a device with another native rate, e.g. the stored one coming back after a fallback.
+            sample_rate = self._supervisor.status.get("sample_rate")
+            if sample_rate and sample_rate != self._dsp_sample_rate:
+                self._dsp = DSP(self._config, sample_rate=sample_rate)
+                self._dsp_sample_rate = sample_rate
 
             in_data = None
             in_data = self.audio_buffer_queue.get_blocking_with_timeout()

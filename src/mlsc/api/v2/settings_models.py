@@ -8,7 +8,7 @@ from typing import Annotated, Any, Literal, Union
 
 from pydantic import BaseModel, ConfigDict, Field, StringConstraints, create_model
 
-from mlsc.webserver.schemas.config_validator_service import definitions, device_schema, general_settings_schema
+from mlsc.webserver.schemas.config_validator_service import audio_schema, definitions, device_schema, general_settings_schema
 
 _IPV4 = r"^((25[0-5]|2[0-4]\d|1?\d?\d)\.){3}(25[0-5]|2[0-4]\d|1?\d?\d)$"
 _SCALARS = {"integer": int, "number": int | float, "string": str, "boolean": bool}
@@ -52,6 +52,8 @@ def _annotation(name: str, schema: dict[str, Any]) -> Any:  # ruff: ignore[any-t
         if union_key in schema:
             return Union[tuple(_annotation(name, option) for option in schema[union_key])]
     kind = schema["type"]
+    if isinstance(kind, list):
+        return Union[tuple(type(None) if option == "null" else _annotation(name, {**schema, "type": option}) for option in kind)]
     if kind == "object":
         if "patternProperties" in schema:
             (pattern, value), = schema["patternProperties"].items()
@@ -75,6 +77,11 @@ GeneralSettingsPatch = _model("GeneralSettingsPatch", {
     "properties": {key: value for key, value in general_settings_schema["properties"].items() if key != "device_groups"},
 })
 DeviceSettingsPatch = _model("DeviceSettingsPatch", device_schema)
+MicrophonePatch = _model("MicrophonePatch", {
+    **audio_schema,
+    # The Browser Microphone has its own flow.
+    "properties": {key: value for key, value in audio_schema["properties"].items() if key != "source"},
+})
 
 EFFECT_SCHEMAS = {
     effect: schema

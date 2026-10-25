@@ -673,7 +673,7 @@
         "device_name": null,
         "host_api": null,
         "gain": 1.0,
-        "sample_rate": 48000,
+        "sample_rate": null,
         "frames_per_buffer": 512,
         "min_frequency": 50,
         "max_frequency": 16000,

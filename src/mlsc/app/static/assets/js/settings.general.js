@@ -6,10 +6,6 @@ import Tagin from '../plugins/tagin/js/tagin.js';
 /** @type {Tagin} */
 let tagin;
 
-/** Settings that are still edited through the v1 API, until the microphone has its own v2 resource. */
-const MICROPHONE_KEYS = ['device_id', 'default_sample_rate', 'min_frequency', 'max_frequency', 'min_volume_threshold', 'frames_per_buffer'];
-
-const pick = (obj, keys) => Object.fromEntries(Object.entries(obj).filter(([key]) => keys.includes(key)));
 const omit = (obj, keys) => Object.fromEntries(Object.entries(obj).filter(([key]) => !keys.includes(key)));
 
 // Init and load all settings.
@@ -40,12 +36,6 @@ $(() => {
         api.get('/resources/logging-levels').then((data) => {
             $.each(data, (key, value) => {
                 $('.logging_levels').append(`<option value='${key}'>${value}</option>`);
-            });
-        }),
-
-        api.get('/resources/audio-devices').then((data) => {
-            $.each(data, (key, value) => {
-                $('.audio_devices').append(`<option value='${key}'>${value}</option>`);
             });
         })
 
@@ -83,22 +73,17 @@ $(() => {
     }
 
     /**
-     * Call API to get all general settings.
-     * The microphone settings have no v2 resource yet, so they are still read and written through the v1 API.
+     * Call API to get all general settings. The microphone settings live on the Microphone page.
      */
     const getLocalSettings = () => {
         const settingsPromises = [
 
             api.get('/settings').then((data) => {
-                populateGeneralSettings(omit(data, MICROPHONE_KEYS));
+                populateGeneralSettings(data);
             }),
 
             api.get('/groups').then((groups) => {
                 populateGeneralSettings({ device_groups: Object.fromEntries(groups.map(g => [g.id, g.name])) });
-            }),
-
-            $.ajax('/api/settings/general').done((data) => {
-                populateGeneralSettings(pick(data.setting_value, MICROPHONE_KEYS));
             }),
 
             api.get('/auth/pin').then((data) => {
@@ -131,17 +116,8 @@ $(() => {
      * @return {Promise}
      */
     const setGeneralSettings = (settings) => {
-        const microphone = pick(settings, MICROPHONE_KEYS);
-        const general = omit(settings, [...MICROPHONE_KEYS, 'device_groups']);
-
         return Promise.all([
-            api.patch('/settings', general),
-            $.ajax({
-                url: '/api/settings/general',
-                type: 'POST',
-                data: JSON.stringify({ settings: microphone }),
-                contentType: 'application/json;charset=UTF-8'
-            }),
+            api.patch('/settings', omit(settings, ['device_groups'])),
             setGroups(settings.device_groups),
         ]);
     }
@@ -300,13 +276,7 @@ $(() => {
 // Tooltip descriptions for general settings.
 $('#WEBSERVER_PORT_TOOLTIP').attr('data-original-title', 'The port used by the web server.<br>Changing this, the web interface will be available on another port. Example:<br>http://[raspberry_pi_ip]:8080<br><br>Default setting: 8080');
 $('#DASHBOARD_PIN_TOOLTIP').attr('data-original-title', 'The PIN code for locking the web interface from unwanted access.<br>Only 4 to 8 digits are allowed.<br>Enable or disable the PIN Lock feature using the checkbox below.');
-$('#DEVICE_ID_TOOLTIP').attr('data-original-title', 'The device ID of your microphone.<br>This audio device will be used for the music reactive effects.');
-$('#DEFAULT_SAMPLE_RATE_TOOLTIP').attr('data-original-title', 'The sample rate of your microphone.<br>You can find it inside the console output.<br><br>Common values are 44100 or 48000.');
-$('#MIN_FREQUENCY_TOOLTIP').attr('data-original-title', 'The minimum frequency supported by your microphone.<br>This will increase the quality of your effects.<br><br>Default setting: 50');
-$('#MAX_FREQUENCY_TOOLTIP').attr('data-original-title', 'The maximum frequency supported by your microphone.<br>This will increase the quality of your effects.<br><br>Default setting: 16000');
-$('#MIN_VOLUME_THRESHOLD_TOOLTIP').attr('data-original-title', 'The minimum volume level of your microphone that has to be reached before the program will recognize the audio signal.<br>It filters background noises and reduces the rate of false triggers.<br><br>Default setting: 0.001');
 $('#N_ROLLING_HISTORY_TOOLTIP').attr('data-original-title', 'The amount of audio snapshots that will be stored for the calculation of the rhythm.<br><br>Default setting: 4');
-$('#FRAMES_PER_BUFFER_TOOLTIP').attr('data-original-title', 'The buffer size of the audio signal.<br>More buffer frames cause lower frame rates, but higher effect quality.<br>Less buffer frames cause high frame rates, but lower effect quality.<br><br>Default setting: 512');
 $('#N_FFT_BINS_TOOLTIP').attr('data-original-title', 'The amount of slices that the audio spectrum will be divided into.<br><br>Default setting: 24');
 $('#LOG_LEVEL_CONSOLE_TOOLTIP').attr('data-original-title', 'The logging verbosity level in the console.<br><br>Default setting: info');
 $('#LOG_LEVEL_FILE_TOOLTIP').attr('data-original-title', 'The logging verbosity level in a log file.<br>Enable or disable file logging using the checkbox below.<br><br>Use this only for debugging.<br>File logging for extensive periods of time could cause SD card wear-out.<br><br>Default setting: info');

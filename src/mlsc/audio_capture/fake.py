@@ -64,18 +64,28 @@ def wav_file(path: str | Path) -> Source:
 class FakeCapture(AudioCapture):
     """Produces one buffer per `feed()` call, so tests control timing without threads."""
 
-    def __init__(self, source: Source | None = None) -> None:
+    def __init__(self, source: Source | None = None, devices: list[AudioDevice] | None = None) -> None:
         super().__init__()
         self._source = source or silence()
         self._generator: Iterator[np.ndarray] | None = None
+        self.devices = devices if devices is not None else [
+            AudioDevice(0, "Fake Mic", 44100, "Fake API"), AudioDevice(1, "Fake Monitor", 48000, "Fake API")]
+        # Raised by the next `open`, to stand in for a device that is busy, gone or not allowed.
+        self.open_error: Exception | None = None
+        self.opened: tuple[AudioDevice, int, int] | None = None
 
     def list_devices(self) -> list[AudioDevice]:
-        return [AudioDevice(0, "Fake Mic", 44100), AudioDevice(1, "Fake Monitor", 48000)]
+        return list(self.devices)
 
     def default_device(self) -> AudioDevice:
-        return self.list_devices()[0]
+        if not self.devices:
+            raise AudioCaptureError("There is no input device.")
+        return self.devices[0]
 
     def _start(self, device, sample_rate, frames_per_buffer) -> None:
+        if self.open_error is not None:
+            raise self.open_error
+        self.opened = (device, sample_rate, frames_per_buffer)
         self._generator = self._source(frames_per_buffer, sample_rate)
 
     def feed(self) -> None:
@@ -85,4 +95,5 @@ class FakeCapture(AudioCapture):
 
     def close(self) -> None:
         self._generator = None
+        self.opened = None
         self._on_data = None

@@ -6,8 +6,13 @@ from mlsc.audio_capture import AudioCapture
 from mlsc.audio_device import AudioDevice
 
 
+# Probed for each device; PortAudio cannot list the rates a device supports, only check one at a time.
+COMMON_SAMPLE_RATES = (8000, 11025, 16000, 22050, 32000, 44100, 48000, 88200, 96000)
+
+
 def _to_device(index: int, info: dict) -> AudioDevice:
-    return AudioDevice(index, info["name"], info["default_samplerate"])
+    host_api = sounddevice.query_hostapis(info["hostapi"])["name"]
+    return AudioDevice(index, info["name"], info["default_samplerate"], host_api)
 
 
 class SoundDeviceCapture(AudioCapture):
@@ -30,6 +35,17 @@ class SoundDeviceCapture(AudioCapture):
     def default_device(self) -> AudioDevice:
         info = sounddevice.query_devices(kind="input")
         return _to_device(info["index"], info)
+
+    def supported_sample_rates(self, device: AudioDevice) -> list[int]:
+        rates = []
+        for rate in COMMON_SAMPLE_RATES:
+            try:
+                sounddevice.check_input_settings(device=device.device_id, channels=1, dtype="int16", samplerate=rate)
+            except Exception:  # PortAudio raises its own error types, and ValueError for an unknown device.
+                continue
+            rates.append(rate)
+        # A device in use by the running stream may refuse every probe, but its native rate always works.
+        return sorted({*rates, int(device.default_sample_rate)})
 
     def _start(self, device, sample_rate, frames_per_buffer) -> None:
         def callback(indata, frames, time_info, status):

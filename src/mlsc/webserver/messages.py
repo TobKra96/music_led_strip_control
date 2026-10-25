@@ -98,6 +98,10 @@ class MigrationReportNotFound(NotFound):
     _message = "There is no migration report to show."
 
 
+class MixerNotFound(NotFound):
+    _message = "The microphone has no hardware gain."
+
+
 class SettingNotFound(NotFound):
     _message = "Setting does not exist."
 

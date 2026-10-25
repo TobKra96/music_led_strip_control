@@ -4,10 +4,15 @@ import numpy as np
 from scipy.ndimage import gaussian_filter1d
 
 
+# Used when the config asks for the device's native rate (`sample_rate` is null) and the caller does not know it.
+FALLBACK_SAMPLE_RATE = 48000
+
+
 class DSP:
-    def __init__(self, config, device_config=None) -> None:
+    def __init__(self, config, device_config=None, sample_rate=None) -> None:
         self._config = config
         self._device_config = device_config
+        self._sample_rate = sample_rate or config["audio"]["sample_rate"] or FALLBACK_SAMPLE_RATE
 
         # Initialise filters etc. I've no idea what most of these are for but I imagine I won't be getting rid of them soon.
         n_fft_bins = self._config["general_settings"]["n_fft_bins"]
@@ -91,7 +96,7 @@ class DSP:
         return audio_data
 
     def rfft(self, data, window=None):
-        default_sample_rate = self._config["audio"]["sample_rate"]
+        default_sample_rate = self._sample_rate
 
         window = 1.0 if window is None else window(len(data))
         ys = np.abs(np.fft.rfft(data * window))
@@ -99,7 +104,7 @@ class DSP:
         return xs, ys
 
     def fft(self, data, window=None):
-        default_sample_rate = self._config["audio"]["sample_rate"]
+        default_sample_rate = self._sample_rate
 
         window = 1.0 if window is None else window(len(data))
         ys = np.fft.fft(data * window)
@@ -107,7 +112,7 @@ class DSP:
         return xs, ys
 
     def create_mel_bank(self):
-        default_sample_rate = self._config["audio"]["sample_rate"]
+        default_sample_rate = self._sample_rate
         min_frequency = self._config["audio"]["min_frequency"]
         max_frequency = self._config["audio"]["max_frequency"]
         frames_per_buffer = self._config["audio"]["frames_per_buffer"]

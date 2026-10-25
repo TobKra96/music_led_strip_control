@@ -51,6 +51,9 @@ class NotificationService:
                         logger.debug("Reloading config...")
                         self.config_refresh(self._current_notification_item)
                         logger.debug("Config reloaded.")
+                    elif self._current_notification_item.notification_enum is NotificationEnum.audio_restart:
+                        # The audio process reloads the config and reopens its stream; nothing else has to pause.
+                        self._notification_queue_audio_in.put_blocking(self._current_notification_item)
 
         except KeyboardInterrupt:
             sys.exit()

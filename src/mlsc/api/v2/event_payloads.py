@@ -4,6 +4,7 @@ The producers of `diagnosis`, `wifi.state` and `operation` live with the Output,
 """
 from pydantic import BaseModel, Field
 
+from mlsc.api.v2.microphone import AudioStatusOut
 from mlsc.api.v2.operations import OperationOut
 from mlsc.webserver.sse import REPLAYABLE_EVENTS
 
@@ -54,6 +55,7 @@ EVENT_PAYLOADS: dict[str, type[BaseModel]] = {
     "device.status": DeviceStatusEvent,
     "diagnosis": DiagnosisEvent,
     "mic.level": MicLevelEvent,
+    "audio.status": AudioStatusOut,
     "wifi.state": WifiStateEvent,
     "system.stats": SystemStatsEvent,
     "operation": OperationOut,

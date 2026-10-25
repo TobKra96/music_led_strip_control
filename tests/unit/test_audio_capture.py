@@ -169,13 +169,13 @@ class StubSoundDevice(types.ModuleType):
 
     @staticmethod
     def query_hostapis(_index):
-        return {"devices": [0, 1]}
+        return {"name": "ALSA", "devices": [0, 1]}
 
     @staticmethod
     def query_devices(index=None, kind=None):
         devices = [
-            {"name": "Speakers", "max_input_channels": 0, "default_samplerate": 48000.0, "index": 0},
-            {"name": "USB Mic", "max_input_channels": 1, "default_samplerate": 44100.0, "index": 1},
+            {"name": "Speakers", "max_input_channels": 0, "default_samplerate": 48000.0, "index": 0, "hostapi": 0},
+            {"name": "USB Mic", "max_input_channels": 1, "default_samplerate": 44100.0, "index": 1, "hostapi": 0},
         ]
         return devices[1] if kind == "input" else devices[index]
 
@@ -192,7 +192,7 @@ def sounddevice_stub(monkeypatch):
 def test_sounddevice_lists_only_input_devices():
     capture = create_capture("sounddevice")
 
-    assert [(d.device_id, d.name) for d in capture.list_devices()] == [(1, "USB Mic")]
+    assert [(d.device_id, d.name, d.host_api) for d in capture.list_devices()] == [(1, "USB Mic", "ALSA")]
     assert capture.default_device().name == "USB Mic"
 
 

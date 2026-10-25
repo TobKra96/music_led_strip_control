@@ -15,6 +15,7 @@ from loguru import logger
 
 from mlsc import paths
 from mlsc.audio_process_service import AudioProcessService
+from mlsc.audio_status import AudioStatus
 from mlsc.config_migration import ConfigMigrationError
 from mlsc.config_service import ConfigService
 from mlsc.device_manager import DeviceManager
@@ -98,6 +99,8 @@ class Main:
 
         # Written by the audio process, read by the webserver process for the `mic.level` events.
         self._mic_level = MicLevel()
+        # Written by the audio process, read by the webserver process for the Microphone page and the `audio.status` events.
+        self._audio_status = AudioStatus()
 
         # Prepare the queue for the output
         self._output_queue = Queue(2)
@@ -152,7 +155,8 @@ class Main:
                 self._notification_queue_webserver_out,
                 self._effects_queue,
                 self._audio_backend,
-                self._mic_level
+                self._mic_level,
+                self._audio_status
             ))
         self._webserver_process.start()
 
@@ -166,7 +170,8 @@ class Main:
                 self._notification_queue_audio_out,
                 self._audio_queue,
                 self._audio_backend,
-                self._mic_level
+                self._mic_level,
+                self._audio_status
             ))
         self._audio_process.start()
 
