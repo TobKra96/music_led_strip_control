@@ -11,6 +11,8 @@ KEEPALIVE_SECONDS = 15
 # How often an open stream re-checks that its login session is still valid.
 SESSION_RECHECK_SECONDS = 15
 SUBSCRIBER_BACKLOG = 64
+# How often an open stream checks that its client is still there, so a closed page frees its slot even when no events flow.
+DISCONNECT_CHECK_SECONDS = 0.1
 
 # Events that are rare and must not be missed get an id and are replayed to a client that reconnects with `Last-Event-ID`.
 # The rest (meters, stats) are continuous: a reconnecting client just waits for the next one.
@@ -80,22 +82,33 @@ class EventBroker:
         keepalive: float | None = None,
         is_valid: Callable[[], bool] | None = None,
         recheck_seconds: float | None = None,
+        client_gone: Callable[[], bool] | None = None,
     ) -> Iterator[str]:
-        """Yield events until the client leaves or `is_valid` turns false, which ends the stream so the client reconnects and is refused."""
+        """Yield events until the client leaves or `is_valid` turns false, which ends the stream so the client reconnects and is refused.
+
+        Without `client_gone` a departed client is only noticed when writing to it fails, so its slot stays taken while no events flow.
+        """
         keepalive = KEEPALIVE_SECONDS if keepalive is None else keepalive
         recheck_seconds = SESSION_RECHECK_SECONDS if recheck_seconds is None else recheck_seconds
-        last_check = time.monotonic()
+        wait = min(keepalive, DISCONNECT_CHECK_SECONDS) if client_gone is not None else keepalive
+        last_check = last_sent = time.monotonic()
         try:
             yield format_event("ready", {})
             while True:
+                if client_gone is not None and client_gone():
+                    return
                 if is_valid is not None and time.monotonic() - last_check >= recheck_seconds:
                     if not is_valid():
                         return
                     last_check = time.monotonic()
                 try:
-                    yield subscriber.get(timeout=keepalive)
+                    message = subscriber.get(timeout=wait)
                 except queue.Empty:
-                    yield ": keepalive\n\n"
+                    if time.monotonic() - last_sent < keepalive:
+                        continue
+                    message = ": keepalive\n\n"
+                last_sent = time.monotonic()
+                yield message
         finally:
             self.unsubscribe(subscriber)
 

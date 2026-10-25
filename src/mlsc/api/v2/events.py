@@ -24,7 +24,9 @@ def events():
 
     # no-transform and X-Accel-Buffering keep proxies from holding events back.
     return Response(
-        stream_with_context(sse.broker.stream(subscriber, is_valid=auth.session_check())),
+        # Set by waitress (with `channel_request_lookahead`), so a closed page frees its slot without waiting for the next event.
+        stream_with_context(sse.broker.stream(
+            subscriber, is_valid=auth.session_check(), client_gone=request.environ.get("waitress.client_disconnected"))),
         mimetype="text/event-stream",
         headers={"Cache-Control": "no-cache, no-transform", "X-Accel-Buffering": "no"},
     )

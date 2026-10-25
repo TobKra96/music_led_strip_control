@@ -287,6 +287,22 @@ def test_events_beyond_the_stream_limit_get_a_503_problem(client, monkeypatch):
     first.close()
 
 
+def test_a_stream_whose_client_left_frees_its_slot_without_waiting_for_an_event(client, monkeypatch):
+    monkeypatch.setattr(sse, "broker", EventBroker(max_subscribers=1))
+    monkeypatch.setattr(sse, "KEEPALIVE_SECONDS", 3600)
+    monkeypatch.setattr(sse, "DISCONNECT_CHECK_SECONDS", 0.01)
+    log_in(client)
+    gone = False
+
+    first = client.get("/api/v2/events", environ_overrides={"waitress.client_disconnected": lambda: gone})
+    assert read_events(first.response, 1)[0].startswith("event: ready")
+    gone = True
+
+    # Nothing is published, as with a silent or paused microphone: the stream must still end and give its slot back.
+    assert list(first.response) == []
+    assert client.get("/api/v2/events").status_code == 200
+
+
 def test_event_stream_closes_once_the_session_is_invalidated(client, monkeypatch):
     local = EventBroker()
     monkeypatch.setattr(sse, "broker", local)

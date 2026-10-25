@@ -77,7 +77,9 @@ class Webserver:
             self.server.run(host="0.0.0.0", port=webserver_port, load_dotenv=False, debug=True)  # ruff: ignore[hardcoded-bind-all-interfaces]
         else:
             try:
-                serve(self.server, host="0.0.0.0", port=webserver_port, threads=8, clear_untrusted_proxy_headers=False)  # ruff: ignore[hardcoded-bind-all-interfaces]
+                # The lookahead keeps reading a connection while its request runs, so an event stream notices a closed page.
+                serve(self.server, host="0.0.0.0", port=webserver_port, threads=8, clear_untrusted_proxy_headers=False,
+                      channel_request_lookahead=1)  # ruff: ignore[hardcoded-bind-all-interfaces]
             finally:
                 for publisher in publishers:
                     publisher.stop()
