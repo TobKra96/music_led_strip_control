@@ -1,12 +1,15 @@
 import json
 import queue
 import threading
+import time
 from collections import deque
-from collections.abc import Iterator
+from collections.abc import Callable, Iterator
 
 # Waitress serves each open stream from one of its worker threads, so the cap must stay well below the thread count.
 MAX_SUBSCRIBERS = 4
 KEEPALIVE_SECONDS = 15
+# How often an open stream re-checks that its login session is still valid.
+SESSION_RECHECK_SECONDS = 15
 SUBSCRIBER_BACKLOG = 64
 
 # Events that are rare and must not be missed get an id and are replayed to a client that reconnects with `Last-Event-ID`.
@@ -71,10 +74,24 @@ class EventBroker:
             except queue.Full:
                 continue
 
-    def stream(self, subscriber: queue.Queue, keepalive: float = KEEPALIVE_SECONDS) -> Iterator[str]:
+    def stream(
+        self,
+        subscriber: queue.Queue,
+        keepalive: float | None = None,
+        is_valid: Callable[[], bool] | None = None,
+        recheck_seconds: float | None = None,
+    ) -> Iterator[str]:
+        """Yield events until the client leaves or `is_valid` turns false, which ends the stream so the client reconnects and is refused."""
+        keepalive = KEEPALIVE_SECONDS if keepalive is None else keepalive
+        recheck_seconds = SESSION_RECHECK_SECONDS if recheck_seconds is None else recheck_seconds
+        last_check = time.monotonic()
         try:
             yield format_event("ready", {})
             while True:
+                if is_valid is not None and time.monotonic() - last_check >= recheck_seconds:
+                    if not is_valid():
+                        return
+                    last_check = time.monotonic()
                 try:
                     yield subscriber.get(timeout=keepalive)
                 except queue.Empty:

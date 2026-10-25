@@ -287,6 +287,23 @@ def test_events_beyond_the_stream_limit_get_a_503_problem(client, monkeypatch):
     first.close()
 
 
+def test_event_stream_closes_once_the_session_is_invalidated(client, monkeypatch):
+    local = EventBroker()
+    monkeypatch.setattr(sse, "broker", local)
+    monkeypatch.setattr(sse, "SESSION_RECHECK_SECONDS", 0)
+    monkeypatch.setattr(sse, "KEEPALIVE_SECONDS", 0.01)
+    app = client.application
+    log_in(client)
+
+    response = client.get("/api/v2/events")
+    assert read_events(response.response, 1)[0].startswith("event: ready")
+    app.config["AUTH_EPOCH"] = app.config.get("AUTH_EPOCH", 0) + 1
+
+    assert [chunk for chunk in response.response if chunk != b": keepalive\n\n"] == []
+    assert local.has_subscribers() is False
+    assert_problem(client.get("/api/v2/events"), 401, "Unauthorized")
+
+
 def test_logout_works_without_a_body_but_not_as_a_form_post(client):
     log_in(client)
 

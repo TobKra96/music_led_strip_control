@@ -1,3 +1,4 @@
+from collections.abc import Callable
 from functools import wraps
 
 from flask import current_app, redirect, request, session, url_for
@@ -22,6 +23,17 @@ def bump_epoch() -> None:
 
 def is_authenticated() -> bool:
     return bool(session.get(SESSION_KEY)) and session.get(EPOCH_KEY) == _epoch()
+
+
+def session_check() -> Callable[[], bool]:
+    """Capture the current login session; the returned check turns false once it has been invalidated.
+
+    Safe to call after the request ended. A session cookie the client deleted cannot be seen from here, only server-side invalidation (epoch bump or auth turned off).
+    """
+    app = current_app._get_current_object()
+    authenticated = is_authenticated()
+    epoch = session.get(EPOCH_KEY)
+    return lambda: not app.config.get("AUTH_ENABLED", True) or (authenticated and epoch == app.config.get("AUTH_EPOCH", 0))
 
 
 def login_user() -> None:

@@ -3,7 +3,7 @@ from flask_openapi3 import APIBlueprint, Tag
 
 from mlsc.api.v2.errors import Problem, ProblemError
 from mlsc.api.v2.security import api_login_required
-from mlsc.webserver import sse
+from mlsc.webserver import auth, sse
 from mlsc.webserver.messages import TooManyStreams
 
 tag = Tag(name="Events", description="Server-sent event stream")
@@ -24,7 +24,7 @@ def events():
 
     # no-transform and X-Accel-Buffering keep proxies from holding events back.
     return Response(
-        stream_with_context(sse.broker.stream(subscriber)),
+        stream_with_context(sse.broker.stream(subscriber, is_valid=auth.session_check())),
         mimetype="text/event-stream",
         headers={"Cache-Control": "no-cache, no-transform", "X-Accel-Buffering": "no"},
     )

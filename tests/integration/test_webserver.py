@@ -235,6 +235,35 @@ def test_stream_sends_keepalive_and_unsubscribes_on_close():
     assert local.subscribe() is not None
 
 
+def test_stream_ends_and_unsubscribes_when_the_session_is_no_longer_valid():
+    local = EventBroker(max_subscribers=1)
+    subscriber = local.subscribe()
+    valid = [True]
+    stream = local.stream(subscriber, keepalive=0.01, is_valid=lambda: valid[0], recheck_seconds=0)
+
+    assert next(stream).startswith("event: ready")
+    assert next(stream) == ": keepalive\n\n"
+    valid[0] = False
+
+    assert list(stream) == []
+    assert local.subscribe() is not None
+
+
+def test_stream_rechecks_the_session_even_while_events_keep_flowing():
+    local = EventBroker()
+    subscriber = local.subscribe()
+    valid = [True]
+    stream = local.stream(subscriber, keepalive=60, is_valid=lambda: valid[0], recheck_seconds=0)
+
+    next(stream)
+    local.publish("mic.level", {"level": 1})
+    assert next(stream).startswith("event: mic.level")
+    valid[0] = False
+    local.publish("mic.level", {"level": 2})
+
+    assert list(stream) == []
+
+
 @pytest.mark.parametrize("pin_lock", [True, False])
 def test_server_authentication_follows_the_pin_lock_setting(pin_lock):
     executer = AuthenticationExecuter.__new__(AuthenticationExecuter)
