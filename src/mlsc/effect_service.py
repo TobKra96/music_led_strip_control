@@ -3,6 +3,7 @@ from time import time
 
 from loguru import logger
 
+from mlsc.diagnosis import Diagnosis
 from mlsc.effects.effect_advanced_scroll import EffectAdvancedScroll
 from mlsc.effects.effect_bars import EffectBars
 from mlsc.effects.effect_beat import EffectBeat
@@ -34,6 +35,10 @@ from mlsc.effects.effect_wiggle import EffectWiggle
 from mlsc.effects_enum import EffectsEnum
 from mlsc.fps_limiter import FPSLimiter
 from mlsc.notification_enum import NotificationEnum
+from mlsc.strip_preview import PreviewSink
+
+FALLBACK_AFTER_FAILURES = 30
+LOG_INTERVAL_SECONDS = 10
 
 # Output array should look like:
 # output = {[r1,r2,r3,r4,r5],[g1,g2,g3,g4,g5],[]}
@@ -52,6 +57,10 @@ class EffectService:
         self.start_time = time()
 
         self._fps_limiter = FPSLimiter(self._device.device_config["fps"])
+        self._preview = PreviewSink(self._device.preview_channel, self._device.device_id)
+        self._failures = 0
+        self._last_logged = float("-inf")
+        self._suppressed = 0
 
         self._available_effects = {
             EffectsEnum.effect_off: EffectOff,
@@ -138,18 +147,13 @@ class EffectService:
         if not self._device.effect_queue.empty():
             new_effect_item = self._device.effect_queue.get_blocking()
             self._current_effect = new_effect_item.effect_enum
+            self._failures = 0
             logger.debug(f"New effect found: {new_effect_item.effect_enum}")
 
         # Something is wrong here, no effect set. So skip until we get new information.
         if self._current_effect is None:
             logger.error("Effect Service | Could not find effect.")
             return
-
-        if (self._current_effect not in self._initialized_effects):
-            if self._current_effect in self._available_effects:
-                self._initialized_effects[self._current_effect] = self._available_effects[self._current_effect](self._device)
-            else:
-                logger.error(f"Could not find effect: {self._current_effect}")
 
         self.end_time = time()
         if time() - self.ten_seconds_counter > 10:
@@ -160,7 +164,39 @@ class EffectService:
 
         self.start_time = time()
 
-        self._initialized_effects[self._current_effect].run()
+        self._run_isolated()
+
+    def _run_isolated(self):
+        """Run one frame of the current effect. A failing frame is skipped, and a persistently failing effect is replaced by effect_off."""
+        effect_enum = self._current_effect
+        try:
+            if effect_enum not in self._initialized_effects:
+                self._initialized_effects[effect_enum] = self._available_effects[effect_enum](self._device)
+            self._initialized_effects[effect_enum].run()
+        except Exception as e:
+            self._frame_failed(effect_enum, e)
+        else:
+            self._failures = 0
+
+    def _frame_failed(self, effect_enum, error):
+        self._failures += 1
+        now = time()
+        if now - self._last_logged >= LOG_INTERVAL_SECONDS:
+            similar = f" ({self._suppressed} similar errors suppressed)" if self._suppressed else ""
+            device_name = self._device.device_config["device_name"]
+            logger.error(f"Effect {effect_enum} failed, skipping the frame{similar}: {error!r} | Device: {device_name}")
+            self._last_logged = now
+            self._suppressed = 0
+        else:
+            self._suppressed += 1
+
+        if self._failures >= FALLBACK_AFTER_FAILURES and effect_enum is not EffectsEnum.effect_off:
+            logger.error(f"Effect {effect_enum} failed {self._failures} frames in a row, falling back to effect_off.")
+            self._current_effect = EffectsEnum.effect_off
+            self._failures = 0
+            self._preview.diagnosis(Diagnosis.warning(
+                f"The effect {effect_enum.name} kept failing and was switched off.",
+                "Choose another effect, and report the problem if it comes back."))
 
     def stop(self):
         logger.info("Stopping effect component...")
