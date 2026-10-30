@@ -105,3 +105,11 @@ def test_unknown_keys_are_accepted_when_preserved_but_known_keys_stay_checked(co
 
     config["audio"]["gain"] = 0
     assert errors(config, allow_unknown_keys=True)
+
+
+def test_the_supply_voltage_of_the_power_limit_is_optional_and_positive(config):
+    limit = next(iter(config["device_configs"].values()))["power_limit"]
+    limit["supply_volts"] = 12
+    assert not errors(config)
+    limit["supply_volts"] = 0
+    assert errors(config)

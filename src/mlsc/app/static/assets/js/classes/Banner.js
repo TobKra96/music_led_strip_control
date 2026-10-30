@@ -19,11 +19,12 @@ export default class Banner {
 
     /**
      * Show the banner. All text is inserted as text, never as HTML.
-     * @param {{level?: string, title?: string, message: string, details?: Array.<string>, onDismiss?: function(): void}} options
-     *   `details` are listed in a collapsible section. A banner with `onDismiss` gets a close button.
+     * @param {{level?: string, title?: string, message: string, details?: Array.<string>, onDismiss?: function(): void,
+     *   actions?: Array.<{label: string, onClick: function(): void}>}} options
+     *   `details` are listed in a collapsible section. A banner with `onDismiss` gets a close button, one with `actions` a button for each.
      * @return {Banner}
      */
-    show({ level = 'info', title = '', message, details = [], onDismiss }) {
+    show({ level = 'info', title = '', message, details = [], onDismiss, actions = [] }) {
         const style = levels[level] || levels.info;
         const $banner = $('<div class="alert mlsc-banner mb-3" role="alert"></div>')
             .addClass(style.class)
@@ -45,6 +46,14 @@ export default class Banner {
             $heading.append($close);
         }
         $banner.append($heading);
+
+        if (actions.length) {
+            const $actions = $('<div class="mt-2"></div>');
+            actions.forEach(({ label, onClick }) => {
+                $actions.append($('<button type="button" class="btn btn-sm btn-outline-secondary mr-2"></button>').text(label).on('click', onClick));
+            });
+            $banner.append($actions);
+        }
 
         if (details.length) {
             const $list = $('<ul class="mb-0 mt-2 pl-4 d-none"></ul>');

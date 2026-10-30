@@ -73,12 +73,19 @@ class PreviewHub:
         self._publish = publish
         self._brokers: dict[str, EventBroker] = {}
         self._lock = threading.Lock()
+        self._diagnoses: dict[str, tuple[int, dict]] = {}
+        self._sequence = 0
 
     def broker(self, device_id: str) -> EventBroker:
         with self._lock:
             if device_id not in self._brokers:
                 self._brokers[device_id] = EventBroker(MAX_STREAMS_PER_DEVICE)
             return self._brokers[device_id]
+
+    def latest(self, device_id: str) -> tuple[int, dict] | None:
+        """The last Diagnosis the output process of `device_id` reported, with a number that grows with every report."""
+        with self._lock:
+            return self._diagnoses.get(device_id)
 
     def drain(self, timeout: float = DRAIN_TIMEOUT_SECONDS) -> None:
         """Handle one message, if there is one, and update the demand."""
@@ -90,6 +97,9 @@ class PreviewHub:
             if kind == "frame":
                 self.broker(payload["device_id"]).publish("preview", payload)
             elif kind == "diagnosis":
+                with self._lock:
+                    self._sequence += 1
+                    self._diagnoses[payload["device_id"]] = (self._sequence, payload)
                 self._publish("diagnosis", payload)
         with self._lock:
             watched = any(broker.has_subscribers() for broker in self._brokers.values())

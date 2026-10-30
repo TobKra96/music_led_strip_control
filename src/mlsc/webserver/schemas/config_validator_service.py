@@ -1390,11 +1390,12 @@ colour_order_enum = ["rgb", "rbg", "grb", "gbr", "brg", "bgr"]
 power_limit_schema = {
     "type": "object",
     "additionalProperties": False,
-    "maxProperties": 4,
+    "maxProperties": 5,
     "minProperties": 4,
     "required": ["enabled", "supply_amps", "ma_per_led", "mode"],
     "properties": {
         "enabled": {"type": "boolean"},
+        "supply_volts": {"type": "number", "exclusiveMinimum": 0},
         "supply_amps": {"type": "number", "exclusiveMinimum": 0},
         "ma_per_led": {"type": "number", "exclusiveMinimum": 0},
         "mode": {"enum": ["warn", "limit"]}

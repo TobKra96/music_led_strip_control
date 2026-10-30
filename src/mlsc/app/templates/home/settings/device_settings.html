@@ -240,6 +240,7 @@
                                         <div class="card-block">
                                             <div class="d-flex flex-md-row flex-column justify-content-md-end">
                                                 <button type="button" id="save_btn" class="btn btn-success m-0">Save</button>
+                                                <button type="button" id="wizard_btn" class="btn btn-secondary m-0 mt-3 mt-md-0 ml-md-3">Setup Wizard</button>
                                                 <button type="button" id="create1_btn" class="btn btn-primary m-0 my-3 my-md-0 mx-md-3">Create Device</button>
                                                 <button type="button" id="delete_btn" class="btn btn-danger m-0">Delete Device</button>
                                             </div>
@@ -267,6 +268,8 @@
                             </div>
                         </div>
                     </div>
+
+                    {% include 'includes/setup_wizard.html' %}
 
                     <div class="modal fade" id="modal_delete_device" tabindex="-1" role="dialog" aria-labelledby="modal_delete_device" aria-hidden="true">
                         <div class="modal-dialog modal-dialog-centered" role="document">

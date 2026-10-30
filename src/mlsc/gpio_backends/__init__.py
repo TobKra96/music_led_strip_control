@@ -41,6 +41,8 @@ class GpioStrip:
 class GpioBackend(ABC):
     name: str
     valid_pins: frozenset[int]
+    # The channel to drive each valid pin with. The channel follows from the pin, so the user never picks it.
+    pin_channels: Mapping[int, int]
 
     @abstractmethod
     def init(self, strip: GpioStrip) -> None:

@@ -1,5 +1,8 @@
 import { api } from './classes/Api.js';
 import { Device, tagin } from './classes/Device.js';
+import { waitForOperation } from './classes/Operation.js';
+import { splitForm } from './classes/OutputSetup.js';
+import SetupWizard from './classes/SetupWizard.js';
 import Toast from './classes/Toast.js';
 import UnsavedChanges from './classes/UnsavedChanges.js';
 
@@ -15,6 +18,11 @@ $(() => {
     let outputTypes = {};
 
     const unsaved = new UnsavedChanges(document.getElementById('settingsForm'));
+
+    const wizard = new SetupWizard({
+        get outputTypes() { return outputTypes; },
+        onApplied: () => dm.select(dm.current),
+    });
 
     // Preload dropdown values.
     const optionsLoaded = api.get('/resources/output-types').then((data) => {
@@ -82,6 +90,11 @@ $(() => {
             });
         });
 
+        // `?wizard=1` opens the Setup Wizard, for example from a link in the docs.
+        if (urlParams.get('wizard') === '1') {
+            loaded.then(() => wizard.open(dm.current.id)).catch(() => {});
+        }
+
         return loaded;
     }).catch((error) => {
         new Toast(`Error while loading settings. ${error.summary}`).error();
@@ -103,6 +116,8 @@ $(() => {
             _reloadDeviceBar(devices);
 
             new Toast(`Device '${dm.current.name}' created.`).success();
+            // A new Device starts with the defaults, so walk through its setup right away.
+            wizard.open(newDevice.id).catch(() => {});
         }).catch((error) => {
             new Toast(`Error while creating new device. ${error.summary}`).error();
         });
@@ -138,7 +153,7 @@ $(() => {
     /**
      * Serialize device settings to JSON.
      */
-    const setLocalSettings = () => {
+    const setLocalSettings = async () => {
         const deviceName = $('#device_name').val().trim();
         const nameExists = devices.some(d => d.name === deviceName && d.id !== dm.current.id);
         if (nameExists) {  // Do not save device settings if device name already exists.
@@ -169,14 +184,29 @@ $(() => {
             });
         });
 
-        api.patch(`/devices/${dm.current.id}/settings`, { ...serializedDeviceForm, output }).then((data) => {
-            dm.current.name = data.device_name;
-            $('#selected_device_txt').text(data.device_name);
-            unsaved.markClean();
-            new Toast(`Device '${dm.current.name}' saved.`).success();
-        }).catch((error) => {
+        // The strip and Output settings are applied safely: they roll back when the Output does not work.
+        const { apply, save } = splitForm(serializedDeviceForm, output);
+        const deviceId = dm.current.id;
+        const $button = $('#save_btn').prop('disabled', true);
+        try {
+            const data = Object.keys(save).length ? await api.patch(`/devices/${deviceId}/settings`, save) : null;
+            const operation = await waitForOperation(await api.patch(`/devices/${deviceId}/output`, apply));
+            if (data) {
+                dm.current.name = data.device_name;
+                $('#selected_device_txt').text(data.device_name);
+            }
+            if (operation.state === 'confirmed') {
+                unsaved.markClean();
+                new Toast(`Device '${dm.current.name}' saved.`).success();
+            } else {
+                new Toast(`The output settings did not work and were rolled back. ${operation.error || ''}`).error();
+                await dm.select(dm.current);
+            }
+        } catch (error) {
             new Toast(`Error while saving device '${dm.current.name}'. ${error.summary}`).error();
-        });
+        } finally {
+            $button.prop('disabled', false);
+        }
     }
 
     /**
@@ -261,6 +291,13 @@ $(() => {
 
     $('#save_btn').on('click', () => {
         setLocalSettings();
+    });
+
+    $('#wizard_btn').on('click', () => {
+        if (!unsaved.guard()) return;
+        wizard.open(dm.current.id).catch((error) => {
+            new Toast(`Could not open the Setup Wizard. ${error.summary}`).error();
+        });
     });
 
     $('#delete_btn').on('click', () => {

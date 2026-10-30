@@ -3031,6 +3031,17 @@
               }
             ],
             "title": "Supply Amps"
+          },
+          "supply_volts": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Supply Volts"
           }
         },
         "title": "DeviceSettingsPatchPowerLimit",
@@ -3118,6 +3129,37 @@
           "suggested_fix"
         ],
         "title": "DiagnosisEvent",
+        "type": "object"
+      },
+      "DiagnosisOut": {
+        "properties": {
+          "message": {
+            "title": "Message",
+            "type": "string"
+          },
+          "status": {
+            "description": "`ok`, `warning` or `error`.",
+            "title": "Status",
+            "type": "string"
+          },
+          "suggested_fix": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Suggested Fix"
+          }
+        },
+        "required": [
+          "status",
+          "message",
+          "suggested_fix"
+        ],
+        "title": "DiagnosisOut",
         "type": "object"
       },
       "EffectAdvancedScrollSettingsPatch": {
@@ -6109,6 +6151,313 @@
         "title": "OperationState",
         "type": "string"
       },
+      "OutputPatch": {
+        "additionalProperties": false,
+        "properties": {
+          "chip_family": {
+            "enum": [
+              "ws2811",
+              "ws2812",
+              "sk6812"
+            ],
+            "title": "Chip Family",
+            "type": "string"
+          },
+          "colour_order": {
+            "enum": [
+              "rgb",
+              "rbg",
+              "grb",
+              "gbr",
+              "brg",
+              "bgr"
+            ],
+            "title": "Colour Order",
+            "type": "string"
+          },
+          "gpio_backend": {
+            "title": "Gpio Backend",
+            "type": "string"
+          },
+          "led_brightness": {
+            "maximum": 100,
+            "minimum": 0.0,
+            "title": "Led Brightness",
+            "type": "integer"
+          },
+          "led_count": {
+            "minimum": 7.0,
+            "title": "Led Count",
+            "type": "integer"
+          },
+          "led_mid": {
+            "minimum": 1.0,
+            "title": "Led Mid",
+            "type": "integer"
+          },
+          "output": {
+            "$ref": "#/components/schemas/OutputPatchOutput"
+          },
+          "output_type": {
+            "enum": [
+              "output_raspi",
+              "output_udp",
+              "output_mqtt"
+            ],
+            "title": "Output Type",
+            "type": "string"
+          },
+          "power_limit": {
+            "$ref": "#/components/schemas/OutputPatchPowerLimit"
+          },
+          "white_channel": {
+            "title": "White Channel",
+            "type": "boolean"
+          }
+        },
+        "title": "OutputPatch",
+        "type": "object"
+      },
+      "OutputPatchOutput": {
+        "additionalProperties": false,
+        "properties": {
+          "output_mqtt": {
+            "$ref": "#/components/schemas/OutputPatchOutputOutputMqtt"
+          },
+          "output_raspi": {
+            "$ref": "#/components/schemas/OutputPatchOutputOutputRaspi"
+          },
+          "output_udp": {
+            "$ref": "#/components/schemas/OutputPatchOutputOutputUdp"
+          }
+        },
+        "title": "OutputPatchOutput",
+        "type": "object"
+      },
+      "OutputPatchOutputOutputMqtt": {
+        "additionalProperties": false,
+        "properties": {
+          "mqtt_broker": {
+            "minLength": 1,
+            "title": "Mqtt Broker",
+            "type": "string"
+          },
+          "mqtt_path": {
+            "minLength": 1,
+            "title": "Mqtt Path",
+            "type": "string"
+          }
+        },
+        "title": "OutputPatchOutputOutputMqtt",
+        "type": "object"
+      },
+      "OutputPatchOutputOutputRaspi": {
+        "additionalProperties": false,
+        "properties": {
+          "led_channel": {
+            "enum": [
+              0,
+              1
+            ],
+            "title": "Led Channel",
+            "type": "integer"
+          },
+          "led_dma": {
+            "maximum": 14,
+            "minimum": 0.0,
+            "title": "Led Dma",
+            "type": "integer"
+          },
+          "led_freq_hz": {
+            "maximum": 1000000,
+            "minimum": 0.0,
+            "title": "Led Freq Hz",
+            "type": "integer"
+          },
+          "led_invert": {
+            "title": "Led Invert",
+            "type": "boolean"
+          },
+          "led_pin": {
+            "enum": [
+              13,
+              18
+            ],
+            "title": "Led Pin",
+            "type": "integer"
+          }
+        },
+        "title": "OutputPatchOutputOutputRaspi",
+        "type": "object"
+      },
+      "OutputPatchOutputOutputUdp": {
+        "additionalProperties": false,
+        "properties": {
+          "udp_client_ip": {
+            "pattern": "^((25[0-5]|2[0-4]\\d|1?\\d?\\d)\\.){3}(25[0-5]|2[0-4]\\d|1?\\d?\\d)$",
+            "title": "Udp Client Ip",
+            "type": "string"
+          },
+          "udp_client_port": {
+            "anyOf": [
+              {
+                "maximum": 65535,
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "title": "Udp Client Port"
+          }
+        },
+        "title": "OutputPatchOutputOutputUdp",
+        "type": "object"
+      },
+      "OutputPatchPowerLimit": {
+        "additionalProperties": false,
+        "properties": {
+          "enabled": {
+            "title": "Enabled",
+            "type": "boolean"
+          },
+          "ma_per_led": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Ma Per Led"
+          },
+          "mode": {
+            "enum": [
+              "warn",
+              "limit"
+            ],
+            "title": "Mode",
+            "type": "string"
+          },
+          "supply_amps": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Supply Amps"
+          },
+          "supply_volts": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Supply Volts"
+          }
+        },
+        "title": "OutputPatchPowerLimit",
+        "type": "object"
+      },
+      "OutputSetupOut": {
+        "properties": {
+          "backend": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The GPIO Backend of this host, `null` when there is none.",
+            "title": "Backend"
+          },
+          "diagnosis": {
+            "$ref": "#/components/schemas/DiagnosisOut",
+            "description": "The Diagnosis of the stored Output config, as `mlsc doctor` reports it."
+          },
+          "experimental": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Notice shown instead of pins on a Pi 5, which has no supported driver.",
+            "title": "Experimental"
+          },
+          "max_fps": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "About 25,600 divided by the LED count.",
+            "title": "Max Fps"
+          },
+          "pi_model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The Raspberry Pi model, `null` when MLSC does not run on a Pi.",
+            "title": "Pi Model"
+          },
+          "pin_channels": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "description": "The valid GPIO pins for this host, each with the channel that is derived from it.",
+            "title": "Pin Channels",
+            "type": "object"
+          },
+          "power": {
+            "$ref": "#/components/schemas/PowerOut"
+          },
+          "split_suggestion": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Advice to split a long strip into several Devices.",
+            "title": "Split Suggestion"
+          }
+        },
+        "required": [
+          "pi_model",
+          "backend",
+          "pin_channels",
+          "experimental",
+          "power",
+          "max_fps",
+          "split_suggestion",
+          "diagnosis"
+        ],
+        "title": "OutputSetupOut",
+        "type": "object"
+      },
       "PinSettings": {
         "properties": {
           "default_pin": {
@@ -6127,6 +6476,38 @@
           "use_pin_lock"
         ],
         "title": "PinSettings",
+        "type": "object"
+      },
+      "PowerOut": {
+        "properties": {
+          "amps": {
+            "description": "Draw at full white and the configured brightness.",
+            "title": "Amps",
+            "type": "number"
+          },
+          "warning": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Set when the Power Limit is enabled and the draw is above the supply. Advisory: nothing is dimmed.",
+            "title": "Warning"
+          },
+          "watts": {
+            "title": "Watts",
+            "type": "number"
+          }
+        },
+        "required": [
+          "amps",
+          "watts",
+          "warning"
+        ],
+        "title": "PowerOut",
         "type": "object"
       },
       "Problem": {
@@ -9727,6 +10108,231 @@
         ]
       }
     },
+    "/api/v2/devices/{device_id}/output": {
+      "patch": {
+        "description": "Run as an Operation: the device restarts with the new settings, the Output is verified with `diagnose()` and a test frame on the strip.<br/><br/>When that fails the previous config comes back, including the file, and the Device falls back to the Mock Output with a banner.<br/>The `channel` is derived from the pin. Values the hardware cannot use are `422`.",
+        "operationId": "output_api_v2_patch_output__device_id__output_patch",
+        "parameters": [
+          {
+            "description": "Stable device id, e.g. `device_0`.",
+            "in": "path",
+            "name": "device_id",
+            "required": true,
+            "schema": {
+              "description": "Stable device id, e.g. `device_0`.",
+              "title": "Device Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OutputPatch"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OperationOut"
+                }
+              }
+            },
+            "description": "Accepted"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "415": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unsupported Media Type"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        },
+        "summary": "Apply the strip and Output settings of a device",
+        "tags": [
+          "Output"
+        ]
+      }
+    },
+    "/api/v2/devices/{device_id}/output/retry": {
+      "post": {
+        "description": "For the banner after a fallback to the Mock Output: applies the stored config again, retrying with a growing wait.",
+        "operationId": "output_api_v2_retry_output__device_id__output_retry_post",
+        "parameters": [
+          {
+            "description": "Stable device id, e.g. `device_0`.",
+            "in": "path",
+            "name": "device_id",
+            "required": true,
+            "schema": {
+              "description": "Stable device id, e.g. `device_0`.",
+              "title": "Device Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OperationOut"
+                }
+              }
+            },
+            "description": "Accepted"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "415": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unsupported Media Type"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        },
+        "summary": "Start the Output of a device again",
+        "tags": [
+          "Output"
+        ]
+      }
+    },
+    "/api/v2/devices/{device_id}/output/setup": {
+      "get": {
+        "description": "Only valid pins are listed for the detected Pi model, and the channel follows from the pin.",
+        "operationId": "output_api_v2_get_output_setup__device_id__output_setup_get",
+        "parameters": [
+          {
+            "description": "Stable device id, e.g. `device_0`.",
+            "in": "path",
+            "name": "device_id",
+            "required": true,
+            "schema": {
+              "description": "Stable device id, e.g. `device_0`.",
+              "title": "Device Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OutputSetupOut"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        },
+        "summary": "Get the choices of the Setup Wizard",
+        "tags": [
+          "Output"
+        ]
+      }
+    },
     "/api/v2/devices/{device_id}/preview": {
       "get": {
         "description": "A `text/event-stream` of `preview` events, one per frame, at most 30 a second: the pixels as base64 red, green, blue per LED.<br/><br/>Works for every output type. Frames only flow while a stream is open.",
@@ -12223,6 +12829,10 @@
     {
       "description": "Temporary patterns that take over a strip to check its setup",
       "name": "Test Patterns"
+    },
+    {
+      "description": "Setup Wizard support: the choices for a strip and its Output, and applying them safely",
+      "name": "Output"
     }
   ]
 }

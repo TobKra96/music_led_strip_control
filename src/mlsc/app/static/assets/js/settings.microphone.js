@@ -1,5 +1,6 @@
 import { api } from './classes/Api.js';
 import { events } from './classes/Events.js';
+import { waitForOperation } from './classes/Operation.js';
 import Toast from './classes/Toast.js';
 import UnsavedChanges from './classes/UnsavedChanges.js';
 import { BrowserMicrophone } from './classes/BrowserMicrophone.js';
@@ -119,24 +120,6 @@ const collectChanges = () => {
     NUMBER_FIELDS.forEach((key) => { form[key] = Number($(`#${key}`).val()); });
     return Object.fromEntries(Object.entries(form).filter(([key, value]) => value !== settings[key]));
 };
-
-/**
- * Resolve with the final state of an Operation, from its `operation` events or, as a fallback, by polling.
- * @param {{id: string, state: string}} operation
- * @return {Promise.<{state: string, error: string|null}>}
- */
-const waitForOperation = operation => new Promise((resolve) => {
-    let done = false;
-    const finish = (result) => {
-        if (done || result.id !== operation.id || result.state === 'pending') return;
-        done = true;
-        clearInterval(timer);
-        resolve(result);
-    };
-    events.on('operation', finish);
-    const timer = setInterval(() => api.get(`/operations/${operation.id}`).then(finish).catch(() => {}), 1000);
-    finish(operation);
-});
 
 const save = async () => {
     const changes = collectChanges();

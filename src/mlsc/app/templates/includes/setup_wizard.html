@@ -1,0 +1,149 @@
+<div class="modal fade" id="modal_wizard" tabindex="-1" role="dialog" aria-labelledby="modal_wizard_title" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modal_wizard_title">Setup Wizard <small class="text-muted" id="wizard_progress"></small></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            </div>
+            <div class="modal-body">
+                <div id="wizard_notice" class="alert alert-warning d-none"></div>
+
+                <div class="wizard-step" data-step="output">
+                    <h6>Where is the strip connected?</h6>
+                    <div class="form-group">
+                        <label for="wz_output_type">Output</label>
+                        <select id="wz_output_type" class="form-control"></select>
+                    </div>
+                    <div id="wz_gpio" class="d-none">
+                        <div class="form-group">
+                            <label for="wz_led_pin">GPIO pin</label>
+                            <select id="wz_led_pin" class="form-control"></select>
+                            <small class="form-text text-muted">Only pins this Raspberry Pi can drive are listed. The channel follows from the pin.</small>
+                        </div>
+                        <a href="#!" id="wz_advanced_toggle">Advanced</a>
+                        <div id="wz_advanced" class="d-none mt-3">
+                            <div class="form-row">
+                                <div class="form-group col-md-4">
+                                    <label for="wz_led_dma">DMA channel (0-14)</label>
+                                    <input type="number" id="wz_led_dma" class="form-control" min="0" max="14">
+                                </div>
+                                <div class="form-group col-md-4">
+                                    <label for="wz_led_freq_hz">Frequency (Hz)</label>
+                                    <input type="number" id="wz_led_freq_hz" class="form-control" min="400000" max="1200000">
+                                </div>
+                                <div class="form-group col-md-4">
+                                    <label>Invert signal</label>
+                                    <div class="custom-control custom-switch">
+                                        <input type="checkbox" class="custom-control-input" id="wz_led_invert">
+                                        <label class="custom-control-label" for="wz_led_invert">Inverted logic level shifter</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="wz_udp" class="d-none">
+                        <div class="form-row">
+                            <div class="form-group col-md-8">
+                                <label for="wz_udp_client_ip">Client host or IP</label>
+                                <input type="text" id="wz_udp_client_ip" class="form-control">
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label for="wz_udp_client_port">Port</label>
+                                <input type="number" id="wz_udp_client_port" class="form-control" min="1" max="65535">
+                            </div>
+                        </div>
+                        <small class="form-text text-muted">UDP has no acknowledgement, so only the host name and the port are checked.</small>
+                    </div>
+                    <div id="wz_mock" class="d-none text-muted">The Mock Output drives no hardware. Watch the result on the Strip Preview page.</div>
+                </div>
+
+                <div class="wizard-step d-none" data-step="strip">
+                    <h6>What kind of strip is it?</h6>
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="wz_chip_family">Chip family</label>
+                            <select id="wz_chip_family" class="form-control">
+                                <option value="ws2812">WS2812</option>
+                                <option value="ws2811">WS2811</option>
+                                <option value="sk6812">SK6812</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="wz_colour_order">Colour order</label>
+                            <select id="wz_colour_order" class="form-control">
+                                <option value="grb">GRB</option>
+                                <option value="rgb">RGB</option>
+                                <option value="rbg">RBG</option>
+                                <option value="gbr">GBR</option>
+                                <option value="brg">BRG</option>
+                                <option value="bgr">BGR</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="custom-control custom-switch mb-3" id="wz_white_row">
+                        <input type="checkbox" class="custom-control-input" id="wz_white_channel">
+                        <label class="custom-control-label" for="wz_white_channel">RGBW strip (with a white channel)</label>
+                    </div>
+                    <p>Apply this and watch the strip: it shows red, green, blue and white one after the other. Pick another colour order until the colours match.</p>
+                    <button type="button" class="btn btn-primary" id="wz_test_colours">Apply and show colours</button>
+                </div>
+
+                <div class="wizard-step d-none" data-step="leds">
+                    <h6>How many LEDs, and where is the middle?</h6>
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="wz_led_count">LED count</label>
+                            <input type="number" id="wz_led_count" class="form-control" min="1">
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="wz_led_mid">Middle LED</label>
+                            <input type="number" id="wz_led_mid" class="form-control" min="0">
+                        </div>
+                    </div>
+                    <p>Apply and watch the strip: the first pixel is red, the middle one green and the last one blue. The last lit pixel is your LED count.</p>
+                    <button type="button" class="btn btn-primary mr-2" id="wz_test_markers">Apply and show markers</button>
+                    <button type="button" class="btn btn-outline-primary" id="wz_test_chase">Show chase</button>
+                    <div id="wz_speed" class="mt-3 text-muted"></div>
+                    <div id="wz_split" class="alert alert-info mt-2 d-none"></div>
+                </div>
+
+                <div class="wizard-step d-none" data-step="power">
+                    <h6>Power Limit</h6>
+                    <p class="text-muted">Optional and advisory: you get a warning, the brightness is never capped.</p>
+                    <div class="custom-control custom-switch mb-3">
+                        <input type="checkbox" class="custom-control-input" id="wz_power_enabled">
+                        <label class="custom-control-label" for="wz_power_enabled">Warn me when the strip can draw more than the supply gives</label>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-4">
+                            <label for="wz_supply_volts">Supply (V)</label>
+                            <input type="number" step="0.1" min="0.1" id="wz_supply_volts" class="form-control">
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label for="wz_supply_amps">Supply (A)</label>
+                            <input type="number" step="0.1" min="0.1" id="wz_supply_amps" class="form-control">
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label for="wz_ma_per_led">Current per LED (mA)</label>
+                            <input type="number" step="1" min="1" id="wz_ma_per_led" class="form-control">
+                        </div>
+                    </div>
+                    <div id="wz_draw" class="text-muted"></div>
+                    <div id="wz_power_warning" class="alert alert-warning mt-2 d-none"></div>
+                    <button type="button" class="btn btn-outline-primary mt-2" id="wz_test_power">Show power test (all white)</button>
+                </div>
+
+                <div class="wizard-step d-none" data-step="review">
+                    <h6>Apply</h6>
+                    <p>The device restarts with these settings and the output is checked with a test frame. If it does not work, the previous settings come back.</p>
+                    <pre id="wz_summary" class="bg-light p-3"></pre>
+                    <div id="wz_result" class="alert d-none"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary m-0" id="wz_back">Back</button>
+                <button type="button" class="btn btn-primary m-0 ml-3" id="wz_next">Next</button>
+            </div>
+        </div>
+    </div>
+</div>

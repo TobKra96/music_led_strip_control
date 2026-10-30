@@ -78,6 +78,12 @@ GeneralSettingsPatch = _model("GeneralSettingsPatch", {
 })
 DeviceSettingsPatch = _model("DeviceSettingsPatch", device_schema)
 MicrophonePatch = _model("MicrophonePatch", audio_schema)
+# What the Setup Wizard changes: the strip, its power and the Output.
+OUTPUT_KEYS = (
+    "led_count", "led_mid", "led_brightness", "output_type", "chip_family", "colour_order", "white_channel", "gpio_backend", "power_limit",
+    "output",
+)
+OutputPatch = _model("OutputPatch", {**device_schema, "properties": {key: device_schema["properties"][key] for key in OUTPUT_KEYS}})
 
 EFFECT_SCHEMAS = {
     effect: schema

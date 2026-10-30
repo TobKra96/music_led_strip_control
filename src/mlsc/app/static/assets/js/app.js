@@ -1,6 +1,8 @@
 import { api } from './classes/Api.js';
 import Banner from './classes/Banner.js';
 import { events } from './classes/Events.js';
+import { waitForOperation } from './classes/Operation.js';
+import Toast from './classes/Toast.js';
 
 // Shown only when the stream stays down for a moment, so reloading or leaving the page does not flash it.
 const DISCONNECT_GRACE_MS = 3000;
@@ -26,6 +28,20 @@ events.on('ready', () => {
 });
 
 /**
+ * Start the Output of a device again, for after the cause of a fallback to the Mock Output is fixed.
+ * The Operation retries with a growing wait; its result arrives as a `diagnosis` event, which updates or removes the banner.
+ * @param {string} deviceId
+ */
+const retryOutput = async (deviceId) => {
+    try {
+        const result = await waitForOperation(await api.post(`/devices/${deviceId}/output/retry`));
+        if (result.state !== 'confirmed') new Toast(`The output still does not work. ${result.error || ''}`).error();
+    } catch (error) {
+        new Toast(`Could not retry the output. ${error.summary || ''}`).error();
+    }
+};
+
+/**
  * A Diagnosis is `{device_id, status, message, suggested_fix}`. Anything but `ok` keeps a banner up for that device.
  * @param {{device_id: string, status: string, message: string, suggested_fix: string | null}} diagnosis
  */
@@ -39,6 +55,7 @@ events.on('diagnosis', (diagnosis) => {
         level: diagnosis.status === 'warning' ? 'warning' : 'error',
         title: `Problem with ${diagnosis.device_id}`,
         message: diagnosis.suggested_fix ? `${diagnosis.message} ${diagnosis.suggested_fix}` : diagnosis.message,
+        actions: [{ label: 'Retry', onClick: () => retryOutput(diagnosis.device_id) }],
     });
 });
 

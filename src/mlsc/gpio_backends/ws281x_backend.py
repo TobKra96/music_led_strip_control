@@ -30,7 +30,9 @@ class Ws281xBackend(GpioBackend):
     """
 
     name = "rpi_ws281x"
-    valid_pins = frozenset({10, 12, 13, 18, 19, 21})
+    # The PWM channel each pin belongs to; the SPI (10) and PCM (21) pins use channel 0.
+    pin_channels = {10: 0, 12: 0, 13: 1, 18: 0, 19: 1, 21: 0}
+    valid_pins = frozenset(pin_channels)
 
     def __init__(self, ws=None) -> None:
         self._ws = ws
