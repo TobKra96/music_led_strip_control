@@ -1,4 +1,5 @@
 from multiprocessing import Process, Queue
+from multiprocessing.process import BaseProcess
 
 from loguru import logger
 
@@ -17,6 +18,10 @@ class Device:
 
         self.create_queues()
         self.create_processes()
+
+    def __getstate__(self):
+        # Spawn (Windows) pickles the Device for each service process, and a started Process cannot be pickled.
+        return {key: value for key, value in self.__dict__.items() if not isinstance(value, BaseProcess)}
 
     def start_device(self):
         logger.info(f'Starting device: {self.__device_config["device_name"]}')
