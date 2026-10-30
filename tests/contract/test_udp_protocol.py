@@ -3,7 +3,10 @@
 One datagram per frame: the channels are interleaved per pixel ("F" order), one byte each, in the strip's
 channel order, after scaling by ``led_brightness``. The ESP clients rely on exactly this layout.
 """
+import json
 import socket
+from importlib import resources
+from pathlib import Path
 from types import SimpleNamespace
 
 import numpy as np
@@ -133,3 +136,15 @@ def test_udp_config_keys_are_read_with_string_port(receiver):
 
     assert output._udp_client_ip == "127.0.0.1"
     assert output._udp_client_port == receiver.getsockname()[1]
+
+
+def test_template_pins_the_udp_config_keys():
+    template = json.loads((resources.files("mlsc") / "config_template.json").read_text())
+
+    assert template["default_device"]["output"]["output_udp"] == {"udp_client_ip": "127.0.0.1", "udp_client_port": 7777}
+
+
+def test_esp_udp_client_parses_three_bytes_per_pixel():
+    client = Path(__file__).parents[2] / "client" / "udp" / "esp" / "nodemcu_client" / "nodemcu_client.ino"
+
+    assert "RgbColor pixel((uint8_t)packetBuffer[i], (uint8_t)packetBuffer[i+1], (uint8_t)packetBuffer[i+2])" in client.read_text()
