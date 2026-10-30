@@ -95,6 +95,8 @@ const showMigrationReport = async () => {
 
 $(() => {
     events.connect();
+    // A hidden tab gives its stream slot back; it reconnects (and refreshes on `ready`) when shown again.
+    document.addEventListener('visibilitychange', () => document.hidden ? events.disconnect() : events.connect());
     showMigrationReport();
     // The event only comes when the status changes, so a page opened later asks once.
     api.get('/microphone/status').then(showAudioStatus).catch(() => {});

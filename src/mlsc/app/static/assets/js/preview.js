@@ -23,11 +23,17 @@ $(() => {
         status.textContent = `${count} LEDs`;
     });
     // A group or `all_devices` shows its first device.
-    const show = item => preview.show(item.isGroup ? Object.keys(item.assigned_to)[0] : item.id);
+    let shownId = null;
+    const show = item => {
+        shownId = item.isGroup ? Object.keys(item.assigned_to)[0] : item.id;
+        preview.show(shownId);
+    };
 
     const items = [...devices, ...groups];
     const current = items.find(item => item.isCurrent) ?? devices[0];
     current && show(current);
     items.forEach(item => $(item.link).on('click', () => show(item)));
     window.addEventListener('pagehide', () => preview.stop());
+    // A hidden tab gives its stream slot back.
+    document.addEventListener('visibilitychange', () => document.hidden ? preview.stop() : shownId && preview.show(shownId));
 });

@@ -56,6 +56,16 @@ class EventStream {
     }
 
     /**
+     * Close the stream, e.g. while the page is hidden: the server only has a few stream slots and every open tab takes one.
+     * No `disconnected` is raised; `connect` opens the stream again.
+     */
+    disconnect() {
+        clearTimeout(this._retryTimer);
+        this._source?.close();
+        this._source = null;
+    }
+
+    /**
      * `EventSource` does not expose the status of a refused connection, so ask the session endpoint whether it was a `401`.
      * An unreachable server counts as not logged out.
      */
