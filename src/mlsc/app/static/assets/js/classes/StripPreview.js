@@ -42,28 +42,10 @@ export default class StripPreview {
         const { width, height } = this._canvas;
         const step = width / Math.max(leds.length, 1);
         // The canvas stays transparent, so the card of the page shows through in both themes.
-        // The sockets of the LEDs use the text color of the page.
         ctx.clearRect(0, 0, width, height);
-        const socket = getComputedStyle(this._canvas).color;
-        // Round LEDs while there is room for them, a solid bar otherwise.
-        const round = step >= 6;
-        const radius = Math.min(step, height) / 2 - 1;
         leds.forEach(([r, g, b], i) => {
-            if (round) {
-                const x = (i + 0.5) * step;
-                ctx.beginPath();
-                ctx.arc(x, height / 2, radius, 0, 2 * Math.PI);
-                ctx.globalAlpha = 0.15;
-                ctx.fillStyle = socket;
-                ctx.fill();
-                ctx.globalAlpha = 1;
-                ctx.fillStyle = `rgb(${r},${g},${b})`;
-                ctx.fill();
-            } else {
-                ctx.globalAlpha = 1;
-                ctx.fillStyle = `rgb(${r},${g},${b})`;
-                ctx.fillRect(i * step, 0, Math.ceil(step), height);
-            }
+            ctx.fillStyle = `rgb(${r},${g},${b})`;
+            ctx.fillRect(i * step, 0, Math.ceil(step), height);
         });
         this._onFrame?.(leds.length);
     }
