@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from time import sleep
+from types import SimpleNamespace
 
 from flask_openapi3 import OpenAPI
 from waitress import serve
@@ -9,6 +10,8 @@ from mlsc import operations
 from mlsc.https_server import start_https
 from mlsc.api.v2 import register_api_v2
 from mlsc.app import create_app
+from mlsc.strip_preview import PreviewHub, start_preview_hub
+from mlsc.webserver import sse
 from mlsc.webserver.blueprints.authentication_api import authentication_api
 from mlsc.webserver.blueprints.device_api import device_api
 from mlsc.webserver.blueprints.device_settings_api import device_settings_api
@@ -48,7 +51,7 @@ DEBUG = False
 class Webserver:
     def start(self: Webserver, config_lock, notification_queue_in, notification_queue_out, effects_queue, audio_backend, mic_level=None,
               audio_status=None, browser_queue=None,
-              mic_recording=None) -> None:
+              mic_recording=None, preview_channel=None) -> None:
         self._config_lock = config_lock
         self.notification_queue_in = notification_queue_in
         self.notification_queue_out = notification_queue_out
@@ -74,6 +77,9 @@ class Webserver:
             publishers.append(start_status_publisher(create_mic_level_publisher(mic_level), MIC_LEVEL_POLL_SECONDS))
         if audio_status is not None:
             publishers.append(start_status_publisher(create_audio_status_publisher(audio_status), AUDIO_STATUS_POLL_SECONDS))
+
+        if preview_channel is not None:
+            publishers.append(SimpleNamespace(stop=start_preview_hub(PreviewHub(preview_channel, sse.broker.publish))))
 
         if DEBUG:
             self.server.run(host="0.0.0.0", port=webserver_port, load_dotenv=False, debug=True)  # ruff: ignore[hardcoded-bind-all-interfaces]

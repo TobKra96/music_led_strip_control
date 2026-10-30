@@ -5,7 +5,7 @@ import pytest
 from mlsc.diagnosis import Diagnosis, Status, worst
 from mlsc.host import Host
 from mlsc.outputs.output import Output
-from mlsc.outputs.output_dummy import OutputDummy
+from mlsc.outputs.output_mock import OutputMock
 from mlsc.outputs.output_raspi import OutputRaspi
 from mlsc.outputs.output_udp import OutputUDP
 
@@ -63,7 +63,7 @@ def test_base_output_is_healthy_by_default():
 
 
 def test_mock_output_is_healthy():
-    assert OutputDummy.diagnose({}).status is Status.OK
+    assert OutputMock.diagnose({}).status is Status.OK
 
 
 def test_raspi_is_healthy_on_a_pi_4_with_the_library():

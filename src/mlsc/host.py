@@ -22,6 +22,10 @@ class Host:
     def has_ws281x(self) -> bool:
         return any(importlib.util.find_spec(name) is not None for name in ("_rpi_ws281x", "rpi_ws281x"))
 
+    def can_drive_gpio(self) -> bool:
+        """Whether local GPIO output can work here at all: on Linux with `rpi_ws281x` installed. Windows and macOS use the Mock Output."""
+        return sys.platform == "linux" and self.has_ws281x()
+
     def pi_model(self) -> str | None:
         """The Raspberry Pi model string, or None when this is not a Pi."""
         try:

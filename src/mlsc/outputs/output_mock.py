@@ -4,7 +4,7 @@ from mlsc.diagnosis import Diagnosis
 from mlsc.outputs.output import Output
 
 
-class OutputDummy(Output):
+class OutputMock(Output):
     def __init__(self, device) -> None:
         # Call the constructor of the base class.
         super().__init__(device)

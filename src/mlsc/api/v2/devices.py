@@ -1,3 +1,4 @@
+from flask import Response, request, stream_with_context
 from flask_openapi3 import APIBlueprint, Tag
 from pydantic import BaseModel, Field, RootModel
 
@@ -5,8 +6,10 @@ from mlsc.api.v2.errors import READ_ERRORS, WRITE_ERRORS, Problem, ProblemError
 from mlsc.api.v2.lookup import device_settings, effect_settings, require_device, require_devices, require_patch, unwrap
 from mlsc.api.v2.security import api_login_required
 from mlsc.api.v2.settings_models import DeviceSettingsPatch, EffectSettingsPatches
+from mlsc.webserver import auth
 from mlsc.webserver.executer import Executer
-from mlsc.webserver.messages import EffectNotFound
+from mlsc import strip_preview
+from mlsc.webserver.messages import EffectNotFound, TooManyStreams
 
 tag = Tag(name="Devices", description="Configured LED strip devices")
 devices_api = APIBlueprint("devices_api_v2", __name__, url_prefix="/api/v2/devices", abp_tags=[tag])
@@ -106,3 +109,25 @@ def _add_effect_settings_route(effect: str, patch_model: type[BaseModel]) -> Non
 
 for _effect, _patch_model in EffectSettingsPatches.items():
     _add_effect_settings_route(_effect, _patch_model)
+
+
+@devices_api.get("/<device_id>/preview", summary="Stream the frames of a device (Strip Preview)",
+                 responses={"200": None, **READ_ERRORS, "503": Problem})
+@api_login_required
+def preview(path: DevicePath):
+    """A `text/event-stream` of `preview` events, one per frame, at most 30 a second: the pixels as base64 red, green, blue per LED.
+
+    Works for every output type. Frames only flow while a stream is open.
+    """
+    require_device(path.device_id)
+    hub = strip_preview.hub
+    broker = hub.broker(path.device_id) if hub else None
+    subscriber = broker.subscribe() if broker else None
+    if subscriber is None:
+        raise ProblemError(TooManyStreams)
+    return Response(
+        stream_with_context(broker.stream(
+            subscriber, is_valid=auth.session_check(), client_gone=request.environ.get("waitress.client_disconnected"))),
+        mimetype="text/event-stream",
+        headers={"Cache-Control": "no-cache, no-transform", "X-Accel-Buffering": "no"},
+    )

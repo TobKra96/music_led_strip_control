@@ -1,5 +1,6 @@
 import { Device } from './classes/Device.js';
 import Toast from './classes/Toast.js';
+import StripPreview from './classes/StripPreview.js';
 
 
 $(() => {
@@ -28,8 +29,15 @@ $(() => {
     const devices = jinja_devices.map(d => new Device(d));
     const groups = [baseGroup, ...jinja_groups.map(g => new Device(g))];
 
+    const preview = new StripPreview(document.getElementById('strip-preview'));
+    const showPreview = item => preview.show(item.isGroup ? Object.keys(item.assigned_to)[0] : item.id);
+    const current = [...devices, ...groups].find(item => item.isCurrent);
+    current && showPreview(current);
+    window.addEventListener('pagehide', () => preview.stop());
+
     [...devices, ...groups].forEach(item => {
         $(item.link).on('click', () => {
+            showPreview(item);
             // Async function.
             item.getActiveEffect();
         });

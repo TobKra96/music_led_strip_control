@@ -13,13 +13,13 @@ from mlsc.diagnosis import Diagnosis, Status
 from mlsc.host import Host
 from mlsc.output_enum import OutputsEnum
 from mlsc.outputs.output import Output
-from mlsc.outputs.output_dummy import OutputDummy
+from mlsc.outputs.output_mock import OutputMock
 from mlsc.outputs.output_raspi import OutputRaspi
 from mlsc.outputs.output_udp import OutputUDP
 from mlsc.webserver.schemas.config_validator_service import ConfigValidatorService
 
 OUTPUTS: dict[str, type[Output]] = {
-    OutputsEnum.output_dummy.name: OutputDummy,
+    OutputsEnum.output_dummy.name: OutputMock,
     OutputsEnum.output_raspi.name: OutputRaspi,
     OutputsEnum.output_udp.name: OutputUDP,
 }

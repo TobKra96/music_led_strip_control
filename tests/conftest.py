@@ -1,7 +1,7 @@
 import pytest
 
 from mlsc import paths
-from mlsc.outputs.output_dummy import OutputDummy
+from mlsc.outputs.output_mock import OutputMock
 
 
 @pytest.fixture
@@ -60,7 +60,7 @@ def fake_device():
     return FakeDevice()
 
 
-class RecordingOutput(OutputDummy):
+class RecordingOutput(OutputMock):
     """Mock Output that records every frame it is asked to show."""
 
     def __init__(self, device) -> None:

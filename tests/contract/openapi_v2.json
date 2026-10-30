@@ -9681,6 +9681,74 @@
         ]
       }
     },
+    "/api/v2/devices/{device_id}/preview": {
+      "get": {
+        "description": "A `text/event-stream` of `preview` events, one per frame, at most 30 a second: the pixels as base64 red, green, blue per LED.<br/><br/>Works for every output type. Frames only flow while a stream is open.",
+        "operationId": "devices_api_v2_preview__device_id__preview_get",
+        "parameters": [
+          {
+            "description": "Stable device id, e.g. `device_0`.",
+            "in": "path",
+            "name": "device_id",
+            "required": true,
+            "schema": {
+              "description": "Stable device id, e.g. `device_0`.",
+              "title": "Device Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "summary": "Stream the frames of a device (Strip Preview)",
+        "tags": [
+          "Devices"
+        ]
+      }
+    },
     "/api/v2/devices/{device_id}/settings": {
       "get": {
         "operationId": "devices_api_v2_get_device_settings__device_id__settings_get",

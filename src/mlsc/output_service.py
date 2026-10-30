@@ -4,13 +4,16 @@ from time import time
 import numpy as np
 from loguru import logger
 
+from mlsc.diagnosis import Diagnosis
 from mlsc.fps_limiter import FPSLimiter
 from mlsc.notification_enum import NotificationEnum
 from mlsc.output_enum import OutputsEnum
-from mlsc.outputs.output_dummy import OutputDummy
+from mlsc.output_selection import build_output
+from mlsc.outputs.output_mock import OutputMock
 from mlsc.outputs.output_raspi import OutputRaspi
 from mlsc.outputs.output_udp import OutputUDP
 from mlsc.strip import has_white_channel
+from mlsc.strip_preview import PreviewSink
 
 
 class OutputService:
@@ -39,15 +42,21 @@ class OutputService:
         self._cancel_token = False
 
         self._available_outputs = {
-            OutputsEnum.output_dummy: OutputDummy,
+            OutputsEnum.output_dummy: OutputMock,
             OutputsEnum.output_raspi: OutputRaspi,
             OutputsEnum.output_udp: OutputUDP
         }
 
         current_output_enum = OutputsEnum[self._device.device_config["output_type"]]
         logger.debug(f"Found output: {current_output_enum}")
-        self._current_output = self._available_outputs[current_output_enum](
-            self._device)
+        self._current_output, fallback = build_output(
+            self._device, {enum.name: output for enum, output in self._available_outputs.items()})
+        self._preview = PreviewSink(self._device.preview_channel, self._device.device_id,
+                                    int(self._device.device_config["led_brightness"]))
+        # An ok Diagnosis clears the banner of an earlier fallback once the Output works again.
+        if fallback is not None:
+            logger.warning(fallback.message)
+        self._preview.diagnosis(fallback or Diagnosis.ok("Ready."))
 
         logger.debug(f'Output component started. Device: {self._device.device_config["device_name"]}')
 
@@ -94,6 +103,7 @@ class OutputService:
                     (current_output_array, np.zeros(self._device.device_config["led_count"])))
 
             self._current_output.show(current_output_array)
+            self._preview.frame(current_output_array)
 
         self.end_time = time()
 
