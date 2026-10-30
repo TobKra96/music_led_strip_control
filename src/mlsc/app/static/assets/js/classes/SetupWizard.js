@@ -51,7 +51,6 @@ export default class SetupWizard {
     _bind() {
         $('#wz_next').on('click', () => this._next());
         $('#wz_back').on('click', () => { this.step -= 1; this._show(); });
-        $('#wz_advanced_toggle').on('click', (e) => { e.preventDefault(); $('#wz_advanced').toggleClass('d-none'); });
         const fields = [...NUMBER_FIELDS, ...TEXT_FIELDS, ...CHECKBOX_FIELDS].map(key => `#wz_${key}`).join(',');
         $(fields).on('input change', () => { this._read(); this._refresh(); });
         $('#wz_test_colours').on('click', () => this._applyAndShow('colour_order'));

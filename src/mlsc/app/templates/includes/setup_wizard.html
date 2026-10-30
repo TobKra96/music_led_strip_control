@@ -9,7 +9,7 @@
                 <div id="wizard_notice" class="alert alert-warning d-none"></div>
 
                 <div class="wizard-step" data-step="output">
-                    <h6>Where is the strip connected?</h6>
+                    <h5>Where is the strip connected?</h5>
                     <div class="form-group">
                         <label for="wz_output_type">Output</label>
                         <select id="wz_output_type" class="form-control"></select>
@@ -20,8 +20,9 @@
                             <select id="wz_led_pin" class="form-control"></select>
                             <small class="form-text text-muted">Only pins this Raspberry Pi can drive are listed. The channel follows from the pin.</small>
                         </div>
-                        <a href="#!" id="wz_advanced_toggle">Advanced</a>
-                        <div id="wz_advanced" class="d-none mt-3">
+                        <hr>
+                        <h5>Advanced</h5>
+                        <div id="wz_advanced">
                             <div class="form-row">
                                 <div class="form-group col-md-4">
                                     <label for="wz_led_dma">DMA channel (0-14)</label>
@@ -58,7 +59,7 @@
                 </div>
 
                 <div class="wizard-step d-none" data-step="strip">
-                    <h6>What kind of strip is it?</h6>
+                    <h5>What kind of strip is it?</h5>
                     <div class="form-row">
                         <div class="form-group col-md-6">
                             <label for="wz_chip_family">Chip family</label>
@@ -89,7 +90,7 @@
                 </div>
 
                 <div class="wizard-step d-none" data-step="leds">
-                    <h6>How many LEDs, and where is the middle?</h6>
+                    <h5>How many LEDs, and where is the middle?</h5>
                     <div class="form-row">
                         <div class="form-group col-md-6">
                             <label for="wz_led_count">LED count</label>
@@ -108,7 +109,7 @@
                 </div>
 
                 <div class="wizard-step d-none" data-step="power">
-                    <h6>Power Limit</h6>
+                    <h5>Power Limit</h5>
                     <p class="text-muted">Optional and advisory: you get a warning, the brightness is never capped.</p>
                     <div class="custom-control custom-switch mb-3">
                         <input type="checkbox" class="custom-control-input" id="wz_power_enabled">
@@ -134,9 +135,9 @@
                 </div>
 
                 <div class="wizard-step d-none" data-step="review">
-                    <h6>Apply</h6>
+                    <h5>Apply</h5>
                     <p>The device restarts with these settings and the output is checked with a test frame. If it does not work, the previous settings come back.</p>
-                    <pre id="wz_summary" class="bg-light p-3"></pre>
+                    <pre id="wz_summary" class="bg-secondary text-white p-3"></pre>
                     <div id="wz_result" class="alert d-none"></div>
                 </div>
             </div>
