@@ -3,6 +3,8 @@ import { waitForOperation } from './Operation.js';
 import { identityPatch, outputPatch, powerEstimate, speedEstimate, stateFrom } from './OutputSetup.js';
 import Toast from './Toast.js';
 
+// The pin most strips are wired to: it has the PWM hardware and works on every supported Pi.
+const RECOMMENDED_PIN = '18';
 const STEPS = ['device', 'output', 'strip', 'leds', 'power', 'review'];
 const NUMBER_FIELDS = ['led_pin', 'led_dma', 'led_freq_hz', 'udp_client_port', 'led_count', 'led_mid', 'supply_volts', 'supply_amps', 'ma_per_led'];
 const TEXT_FIELDS = ['output_type', 'udp_client_ip', 'chip_family', 'colour_order'];
@@ -89,7 +91,8 @@ export default class SetupWizard {
         Object.entries(this.getOutputTypes()).forEach(([key, name]) => $type.append($('<option></option>').val(key).text(name)));
         const $pin = $('#wz_led_pin').empty();
         Object.keys(this.options.pin_channels).forEach((pin) => {
-            $pin.append($('<option></option>').val(pin).text(`GPIO ${pin} (channel ${this.options.pin_channels[pin]})`));
+            const suffix = pin === RECOMMENDED_PIN ? ' - recommended' : '';
+            $pin.append($('<option></option>').val(pin).text(`GPIO ${pin} (channel ${this.options.pin_channels[pin]})${suffix}`));
         });
         $('#wz_led_pin').closest('.form-group').toggleClass('d-none', !$pin.children().length);
         $('#wizard_notice').toggleClass('d-none', !this.options.experimental).text(this.options.experimental || '');

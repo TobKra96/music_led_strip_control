@@ -41,7 +41,7 @@
 <text x="221.0" y="204" text-anchor="end">GPIO17</text>
 <circle cx="277.0" cy="200" r="10" fill="#1e8e3e"/>
 <text x="277.0" y="204" text-anchor="middle" class="n">12</text>
-<text x="299.0" y="204" class="b">GPIO18 · PWM0</text>
+<text x="299.0" y="204" class="b">GPIO18 · PWM0 · recommended</text>
 <circle cx="243.0" cy="226" r="10" fill="#5f7da8"/>
 <text x="243.0" y="230" text-anchor="middle" class="n">13</text>
 <text x="221.0" y="230" text-anchor="end">GPIO27</text>
