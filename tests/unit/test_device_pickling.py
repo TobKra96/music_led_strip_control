@@ -10,7 +10,7 @@ def test_the_device_given_to_a_process_does_not_carry_the_processes_of_its_servi
     started = multiprocessing.Process(target=time.sleep, args=(0.1,))
     started.start()
     try:
-        device._Device__output_process = started
+        device._Device__output_process = started  # ruff: ignore[private-member-access]
 
         state = device.__getstate__()
 
