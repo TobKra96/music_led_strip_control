@@ -1,0 +1,143 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 716" role="img" aria-labelledby="t d">
+<title id="t">Raspberry Pi 40-pin GPIO header</title>
+<desc id="d">The pins that can drive an LED strip are green: GPIO 18 and 12 (PWM0), GPIO 13 and 19 (PWM1), GPIO 10 (SPI) and GPIO 21 (PCM).</desc>
+<style>text{font-family:Arial,Helvetica,sans-serif;font-size:13px;fill:#202124}.n{font-size:11px;fill:#fff;font-weight:bold}.b{font-weight:bold}</style>
+<rect width="520" height="716" rx="10" fill="#f8f9fa" stroke="#dadce0"/>
+<text x="260.0" y="30" text-anchor="middle" class="b" style="font-size:16px">Raspberry Pi 40-pin GPIO header</text>
+<text x="260.0" y="50" text-anchor="middle" style="font-size:12px">Pi 2, Pi 3, Pi 4, Pi Zero (2) W and Pi 5 · pin 1 at the top left</text>
+<rect x="224.0" y="56" width="72" height="526" rx="6" fill="#202124"/>
+<circle cx="243.0" cy="70" r="10" fill="#f29900"/>
+<text x="243.0" y="74" text-anchor="middle" class="n">1</text>
+<text x="221.0" y="74" text-anchor="end">3V3</text>
+<circle cx="277.0" cy="70" r="10" fill="#d93025"/>
+<text x="277.0" y="74" text-anchor="middle" class="n">2</text>
+<text x="299.0" y="74">5V</text>
+<circle cx="243.0" cy="96" r="10" fill="#5f7da8"/>
+<text x="243.0" y="100" text-anchor="middle" class="n">3</text>
+<text x="221.0" y="100" text-anchor="end">GPIO2</text>
+<circle cx="277.0" cy="96" r="10" fill="#d93025"/>
+<text x="277.0" y="100" text-anchor="middle" class="n">4</text>
+<text x="299.0" y="100">5V</text>
+<circle cx="243.0" cy="122" r="10" fill="#5f7da8"/>
+<text x="243.0" y="126" text-anchor="middle" class="n">5</text>
+<text x="221.0" y="126" text-anchor="end">GPIO3</text>
+<circle cx="277.0" cy="122" r="10" fill="#3c4043"/>
+<text x="277.0" y="126" text-anchor="middle" class="n">6</text>
+<text x="299.0" y="126">GND</text>
+<circle cx="243.0" cy="148" r="10" fill="#5f7da8"/>
+<text x="243.0" y="152" text-anchor="middle" class="n">7</text>
+<text x="221.0" y="152" text-anchor="end">GPIO4</text>
+<circle cx="277.0" cy="148" r="10" fill="#5f7da8"/>
+<text x="277.0" y="152" text-anchor="middle" class="n">8</text>
+<text x="299.0" y="152">GPIO14</text>
+<circle cx="243.0" cy="174" r="10" fill="#3c4043"/>
+<text x="243.0" y="178" text-anchor="middle" class="n">9</text>
+<text x="221.0" y="178" text-anchor="end">GND</text>
+<circle cx="277.0" cy="174" r="10" fill="#5f7da8"/>
+<text x="277.0" y="178" text-anchor="middle" class="n">10</text>
+<text x="299.0" y="178">GPIO15</text>
+<circle cx="243.0" cy="200" r="10" fill="#5f7da8"/>
+<text x="243.0" y="204" text-anchor="middle" class="n">11</text>
+<text x="221.0" y="204" text-anchor="end">GPIO17</text>
+<circle cx="277.0" cy="200" r="10" fill="#1e8e3e"/>
+<text x="277.0" y="204" text-anchor="middle" class="n">12</text>
+<text x="299.0" y="204" class="b">GPIO18 · PWM0</text>
+<circle cx="243.0" cy="226" r="10" fill="#5f7da8"/>
+<text x="243.0" y="230" text-anchor="middle" class="n">13</text>
+<text x="221.0" y="230" text-anchor="end">GPIO27</text>
+<circle cx="277.0" cy="226" r="10" fill="#3c4043"/>
+<text x="277.0" y="230" text-anchor="middle" class="n">14</text>
+<text x="299.0" y="230">GND</text>
+<circle cx="243.0" cy="252" r="10" fill="#5f7da8"/>
+<text x="243.0" y="256" text-anchor="middle" class="n">15</text>
+<text x="221.0" y="256" text-anchor="end">GPIO22</text>
+<circle cx="277.0" cy="252" r="10" fill="#5f7da8"/>
+<text x="277.0" y="256" text-anchor="middle" class="n">16</text>
+<text x="299.0" y="256">GPIO23</text>
+<circle cx="243.0" cy="278" r="10" fill="#f29900"/>
+<text x="243.0" y="282" text-anchor="middle" class="n">17</text>
+<text x="221.0" y="282" text-anchor="end">3V3</text>
+<circle cx="277.0" cy="278" r="10" fill="#5f7da8"/>
+<text x="277.0" y="282" text-anchor="middle" class="n">18</text>
+<text x="299.0" y="282">GPIO24</text>
+<circle cx="243.0" cy="304" r="10" fill="#1e8e3e"/>
+<text x="243.0" y="308" text-anchor="middle" class="n">19</text>
+<text x="221.0" y="308" text-anchor="end" class="b">GPIO10 · SPI</text>
+<circle cx="277.0" cy="304" r="10" fill="#3c4043"/>
+<text x="277.0" y="308" text-anchor="middle" class="n">20</text>
+<text x="299.0" y="308">GND</text>
+<circle cx="243.0" cy="330" r="10" fill="#5f7da8"/>
+<text x="243.0" y="334" text-anchor="middle" class="n">21</text>
+<text x="221.0" y="334" text-anchor="end">GPIO9</text>
+<circle cx="277.0" cy="330" r="10" fill="#5f7da8"/>
+<text x="277.0" y="334" text-anchor="middle" class="n">22</text>
+<text x="299.0" y="334">GPIO25</text>
+<circle cx="243.0" cy="356" r="10" fill="#5f7da8"/>
+<text x="243.0" y="360" text-anchor="middle" class="n">23</text>
+<text x="221.0" y="360" text-anchor="end">GPIO11</text>
+<circle cx="277.0" cy="356" r="10" fill="#5f7da8"/>
+<text x="277.0" y="360" text-anchor="middle" class="n">24</text>
+<text x="299.0" y="360">GPIO8</text>
+<circle cx="243.0" cy="382" r="10" fill="#3c4043"/>
+<text x="243.0" y="386" text-anchor="middle" class="n">25</text>
+<text x="221.0" y="386" text-anchor="end">GND</text>
+<circle cx="277.0" cy="382" r="10" fill="#5f7da8"/>
+<text x="277.0" y="386" text-anchor="middle" class="n">26</text>
+<text x="299.0" y="386">GPIO7</text>
+<circle cx="243.0" cy="408" r="10" fill="#80868b"/>
+<text x="243.0" y="412" text-anchor="middle" class="n">27</text>
+<text x="221.0" y="412" text-anchor="end">ID_SD</text>
+<circle cx="277.0" cy="408" r="10" fill="#80868b"/>
+<text x="277.0" y="412" text-anchor="middle" class="n">28</text>
+<text x="299.0" y="412">ID_SC</text>
+<circle cx="243.0" cy="434" r="10" fill="#5f7da8"/>
+<text x="243.0" y="438" text-anchor="middle" class="n">29</text>
+<text x="221.0" y="438" text-anchor="end">GPIO5</text>
+<circle cx="277.0" cy="434" r="10" fill="#3c4043"/>
+<text x="277.0" y="438" text-anchor="middle" class="n">30</text>
+<text x="299.0" y="438">GND</text>
+<circle cx="243.0" cy="460" r="10" fill="#5f7da8"/>
+<text x="243.0" y="464" text-anchor="middle" class="n">31</text>
+<text x="221.0" y="464" text-anchor="end">GPIO6</text>
+<circle cx="277.0" cy="460" r="10" fill="#1e8e3e"/>
+<text x="277.0" y="464" text-anchor="middle" class="n">32</text>
+<text x="299.0" y="464" class="b">GPIO12 · PWM0</text>
+<circle cx="243.0" cy="486" r="10" fill="#1e8e3e"/>
+<text x="243.0" y="490" text-anchor="middle" class="n">33</text>
+<text x="221.0" y="490" text-anchor="end" class="b">GPIO13 · PWM1</text>
+<circle cx="277.0" cy="486" r="10" fill="#3c4043"/>
+<text x="277.0" y="490" text-anchor="middle" class="n">34</text>
+<text x="299.0" y="490">GND</text>
+<circle cx="243.0" cy="512" r="10" fill="#1e8e3e"/>
+<text x="243.0" y="516" text-anchor="middle" class="n">35</text>
+<text x="221.0" y="516" text-anchor="end" class="b">GPIO19 · PWM1</text>
+<circle cx="277.0" cy="512" r="10" fill="#5f7da8"/>
+<text x="277.0" y="516" text-anchor="middle" class="n">36</text>
+<text x="299.0" y="516">GPIO16</text>
+<circle cx="243.0" cy="538" r="10" fill="#5f7da8"/>
+<text x="243.0" y="542" text-anchor="middle" class="n">37</text>
+<text x="221.0" y="542" text-anchor="end">GPIO26</text>
+<circle cx="277.0" cy="538" r="10" fill="#5f7da8"/>
+<text x="277.0" y="542" text-anchor="middle" class="n">38</text>
+<text x="299.0" y="542">GPIO20</text>
+<circle cx="243.0" cy="564" r="10" fill="#3c4043"/>
+<text x="243.0" y="568" text-anchor="middle" class="n">39</text>
+<text x="221.0" y="568" text-anchor="end">GND</text>
+<circle cx="277.0" cy="564" r="10" fill="#1e8e3e"/>
+<text x="277.0" y="568" text-anchor="middle" class="n">40</text>
+<text x="299.0" y="568" class="b">GPIO21 · PCM</text>
+<circle cx="40" cy="614" r="8" fill="#1e8e3e"/>
+<text x="54" y="618">Can drive a strip</text>
+<circle cx="200" cy="614" r="8" fill="#5f7da8"/>
+<text x="214" y="618">Other GPIO</text>
+<circle cx="360" cy="614" r="8" fill="#d93025"/>
+<text x="374" y="618">5 V</text>
+<circle cx="40" cy="638" r="8" fill="#f29900"/>
+<text x="54" y="642">3.3 V</text>
+<circle cx="200" cy="638" r="8" fill="#3c4043"/>
+<text x="214" y="642">Ground</text>
+<circle cx="360" cy="638" r="8" fill="#80868b"/>
+<text x="374" y="642">ID EEPROM</text>
+<text x="260.0" y="684" text-anchor="middle" style="font-size:11px">Connect the strip data line to a green pin and its ground to a GND pin.</text>
+<text x="260.0" y="700" text-anchor="middle" style="font-size:11px">The Pi 5 has the same header, but MLSC has no supported driver for it yet.</text>
+</svg>
