@@ -1,5 +1,5 @@
 import { expect, it } from 'vitest';
-import { outputPatch, powerEstimate, speedEstimate, splitForm, stateFrom } from '../../src/mlsc/app/static/assets/js/classes/OutputSetup.js';
+import { identityPatch, outputPatch, powerEstimate, speedEstimate, splitForm, stateFrom } from '../../src/mlsc/app/static/assets/js/classes/OutputSetup.js';
 
 const settings = () => ({
     output_type: 'output_raspi', chip_family: 'ws2812', colour_order: 'grb', white_channel: false, led_count: 100, led_mid: 50, led_brightness: 100,
@@ -54,4 +54,13 @@ it('splits the flat form into what is applied safely and what is saved directly'
         apply: { output, led_count: 50, colour_order: 'rgb' },
         save: { device_name: 'Desk', fps: 60 },
     });
+});
+
+it('sends the name and groups only when they differ from the stored ones', () => {
+    const stored = { device_name: 'Desk', device_groups: { group_0: 'Room', group_1: 'Home' } };
+
+    expect(identityPatch(stored, 'Desk', { group_1: 'Home', group_0: 'Room' })).toEqual({});
+    expect(identityPatch(stored, 'Shelf', stored.device_groups)).toEqual({ device_name: 'Shelf' });
+    expect(identityPatch(stored, 'Desk', { group_0: 'Room' })).toEqual({ device_groups: { group_0: 'Room' } });
+    expect(identityPatch(stored, 'Desk', {})).toEqual({ device_groups: {} });
 });

@@ -21,7 +21,13 @@ $(() => {
 
     const wizard = new SetupWizard({
         getOutputTypes: () => outputTypes,
-        onApplied: () => dm.select(dm.current),
+        getGroups: () => jinja_groups.groups,
+        getDeviceNames: id => devices.filter(d => d.id !== id).map(d => d.name),
+        onApplied: (name) => {
+            dm.current.name = name;
+            $('#selected_device_txt').text(name);
+            dm.select(dm.current);
+        },
     });
 
     // Preload dropdown values.

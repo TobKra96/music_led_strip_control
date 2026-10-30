@@ -112,6 +112,22 @@ export const speedEstimate = (ledCount) => {
 };
 
 /**
+ * The name and groups that differ from the stored settings, for `PATCH /devices/<id>/settings`.
+ * @param {{device_name: string, device_groups: Object.<string, string>}} settings
+ * @param {string} name
+ * @param {Object.<string, string>} groups Group id to group name.
+ * @return {object} Empty when nothing changed.
+ */
+export const identityPatch = (settings, name, groups) => {
+    const patch = {};
+    if (name !== settings.device_name) patch.device_name = name;
+    const stored = Object.keys(settings.device_groups).sort();
+    const chosen = Object.keys(groups).sort();
+    if (stored.length !== chosen.length || stored.some((id, i) => id !== chosen[i])) patch.device_groups = groups;
+    return patch;
+};
+
+/**
  * The settings of the flat form that the safe apply handles: the rest is saved as before.
  */
 export const OUTPUT_FIELDS = ['output_type', 'led_count', 'led_mid', 'led_brightness', 'chip_family', 'colour_order', 'white_channel'];

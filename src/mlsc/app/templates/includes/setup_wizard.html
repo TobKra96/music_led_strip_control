@@ -8,7 +8,19 @@
             <div class="modal-body">
                 <div id="wizard_notice" class="alert alert-warning d-none"></div>
 
-                <div class="wizard-step" data-step="output">
+                <div class="wizard-step" data-step="device">
+                    <h5>Name and groups</h5>
+                    <div class="form-group">
+                        <label for="wz_device_name">Device name</label>
+                        <input type="text" id="wz_device_name" class="form-control" maxlength="64">
+                    </div>
+                    <hr>
+                    <h5>Groups</h5>
+                    <div id="wz_groups"></div>
+                    <small id="wz_groups_hint" class="form-text text-muted d-none">No groups defined yet. Create them in <a href="/settings/general_settings">General Settings</a>.</small>
+                </div>
+
+                <div class="wizard-step d-none" data-step="output">
                     <h5>Where is the strip connected?</h5>
                     <div class="form-group">
                         <label for="wz_output_type">Output</label>

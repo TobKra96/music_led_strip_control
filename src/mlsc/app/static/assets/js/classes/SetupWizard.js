@@ -1,9 +1,9 @@
 import { api } from './Api.js';
 import { waitForOperation } from './Operation.js';
-import { outputPatch, powerEstimate, speedEstimate, stateFrom } from './OutputSetup.js';
+import { identityPatch, outputPatch, powerEstimate, speedEstimate, stateFrom } from './OutputSetup.js';
 import Toast from './Toast.js';
 
-const STEPS = ['output', 'strip', 'leds', 'power', 'review'];
+const STEPS = ['device', 'output', 'strip', 'leds', 'power', 'review'];
 const NUMBER_FIELDS = ['led_pin', 'led_dma', 'led_freq_hz', 'udp_client_port', 'led_count', 'led_mid', 'supply_volts', 'supply_amps', 'ma_per_led'];
 const TEXT_FIELDS = ['output_type', 'udp_client_ip', 'chip_family', 'colour_order'];
 const CHECKBOX_FIELDS = ['led_invert', 'white_channel', 'power_enabled'];
@@ -14,12 +14,16 @@ const CHECKBOX_FIELDS = ['led_invert', 'white_channel', 'power_enabled'];
  */
 export default class SetupWizard {
     /**
-     * @param {{getOutputTypes: function(): Object.<string, string>, onApplied: function(): void}} options
+     * @param {{getOutputTypes: function(): Object.<string, string>, getGroups: function(): Object.<string, string>,
+     *   getDeviceNames: function(string): Array.<string>, onApplied: function(string): void}} options
      *   `getOutputTypes` is read when the wizard opens, since the page loads the types after it creates the wizard.
-     *   `onApplied` runs after a confirmed apply, so the page can reload the settings.
+     *   `getGroups` gives the global groups (id to name) and `getDeviceNames` the names of the other devices.
+     *   `onApplied` runs with the device name after a confirmed apply, so the page can reload the settings.
      */
-    constructor({ getOutputTypes, onApplied }) {
+    constructor({ getOutputTypes, getGroups, getDeviceNames, onApplied }) {
         this.getOutputTypes = getOutputTypes;
+        this.getGroups = getGroups;
+        this.getDeviceNames = getDeviceNames;
         this.onApplied = onApplied;
         this.$modal = $('#modal_wizard');
         this.step = 0;
@@ -39,7 +43,10 @@ export default class SetupWizard {
         const [settings, options] = await Promise.all([
             api.get(`/devices/${deviceId}/settings`), api.get(`/devices/${deviceId}/output/setup`),
         ]);
+        this.settings = settings;
         this.state = stateFrom(settings);
+        this.name = settings.device_name;
+        this.groups = { ...settings.device_groups };
         this.options = options;
         this._fill();
         this.step = 0;
@@ -49,6 +56,14 @@ export default class SetupWizard {
     }
 
     _bind() {
+        $('#wz_device_name').on('input', (e) => {
+            this.name = e.currentTarget.value.replace(/[^a-zA-Zа-яА-Я0-9_ ()-]/g, '');
+            e.currentTarget.value = this.name;
+        });
+        $('#wz_groups').on('change', 'input', (e) => {
+            const { id, name } = e.currentTarget.dataset;
+            if (e.currentTarget.checked) this.groups[id] = name; else delete this.groups[id];
+        });
         $('#wz_next').on('click', () => this._next());
         $('#wz_back').on('click', () => { this.step -= 1; this._show(); });
         const fields = [...NUMBER_FIELDS, ...TEXT_FIELDS, ...CHECKBOX_FIELDS].map(key => `#wz_${key}`).join(',');
@@ -60,6 +75,16 @@ export default class SetupWizard {
     }
 
     _fill() {
+        $('#wz_device_name').val(this.name);
+        const $groups = $('#wz_groups').empty();
+        const globalGroups = this.getGroups();
+        Object.entries(globalGroups).forEach(([id, name]) => {
+            const $box = $('<input type="checkbox" class="custom-control-input">').attr('id', `wz_group_${id}`).attr('data-id', id).attr('data-name', name)
+                .prop('checked', id in this.groups);
+            $groups.append($('<div class="custom-control custom-checkbox"></div>').append($box)
+                .append($('<label class="custom-control-label"></label>').attr('for', `wz_group_${id}`).text(name)));
+        });
+        $('#wz_groups_hint').toggleClass('d-none', Object.keys(globalGroups).length > 0);
         const $type = $('#wz_output_type').empty();
         Object.entries(this.getOutputTypes()).forEach(([key, name]) => $type.append($('<option></option>').val(key).text(name)));
         const $pin = $('#wz_led_pin').empty();
@@ -96,7 +121,7 @@ export default class SetupWizard {
         const power = powerEstimate(this.state);
         $('#wz_draw').text(`Estimated draw at full white and ${this.state.led_brightness}% brightness: ${power.amps.toFixed(1)} A, ${power.watts.toFixed(0)} W.`);
         $('#wz_power_warning').toggleClass('d-none', !power.warning).text(power.warning || '');
-        $('#wz_summary').text(JSON.stringify(outputPatch(this.state), null, 2));
+        $('#wz_summary').text(JSON.stringify({ device_name: this.name, device_groups: this.groups, ...outputPatch(this.state) }, null, 2));
     }
 
     _show() {
@@ -109,12 +134,21 @@ export default class SetupWizard {
 
     async _next() {
         this._read();
+        if (this.step === 0 && !this._nameIsValid()) return;
         if (this.step < STEPS.length - 1) {
             this.step += 1;
             this._show();
             return;
         }
         if (await this._apply()) this.$modal.modal('hide');
+    }
+
+    _nameIsValid() {
+        const name = this.name.trim();
+        const problem = !name ? 'Give the device a name.' : this.getDeviceNames(this.deviceId).includes(name) ? `A device named '${name}' already exists.` : null;
+        if (problem) new Toast(problem).error();
+        this.name = name;
+        return !problem;
     }
 
     /**
@@ -124,13 +158,18 @@ export default class SetupWizard {
     async _apply() {
         const $result = $('#wz_result').removeClass('d-none alert-success alert-danger').addClass('alert-info').text('Applying…');
         try {
+            const identity = identityPatch(this.settings, this.name, this.groups);
+            if (Object.keys(identity).length) {
+                await api.patch(`/devices/${this.deviceId}/settings`, identity);
+                this.settings = { ...this.settings, device_name: this.name, device_groups: { ...this.groups } };
+            }
             const operation = await waitForOperation(await api.patch(`/devices/${this.deviceId}/output`, outputPatch(this.state)));
             const confirmed = operation.state === 'confirmed';
             $result.removeClass('alert-info').addClass(confirmed ? 'alert-success' : 'alert-danger')
                 .text(confirmed
                     ? 'Applied. The strip shows the markers for a moment.'
                     : `It did not work and the previous settings are back. ${operation.error || ''}`);
-            if (confirmed) this.onApplied();
+            if (confirmed) this.onApplied(this.name);
             return confirmed;
         } catch (error) {
             $result.removeClass('alert-info').addClass('alert-danger');
