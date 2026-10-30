@@ -7,9 +7,10 @@ import pytest
 from mlsc import effect_service
 from mlsc.diagnosis import Status
 from mlsc.effect_item import EffectItem
-from mlsc.effect_service import FALLBACK_AFTER_FAILURES, LOG_INTERVAL_SECONDS, EffectService
+from mlsc.effect_service import FALLBACK_AFTER_FAILURES, LOG_INTERVAL_SECONDS, WARNING_REPEAT_SECONDS, EffectService
 from mlsc.effects_enum import EffectsEnum
 from mlsc.fps_limiter import FPSLimiter
+from mlsc.strip_preview import PreviewChannel, PreviewHub, PreviewSink
 
 pytestmark = pytest.mark.unit
 
@@ -96,6 +97,8 @@ def setup(monkeypatch):
     service._failures = 0
     service._last_logged = float("-inf")
     service._suppressed = 0
+    service._warning = None
+    service._warned_at = float("-inf")
     service.ten_seconds_counter = service.start_time = clock[0]
     return service, device, clock, errors
 
@@ -161,3 +164,47 @@ def test_an_unknown_effect_is_isolated(setup):
     service.effect_routine()
 
     assert len(errors) >= 1
+
+
+def test_the_warning_is_repeated_while_the_fallback_lasts(setup):
+    service, _device, clock, _errors = setup
+    for _ in range(FALLBACK_AFTER_FAILURES):
+        service.effect_routine()
+
+    service.effect_routine()
+    assert len(service._preview.diagnoses) == 1
+
+    clock[0] += WARNING_REPEAT_SECONDS
+    service.effect_routine()
+    assert [d.status for d in service._preview.diagnoses] == [Status.WARNING, Status.WARNING]
+
+
+def test_choosing_another_effect_clears_the_warning(setup):
+    service, device, clock, _errors = setup
+    for _ in range(FALLBACK_AFTER_FAILURES):
+        service.effect_routine()
+
+    device.effect_queue.put_blocking(EffectItem(EffectsEnum.effect_fade, "device_0"))
+    service.effect_routine()
+    clock[0] += WARNING_REPEAT_SECONDS
+    service.effect_routine()
+
+    assert [d.status for d in service._preview.diagnoses] == [Status.WARNING, Status.OK]
+
+
+def test_the_warning_reaches_the_diagnosis_event_through_the_preview_hub(setup):
+    service, _device, _clock, _errors = setup
+    channel = PreviewChannel()
+    service._preview = PreviewSink(channel, "device_0")
+    published = []
+    hub = PreviewHub(channel, lambda event, data: published.append((event, data)))
+
+    for _ in range(FALLBACK_AFTER_FAILURES):
+        service.effect_routine()
+    hub.drain(timeout=1)
+
+    [(event, payload)] = published
+    assert event == "diagnosis"
+    assert payload["device_id"] == "device_0"
+    assert payload["status"] == "warning"
+    assert hub.latest("device_0")[1] == payload

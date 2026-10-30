@@ -39,6 +39,8 @@ from mlsc.strip_preview import PreviewSink
 
 FALLBACK_AFTER_FAILURES = 30
 LOG_INTERVAL_SECONDS = 10
+# The warning is sent again because the preview queue drops messages when full and the output process can report a later Diagnosis over it.
+WARNING_REPEAT_SECONDS = 10
 
 # Output array should look like:
 # output = {[r1,r2,r3,r4,r5],[g1,g2,g3,g4,g5],[]}
@@ -61,6 +63,8 @@ class EffectService:
         self._failures = 0
         self._last_logged = float("-inf")
         self._suppressed = 0
+        self._warning = None
+        self._warned_at = float("-inf")
 
         self._available_effects = {
             EffectsEnum.effect_off: EffectOff,
@@ -148,6 +152,9 @@ class EffectService:
             new_effect_item = self._device.effect_queue.get_blocking()
             self._current_effect = new_effect_item.effect_enum
             self._failures = 0
+            if self._warning is not None:
+                self._warning = None
+                self._preview.diagnosis(Diagnosis.ok("Ready."))
             logger.debug(f"New effect found: {new_effect_item.effect_enum}")
 
         # Something is wrong here, no effect set. So skip until we get new information.
@@ -165,6 +172,12 @@ class EffectService:
         self.start_time = time()
 
         self._run_isolated()
+        self._repeat_warning()
+
+    def _repeat_warning(self):
+        if self._warning is not None and time() - self._warned_at >= WARNING_REPEAT_SECONDS:
+            self._warned_at = time()
+            self._preview.diagnosis(self._warning)
 
     def _run_isolated(self):
         """Run one frame of the current effect. A failing frame is skipped, and a persistently failing effect is replaced by effect_off."""
@@ -194,9 +207,11 @@ class EffectService:
             logger.error(f"Effect {effect_enum} failed {self._failures} frames in a row, falling back to effect_off.")
             self._current_effect = EffectsEnum.effect_off
             self._failures = 0
-            self._preview.diagnosis(Diagnosis.warning(
+            self._warning = Diagnosis.warning(
                 f"The effect {effect_enum.name} kept failing and was switched off.",
-                "Choose another effect, and report the problem if it comes back."))
+                "Choose another effect, and report the problem if it comes back.")
+            self._warned_at = time()
+            self._preview.diagnosis(self._warning)
 
     def stop(self):
         logger.info("Stopping effect component...")
