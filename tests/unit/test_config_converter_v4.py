@@ -154,14 +154,43 @@ def test_device_without_raspi_output_is_left_alone():
     assert config["device_configs"]["device_0"]["output"] == {"output_udp": {"udp_client_ip": "1.2.3.4", "udp_client_port": 7777}}
 
 
-def test_mqtt_and_udp_keys_keep_names_and_values():
-    output = {
-        "output_mqtt": {"mqtt_broker": "broker", "mqtt_path": "led/a"},
-        "output_udp": {"udp_client_ip": "1.2.3.4", "udp_client_port": 7777},
-    }
+def test_udp_keys_keep_names_and_values():
+    output = {"output_udp": {"udp_client_ip": "1.2.3.4", "udp_client_port": 7777}}
     config, _ = upgrade(v3_config(output=copy.deepcopy(output)))
 
     assert config["device_configs"]["device_0"]["output"] == output
+
+
+def test_mqtt_output_type_falls_back_to_mock_output_and_reports_the_dropped_values():
+    output = {"output_mqtt": {"mqtt_broker": "broker", "mqtt_path": "led/a"}, "output_udp": {"udp_client_ip": "1.2.3.4", "udp_client_port": 7777}}
+    config, report = upgrade(v3_config(output_type="output_mqtt", output=copy.deepcopy(output)))
+
+    device = config["device_configs"]["device_0"]
+    assert device["output_type"] == "output_dummy"
+    assert device["output"] == {"output_udp": output["output_udp"]}
+    entry = next(e for e in report.entries if e["code"] == "mqtt_output_removed" and e["path"] == "device_configs.device_0.output_type")
+    assert entry["level"] == "warning"
+    assert entry["original"] == "output_mqtt"
+    assert "MQTT_Broker" in entry["message"]
+    assert "MQTT_Path" in entry["message"]
+
+
+def test_unused_mqtt_settings_are_dropped_and_reported_without_changing_the_output_type():
+    output = {"output_mqtt": {"mqtt_broker": "broker", "mqtt_path": "led/a"}}
+    config, report = upgrade(v3_config(output_type="output_udp", output=output))
+
+    device = config["device_configs"]["device_0"]
+    assert device["output_type"] == "output_udp"
+    assert device["output"] == {}
+    entry = next(e for e in report.entries if e["code"] == "mqtt_settings_removed")
+    assert entry["level"] == "info"
+    assert entry["original"] == {"mqtt_broker": "broker", "mqtt_path": "led/a"}
+
+
+def test_config_without_mqtt_has_no_mqtt_report_entries():
+    _, report = upgrade(v3_config(output_type="output_udp"))
+
+    assert not [e for e in report.entries if "mqtt" in e["code"]]
 
 
 def test_audio_device_index_is_resolved_to_name_and_host_api():

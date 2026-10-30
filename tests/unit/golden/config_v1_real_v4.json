@@ -316,10 +316,6 @@
             "last_effect": "effect_off"
         },
         "output": {
-            "output_mqtt": {
-                "mqtt_broker": "localhost",
-                "mqtt_path": "led/device_a"
-            },
             "output_raspi": {
                 "led_channel": 0,
                 "led_dma": 10,
@@ -874,10 +870,6 @@
                 "last_effect": "effect_off"
             },
             "output": {
-                "output_mqtt": {
-                    "mqtt_broker": "localhost",
-                    "mqtt_path": "led/device_a"
-                },
                 "output_raspi": {
                     "led_channel": 0,
                     "led_dma": 10,
@@ -1167,10 +1159,6 @@
                 "last_effect": "effect_off"
             },
             "output": {
-                "output_mqtt": {
-                    "mqtt_broker": "localhost",
-                    "mqtt_path": "led/device_a"
-                },
                 "output_raspi": {
                     "led_channel": 0,
                     "led_dma": 10,

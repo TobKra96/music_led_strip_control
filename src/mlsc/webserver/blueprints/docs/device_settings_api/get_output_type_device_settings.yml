@@ -23,7 +23,6 @@ parameters:
     schema:
       type: string
       enum:
-        - output_mqtt
         - output_raspi
         - output_udp
 
@@ -35,15 +34,12 @@ parameters:
       View the table below for the allowed `setting_key` values for each `output_type_key`:<br><br>
       | Selected `output_type_key` | Allowed `setting_key` value                              |
       | ---------------------------| ---------------------------------------------------------|
-      | *output_mqtt*              | *mqtt_broker, mqtt_path*                                 |
       | *output_raspi*             | *led_channel, led_dma, led_freq_hz, led_invert, led_pin* |
       | *output_udp*               | *udp_client_ip, udp_client_port*                         |
     required: false
     schema:
       type: string
       enum:
-        - mqtt_broker
-        - mqtt_path
         - led_channel
         - led_dma
         - led_freq_hz
@@ -84,10 +80,6 @@ responses:
                     led_pin:
                       type: integer
                       format: int32
-                    mqtt_broker:
-                      type: string
-                    mqtt_path:
-                      type: string
                     udp_client_ip:
                       type: string
                     udp_client_port:
@@ -126,8 +118,6 @@ responses:
                 led_freq_hz: integer
                 led_invert: boolean
                 led_pin: integer
-                mqtt_broker: string
-                mqtt_path: string
                 udp_client_ip: string
                 udp_client_port: integer
 

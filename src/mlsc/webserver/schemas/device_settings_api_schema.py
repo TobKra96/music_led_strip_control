@@ -102,15 +102,12 @@ GET_OUTPUT_SETTING_SCHEMA = {
         "device": valid_device_id_type,
         "output_type_key": {
             "enum": [
-                "output_mqtt",
                 "output_raspi",
                 "output_udp",
             ],
         },
         "setting_key": {
             "enum": [
-                "mqtt_broker",
-                "mqtt_path",
                 "led_channel",
                 "led_dma",
                 "led_freq_hz",
@@ -134,7 +131,6 @@ SET_OUTPUT_SETTINGS_SCHEMA = {
         "device": valid_device_id_type,
         "output_type_key": {
             "enum": [
-                "output_mqtt",
                 "output_raspi",
                 "output_udp",
             ],

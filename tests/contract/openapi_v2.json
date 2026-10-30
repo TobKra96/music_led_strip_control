@@ -440,9 +440,9 @@
           },
           "output_type": {
             "enum": [
+              "output_dummy",
               "output_raspi",
-              "output_udp",
-              "output_mqtt"
+              "output_udp"
             ],
             "title": "Output Type",
             "type": "string"
@@ -2901,9 +2901,6 @@
       "DeviceSettingsPatchOutput": {
         "additionalProperties": false,
         "properties": {
-          "output_mqtt": {
-            "$ref": "#/components/schemas/DeviceSettingsPatchOutputOutputMqtt"
-          },
           "output_raspi": {
             "$ref": "#/components/schemas/DeviceSettingsPatchOutputOutputRaspi"
           },
@@ -2912,23 +2909,6 @@
           }
         },
         "title": "DeviceSettingsPatchOutput",
-        "type": "object"
-      },
-      "DeviceSettingsPatchOutputOutputMqtt": {
-        "additionalProperties": false,
-        "properties": {
-          "mqtt_broker": {
-            "minLength": 1,
-            "title": "Mqtt Broker",
-            "type": "string"
-          },
-          "mqtt_path": {
-            "minLength": 1,
-            "title": "Mqtt Path",
-            "type": "string"
-          }
-        },
-        "title": "DeviceSettingsPatchOutputOutputMqtt",
         "type": "object"
       },
       "DeviceSettingsPatchOutputOutputRaspi": {
@@ -6200,9 +6180,9 @@
           },
           "output_type": {
             "enum": [
+              "output_dummy",
               "output_raspi",
-              "output_udp",
-              "output_mqtt"
+              "output_udp"
             ],
             "title": "Output Type",
             "type": "string"
@@ -6221,9 +6201,6 @@
       "OutputPatchOutput": {
         "additionalProperties": false,
         "properties": {
-          "output_mqtt": {
-            "$ref": "#/components/schemas/OutputPatchOutputOutputMqtt"
-          },
           "output_raspi": {
             "$ref": "#/components/schemas/OutputPatchOutputOutputRaspi"
           },
@@ -6232,23 +6209,6 @@
           }
         },
         "title": "OutputPatchOutput",
-        "type": "object"
-      },
-      "OutputPatchOutputOutputMqtt": {
-        "additionalProperties": false,
-        "properties": {
-          "mqtt_broker": {
-            "minLength": 1,
-            "title": "Mqtt Broker",
-            "type": "string"
-          },
-          "mqtt_path": {
-            "minLength": 1,
-            "title": "Mqtt Path",
-            "type": "string"
-          }
-        },
-        "title": "OutputPatchOutputOutputMqtt",
         "type": "object"
       },
       "OutputPatchOutputOutputRaspi": {

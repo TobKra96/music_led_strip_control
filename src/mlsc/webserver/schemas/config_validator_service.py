@@ -1522,34 +1522,13 @@ device_schema = {
         "output": {
             "type": "object",
             "additionalProperties": False,
-            "maxProperties": 3,
-            "minProperties": 3,
+            "maxProperties": 2,
+            "minProperties": 2,
             "required": [
-                "output_mqtt",
                 "output_raspi",
                 "output_udp"
             ],
             "properties": {
-                "output_mqtt": {
-                    "type": "object",
-                    "additionalProperties": False,
-                    "maxProperties": 2,
-                    "minProperties": 2,
-                    "required": [
-                        "mqtt_broker",
-                        "mqtt_path"
-                    ],
-                    "properties": {
-                        "mqtt_broker": {
-                            "type": "string",
-                            "minLength": 1
-                        },
-                        "mqtt_path": {
-                            "type": "string",
-                            "minLength": 1
-                        }
-                    }
-                },
                 "output_raspi": {
                     "type": "object",
                     "additionalProperties": False,
@@ -1618,9 +1597,9 @@ device_schema = {
         },
         "output_type": {
             "enum": [
+                "output_dummy",
                 "output_raspi",
-                "output_udp",
-                "output_mqtt"
+                "output_udp"
             ]
         }
     }

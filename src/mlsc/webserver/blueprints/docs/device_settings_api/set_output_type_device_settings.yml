@@ -10,7 +10,6 @@ requestBody:
     View the table below for the allowed `settings` keys for each `output_type_key`:<br><br>
     | Selected `output_type_key` | Allowed `settings` keys                                  |
     | ---------------------------| ---------------------------------------------------------|
-    | *output_mqtt*              | *mqtt_broker, mqtt_path*                                 |
     | *output_raspi*             | *led_channel, led_dma, led_freq_hz, led_invert, led_pin* |
     | *output_udp*               | *udp_client_ip, udp_client_port*                         |
   required: true
@@ -30,18 +29,10 @@ requestBody:
             type: string
             description: The name of the output type
             enum:
-              - output_mqtt
               - output_raspi
               - output_udp
           settings:
             oneOf:
-              - type: object
-                properties:
-                  mqtt_broker:
-                    type: string
-                  mqtt_path:
-                    type: string
-
               - type: object
                 properties:
                   led_channel:
@@ -63,15 +54,6 @@ requestBody:
                     type: integer
       examples:
         example1:
-          summary: Default output_mqtt settings
-          value:
-            device: device_0
-            output_type_key: output_mqtt
-            settings:
-              mqtt_broker: localhost
-              mqtt_path: led/device_a
-
-        example2:
           summary: Default output_raspi settings
           value:
             device: device_0
@@ -83,7 +65,7 @@ requestBody:
               led_invert: false
               led_pin: 18
 
-        example3:
+        example2:
           summary: Default output_udp settings
           value:
             device: device_0
@@ -101,15 +83,6 @@ responses:
           type: object
         examples:
           example1:
-            summary: With output_mqtt settings
-            value:
-              device: string
-              output_type_key: string
-              settings:
-                mqtt_broker: string
-                mqtt_path: string
-
-          example2:
             summary: With output_raspi settings
             value:
               device: string
@@ -121,7 +94,7 @@ responses:
                 led_invert: boolean
                 led_pin: integer
 
-          example3:
+          example2:
             summary: With output_udp settings
             value:
               device: string

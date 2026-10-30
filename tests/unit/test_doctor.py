@@ -111,13 +111,14 @@ def test_config_failing_the_schema_is_an_error(config_dir):
     assert "led_count" in result.message
 
 
-def test_unsupported_output_type_is_an_error(config_dir):
-    write_config(config_dir, output_type="output_mqtt")
+def test_unsupported_output_type_is_an_error(config_dir, monkeypatch):
+    monkeypatch.delitem(doctor.OUTPUTS, "output_dummy")
+    write_config(config_dir, output_type="output_dummy")
 
     result = checks_by_name(config_dir)["output device_0"]
 
     assert result.status is Status.ERROR
-    assert "output_mqtt" in result.message
+    assert "output_dummy" in result.message
 
 
 def test_output_diagnosis_is_reported_per_device(config_dir):

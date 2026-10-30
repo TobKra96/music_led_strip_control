@@ -90,12 +90,27 @@ class ConfigConverterV4(ConfigConverterBase):
 
     def convert_device(self, device: dict, path: str, report: MigrationReport) -> None:
         self.convert_led_strip(device, path, report)
+        self.convert_mqtt_output(device, path, report)
         device.setdefault("gpio_backend", "auto")
         device.setdefault("power_limit", copy.deepcopy(DEFAULT_POWER_LIMIT))
 
         raspi = device.get("output", {}).get("output_raspi")
         if raspi is not None and "led_pin" in raspi:
             raspi["led_pin"] = self.validated_led_pin(raspi["led_pin"], f"{path}.output.output_raspi.led_pin", report)
+
+    @staticmethod
+    def convert_mqtt_output(device: dict, path: str, report: MigrationReport) -> None:
+        """MQTT output never worked since 2.x, so a device that selected it falls back to Mock Output."""
+        output = device.get("output", {})
+        mqtt_settings = output.pop("output_mqtt", None)
+
+        if device.get("output_type") == "output_mqtt":
+            device["output_type"] = "output_dummy"
+            report.add("warning", "mqtt_output_removed", f"{path}.output_type",
+                       "MQTT output was removed, using Mock Output. MQTT_Broker and MQTT_Path were not carried over.", "output_mqtt")
+        elif mqtt_settings is not None:
+            report.add("info", "mqtt_settings_removed", f"{path}.output.output_mqtt",
+                       "MQTT output was removed. MQTT_Broker and MQTT_Path were not carried over.", mqtt_settings)
 
     @staticmethod
     def convert_led_strip(device: dict, path: str, report: MigrationReport) -> None:
