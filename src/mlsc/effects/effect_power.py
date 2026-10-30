@@ -54,11 +54,14 @@ class EffectPower(Effect):
         if self.power_brightness > 0:
             self.power_brightness -= 0.05
         # Calculate length of bass bar based on max bass frequency volume and length of strip.
-        strip_len = int((led_count // 3) * max(y[:int(n_fft_bins * 0.2)]))
+        # The mel values are not bounded, so clip the bar to the strip. The gradient has 2 x led_count columns.
+        bass_level = np.nan_to_num(max(y[:int(n_fft_bins * 0.2)]))
+        strip_len = int(np.clip((led_count // 3) * bass_level, 0, led_count))
+        bar_gradient = self._color_service.full_gradients[effect_config["color_mode"]]
         # Add the bass bars into the output. Color proportional to length.
-        output[0][:strip_len] = self._color_service.full_gradients[effect_config["color_mode"]][0][strip_len]
-        output[1][:strip_len] = self._color_service.full_gradients[effect_config["color_mode"]][1][strip_len]
-        output[2][:strip_len] = self._color_service.full_gradients[effect_config["color_mode"]][2][strip_len]
+        output[0][:strip_len] = bar_gradient[0][strip_len]
+        output[1][:strip_len] = bar_gradient[1][strip_len]
+        output[2][:strip_len] = bar_gradient[2][strip_len]
         if effect_config["flip_lr"]:
             output = np.fliplr(output)
 

@@ -50,9 +50,11 @@ class EffectVuMeter(Effect):
         self.max_vol = max(normalized_vol, self.max_vol)
 
         # Show the max. volume
-        output[0][int(self.max_vol * led_count) - effect_config["bar_length"]: int(self.max_vol * led_count)] = self._color_service.colour(effect_config["max_vol_color"])[0]
-        output[1][int(self.max_vol * led_count) - effect_config["bar_length"]: int(self.max_vol * led_count)] = self._color_service.colour(effect_config["max_vol_color"])[1]
-        output[2][int(self.max_vol * led_count) - effect_config["bar_length"]: int(self.max_vol * led_count)] = self._color_service.colour(effect_config["max_vol_color"])[2]
+        max_vol_end = int(self.max_vol * led_count)
+        max_vol_start = max(max_vol_end - effect_config["bar_length"], 0)
+        output[0][max_vol_start: max_vol_end] = self._color_service.colour(effect_config["max_vol_color"])[0]
+        output[1][max_vol_start: max_vol_end] = self._color_service.colour(effect_config["max_vol_color"])[1]
+        output[2][max_vol_start: max_vol_end] = self._color_service.colour(effect_config["max_vol_color"])[2]
 
         self.max_vol -= effect_config["speed"] / 10000
 
@@ -67,4 +69,8 @@ class EffectVuMeter(Effect):
         self.vol_history[0] = current_vol
 
     def get_normalized_vol(self, current_vol):
-        return (current_vol - np.min(self.vol_history)) / (np.max(self.vol_history) - np.min(self.vol_history))
+        vol_range = np.max(self.vol_history) - np.min(self.vol_history)
+        if vol_range == 0:
+            return 0.0
+
+        return float(np.clip((current_vol - np.min(self.vol_history)) / vol_range, 0, 1))
