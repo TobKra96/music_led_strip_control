@@ -58,10 +58,10 @@ class Host:
     def which(self, command: str) -> str | None:
         return shutil.which(command)
 
-    def run(self, command: list[str]) -> tuple[int, str]:
+    def run(self, command: list[str], timeout: float = COMMAND_TIMEOUT_SECONDS) -> tuple[int, str]:
         """Run `command` and return its exit code and combined output. 127 when the command does not exist."""
         try:
-            result = subprocess.run(command, capture_output=True, text=True, timeout=COMMAND_TIMEOUT_SECONDS, check=False)
+            result = subprocess.run(command, capture_output=True, text=True, timeout=timeout, check=False)
         except FileNotFoundError:
             return 127, f"{command[0]}: command not found"
         except subprocess.TimeoutExpired:

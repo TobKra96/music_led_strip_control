@@ -179,6 +179,10 @@ class ValidationError(UnprocessableEntity):
     _message = "Request validation failed."
 
 
+class WifiChangeFailed(UnprocessableEntity):
+    _message = "The Wi-Fi change failed."
+
+
 class HttpError(_Message):
     _message = "The request was rejected."
 
@@ -224,6 +228,11 @@ class ServerError(_Message):
 
 class TooManyStreams(_Message):
     _message = "Too many event streams."
+    _code = HTTPStatus.SERVICE_UNAVAILABLE.value
+
+
+class WifiUnsupported(_Message):
+    _message = "Wi-Fi management is not supported on this host."
     _code = HTTPStatus.SERVICE_UNAVAILABLE.value
 
 

@@ -308,6 +308,35 @@
         "title": "ConfigDocument",
         "type": "object"
       },
+      "ConnectBody": {
+        "properties": {
+          "password": {
+            "anyOf": [
+              {
+                "maxLength": 63,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Handed to NetworkManager and never stored by MLSC.",
+            "title": "Password"
+          },
+          "ssid": {
+            "maxLength": 32,
+            "minLength": 1,
+            "title": "Ssid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "ssid"
+        ],
+        "title": "ConnectBody",
+        "type": "object"
+      },
       "DeviceEffectOut": {
         "properties": {
           "device_id": {
@@ -5490,6 +5519,21 @@
         "title": "FieldError",
         "type": "object"
       },
+      "ForgetBody": {
+        "properties": {
+          "ssid": {
+            "maxLength": 32,
+            "minLength": 1,
+            "title": "Ssid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "ssid"
+        ],
+        "title": "ForgetBody",
+        "type": "object"
+      },
       "GeneralSettingsPatch": {
         "additionalProperties": false,
         "properties": {
@@ -5704,6 +5748,75 @@
           "name"
         ],
         "title": "GroupRename",
+        "type": "object"
+      },
+      "HotspotBody": {
+        "properties": {
+          "enabled": {
+            "title": "Enabled",
+            "type": "boolean"
+          },
+          "password": {
+            "anyOf": [
+              {
+                "maxLength": 63,
+                "minLength": 8,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Generated when left out.",
+            "title": "Password"
+          },
+          "ssid": {
+            "anyOf": [
+              {
+                "maxLength": 32,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Generated when left out.",
+            "title": "Ssid"
+          }
+        },
+        "required": [
+          "enabled"
+        ],
+        "title": "HotspotBody",
+        "type": "object"
+      },
+      "HotspotOut": {
+        "properties": {
+          "password": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Shown to an authenticated session, or to anyone while the PIN lock is off.",
+            "title": "Password"
+          },
+          "ssid": {
+            "title": "Ssid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "ssid",
+          "password"
+        ],
+        "title": "HotspotOut",
         "type": "object"
       },
       "InfoOut": {
@@ -6077,6 +6190,65 @@
           "level"
         ],
         "title": "MixerOut",
+        "type": "object"
+      },
+      "NetworkOut": {
+        "properties": {
+          "in_use": {
+            "title": "In Use",
+            "type": "boolean"
+          },
+          "known": {
+            "description": "Whether the network is saved. Saved passwords are never returned.",
+            "title": "Known",
+            "type": "boolean"
+          },
+          "security": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "`null` for an open network.",
+            "title": "Security"
+          },
+          "signal": {
+            "description": "Signal strength, 0 to 100.",
+            "title": "Signal",
+            "type": "integer"
+          },
+          "ssid": {
+            "title": "Ssid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "ssid",
+          "signal",
+          "security",
+          "in_use",
+          "known"
+        ],
+        "title": "NetworkOut",
+        "type": "object"
+      },
+      "NetworksOut": {
+        "properties": {
+          "networks": {
+            "items": {
+              "$ref": "#/components/schemas/NetworkOut"
+            },
+            "title": "Networks",
+            "type": "array"
+          }
+        },
+        "required": [
+          "networks"
+        ],
+        "title": "NetworksOut",
         "type": "object"
       },
       "OperationOut": {
@@ -6509,7 +6681,9 @@
               "Unauthorized",
               "UnprocessableEntity",
               "UnsupportedMediaType",
-              "ValidationError"
+              "ValidationError",
+              "WifiChangeFailed",
+              "WifiUnsupported"
             ],
             "title": "Code",
             "type": "string"
@@ -6737,6 +6911,87 @@
           "fallback"
         ],
         "title": "WifiStateEvent",
+        "type": "object"
+      },
+      "WifiStatusOut": {
+        "properties": {
+          "connected": {
+            "title": "Connected",
+            "type": "boolean"
+          },
+          "country": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The Wi-Fi country, `null` when it is not set.",
+            "title": "Country"
+          },
+          "hotspot": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/HotspotOut"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Set while the Hotspot is up."
+          },
+          "hotspot_supported": {
+            "description": "Whether the adapter can run a Hotspot.",
+            "title": "Hotspot Supported",
+            "type": "boolean"
+          },
+          "ip": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ip"
+          },
+          "mode": {
+            "description": "`client` or `hotspot`.",
+            "title": "Mode",
+            "type": "string"
+          },
+          "ssid": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The network the Pi is connected to.",
+            "title": "Ssid"
+          },
+          "supported": {
+            "description": "`false` without NetworkManager (Windows, WSL, other Linux): the panel is hidden or says so.",
+            "title": "Supported",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "supported",
+          "hotspot_supported",
+          "country",
+          "mode",
+          "connected",
+          "ssid",
+          "ip",
+          "hotspot"
+        ],
+        "title": "WifiStatusOut",
         "type": "object"
       }
     },
@@ -12743,6 +12998,317 @@
           "System"
         ]
       }
+    },
+    "/api/v2/wifi/connect": {
+      "post": {
+        "description": "The connection is saved by the system under the SSID. A wrong password is a `422` and leaves nothing saved.",
+        "operationId": "wifi_api_v2_connect_connect_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConnectBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WifiStatusOut"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "415": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unsupported Media Type"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "summary": "Join a Wi-Fi network",
+        "tags": [
+          "Wi-Fi"
+        ]
+      }
+    },
+    "/api/v2/wifi/forget": {
+      "post": {
+        "operationId": "wifi_api_v2_forget_forget_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ForgetBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "415": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unsupported Media Type"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "summary": "Forget a saved Wi-Fi network",
+        "tags": [
+          "Wi-Fi"
+        ]
+      }
+    },
+    "/api/v2/wifi/hotspot": {
+      "put": {
+        "description": "On raises the Hotspot, which drops a client connection. Off returns to the saved networks.",
+        "operationId": "wifi_api_v2_put_hotspot_hotspot_put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/HotspotBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WifiStatusOut"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "415": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unsupported Media Type"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "summary": "Switch the Hotspot on or off",
+        "tags": [
+          "Wi-Fi"
+        ]
+      }
+    },
+    "/api/v2/wifi/scan": {
+      "get": {
+        "operationId": "wifi_api_v2_scan_scan_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NetworksOut"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "summary": "Scan for Wi-Fi networks",
+        "tags": [
+          "Wi-Fi"
+        ]
+      }
+    },
+    "/api/v2/wifi/status": {
+      "get": {
+        "description": "Always answers, also on a host without NetworkManager, where `supported` is `false`.",
+        "operationId": "wifi_api_v2_get_status_status_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WifiStatusOut"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        },
+        "summary": "Get the Wi-Fi status",
+        "tags": [
+          "Wi-Fi"
+        ]
+      }
     }
   },
   "tags": [
@@ -12793,6 +13359,10 @@
     {
       "description": "Setup Wizard support: the choices for a strip and its Output, and applying them safely",
       "name": "Output"
+    },
+    {
+      "description": "Join a network, forget one, or raise the Hotspot",
+      "name": "Wi-Fi"
     }
   ]
 }

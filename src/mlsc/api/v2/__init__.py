@@ -21,11 +21,12 @@ from mlsc.api.v2.settings import settings_api
 from mlsc.api.v2.system import system_api
 from mlsc.api.v2.test_patterns import test_patterns_api
 from mlsc.api.v2.throttle import LoginLimiter
+from mlsc.api.v2.wifi import wifi_api
 
 SPEC_PATH = f"{API_V2_PREFIX}openapi.json"
 API_V2_BLUEPRINTS = (
     auth_api, devices_api, groups_api, effects_api, microphone_api, resources_api, settings_api, system_api, events_api, operations_api, test_patterns_api,
-    output_api,
+    output_api, wifi_api,
 )
 
 

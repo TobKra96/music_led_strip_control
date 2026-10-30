@@ -7,6 +7,7 @@ from mlsc.webserver.blueprints.general_executer import GeneralExecuter
 from mlsc.webserver.blueprints.general_settings_executer import GeneralSettingsExecuter
 from mlsc.webserver.blueprints.microphone_settings_executer import MicrophoneSettingsExecuter
 from mlsc.webserver.blueprints.system_info_executer import SystemInfoExecuter
+from mlsc.wifi.factory import create_wifi_manager
 
 
 class Executer:
@@ -29,5 +30,6 @@ class Executer:
             config_lock, notification_queue_in, notification_queue_out, effects_queue, audio_backend)
         self.microphone_settings_executer = MicrophoneSettingsExecuter(
             config_lock, notification_queue_in, notification_queue_out, effects_queue, audio_backend)
+        self.wifi_manager = create_wifi_manager()
 
         Executer.instance = self
