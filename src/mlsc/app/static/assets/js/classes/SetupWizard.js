@@ -14,11 +14,12 @@ const CHECKBOX_FIELDS = ['led_invert', 'white_channel', 'power_enabled'];
  */
 export default class SetupWizard {
     /**
-     * @param {{outputTypes: Object.<string, string>, onApplied: function(): void}} options
+     * @param {{getOutputTypes: function(): Object.<string, string>, onApplied: function(): void}} options
+     *   `getOutputTypes` is read when the wizard opens, since the page loads the types after it creates the wizard.
      *   `onApplied` runs after a confirmed apply, so the page can reload the settings.
      */
-    constructor({ outputTypes, onApplied }) {
-        this.outputTypes = outputTypes;
+    constructor({ getOutputTypes, onApplied }) {
+        this.getOutputTypes = getOutputTypes;
         this.onApplied = onApplied;
         this.$modal = $('#modal_wizard');
         this.step = 0;
@@ -61,7 +62,7 @@ export default class SetupWizard {
 
     _fill() {
         const $type = $('#wz_output_type').empty();
-        Object.entries(this.outputTypes).forEach(([key, name]) => $type.append($('<option></option>').val(key).text(name)));
+        Object.entries(this.getOutputTypes()).forEach(([key, name]) => $type.append($('<option></option>').val(key).text(name)));
         const $pin = $('#wz_led_pin').empty();
         Object.keys(this.options.pin_channels).forEach((pin) => {
             $pin.append($('<option></option>').val(pin).text(`GPIO ${pin} (channel ${this.options.pin_channels[pin]})`));

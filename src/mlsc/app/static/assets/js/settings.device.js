@@ -20,7 +20,7 @@ $(() => {
     const unsaved = new UnsavedChanges(document.getElementById('settingsForm'));
 
     const wizard = new SetupWizard({
-        get outputTypes() { return outputTypes; },
+        getOutputTypes: () => outputTypes,
         onApplied: () => dm.select(dm.current),
     });
 
