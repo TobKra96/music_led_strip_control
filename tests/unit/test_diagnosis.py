@@ -98,11 +98,19 @@ def test_raspi_does_not_warn_about_audio_for_a_pin_without_pwm():
     assert OutputRaspi.diagnose(raspi_config(10), FakeHost(analog_audio_enabled=True)).status is Status.OK
 
 
-def test_raspi_warns_that_pi_5_is_unsupported():
+def test_raspi_reports_that_no_pi_5_driver_is_installed():
     diagnosis = OutputRaspi.diagnose(raspi_config(), FakeHost(pi_model="Raspberry Pi 5 Model B Rev 1.0"))
 
-    assert diagnosis.status is Status.WARNING
-    assert "Pi 5" in diagnosis.message
+    assert diagnosis.status is Status.ERROR
+    assert "No Pi 5 driver installed" in diagnosis.message
+    assert diagnosis.suggested_fix
+
+
+def test_raspi_rejects_a_pin_the_backend_cannot_drive():
+    diagnosis = OutputRaspi.diagnose(raspi_config(5), FakeHost())
+
+    assert diagnosis.status is Status.ERROR
+    assert "GPIO 5" in diagnosis.message
 
 
 def test_raspi_error_wins_over_warning():

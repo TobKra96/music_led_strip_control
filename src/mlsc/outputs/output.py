@@ -11,6 +11,9 @@ class Output:
         msg = f"Please implement this method. {output_array}"
         raise NotImplementedError(msg)
 
+    def close(self) -> None:
+        """Release what the Output holds. Nothing by default."""
+
     @classmethod
     def diagnose(cls, device_config: dict, host=None) -> Diagnosis:
         """Check that this Output can work with `device_config`, without creating it."""

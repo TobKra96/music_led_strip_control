@@ -65,9 +65,7 @@ markers = [
 [tool.coverage.run]
 source = ["mlsc"]
 branch = true
-omit = [
-    "*/outputs/output_raspi.py",  # Pi-only GPIO backend, covered by the hardware smoke test
-]
+omit = []
 
 [tool.coverage.report]
 # Floor is the measured baseline and only ratchets up; the long-term goal is 80%.

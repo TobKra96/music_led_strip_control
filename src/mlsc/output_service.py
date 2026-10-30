@@ -107,7 +107,7 @@ class OutputService:
 
     def stop(self):
         self._cancel_token = True
-        self._current_output.clear()
+        self._current_output.close()
 
     def refresh(self):
         logger.debug("Refreshing output...")
