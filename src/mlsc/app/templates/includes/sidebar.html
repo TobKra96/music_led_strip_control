@@ -18,6 +18,9 @@
                 <li class="nav-item {{'active' if segment == 'dashboard'}}">
                     <a href="{{ url_for('home_blueprint.index') }}" class="nav-link"><span class="pcoded-micon"><i class="feather icon-home"></i></span><span class="pcoded-mtext">Dashboard</span></a>
                 </li>
+                <li class="nav-item {{'active' if segment == 'preview'}}">
+                    <a href="{{ url_for('home_blueprint.route_preview') }}" class="nav-link"><span class="pcoded-micon"><i class="feather icon-eye"></i></span><span class="pcoded-mtext">Strip Preview</span></a>
+                </li>
                 <li class="nav-item {{'active' if segment == 'system_status'}}">
                     <a href="{{ url_for('home_blueprint.route_system_status') }}" class="nav-link"><span class="pcoded-micon"><i class="feather icon-activity"></i></span><span class="pcoded-mtext">System Status</span></a>
                 </li>

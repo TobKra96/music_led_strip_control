@@ -14,9 +14,13 @@ export function decodeFrame(frame) {
 
 /** A live rendering of the frames of one Device on a canvas. The stream is only open while a device is shown. */
 export default class StripPreview {
-    /** @param {HTMLCanvasElement} canvas */
-    constructor(canvas) {
+    /**
+     * @param {HTMLCanvasElement} canvas
+     * @param {function(number): void} [onFrame] Called with the LED count of every frame.
+     */
+    constructor(canvas, onFrame) {
         this._canvas = canvas;
+        this._onFrame = onFrame;
         /** @type {EventSource|null} */
         this._source = null;
     }
@@ -37,10 +41,22 @@ export default class StripPreview {
         const ctx = this._canvas.getContext('2d');
         const width = this._canvas.width;
         const step = width / Math.max(leds.length, 1);
-        ctx.clearRect(0, 0, width, this._canvas.height);
+        ctx.fillStyle = '#111';
+        ctx.fillRect(0, 0, width, this._canvas.height);
+        const height = this._canvas.height;
+        // Round LEDs while there is room for them, a solid bar otherwise.
+        const round = step >= 6;
+        const radius = Math.min(step, height) / 2 - 1;
         leds.forEach(([r, g, b], i) => {
             ctx.fillStyle = `rgb(${r},${g},${b})`;
-            ctx.fillRect(i * step, 0, Math.ceil(step), this._canvas.height);
+            if (round) {
+                ctx.beginPath();
+                ctx.arc((i + 0.5) * step, height / 2, radius, 0, 2 * Math.PI);
+                ctx.fill();
+            } else {
+                ctx.fillRect(i * step, 0, Math.ceil(step), height);
+            }
         });
+        this._onFrame?.(leds.length);
     }
 }

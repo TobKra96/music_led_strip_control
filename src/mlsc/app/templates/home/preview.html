@@ -1,0 +1,42 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Strip Preview {% endblock %}
+
+<!-- Specific CSS goes HERE -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+    <div class="pcoded-content">
+        <div class="pcoded-inner-content">
+
+            {% include 'includes/toasts.html' %}
+
+            <div class="main-body">
+                <div class="page-wrapper">
+                    <!-- [ Main Content ] start -->
+
+                    <div class="d-flex text-secondary justify-content-between align-items-center mb-2">
+                        <div class="h5 m-0 font-weight-bold">Strip Preview</div>
+                    </div>
+
+                    {% include 'includes/devices.html' %}
+
+                    <div class="card mt-3">
+                        <div class="card-body">
+                            <canvas id="strip-preview" class="w-100 rounded" width="1200" height="80" aria-label="Strip Preview"></canvas>
+                            <p id="strip-preview-status" class="text-secondary small mt-2 mb-0">Waiting for frames…</p>
+                        </div>
+                    </div>
+
+                    <!-- [ Main Content ] end -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+<script src="{{ url_for('static', filename='assets/js/preview.js') }}" type="module"></script>
+{% endblock javascripts %}

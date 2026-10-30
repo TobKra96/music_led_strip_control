@@ -15,6 +15,14 @@ def index():
     return render_template("home/dashboard.html", segment="dashboard", devices=devices, groups=assigned_groups)
 
 
+@blueprint.get("/preview")
+@login_required
+def route_preview():
+    devices = Executer.instance.device_executer.get_devices()
+    assigned_groups = Executer.instance.device_executer.get_assigned_groups()
+    return render_template("home/preview.html", segment="preview", devices=devices, groups=assigned_groups)
+
+
 @blueprint.get("/system_status")
 @login_required
 def route_system_status():

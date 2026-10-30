@@ -18,7 +18,7 @@ from mlsc.webserver.webserver import register_api_blueprints
 pytestmark = pytest.mark.integration
 
 PIN = "1234"
-PROTECTED_URLS = ("/api/resources/colors", "/dashboard")
+PROTECTED_URLS = ("/api/resources/colors", "/dashboard", "/preview")
 REMOTE_ASSET = re.compile(r"""<(?:script|link|img)\s[^>]*(?:src|href)\s*=\s*["'](?:https?:)?//|url\(\s*["']?(?:https?:)?//""")
 
 
@@ -293,3 +293,14 @@ def test_pages_render_with_a_link_to_the_bundled_api_docs(client):
 
     assert response.status_code == 200
     assert 'href="/api/"' in response.get_data(as_text=True)
+
+
+def test_preview_page_shows_the_strip_preview_on_its_own_page(client):
+    log_in(client)
+
+    page = client.get("/preview").get_data(as_text=True)
+    dashboard = client.get("/dashboard").get_data(as_text=True)
+
+    assert 'id="strip-preview"' in page
+    assert 'id="strip-preview"' not in dashboard
+    assert 'href="/preview"' in dashboard
