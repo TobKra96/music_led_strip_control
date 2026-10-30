@@ -9,8 +9,10 @@ from mlsc.queue_wrapper import QueueWrapper
 
 
 class Device:
-    def __init__(self, config, device_config, color_service_global, device_id=None, preview_channel=None) -> None:
+    def __init__(self, config, device_config, color_service_global, device_id=None, preview_channel=None,
+                 pattern_channel=None) -> None:
         self.__device_id = device_id
+        self.__pattern_channel = pattern_channel
         self.__preview_channel = preview_channel
         self.__config = config
         self.__device_config = device_config
@@ -108,6 +110,9 @@ class Device:
     def get_preview_channel(self):
         return self.__preview_channel
 
+    def get_pattern_channel(self):
+        return self.__pattern_channel
+
     def get_color_service_global(self):
         return self.__color_service_global
 
@@ -127,5 +132,7 @@ class Device:
     device_id = property(get_device_id)
 
     preview_channel = property(get_preview_channel)
+
+    pattern_channel = property(get_pattern_channel)
 
     color_service_global = property(get_color_service_global)

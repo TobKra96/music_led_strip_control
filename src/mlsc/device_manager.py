@@ -14,8 +14,10 @@ from mlsc.queue_wrapper import QueueWrapper
 
 
 class DeviceManager:
-    def start(self, config_lock, notification_queue_in, notification_queue_out, effect_queue, audio_queue, preview_channel=None):
+    def start(self, config_lock, notification_queue_in, notification_queue_out, effect_queue, audio_queue, preview_channel=None,
+              pattern_channel=None):
         self._preview_channel = preview_channel
+        self._pattern_channel = pattern_channel
         self._config_lock = config_lock
         self._config = ConfigService.instance(self._config_lock).config
 
@@ -136,7 +138,7 @@ class DeviceManager:
             logger.debug(f"Init device with device id: {device_id}")
             self._devices[device_id] = Device(
                 self._config, self._config["device_configs"][device_id], self._color_service_global,
-                device_id, self._preview_channel)
+                device_id, self._preview_channel, self._pattern_channel)
         logger.debug("Leaving init_devices()")
 
     def reinit_devices(self):

@@ -2,6 +2,7 @@ from types import SimpleNamespace
 
 import pytest
 
+from mlsc import strip_pattern
 from mlsc.api.v2 import register_api_v2
 from mlsc.app import create_app
 from mlsc.webserver import auth, sse
@@ -367,3 +368,77 @@ def test_every_code_returned_by_v2_is_a_documented_one(client):
 
     codes = {response.get_json()["code"] for response in responses}
     assert codes <= set(error_codes())
+
+
+class RecordingPatternChannel:
+    def __init__(self) -> None:
+        self.started = []
+        self.stopped = []
+
+    def start(self, device_id, pattern, seconds):
+        self.started.append((device_id, pattern.name, seconds))
+
+    def stop(self, device_id):
+        self.stopped.append(device_id)
+
+
+@pytest.fixture
+def pattern_channel(monkeypatch):
+    channel = RecordingPatternChannel()
+    monkeypatch.setattr(strip_pattern, "channel", channel)
+    return channel
+
+
+def test_a_test_pattern_takes_over_the_strip_of_a_device(client, pattern_channel):
+    log_in(client)
+
+    response = client.post("/api/v2/devices/device_0/test-pattern", json={"pattern": "chase", "duration_seconds": 5})
+
+    assert response.status_code == 200
+    assert response.get_json() == {"pattern": "chase", "duration_seconds": 5}
+    assert pattern_channel.started == [("device_0", "chase", 5)]
+
+
+def test_a_test_pattern_defaults_to_ten_seconds(client, pattern_channel):
+    log_in(client)
+
+    client.post("/api/v2/devices/device_0/test-pattern", json={"pattern": "markers"})
+
+    assert pattern_channel.started == [("device_0", "markers", 10)]
+
+
+@pytest.mark.parametrize(
+    "body", [{"pattern": "disco"}, {"pattern": "chase", "duration_seconds": 0}, {"pattern": "chase", "duration_seconds": 61}, {}])
+def test_an_invalid_test_pattern_is_rejected(client, pattern_channel, body):
+    log_in(client)
+
+    assert_problem(client.post("/api/v2/devices/device_0/test-pattern", json=body), 422, "ValidationError")
+    assert pattern_channel.started == []
+
+
+def test_a_test_pattern_for_an_unknown_device_is_a_404(client, pattern_channel):
+    log_in(client)
+
+    assert_problem(client.post("/api/v2/devices/nope/test-pattern", json={"pattern": "power"}), 404, "DeviceNotFound")
+    assert pattern_channel.started == []
+
+
+def test_a_test_pattern_needs_a_login(client, pattern_channel):  # ruff: ignore[unused-function-argument]
+    assert_problem(client.post("/api/v2/devices/device_0/test-pattern", json={"pattern": "power"}), 401, "Unauthorized")
+    assert_problem(client.delete("/api/v2/devices/device_0/test-pattern"), 401, "Unauthorized")
+
+
+def test_deleting_the_test_pattern_restores_the_strip(client, pattern_channel):
+    log_in(client)
+
+    response = client.delete("/api/v2/devices/device_0/test-pattern")
+
+    assert response.status_code == 204
+    assert pattern_channel.stopped == ["device_0"]
+
+
+def test_test_patterns_are_unavailable_without_a_channel(client, monkeypatch):
+    monkeypatch.setattr(strip_pattern, "channel", None)
+    log_in(client)
+
+    assert_problem(client.post("/api/v2/devices/device_0/test-pattern", json={"pattern": "power"}), 500, "ServerError")

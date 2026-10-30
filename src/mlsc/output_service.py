@@ -13,6 +13,7 @@ from mlsc.outputs.output_mock import OutputMock
 from mlsc.outputs.output_raspi import OutputRaspi
 from mlsc.outputs.output_udp import OutputUDP
 from mlsc.strip import has_white_channel
+from mlsc.strip_pattern import PatternPlayer
 from mlsc.strip_preview import PreviewSink
 
 
@@ -51,6 +52,9 @@ class OutputService:
         logger.debug(f"Found output: {current_output_enum}")
         self._current_output, fallback = build_output(
             self._device, {enum.name: output for enum, output in self._available_outputs.items()})
+        self._pattern = PatternPlayer(
+            self._device.pattern_channel, self._device.device_id, int(self._device.device_config["led_count"]),
+            int(self._device.device_config["led_mid"]), self._white_channel)
         self._preview = PreviewSink(self._device.preview_channel, self._device.device_id,
                                     int(self._device.device_config["led_brightness"]))
         # An ok Diagnosis clears the banner of an earlier fallback once the Output works again.
@@ -94,16 +98,7 @@ class OutputService:
                 del skip_output_queue
             return
 
-        # Check if the queue is empty and stop if its empty.
-        if not self._output_queue.empty():
-            current_output_array = self._output_queue.get_blocking()
-            # Add another Array of LEDS for White Channel
-            if self._white_channel and len(current_output_array) == 3:
-                current_output_array = np.vstack(
-                    (current_output_array, np.zeros(self._device.device_config["led_count"])))
-
-            self._current_output.show(current_output_array)
-            self._preview.frame(current_output_array)
+        self.show_next_frame()
 
         self.end_time = time()
 
@@ -114,6 +109,27 @@ class OutputService:
             logger.info(f'FPS: {self.fps:.2f} | Device: {self._device.device_config["device_name"]}')
 
         self.start_time = time()
+
+    def show_next_frame(self):
+        # A Test Pattern takes over the strip and drops the frames of the effect until it ends.
+        pattern_frame = self._pattern.frame()
+
+        # Check if the queue is empty and stop if its empty.
+        if not self._output_queue.empty():
+            current_output_array = self._output_queue.get_blocking()
+            # Add another Array of LEDS for White Channel
+            if self._white_channel and len(current_output_array) == 3:
+                current_output_array = np.vstack(
+                    (current_output_array, np.zeros(self._device.device_config["led_count"])))
+            if pattern_frame is None:
+                self._show(current_output_array)
+
+        if pattern_frame is not None:
+            self._show(pattern_frame)
+
+    def _show(self, output_array):
+        self._current_output.show(output_array)
+        self._preview.frame(output_array)
 
     def stop(self):
         self._cancel_token = True

@@ -6310,6 +6310,52 @@
         "title": "SystemStatsEvent",
         "type": "object"
       },
+      "TestPatternBody": {
+        "properties": {
+          "duration_seconds": {
+            "default": 10,
+            "description": "After this time the strip returns to its effect.",
+            "maximum": 60,
+            "minimum": 1.0,
+            "title": "Duration Seconds",
+            "type": "integer"
+          },
+          "pattern": {
+            "description": "`colour_order`: the whole strip in red, green, blue and white, one after the other. `markers`: the first pixel red, the middle one green, the last one blue. `chase`: one pixel that runs along the strip. `power`: every pixel and colour at full brightness.",
+            "enum": [
+              "colour_order",
+              "markers",
+              "chase",
+              "power"
+            ],
+            "title": "Pattern",
+            "type": "string"
+          }
+        },
+        "required": [
+          "pattern"
+        ],
+        "title": "TestPatternBody",
+        "type": "object"
+      },
+      "TestPatternOut": {
+        "properties": {
+          "duration_seconds": {
+            "title": "Duration Seconds",
+            "type": "integer"
+          },
+          "pattern": {
+            "title": "Pattern",
+            "type": "string"
+          }
+        },
+        "required": [
+          "pattern",
+          "duration_seconds"
+        ],
+        "title": "TestPatternOut",
+        "type": "object"
+      },
       "VersionsOut": {
         "properties": {
           "versions": {
@@ -9896,6 +9942,147 @@
         ]
       }
     },
+    "/api/v2/devices/{device_id}/test-pattern": {
+      "delete": {
+        "description": "Returns the strip to its effect at once. Does nothing when no pattern runs.",
+        "operationId": "test_patterns_api_v2_stop_test_pattern__device_id__test_pattern_delete",
+        "parameters": [
+          {
+            "description": "Stable device id, e.g. `device_0`.",
+            "in": "path",
+            "name": "device_id",
+            "required": true,
+            "schema": {
+              "description": "Stable device id, e.g. `device_0`.",
+              "title": "Device Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        },
+        "summary": "Stop the Test Pattern of a device",
+        "tags": [
+          "Test Patterns"
+        ]
+      },
+      "post": {
+        "description": "Takes over the strip of the device and returns it to its effect after `duration_seconds`. A running pattern is replaced.",
+        "operationId": "test_patterns_api_v2_start_test_pattern__device_id__test_pattern_post",
+        "parameters": [
+          {
+            "description": "Stable device id, e.g. `device_0`.",
+            "in": "path",
+            "name": "device_id",
+            "required": true,
+            "schema": {
+              "description": "Stable device id, e.g. `device_0`.",
+              "title": "Device Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TestPatternBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TestPatternOut"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "415": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unsupported Media Type"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        },
+        "summary": "Show a Test Pattern on a device",
+        "tags": [
+          "Test Patterns"
+        ]
+      }
+    },
     "/api/v2/effect": {
       "get": {
         "operationId": "effects_api_v2_get_active_effects_effect_get",
@@ -12032,6 +12219,10 @@
     {
       "description": "Tracked changes that can take time or fail",
       "name": "Operations"
+    },
+    {
+      "description": "Temporary patterns that take over a strip to check its setup",
+      "name": "Test Patterns"
     }
   ]
 }

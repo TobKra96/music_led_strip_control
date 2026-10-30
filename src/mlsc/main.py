@@ -23,6 +23,7 @@ from mlsc.device_manager import DeviceManager
 from mlsc.mic_level import MicLevel
 from mlsc.mic_recording import MicRecording
 from mlsc.notification_service import NotificationService
+from mlsc.strip_pattern import PatternChannel
 from mlsc.strip_preview import PreviewChannel
 from mlsc.webserver.webserver import Webserver
 
@@ -113,6 +114,9 @@ class Main:
         # Frames and Diagnoses of the Outputs, from the output processes to the webserver process (Strip Preview).
         self._preview_channel = PreviewChannel()
 
+        # Which Test Pattern runs on which Device, from the webserver process to the output processes.
+        self._pattern_channel = PatternChannel()
+
         # Prepare the queue for the output
         self._output_queue = Queue(2)
         self._effects_queue = Queue(100)
@@ -138,7 +142,8 @@ class Main:
                 self._notification_queue_device_manager_out,
                 self._effects_queue,
                 self._audio_queue,
-                self._preview_channel
+                self._preview_channel,
+                self._pattern_channel
             ))
         self._device_manager_process.start()
 
@@ -171,7 +176,8 @@ class Main:
                 self._audio_status,
                 self._browser_audio_queue,
                 self._mic_recording,
-                self._preview_channel
+                self._preview_channel,
+                self._pattern_channel
             ))
         self._webserver_process.start()
 

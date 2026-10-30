@@ -10,6 +10,7 @@ from mlsc import operations
 from mlsc.https_server import start_https
 from mlsc.api.v2 import register_api_v2
 from mlsc.app import create_app
+from mlsc import strip_pattern
 from mlsc.strip_preview import PreviewHub, start_preview_hub
 from mlsc.webserver import sse
 from mlsc.webserver.blueprints.authentication_api import authentication_api
@@ -51,7 +52,7 @@ DEBUG = False
 class Webserver:
     def start(self: Webserver, config_lock, notification_queue_in, notification_queue_out, effects_queue, audio_backend, mic_level=None,
               audio_status=None, browser_queue=None,
-              mic_recording=None, preview_channel=None) -> None:
+              mic_recording=None, preview_channel=None, pattern_channel=None) -> None:
         self._config_lock = config_lock
         self.notification_queue_in = notification_queue_in
         self.notification_queue_out = notification_queue_out
@@ -70,6 +71,7 @@ class Webserver:
         self.server.config["TEMPLATES_AUTO_RELOAD"] = True
         webserver_port = Executer.instance.general_settings_executer.get_webserver_port()
 
+        strip_pattern.channel = pattern_channel
         register_api_blueprints(self.server)
         operations.start_ticker(operations.registry)
         publishers = [start_status_publisher(create_status_publisher(Executer.instance.system_info_executer))]
