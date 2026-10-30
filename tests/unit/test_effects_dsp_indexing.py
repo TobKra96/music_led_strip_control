@@ -51,6 +51,7 @@ def test_power_clips_the_bass_bar_for_out_of_range_mel(scale):
 
     frame = device.output_queue.items[0]
     assert frame.shape == (3, led_count)
+    assert np.isfinite(frame).all()
 
 
 def test_power_survives_nan_mel():
@@ -59,7 +60,16 @@ def test_power_survives_nan_mel():
 
     effect.run()
 
-    assert len(device.output_queue.items) == 1
+    assert np.isfinite(device.output_queue.items[0]).all()
+
+
+def test_vu_meter_skips_nan_volume():
+    device = make_device({"mel": None, "vol": np.nan})
+    effect = EffectVuMeter(device)
+
+    effect.run()
+
+    assert device.output_queue.items == []
 
 
 def test_vu_meter_handles_flat_volume_history():
@@ -81,4 +91,6 @@ def test_vu_meter_max_bar_does_not_wrap_below_zero():
 
     effect.run()
 
-    assert not device.output_queue.items[0][:, -10:].any()
+    frame = device.output_queue.items[0]
+    max_vol_end = int(0.01 * device.device_config["led_count"])
+    assert not frame[:, max_vol_end:].any()

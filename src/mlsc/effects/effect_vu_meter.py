@@ -21,7 +21,7 @@ class EffectVuMeter(Effect):
         audio_data = self.get_audio_data()
         vol = self.get_vol(audio_data)
 
-        if vol is None:
+        if vol is None or not np.isfinite(vol):
             return
 
         self.set_vol_history(vol)
@@ -50,7 +50,7 @@ class EffectVuMeter(Effect):
         self.max_vol = max(normalized_vol, self.max_vol)
 
         # Show the max. volume
-        max_vol_end = int(self.max_vol * led_count)
+        max_vol_end = int(np.clip(self.max_vol * led_count, 0, led_count))
         max_vol_start = max(max_vol_end - effect_config["bar_length"], 0)
         output[0][max_vol_start: max_vol_end] = self._color_service.colour(effect_config["max_vol_color"])[0]
         output[1][max_vol_start: max_vol_end] = self._color_service.colour(effect_config["max_vol_color"])[1]
