@@ -117,7 +117,8 @@ def test_udp_is_healthy_for_a_resolvable_host():
 
 def test_udp_reports_an_unresolvable_host(monkeypatch):
     def fail(*_args, **_kwargs):
-        raise socket.gaierror("nope")
+        message = "nope"
+        raise socket.gaierror(message)
 
     monkeypatch.setattr(socket, "getaddrinfo", fail)
 

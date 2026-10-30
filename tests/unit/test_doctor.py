@@ -15,23 +15,26 @@ class QuietHost(Host):
         self.nmcli = nmcli
         self.nmcli_state = nmcli_state
         self.ws281x = ws281x
+        self.model = None
+        self.gpio_memory = True
+        self.analog_audio = False
 
     def has_ws281x(self):
         return self.ws281x
 
     def pi_model(self):
-        return None
+        return self.model
 
     def can_use_gpio_memory(self):
-        return True
+        return self.gpio_memory
 
     def analog_audio_enabled(self):
-        return False
+        return self.analog_audio
 
     def which(self, command):
         return f"/usr/bin/{command}" if self.nmcli else None
 
-    def run(self, command):
+    def run(self, command):  # ruff: ignore[unused-method-argument]
         return self.nmcli_state
 
 
@@ -208,14 +211,14 @@ def test_unwritable_config_dir_is_an_error(config_dir, monkeypatch):
 def test_writable_probe_checks_a_missing_directory_without_creating_it(tmp_path):
     target = tmp_path / "new" / "dir"
 
-    assert doctor._unwritable_reason(target) is None
+    assert doctor._unwritable_reason(target) is None  # ruff: ignore[private-member-access]
     assert not target.exists()
 
 
 def test_writable_probe_reports_a_missing_directory_under_a_read_only_parent(tmp_path, monkeypatch):
     monkeypatch.setattr(doctor.os, "access", lambda *_: False)
 
-    assert "no write permission" in doctor._unwritable_reason(tmp_path / "new")
+    assert "no write permission" in doctor._unwritable_reason(tmp_path / "new")  # ruff: ignore[private-member-access]
 
 
 def test_wifi_connected_without_internet_is_fine(config_dir, monkeypatch):
@@ -228,7 +231,8 @@ def test_incomplete_output_settings_are_an_error_not_a_crash(config_dir, monkeyp
     write_config(config_dir)
 
     def missing_key(_device_config, _host):
-        raise KeyError("udp_client_ip")
+        message = "udp_client_ip"
+        raise KeyError(message)
 
     monkeypatch.setattr(doctor.OUTPUTS["output_udp"], "diagnose", missing_key)
 
@@ -242,7 +246,7 @@ def test_writable_probe_reports_a_file_in_the_way(tmp_path):
     blocker = tmp_path / "file"
     blocker.write_text("x")
 
-    assert doctor._unwritable_reason(blocker / "sub") is not None
+    assert doctor._unwritable_reason(blocker / "sub") is not None  # ruff: ignore[private-member-access]
 
 
 def test_report_marks_each_check_and_prints_the_fix():

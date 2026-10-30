@@ -17,7 +17,10 @@ def test_pi_model_strips_the_trailing_nul(tmp_path):
     assert Host(device_tree_model=model).pi_model() == "Raspberry Pi 4 Model B"
 
 
-@pytest.mark.parametrize(("text", "expected"), [("dtparam=audio=on\n", True), ("#dtparam=audio=on\n", False), ("dtparam=audio=off\n", False), ("", False)])
+AUDIO_CASES = [("dtparam=audio=on\n", True), ("#dtparam=audio=on\n", False), ("dtparam=audio=off\n", False), ("", False)]
+
+
+@pytest.mark.parametrize(("text", "expected"), AUDIO_CASES)
 def test_analog_audio_enabled_reads_the_boot_config(tmp_path, text, expected):
     config = tmp_path / "config.txt"
     config.write_text(text)
