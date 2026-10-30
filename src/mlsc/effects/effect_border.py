@@ -4,18 +4,19 @@ from mlsc.effects.effect import Effect
 
 
 class EffectBorder(Effect):
-    def run(self):
+    needs_audio = True
+
+    def run(self, audio_data):
         effect_config = self.get_effect_config("effect_border")
-        led_count = self._device.device_config["led_count"]
-        led_mid = self._device.device_config["led_mid"]
+        led_count = self._device_config["led_count"]
+        led_mid = self._device_config["led_mid"]
 
         bar_count = effect_config["bar_count"]
 
-        audio_data = self.get_audio_data()
         y = self.get_mel(audio_data)
 
         if y is None:
-            return
+            return None
 
         self.update_freq_channels(y)
 
@@ -59,6 +60,6 @@ class EffectBorder(Effect):
         if effect_config["mirror"]:
             output = self.mirror_array(output, led_mid, led_count)
 
-        self.queue_output_array_noneblocking(output)
-
         self.prev_output = output
+
+        return output

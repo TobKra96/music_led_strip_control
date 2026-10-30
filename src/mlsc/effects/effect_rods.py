@@ -5,10 +5,10 @@ from mlsc.effects.effect import Effect
 
 class EffectRods(Effect):
 
-    def __init__(self, device) -> None:
+    def __init__(self, config, device_config, color_service_global=None) -> None:
 
         # Call the constructor of the base class.
-        super().__init__(device)
+        super().__init__(config, device_config, color_service_global)
 
         # Rods Variables.
         self.count_since_last_rod = 0
@@ -18,8 +18,8 @@ class EffectRods(Effect):
     def run(self):
         # Get the config of the current effect.
         effect_config = self.get_effect_config("effect_rods")
-        led_count = self._device.device_config["led_count"]
-        led_mid = self._device.device_config["led_mid"]
+        led_count = self._device_config["led_count"]
+        led_mid = self._device_config["led_mid"]
 
         self.count_since_last_rod += 1
 
@@ -37,7 +37,7 @@ class EffectRods(Effect):
         # Move array <--- this direction for "steps" fields
 
         # Build an empty array.
-        local_output_array = np.zeros((3, self._device.device_config["led_count"]))
+        local_output_array = np.zeros((3, self._device_config["led_count"]))
 
         if not effect_config["reverse"]:
             self.output = np.roll(self.output, steps, axis=1)
@@ -79,4 +79,4 @@ class EffectRods(Effect):
             local_output_array = self.mirror_array(local_output_array, led_mid, led_count)
 
         # Add the output array to the queue.
-        self.queue_output_array_blocking(local_output_array)
+        return local_output_array

@@ -4,25 +4,26 @@ from mlsc.effects.effect import Effect
 
 
 class EffectVuMeter(Effect):
-    def __init__(self, device) -> None:
+    needs_audio = True
+
+    def __init__(self, config, device_config, color_service_global=None) -> None:
 
         # Call the constructor of the base class.
-        super().__init__(device)
+        super().__init__(config, device_config, color_service_global)
 
         # Setup for "VU Meter" (don't change these).
         self.max_vol = 0
         self.vol_history = np.zeros(300)
 
-    def run(self):
+    def run(self, audio_data):
         """Effect that lights up more leds when volume gets higher."""
         effect_config = self.get_effect_config("effect_vu_meter")
-        led_count = self._device.device_config["led_count"]
+        led_count = self._device_config["led_count"]
 
-        audio_data = self.get_audio_data()
         vol = self.get_vol(audio_data)
 
         if vol is None or not np.isfinite(vol):
-            return
+            return None
 
         self.set_vol_history(vol)
         normalized_vol = self.get_normalized_vol(vol)
@@ -58,9 +59,9 @@ class EffectVuMeter(Effect):
 
         self.max_vol -= effect_config["speed"] / 10000
 
-        self.queue_output_array_noneblocking(output)
-
         self.prev_output = output
+
+        return output
 
     def set_vol_history(self, current_vol):
         # Roll the history for one.

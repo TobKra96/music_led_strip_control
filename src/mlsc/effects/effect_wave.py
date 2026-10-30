@@ -4,16 +4,17 @@ from mlsc.effects.effect import Effect
 
 
 class EffectWave(Effect):
-    def run(self):
+    needs_audio = True
+
+    def run(self, audio_data):
         """Effect that flashes to the beat with scrolling coloured bits."""
         effect_config = self.get_effect_config("effect_wave")
-        led_count = self._device.device_config["led_count"]
+        led_count = self._device_config["led_count"]
 
-        audio_data = self.get_audio_data()
         y = self.get_mel(audio_data)
 
         if y is None:
-            return
+            return None
 
         self.update_freq_channels(y)
         self.detect_freqs()
@@ -44,6 +45,6 @@ class EffectWave(Effect):
 
             self.wave_wipe_count += steps
 
-        self.queue_output_array_noneblocking(output)
-
         self.prev_output = output
+
+        return output

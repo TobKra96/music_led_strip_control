@@ -5,16 +5,17 @@ from mlsc.effects.effect import Effect
 
 
 class EffectEnergy(Effect):
-    def run(self):
-        effect_config = self.get_effect_config("effect_energy")
-        led_count = self._device.device_config["led_count"]
-        led_mid = self._device.device_config["led_mid"]
+    needs_audio = True
 
-        audio_data = self.get_audio_data()
+    def run(self, audio_data):
+        effect_config = self.get_effect_config("effect_energy")
+        led_count = self._device_config["led_count"]
+        led_mid = self._device_config["led_mid"]
+
         y = self.get_mel(audio_data)
 
         if y is None:
-            return
+            return None
 
         y = np.copy(y)
         self._dsp.gain.update(y)
@@ -47,4 +48,4 @@ class EffectEnergy(Effect):
 
         output_array = self.mirror_array(self.output, led_mid, led_count) if effect_config["mirror"] else self.output
 
-        self.queue_output_array_noneblocking(output_array)
+        return output_array

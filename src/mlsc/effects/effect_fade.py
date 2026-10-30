@@ -13,7 +13,7 @@ class EffectFade(Effect):
         current_speed = effect_config["speed"]
         current_reverse = effect_config["reverse"]
 
-        led_count = self._device.device_config["led_count"]
+        led_count = self._device_config["led_count"]
 
         # Translate the true and false to a number, for the function use.
         current_reverse_translated = -1 if current_reverse else 1
@@ -43,4 +43,4 @@ class EffectFade(Effect):
         )
 
         # Add the output array to the queue.
-        self.queue_output_array_blocking(output_array)
+        return output_array

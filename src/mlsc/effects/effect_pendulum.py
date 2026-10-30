@@ -5,10 +5,10 @@ from mlsc.effects.effect import Effect
 
 class EffectPendulum(Effect):
 
-    def __init__(self, device) -> None:
+    def __init__(self, config, device_config, color_service_global=None) -> None:
 
         # Call the constructor of the base class.
-        super().__init__(device)
+        super().__init__(config, device_config, color_service_global)
 
         # Pendulum Variables.
         self.current_direction = True
@@ -23,7 +23,7 @@ class EffectPendulum(Effect):
     def run(self):
         # Get the config of the current effect.
         effect_config = self.get_effect_config("effect_pendulum")
-        led_count = self._device.device_config["led_count"]
+        led_count = self._device_config["led_count"]
 
         if self.current_position in {0, led_count - 1} and self.current_position != self.last_position:
             if effect_config["change_color"]:
@@ -39,7 +39,7 @@ class EffectPendulum(Effect):
             self.last_position = self.current_position
 
         # Build an empty array.
-        output_array = np.zeros((3, self._device.device_config["led_count"]))
+        output_array = np.zeros((3, self._device_config["led_count"]))
 
         # Calculate how many steps the array will roll.
         steps = self.get_roll_steps(effect_config["speed"])
@@ -91,4 +91,4 @@ class EffectPendulum(Effect):
             output_array[2, start_position:end_position] = self.current_color[2]
 
         # Add the output array to the queue.
-        self.queue_output_array_blocking(output_array)
+        return output_array

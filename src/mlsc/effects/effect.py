@@ -9,18 +9,17 @@ from mlsc.math_service import MathService
 
 
 class Effect:
+    # Effects that read audio get the latest audio data passed to run(); the others are run without it.
+    needs_audio = False
 
-    def __init__(self, device) -> None:
-        self._device = device
-
+    def __init__(self, config, device_config, color_service_global=None) -> None:
         # Initial config load.
-        self._config = self._device.config
+        self._config = config
         self._config_colours = self._config["colors"]
         self._config_gradients = self._config["gradients"]
 
-        self._device_config = self._device.device_config
-        self._output_queue = self._device.output_queue
-        self._audio_queue = self._device.audio_queue
+        self._device_config = device_config
+        self._color_service_global = color_service_global
 
         # Initialize color service and build gradients.
         self._color_service = ColorService(self._config, self._device_config)
@@ -94,7 +93,8 @@ class Effect:
         # Setup for "Wave" (don't change this).
         self.wave_wipe_count = 0
 
-    def run(self):
+    def run(self, audio_data=None):
+        """Render one frame and return it, or None to skip the frame."""
         raise NotImplementedError
 
     def update_freq_channels(self, y):
@@ -150,13 +150,6 @@ class Effect:
 
         return steps
 
-    def get_audio_data(self):
-        audio_data = None
-        if not self._audio_queue.empty():
-            audio_data = self._audio_queue.get_blocking()
-
-        return audio_data
-
     @staticmethod
     def get_mel(audio_data):
 
@@ -187,14 +180,8 @@ class Effect:
 
         return audio_vol
 
-    def queue_output_array_blocking(self, output_array):
-        self._output_queue.put_blocking(output_array)
-
-    def queue_output_array_noneblocking(self, output_array):
-        self._output_queue.put_none_blocking(output_array)
-
     def get_effect_config(self, effect_id):
-        return self._device.device_config["effects"][effect_id]
+        return self._device_config["effects"][effect_id]
 
     @staticmethod
     def mirror_array(array, led_mid, led_count):

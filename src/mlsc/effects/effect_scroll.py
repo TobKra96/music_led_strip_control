@@ -5,25 +5,26 @@ from mlsc.effects.effect import Effect
 
 
 class EffectScroll(Effect):
-    def __init__(self, device) -> None:
+    needs_audio = True
+
+    def __init__(self, config, device_config, color_service_global=None) -> None:
         # Call the constructor of the base class.
-        super().__init__(device)
+        super().__init__(config, device_config, color_service_global)
 
         # Scroll Variables.
         self.output_scroll_high = np.array([[0 for i in range(self.led_count)] for i in range(3)])
         self.output_scroll_mid = np.array([[0 for i in range(self.led_count)] for i in range(3)])
         self.output_scroll_low = np.array([[0 for i in range(self.led_count)] for i in range(3)])
 
-    def run(self):
+    def run(self, audio_data):
         effect_config = self.get_effect_config("effect_scroll")
-        led_count = self._device.device_config["led_count"]
-        led_mid = self._device.device_config["led_mid"]
+        led_count = self._device_config["led_count"]
+        led_mid = self._device_config["led_mid"]
 
-        audio_data = self.get_audio_data()
         y = self.get_mel(audio_data)
 
         if y is None:
-            return
+            return None
 
         # Effect that scrolls colors corresponding to frequencies across the strip.
         y **= 4.0
@@ -92,4 +93,4 @@ class EffectScroll(Effect):
 
         output_array = self.mirror_array(self.output, led_mid, led_count) if effect_config["mirror"] else self.output
 
-        self.queue_output_array_noneblocking(output_array)
+        return output_array

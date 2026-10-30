@@ -42,6 +42,37 @@ LOG_INTERVAL_SECONDS = 10
 # The warning is sent again because the preview queue drops messages when full and the output process can report a later Diagnosis over it.
 WARNING_REPEAT_SECONDS = 10
 
+AVAILABLE_EFFECTS = {
+    EffectsEnum.effect_off: EffectOff,
+    EffectsEnum.effect_single: EffectSingle,
+    EffectsEnum.effect_gradient: EffectGradient,
+    EffectsEnum.effect_fade: EffectFade,
+    EffectsEnum.effect_sync_fade: EffectSyncFade,
+    EffectsEnum.effect_slide: EffectSlide,
+    EffectsEnum.effect_bubble: EffectBubble,
+    EffectsEnum.effect_twinkle: EffectTwinkle,
+    EffectsEnum.effect_pendulum: EffectPendulum,
+    EffectsEnum.effect_rods: EffectRods,
+    EffectsEnum.effect_segment_color: EffectSegmentColor,
+    EffectsEnum.effect_fireplace: EffectFireplace,
+    EffectsEnum.effect_strobe: EffectStrobe,
+    EffectsEnum.effect_scroll: EffectScroll,
+    EffectsEnum.effect_advanced_scroll: EffectAdvancedScroll,
+    EffectsEnum.effect_energy: EffectEnergy,
+    EffectsEnum.effect_wavelength: EffectWavelength,
+    EffectsEnum.effect_bars: EffectBars,
+    EffectsEnum.effect_power: EffectPower,
+    EffectsEnum.effect_beat: EffectBeat,
+    EffectsEnum.effect_beat_twinkle: EffectBeatTwinkle,
+    EffectsEnum.effect_beat_slide: EffectBeatSlide,
+    EffectsEnum.effect_wave: EffectWave,
+    EffectsEnum.effect_wiggle: EffectWiggle,
+    EffectsEnum.effect_vu_meter: EffectVuMeter,
+    EffectsEnum.effect_spectrum_analyzer: EffectSpectrumAnalyzer,
+    EffectsEnum.effect_direction_changer: EffectDirectionChanger,
+    EffectsEnum.effect_border: EffectBorder
+}
+
 # Output array should look like:
 # output = {[r1,r2,r3,r4,r5],[g1,g2,g3,g4,g5],[]}
 
@@ -66,36 +97,7 @@ class EffectService:
         self._warning = None
         self._warned_at = float("-inf")
 
-        self._available_effects = {
-            EffectsEnum.effect_off: EffectOff,
-            EffectsEnum.effect_single: EffectSingle,
-            EffectsEnum.effect_gradient: EffectGradient,
-            EffectsEnum.effect_fade: EffectFade,
-            EffectsEnum.effect_sync_fade: EffectSyncFade,
-            EffectsEnum.effect_slide: EffectSlide,
-            EffectsEnum.effect_bubble: EffectBubble,
-            EffectsEnum.effect_twinkle: EffectTwinkle,
-            EffectsEnum.effect_pendulum: EffectPendulum,
-            EffectsEnum.effect_rods: EffectRods,
-            EffectsEnum.effect_segment_color: EffectSegmentColor,
-            EffectsEnum.effect_fireplace: EffectFireplace,
-            EffectsEnum.effect_strobe: EffectStrobe,
-            EffectsEnum.effect_scroll: EffectScroll,
-            EffectsEnum.effect_advanced_scroll: EffectAdvancedScroll,
-            EffectsEnum.effect_energy: EffectEnergy,
-            EffectsEnum.effect_wavelength: EffectWavelength,
-            EffectsEnum.effect_bars: EffectBars,
-            EffectsEnum.effect_power: EffectPower,
-            EffectsEnum.effect_beat: EffectBeat,
-            EffectsEnum.effect_beat_twinkle: EffectBeatTwinkle,
-            EffectsEnum.effect_beat_slide: EffectBeatSlide,
-            EffectsEnum.effect_wave: EffectWave,
-            EffectsEnum.effect_wiggle: EffectWiggle,
-            EffectsEnum.effect_vu_meter: EffectVuMeter,
-            EffectsEnum.effect_spectrum_analyzer: EffectSpectrumAnalyzer,
-            EffectsEnum.effect_direction_changer: EffectDirectionChanger,
-            EffectsEnum.effect_border: EffectBorder
-        }
+        self._available_effects = AVAILABLE_EFFECTS
 
         self._initialized_effects = {}
         self._current_effect = {}
@@ -184,12 +186,27 @@ class EffectService:
         effect_enum = self._current_effect
         try:
             if effect_enum not in self._initialized_effects:
-                self._initialized_effects[effect_enum] = self._available_effects[effect_enum](self._device)
-            self._initialized_effects[effect_enum].run()
+                self._initialized_effects[effect_enum] = self._available_effects[effect_enum](
+                    self._device.config, self._device.device_config, self._device.color_service_global)
+            self._render(self._initialized_effects[effect_enum])
         except Exception as e:
             self._frame_failed(effect_enum, e)
         else:
             self._failures = 0
+
+    def _render(self, effect):
+        """Run the effect with the latest audio and hand its frame to the output queue."""
+        audio_data = None
+        if effect.needs_audio:
+            if not self._device.audio_queue.empty():
+                audio_data = self._device.audio_queue.get_blocking()
+            output = effect.run(audio_data)
+            if output is not None:
+                self._device.output_queue.put_none_blocking(output)
+        else:
+            output = effect.run()
+            if output is not None:
+                self._device.output_queue.put_blocking(output)
 
     def _frame_failed(self, effect_enum, error):
         self._failures += 1

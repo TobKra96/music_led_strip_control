@@ -9,15 +9,15 @@ class EffectSingle(Effect):
         """Show one single color."""
         # Get the config of the current effect.
         effect_config = self.get_effect_config("effect_single")
-        white_channel = has_white_channel(self._device.device_config)
+        white_channel = has_white_channel(self._device_config)
         # Set Fallback Strip
         # self._led_strip_translated = ws.WS2811_STRIP_RGB
 
         # Build an empty array.
         if white_channel:
-            output_array = np.zeros((4, self._device.device_config["led_count"]))
+            output_array = np.zeros((4, self._device_config["led_count"]))
         else:
-            output_array = np.zeros((3, self._device.device_config["led_count"]))
+            output_array = np.zeros((3, self._device_config["led_count"]))
 
         if effect_config["use_custom_color"]:
             output_array[0][:] = effect_config["custom_color"][0]
@@ -33,4 +33,4 @@ class EffectSingle(Effect):
             output_array[3][:] = effect_config["white"]
 
         # Add the output array to the queue.
-        self.queue_output_array_blocking(output_array)
+        return output_array

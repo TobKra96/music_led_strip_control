@@ -5,16 +5,17 @@ from mlsc.effects.effect import Effect
 
 
 class EffectWavelength(Effect):
-    def run(self):
-        effect_config = self.get_effect_config("effect_wavelength")
-        led_count = self._device.device_config["led_count"]
-        led_mid = self._device.device_config["led_mid"]
+    needs_audio = True
 
-        audio_data = self.get_audio_data()
+    def run(self, audio_data):
+        effect_config = self.get_effect_config("effect_wavelength")
+        led_count = self._device_config["led_count"]
+        led_mid = self._device_config["led_mid"]
+
         y = self.get_mel(audio_data)
 
         if y is None:
-            return
+            return None
 
         # Interpolate y to get an array, which is half as long as the LED strip.
         y = np.copy(self._math_service.interpolate(y, led_count // 2))
@@ -64,4 +65,4 @@ class EffectWavelength(Effect):
         if effect_config["mirror"]:
             self.output = self.mirror_array(self.output, led_mid, led_count)
 
-        self.queue_output_array_noneblocking(self.output)
+        return self.output

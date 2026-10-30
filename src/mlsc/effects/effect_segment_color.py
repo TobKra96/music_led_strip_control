@@ -8,7 +8,7 @@ class EffectSegmentColor(Effect):
         """Show one single color."""
         # Get the config of the current effect.
         effect_config = self.get_effect_config("effect_segment_color")
-        led_count = self._device.device_config["led_count"]
+        led_count = self._device_config["led_count"]
         # Build an empty array.
         output_array = np.zeros((3, led_count))
 
@@ -52,4 +52,4 @@ class EffectSegmentColor(Effect):
             output_array[2][start_translated:end_translated] = color[2]
 
         # Add the output array to the queue.
-        self.queue_output_array_blocking(output_array)
+        return output_array

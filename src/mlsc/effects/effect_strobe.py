@@ -8,10 +8,10 @@ from mlsc.strip import has_white_channel
 
 class EffectStrobe(Effect):
 
-    def __init__(self, device) -> None:
+    def __init__(self, config, device_config, color_service_global=None) -> None:
 
         # Call the constructor of the base class.
-        super().__init__(device)
+        super().__init__(config, device_config, color_service_global)
 
         # Used to calculate time between strobe states.
         self.now = time() * 1000
@@ -23,7 +23,7 @@ class EffectStrobe(Effect):
     def run(self):
         # Get the config of the current effect.
         effect_config = self.get_effect_config("effect_strobe")
-        white_channel = has_white_channel(self._device.device_config)
+        white_channel = has_white_channel(self._device_config)
 
         speed = effect_config["speed"]
 
@@ -35,9 +35,9 @@ class EffectStrobe(Effect):
 
         # Build an empty array.
         if white_channel:
-            output_array = np.zeros((4, self._device.device_config["led_count"]))
+            output_array = np.zeros((4, self._device_config["led_count"]))
         else:
-            output_array = np.zeros((3, self._device.device_config["led_count"]))
+            output_array = np.zeros((3, self._device_config["led_count"]))
 
         if self.current_state:
             color = effect_config["custom_color"] if effect_config["use_custom_color"] else self._config_colours[effect_config["color"]]
@@ -52,4 +52,4 @@ class EffectStrobe(Effect):
             output_array[3][:] = effect_config["white"]
 
         # Add the output array to the queue.
-        self.queue_output_array_blocking(output_array)
+        return output_array

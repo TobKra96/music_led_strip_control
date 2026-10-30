@@ -8,9 +8,9 @@ from mlsc.effects.effect import Effect
 
 class EffectFireplace(Effect):
 
-    def __init__(self, device) -> None:
+    def __init__(self, config, device_config, color_service_global=None) -> None:
         # Call the constructor of the base class.
-        super().__init__(device)
+        super().__init__(config, device_config, color_service_global)
         # Setup for "EffectFireplace" (don't change this).
 
         self.sparks_area_current_length = 0
@@ -23,7 +23,7 @@ class EffectFireplace(Effect):
         self.sparks_flicker_speed_counter = 0
         self.sparks_fly_speed_counter = 0
 
-        self.sparks_array = np.zeros((3, self._device.device_config["led_count"]))
+        self.sparks_array = np.zeros((3, self._device_config["led_count"]))
 
         self.firebase_area_current_length = 0
         self.firebase_area_target_length = 0
@@ -41,8 +41,8 @@ class EffectFireplace(Effect):
         # Get the config of the current effect.
         effect_config = self.get_effect_config("effect_fireplace")
 
-        led_count = self._device.device_config["led_count"]
-        led_mid = self._device.device_config["led_mid"]
+        led_count = self._device_config["led_count"]
+        led_mid = self._device_config["led_mid"]
 
         # Build an empty array.
         output_array = np.zeros((3, led_count))
@@ -174,7 +174,7 @@ class EffectFireplace(Effect):
             output_array = self.mirror_array(output_array, led_mid, led_count)
 
         # Add the output array to the queue.
-        self.queue_output_array_blocking(output_array)
+        return output_array
 
     @staticmethod
     def get_current_length(current_length, steps, target_length) -> int:

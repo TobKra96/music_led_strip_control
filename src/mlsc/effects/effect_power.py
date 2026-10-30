@@ -6,17 +6,18 @@ from mlsc.effects.effect import Effect
 
 
 class EffectPower(Effect):
-    def run(self):
-        effect_config = self.get_effect_config("effect_power")
-        led_count = self._device.device_config["led_count"]
-        n_fft_bins = self._config["general_settings"]["n_fft_bins"]
-        led_mid = self._device.device_config["led_mid"]
+    needs_audio = True
 
-        audio_data = self.get_audio_data()
+    def run(self, audio_data):
+        effect_config = self.get_effect_config("effect_power")
+        led_count = self._device_config["led_count"]
+        n_fft_bins = self._config["general_settings"]["n_fft_bins"]
+        led_mid = self._device_config["led_mid"]
+
         y = self.get_mel(audio_data)
 
         if y is None:
-            return
+            return None
 
         y = np.nan_to_num(y)
 
@@ -70,4 +71,4 @@ class EffectPower(Effect):
         if effect_config["mirror"]:
             output = self.mirror_array(output, led_mid, led_count)
 
-        self.queue_output_array_noneblocking(output)
+        return output

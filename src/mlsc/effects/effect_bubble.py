@@ -7,8 +7,8 @@ class EffectBubble(Effect):
     def run(self):
         # Get the config of the current effect.
         effect_config = self.get_effect_config("effect_bubble")
-        led_count = self._device.device_config["led_count"]
-        led_mid = self._device.device_config["led_mid"]
+        led_count = self._device_config["led_count"]
+        led_mid = self._device_config["led_mid"]
 
         # Translate the true and false to a number, for the function use.
         current_reverse_translated = -1 if effect_config["reverse"] else 1
@@ -39,4 +39,4 @@ class EffectBubble(Effect):
             output_array = self.mirror_array(output_array, led_mid, led_count)
 
         # Add the output array to the queue.
-        self.queue_output_array_blocking(output_array)
+        return output_array

@@ -6,15 +6,17 @@ from mlsc.effects.effect import Effect
 
 
 class EffectBeatTwinkle(Effect):
-    def __init__(self, device) -> None:
+    needs_audio = True
+
+    def __init__(self, config, device_config, color_service_global=None) -> None:
         # Call the constructor of the base class.
-        super().__init__(device)
+        super().__init__(config, device_config, color_service_global)
         self.gradient_position = 0
 
-    def run(self):
+    def run(self, audio_data):
         """Effect that flashes parts of strip to the beat."""
         effect_config = self.get_effect_config("effect_beat_twinkle")
-        led_count = self._device.device_config["led_count"]
+        led_count = self._device_config["led_count"]
         current_gradient = effect_config["gradient"]
         use_random_color = effect_config["random_color"]
         colorful_mode = effect_config["colorful_mode"]
@@ -23,11 +25,10 @@ class EffectBeatTwinkle(Effect):
 
         star_length = min(star_length, led_count)
 
-        audio_data = self.get_audio_data()
         y = self.get_mel(audio_data)
 
         if y is None:
-            return
+            return None
 
         self.update_freq_channels(y)
         self.detect_freqs()
@@ -70,5 +71,6 @@ class EffectBeatTwinkle(Effect):
             output[1][star_start_index:star_start_index + star_length] = color[1]
             output[2][star_start_index:star_start_index + star_length] = color[2]
 
-        self.queue_output_array_noneblocking(output)
         self.prev_output = output
+
+        return output

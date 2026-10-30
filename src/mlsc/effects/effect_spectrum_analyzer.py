@@ -4,15 +4,16 @@ from mlsc.effects.effect import Effect
 
 
 class EffectSpectrumAnalyzer(Effect):
-    def run(self):
-        effect_config = self.get_effect_config("effect_spectrum_analyzer")
-        led_count = self._device.device_config["led_count"]
+    needs_audio = True
 
-        audio_data = self.get_audio_data()
+    def run(self, audio_data):
+        effect_config = self.get_effect_config("effect_spectrum_analyzer")
+        led_count = self._device_config["led_count"]
+
         y = self.get_mel(audio_data)
 
         if y is None:
-            return
+            return None
 
         self.update_freq_channels(y)
         # self.detect_freqs()
@@ -32,6 +33,6 @@ class EffectSpectrumAnalyzer(Effect):
             output[1][i * (led_count // effect_config["spectrum_count"]): i * (led_count // effect_config["spectrum_count"]) + int(pegel_max * (led_count / effect_config["spectrum_count"]))] = self._color_service.colour(effect_config["color"])[1]
             output[2][i * (led_count // effect_config["spectrum_count"]): i * (led_count // effect_config["spectrum_count"]) + int(pegel_max * (led_count / effect_config["spectrum_count"]))] = self._color_service.colour(effect_config["color"])[2]
 
-        self.queue_output_array_noneblocking(output)
-
         self.prev_output = output
+
+        return output

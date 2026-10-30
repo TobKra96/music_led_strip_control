@@ -8,10 +8,10 @@ from mlsc.effects.effect import Effect
 
 class EffectTwinkle(Effect):
 
-    def __init__(self, device) -> None:
+    def __init__(self, config, device_config, color_service_global=None) -> None:
 
         # Call the constructor of the base class.
-        super().__init__(device)
+        super().__init__(config, device_config, color_service_global)
 
         # Twinkle Variables.
         self.rising_stars = []
@@ -21,12 +21,12 @@ class EffectTwinkle(Effect):
     def run(self):
         # Get the config of the current effect.
         effect_config = self.get_effect_config("effect_twinkle")
-        led_count = self._device.device_config["led_count"]
+        led_count = self._device_config["led_count"]
 
         # Rising Star array format: [[r,g,b], [start_position, end_position], percent_brightness].
 
         # Reset output array.
-        self.output = np.zeros((3, self._device.device_config["led_count"]))
+        self.output = np.zeros((3, self._device_config["led_count"]))
         # Randomly add the stars, depending on speed settings.
         if random.randrange(0, 100, 1) <= effect_config["star_ascending_speed"]:  # ruff: ignore[collapsible-if]
             # Add a star only if the list is not full.
@@ -89,4 +89,4 @@ class EffectTwinkle(Effect):
             self.output = gaussian_filter1d(self.output, sigma=blur_amount)
 
         # Add the output array to the queue.
-        self.queue_output_array_blocking(self.output)
+        return self.output

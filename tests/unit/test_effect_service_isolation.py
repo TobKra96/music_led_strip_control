@@ -31,6 +31,8 @@ class Queue:
 
 class StubDevice:
     device_config: ClassVar[dict] = {"device_name": "Desk", "fps": 1000}
+    config: ClassVar[dict] = {}
+    color_service_global = None
 
     def __init__(self) -> None:
         self.device_notification_queue_in = Queue()
@@ -48,8 +50,9 @@ class Preview:
 
 class Broken:
     runs = 0
+    needs_audio = False
 
-    def __init__(self, _device) -> None:
+    def __init__(self, *_args) -> None:
         pass
 
     def run(self):  # ruff: ignore[no-self-use]
@@ -60,8 +63,9 @@ class Broken:
 
 class Healthy:
     runs = 0
+    needs_audio = False
 
-    def __init__(self, _device) -> None:
+    def __init__(self, *_args) -> None:
         pass
 
     def run(self):  # ruff: ignore[no-self-use]
@@ -70,8 +74,9 @@ class Healthy:
 
 class Off:
     runs = 0
+    needs_audio = False
 
-    def __init__(self, _device) -> None:
+    def __init__(self, *_args) -> None:
         pass
 
     def run(self):  # ruff: ignore[no-self-use]

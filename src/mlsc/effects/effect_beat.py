@@ -6,26 +6,26 @@ from mlsc.effects.effect import Effect
 
 
 class EffectBeat(Effect):
+    needs_audio = True
 
-    def __init__(self, device) -> None:
+    def __init__(self, config, device_config, color_service_global=None) -> None:
         # Call the constructor of the base class.
-        super().__init__(device)
+        super().__init__(config, device_config, color_service_global)
         # Setup for "EffectBeat" (don't change this).
         self.gradient_position = 0
 
-    def run(self):
+    def run(self, audio_data):
         """Effect that flashes to the beat."""
         effect_config = self.get_effect_config("effect_beat")
-        led_count = self._device.device_config["led_count"]
+        led_count = self._device_config["led_count"]
         current_gradient = effect_config["gradient"]
         use_random_color = effect_config["random_color"]
         colorful_mode = effect_config["colorful_mode"]
 
-        audio_data = self.get_audio_data()
         y = self.get_mel(audio_data)
 
         if y is None:
-            return
+            return None
 
         self.update_freq_channels(y)
         self.detect_freqs()
@@ -56,6 +56,6 @@ class EffectBeat(Effect):
             output = np.copy(self.prev_output)
             output = np.multiply(self.prev_output, effect_config["decay"])
 
-        self.queue_output_array_noneblocking(output)
-
         self.prev_output = output
+
+        return output

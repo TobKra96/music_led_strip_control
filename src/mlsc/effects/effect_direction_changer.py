@@ -6,9 +6,11 @@ from mlsc.effects.effect import Effect
 
 
 class EffectDirectionChanger(Effect):
-    def __init__(self, device) -> None:
+    needs_audio = True
+
+    def __init__(self, config, device_config, color_service_global=None) -> None:
         # Call the constructor of the base class.
-        super().__init__(device)
+        super().__init__(config, device_config, color_service_global)
         self.gradient_position = 0
 
         # Example
@@ -45,16 +47,16 @@ class EffectDirectionChanger(Effect):
         #
         #
 
-        self.output_left_length = self._device.device_config["led_mid"]
+        self.output_left_length = self._device_config["led_mid"]
 
         # Set effect middle to center if value is outside the led_count range.
-        if not 0 < self.output_left_length < self._device.device_config["led_count"]:
-            self.output_left_length = self._device.device_config["led_count"] // 2
+        if not 0 < self.output_left_length < self._device_config["led_count"]:
+            self.output_left_length = self._device_config["led_count"] // 2
 
         self.output_left_min_index = 0
         self.output_left_max_index = self.output_left_length
 
-        self.output_right_length = self._device.device_config["led_count"] - self.output_left_length
+        self.output_right_length = self._device_config["led_count"] - self.output_left_length
         self.output_right_min_index = self.output_left_max_index
         self.output_right_max_index = self.output_right_min_index + self.output_right_length
 
@@ -81,9 +83,9 @@ class EffectDirectionChanger(Effect):
         self.current_bar_length_left = 0
         self.current_bar_length_right = 0
 
-    def run(self):
+    def run(self, audio_data):
         effect_config = self.get_effect_config("effect_direction_changer")
-        led_count = self._device.device_config["led_count"]
+        led_count = self._device_config["led_count"]
 
         current_gradient = effect_config["gradient"]
         use_random_color = effect_config["random_color"]
@@ -95,13 +97,12 @@ class EffectDirectionChanger(Effect):
         # Calculate how many steps the array will roll.
         steps = self.get_roll_steps(bar_speed)
         if steps <= 0:
-            return
+            return None
 
-        audio_data = self.get_audio_data()
         y = self.get_mel(audio_data)
 
         if y is None:
-            return
+            return None
 
         self.update_freq_channels(y)
         self.detect_freqs()
@@ -254,7 +255,7 @@ class EffectDirectionChanger(Effect):
         output[1][self.output_right_min_index:] = current_output_right[1]
         output[2][self.output_right_min_index:] = current_output_right[2]
 
-        self.queue_output_array_noneblocking(output)
-
         self.output_left = current_output_left
         self.output_right = current_output_right
+
+        return output

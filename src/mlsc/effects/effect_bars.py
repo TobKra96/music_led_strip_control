@@ -4,16 +4,17 @@ from mlsc.effects.effect import Effect
 
 
 class EffectBars(Effect):
-    def run(self):
-        effect_config = self.get_effect_config("effect_bars")
-        led_count = self._device.device_config["led_count"]
-        led_mid = self._device.device_config["led_mid"]
+    needs_audio = True
 
-        audio_data = self.get_audio_data()
+    def run(self, audio_data):
+        effect_config = self.get_effect_config("effect_bars")
+        led_count = self._device_config["led_count"]
+        led_mid = self._device_config["led_mid"]
+
         y = self.get_mel(audio_data)
 
         if y is None:
-            return
+            return None
 
         # Bit of fiddling with the y values.
         y = np.copy(self._math_service.interpolate(y, led_count // 2))
@@ -59,4 +60,4 @@ class EffectBars(Effect):
         if effect_config["mirror"]:
             output = self.mirror_array(output, led_mid, led_count)
 
-        self.queue_output_array_noneblocking(output)
+        return output

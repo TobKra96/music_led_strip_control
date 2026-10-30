@@ -4,23 +4,24 @@ from mlsc.effects.effect import Effect
 
 
 class EffectWiggle(Effect):
-    def __init__(self, device) -> None:
+    needs_audio = True
+
+    def __init__(self, config, device_config, color_service_global=None) -> None:
 
         # Call the constructor of the base class.
-        super().__init__(device)
+        super().__init__(config, device_config, color_service_global)
 
         # Setup for "Wiggle" (don't change this).
         self.bool_lr = 0
 
-    def run(self):
+    def run(self, audio_data):
         effect_config = self.get_effect_config("effect_wiggle")
-        led_count = self._device.device_config["led_count"]
+        led_count = self._device_config["led_count"]
 
-        audio_data = self.get_audio_data()
         y = self.get_mel(audio_data)
 
         if y is None:
-            return
+            return None
 
         self.update_freq_channels(y)
         self.detect_freqs()
@@ -57,4 +58,4 @@ class EffectWiggle(Effect):
             output = np.multiply(self.prev_output, effect_config["decay"])
 
         self.prev_output = output
-        self.queue_output_array_noneblocking(output)
+        return output
