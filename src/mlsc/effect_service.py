@@ -97,7 +97,7 @@ class EffectService:
         self._warning = None
         self._warned_at = float("-inf")
 
-        self._available_effects = AVAILABLE_EFFECTS
+        self._available_effects = dict(AVAILABLE_EFFECTS)
 
         self._initialized_effects = {}
         self._current_effect = {}
