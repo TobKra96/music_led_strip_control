@@ -3,6 +3,7 @@ import socket
 import numpy as np
 from loguru import logger
 
+from mlsc.diagnosis import Diagnosis
 from mlsc.outputs.output import Output
 from mlsc.strip import udp_channel_order
 
@@ -40,3 +41,19 @@ class OutputUDP(Output):
         if len(output_array_in) >= 3:
             output_array_out[:3] = output_array_in[list(self._channel_order)]
         return output_array_out
+
+    @classmethod
+    def diagnose(cls, device_config: dict, host=None) -> Diagnosis:
+        """Checks the host and port only: UDP has no acknowledgement, so delivery cannot be verified."""
+        settings = device_config["output"]["output_udp"]
+        ip, port = settings["udp_client_ip"], settings["udp_client_port"]
+        if not ip or not isinstance(ip, str):
+            return Diagnosis.error("No UDP client host is set.", "Enter the host name or IP address of the UDP client.")
+        if isinstance(port, bool) or not isinstance(port, int) or not 1 <= port <= 65535:
+            return Diagnosis.error(f"The UDP port {port} is not valid.", "Use a port between 1 and 65535.")
+        try:
+            socket.getaddrinfo(ip, port, type=socket.SOCK_DGRAM)
+        except OSError as e:
+            message = f"The UDP client host {ip!r} cannot be resolved ({e})."
+            return Diagnosis.error(message, "Check the host name or use the IP address of the client.")
+        return Diagnosis.ok(f"Sending to {ip}:{port}. UDP has no acknowledgement, so delivery is not verified.")

@@ -1,8 +1,13 @@
 import numpy as np
 from loguru import logger
 
+from mlsc.diagnosis import Diagnosis, worst
+from mlsc.host import Host
 from mlsc.outputs.output import Output
 from mlsc.strip import has_white_channel, rpi_ws281x_strip_type
+
+# GPIOs that rpi_ws281x drives with the PWM hardware, which the Pi's analog audio also uses.
+PWM_PINS = frozenset({12, 13, 18, 19})
 
 
 class OutputRaspi(Output):
@@ -101,3 +106,31 @@ class OutputRaspi(Output):
             message = ws.ws2811_get_return_t_str(resp)
             error_msg = f"ws2811_render failed with code {resp} ({message})"
             raise RuntimeError(error_msg)
+
+    @classmethod
+    def diagnose(cls, device_config: dict, host: Host | None = None) -> Diagnosis:
+        host = host or Host()
+        pin = device_config["output"]["output_raspi"]["led_pin"]
+        problems = []
+        if not host.has_ws281x():
+            problems.append(Diagnosis.error("The rpi_ws281x library is not installed.", "Install it with: pip install 'mlsc[pi]'"))
+        if not host.can_use_gpio_memory():
+            problems.append(
+                Diagnosis.error("Permission denied for the GPIO memory (/dev/mem).", "Run MLSC as root, for example through the systemd service.")
+            )
+        model = host.pi_model()
+        if model and "Pi 5" in model:
+            problems.append(
+                Diagnosis.warning(
+                    "The Pi 5 is not supported by rpi_ws281x (experimental/unsupported driver).",
+                    "Use a Pi 4 or older, or send the frames to a UDP client.",
+                )
+            )
+        if pin in PWM_PINS and host.analog_audio_enabled():
+            problems.append(
+                Diagnosis.warning(
+                    f"GPIO {pin} is used by the Pi's analog audio (PWM).",
+                    "Set dtparam=audio=off in /boot/firmware/config.txt and reboot, or use another pin such as GPIO 10 (SPI).",
+                )
+            )
+        return worst(problems) if problems else Diagnosis.ok(f"GPIO {pin} is ready.")

@@ -21,6 +21,12 @@ def _not_implemented(name: str):
     return handler
 
 
+def _doctor(_: argparse.Namespace) -> int:
+    from mlsc import doctor  # ruff: ignore[import-outside-top-level] Pulls in the outputs and the validator, only needed for `doctor`.
+
+    return doctor.run(paths.config_dir())
+
+
 def _config_path(_: argparse.Namespace) -> int:
     print(paths.config_dir() / "config.json")  # ruff: ignore[print]
     return 0
@@ -82,7 +88,7 @@ def build_parser() -> argparse.ArgumentParser:
     for action in ("install", "uninstall", "status", "restart"):
         service_sub.add_parser(action, help=f"{action} the service", parents=[common]).set_defaults(handler=_not_implemented(f"service {action}"))
 
-    sub.add_parser("doctor", help="check the setup", parents=[common]).set_defaults(handler=_not_implemented("doctor"))
+    sub.add_parser("doctor", help="check the setup", parents=[common]).set_defaults(handler=_doctor)
 
     config = sub.add_parser("config", help="inspect and migrate the config", parents=[common])
     config_sub = config.add_subparsers(dest="config_command", metavar="ACTION", required=True)
