@@ -50,8 +50,19 @@ def test_report_is_json_serialisable():
 def test_seed_config_writes_one_device_with_the_requested_effect(tmp_path):
     bench.seed_config(tmp_path, leds=300, fps=60, output="output_dummy", effect="effect_wave")
 
-    device = json.loads((tmp_path / "config.json").read_text(encoding="utf-8"))["device_configs"]["0"]
+    device = json.loads((tmp_path / "config.json").read_text(encoding="utf-8"))["device_configs"]["device_0"]
     assert (device["led_count"], device["output_type"], device["effects"]["last_effect"]) == (300, "output_dummy", "effect_wave")
+
+
+@pytest.mark.parametrize("microphone", [None, "USB PnP Audio Device"])
+def test_seed_config_passes_the_config_schema(tmp_path, microphone):
+    from mlsc.webserver.schemas.config_validator_service import ConfigValidatorService
+
+    bench.seed_config(tmp_path, leds=900, fps=60, output="output_raspi", effect="effect_wave", microphone=microphone)
+
+    config = json.loads((tmp_path / "config.json").read_text(encoding="utf-8"))
+    assert ConfigValidatorService().errors(config) == []
+    assert config["audio"]["device_name"] == microphone
 
 
 def test_parse_fps_ignores_loguru_colour_codes():

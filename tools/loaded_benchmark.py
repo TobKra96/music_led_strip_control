@@ -108,12 +108,14 @@ def system_info() -> dict:
     }
 
 
-def seed_config(config_dir: Path, *, leds: int, fps: int, output: str, effect: str) -> None:
+def seed_config(config_dir: Path, *, leds: int, fps: int, output: str, effect: str, microphone: str | None = None) -> None:
     config = json.loads((ROOT / "src" / "mlsc" / "config_template.json").read_text(encoding="utf-8"))
     device = config["default_device"]
     device.update(led_count=leds, led_mid=leds // 2, fps=fps, output_type=output)
     device["effects"]["last_effect"] = effect
-    config["device_configs"] = {"0": device}
+    config["device_configs"] = {"device_0": device}
+    config["id_counters"]["device"] = 1
+    config["audio"]["device_name"] = microphone  # None is the system default, which may not exist (a service, sudo).
     (config_dir / "config.json").write_text(json.dumps(config), encoding="utf-8")
 
 
@@ -154,7 +156,7 @@ def start_web_load(port: int, clients: int, stop: threading.Event) -> None:
 def run_once(args, leds: int) -> dict:
     with tempfile.TemporaryDirectory() as tmp:
         config_dir = Path(tmp)
-        seed_config(config_dir, leds=leds, fps=args.fps, output=args.output, effect=args.effect)
+        seed_config(config_dir, leds=leds, fps=args.fps, output=args.output, effect=args.effect, microphone=args.microphone)
         env = {**os.environ, "MLSC_CONFIG_DIR": str(config_dir), "PYTHONUNBUFFERED": "1"}
         proc = subprocess.Popen([sys.executable, "-m", "mlsc", "run"], cwd=ROOT, env=env, text=True,
                                 stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
@@ -189,6 +191,7 @@ def main(argv=None) -> int:
     p.add_argument("--fps", type=int, default=60)
     p.add_argument("--output", default="output_raspi", help="output_raspi, output_udp or output_dummy (the Mock Output)")
     p.add_argument("--effect", default="effect_energy")
+    p.add_argument("--microphone", help="name of the audio input device (see `mlsc doctor`); default is the system default")
     p.add_argument("--clients", type=int, default=2, help="browser tabs: one SSE stream and one API poller each")
     p.add_argument("--warmup", type=int, default=20, help="seconds before measuring")
     p.add_argument("--duration", type=int, default=60, help="seconds measured per LED count")
