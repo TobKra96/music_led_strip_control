@@ -56,10 +56,7 @@
 
     {% include 'includes/scripts.html' %}
 
-    {% include 'includes/wifi_wizard.html' %}
-
     <script src="{{ url_for('static', filename='assets/js/app.js') }}" type="module"></script>
-    <script src="{{ url_for('static', filename='assets/js/wifi.wizard.js') }}" type="module"></script>
 
     <!-- Specific Page JS goes HERE  -->
     {% block javascripts %}{% endblock javascripts %}
