@@ -1,0 +1,159 @@
+{% extends "layouts/base.html" %}
+{# PROTOTYPE (throwaway, #320): 3 layout variants of the Gradients & Colours page, switch with ?variant=A|B|C or the bottom bar / arrow keys.
+   All data is fake and in memory. Colour inputs are <input type=color> standing in for Pickr. Nothing is saved. #}
+{% block title %} Gradients &amp; Colours (PROTOTYPE) {% endblock %}
+{% block stylesheets %}
+<style>
+  .proto-bar{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);z-index:2000;background:#111;color:#fff;border-radius:24px;padding:6px 14px;display:flex;gap:12px;align-items:center;box-shadow:0 4px 16px rgba(0,0,0,.4)}
+  .proto-bar button{background:none;border:0;color:#fff;font-size:20px;cursor:pointer}
+  .bar-prev{height:34px;border-radius:6px;border:1px solid rgba(128,128,128,.4)}
+  .bar-sm{height:14px;border-radius:4px;width:100%}
+  .item{cursor:pointer;padding:8px;border-radius:6px;border:1px solid transparent}
+  .item:hover{background:rgba(128,128,128,.12)} .item.sel{border-color:#04a9f5;background:rgba(4,169,245,.08)}
+  .badge-pre{font-size:10px}
+  .stop-row{display:flex;gap:8px;align-items:center;margin-bottom:6px}
+  .stop-row input[type=color]{width:44px;height:34px;padding:0;border:0;background:none}
+  .tile{width:100%;aspect-ratio:3/2;border-radius:8px;cursor:pointer;border:2px solid transparent}
+  .tile:hover{border-color:#04a9f5}
+  .swatch{width:28px;height:28px;border-radius:50%;border:1px solid rgba(128,128,128,.5);flex:none}
+  .proto-banner{background:#fff3cd;color:#664d03;padding:6px 12px;border-radius:6px;margin-bottom:12px;font-size:13px}
+</style>
+{% endblock stylesheets %}
+
+{% block content %}
+<div class="pcoded-content"><div class="pcoded-inner-content">
+  <div class="page-header"><div class="page-block"><div class="page-header-title"><h5 class="m-b-10">Gradients &amp; Colours</h5></div>
+    <ul class="breadcrumb"><li class="breadcrumb-item"><a href="javascript:">Settings</a></li><li class="breadcrumb-item"><a href="javascript:">Gradients &amp; Colours</a></li></ul></div></div>
+  <div class="main-body"><div class="page-wrapper">
+    <div class="proto-banner">PROTOTYPE variant <b id="vname"></b>. Fake data, nothing saved. Try: select Spectral (read-only), Duplicate, edit My Party, delete My Party (in use), delete Teal (free), add/reorder stops.</div>
+    <div id="root"></div>
+  </div></div>
+</div></div>
+
+<div class="proto-bar"><button id="prev">&larr;</button><span id="vlabel"></span><button id="next">&rarr;</button></div>
+{% endblock content %}
+
+{% block javascripts %}
+<script>
+const VARIANTS = {A: "Master-detail with tabs", B: "Two sections, inline accordion editor", C: "Swatch gallery + modal editor"};
+const hex = c => c; // stops are hex strings in the prototype
+const db = {
+  gradient: [
+    {name:"Spectral", pre:true, stops:["#ff0000","#ffff00","#00ff00","#00ffff","#0000ff","#ff00ff"], used:["Effect Spectrum"]},
+    {name:"Sunset", pre:true, stops:["#ff5e3a","#ff2a68","#5b2a86"], used:[]},
+    {name:"Dancefloor", pre:true, stops:["#ff00ff","#00ffff","#ffffff"], used:["Device Desk"]},
+    {name:"My Party", pre:false, stops:["#ff8800","#ff0088","#8800ff"], used:["Effect Scroll (Desk)","Device Shelf"]},
+    {name:"Ocean 2", pre:false, stops:["#003366","#0099cc"], used:[]},
+  ],
+  colour: [
+    {name:"Red", pre:true, stops:["#ff0000"], used:["Effect Single"]},
+    {name:"Blue", pre:true, stops:["#0000ff"], used:[]},
+    {name:"Teal", pre:false, stops:["#008080"], used:[]},
+    {name:"Warm Amber", pre:false, stops:["#ffbf00"], used:["Effect Fade"]},
+  ]};
+const css = e => e.stops.length===1 ? e.stops[0] : `linear-gradient(90deg,${e.stops.join(",")})`;
+let kind = "gradient", sel = {gradient:"My Party", colour:"Teal"}, msg = "";
+const cur = k => db[k].find(e=>e.name===sel[k]);
+const esc = s => s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+// ---- shared editor body (name, stops, preview, actions) ----
+function editor(k, e){
+  if(!e) return `<p class="text-muted">Select an entry.</p>`;
+  const ro = e.pre, single = k==="colour";
+  const stops = e.stops.map((s,i)=>`<div class="stop-row">
+     <input type="color" value="${s}" ${ro?"disabled":""} data-act="stop" data-k="${k}" data-i="${i}">
+     <code>${s}</code>
+     ${ro||single?"":`<button class="btn btn-sm btn-outline-secondary" data-act="up" data-k="${k}" data-i="${i}" ${i==0?"disabled":""}>↑</button>
+     <button class="btn btn-sm btn-outline-secondary" data-act="down" data-k="${k}" data-i="${i}" ${i==e.stops.length-1?"disabled":""}>↓</button>
+     <button class="btn btn-sm btn-outline-danger" data-act="rm" data-k="${k}" data-i="${i}" ${e.stops.length<=2?"disabled":""}>✕</button>`}</div>`).join("");
+  return `
+   ${ro?`<div class="alert alert-info py-2">Predefined, read-only. Duplicate it to make an editable copy.</div>`:""}
+   <label class="mb-1">Name</label>
+   <input class="form-control mb-2" value="${esc(e.name)}" ${ro?"disabled":""} maxlength="32" data-act="name" data-k="${k}">
+   <div class="bar-prev mb-3" style="background:${css(e)}"></div>
+   <label class="mb-1">${single?"Colour":"Colour stops (evenly spaced)"}</label>${stops}
+   ${ro||single?"":`<button class="btn btn-sm btn-outline-primary mb-3" data-act="add" data-k="${k}">+ Add stop</button>`}
+   <div class="mt-2">
+     <button class="btn btn-primary btn-sm" ${ro?"disabled":""} data-act="save">Save</button>
+     <button class="btn btn-outline-secondary btn-sm" data-act="dup" data-k="${k}">Duplicate</button>
+     <button class="btn btn-outline-danger btn-sm" ${ro?"disabled":""} data-act="del" data-k="${k}">Delete</button>
+   </div>
+   ${msg?`<div class="alert alert-${msg.startsWith("Cannot")?"danger":"success"} mt-3 py-2">${msg}</div>`:""}`;
+}
+const listItem = (k,e,mode) => `<div class="item d-flex align-items-center gap-2 ${sel[k]===e.name?"sel":""}" data-act="sel" data-k="${k}" data-n="${esc(e.name)}">
+   ${k==="colour"?`<span class="swatch" style="background:${css(e)}"></span>`:""}
+   <div class="flex-grow-1"><div>${esc(e.name)} ${e.pre?`<span class="badge badge-secondary badge-pre">Predefined</span>`:""}</div>
+   ${k==="gradient"?`<div class="bar-sm mt-1" style="background:${css(e)}"></div>`:""}</div></div>`;
+
+// ---- Variant A: tabs + master/detail ----
+function A(){
+  const k = kind;
+  return `<div class="card"><div class="card-block">
+   <ul class="nav nav-tabs mb-3"><li class="nav-item"><a class="nav-link ${k=="gradient"?"active":""}" href="javascript:" data-act="tab" data-k="gradient">Gradients</a></li>
+     <li class="nav-item"><a class="nav-link ${k=="colour"?"active":""}" href="javascript:" data-act="tab" data-k="colour">Colours</a></li></ul>
+   <div class="row"><div class="col-md-5 mb-3">${db[k].map(e=>listItem(k,e)).join("")}
+     <button class="btn btn-sm btn-primary mt-2" data-act="new" data-k="${k}">+ New ${k}</button></div>
+   <div class="col-md-7">${editor(k,cur(k))}</div></div></div></div>`;
+}
+// ---- Variant B: both kinds as stacked sections, editor expands inline under the selected row ----
+function B(){
+  return ["gradient","colour"].map(k=>`<div class="card"><div class="card-header d-flex justify-content-between"><h5>${k=="gradient"?"Gradients":"Colours"}</h5>
+    <button class="btn btn-sm btn-primary" data-act="new" data-k="${k}">+ New</button></div><div class="card-block">
+    ${db[k].map(e=>listItem(k,e)+(sel[k]===e.name?`<div class="p-3 mb-2" style="border-left:3px solid #04a9f5">${editor(k,e)}</div>`:"")).join("")}</div></div>`).join("");
+}
+// ---- Variant C: gallery of tiles, modal editor ----
+let modal = null;
+function C(){
+  return ["gradient","colour"].map(k=>`<div class="card"><div class="card-header"><h5>${k=="gradient"?"Gradients":"Colours"}</h5></div><div class="card-block"><div class="row">
+   ${db[k].map(e=>`<div class="col-6 col-md-3 mb-3"><div class="tile" style="background:${css(e)}" data-act="open" data-k="${k}" data-n="${esc(e.name)}"></div>
+     <div class="mt-1 small">${esc(e.name)} ${e.pre?"🔒":""}</div></div>`).join("")}
+   <div class="col-6 col-md-3 mb-3"><div class="tile d-flex align-items-center justify-content-center text-muted" style="border:2px dashed #999" data-act="new" data-k="${k}">+ New</div></div>
+  </div></div></div>`).join("") + (modal?`<div style="position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1500;display:flex;align-items:center;justify-content:center" data-act="close">
+   <div class="card" style="width:min(520px,94vw);max-height:90vh;overflow:auto" onclick="event.stopPropagation()"><div class="card-header d-flex justify-content-between"><h5>${esc(cur(modal).name)}</h5><button class="btn btn-sm" data-act="close">✕</button></div>
+   <div class="card-block">${editor(modal,cur(modal))}</div></div></div>`:"");
+}
+
+const views = {A,B,C};
+let variant = new URLSearchParams(location.search).get("variant") || "A";
+function render(){
+  document.getElementById("root").innerHTML = views[variant]();
+  document.getElementById("vname").textContent = variant;
+  document.getElementById("vlabel").textContent = `${variant} (${VARIANTS[variant]})`;
+}
+function setVariant(v){variant=v;msg="";modal=null;const u=new URL(location);u.searchParams.set("variant",v);history.replaceState(null,"",u);render();}
+const keys = Object.keys(VARIANTS);
+const step = d => setVariant(keys[(keys.indexOf(variant)+d+keys.length)%keys.length]);
+document.getElementById("prev").onclick=()=>step(-1);
+document.getElementById("next").onclick=()=>step(1);
+document.addEventListener("keydown",ev=>{if(/INPUT|TEXTAREA/.test(ev.target.tagName))return;if(ev.key==="ArrowLeft")step(-1);if(ev.key==="ArrowRight")step(1);});
+
+document.getElementById("root").addEventListener("click",ev=>{
+  const t = ev.target.closest("[data-act]"); if(!t) return;
+  const a=t.dataset.act, k=t.dataset.k||kind, e=db[k]&&cur(k), i=+t.dataset.i;
+  msg="";
+  if(a==="tab"){kind=k;}
+  else if(a==="sel"){sel[k]=t.dataset.n;}
+  else if(a==="open"){sel[k]=t.dataset.n;modal=k;}
+  else if(a==="close"){if(ev.target===t||t.tagName==="BUTTON")modal=null;}
+  else if(a==="new"){const n=`New ${k} ${db[k].length+1}`;db[k].push({name:n,pre:false,stops:k==="colour"?["#ffffff"]:["#ff0000","#0000ff"],used:[]});sel[k]=n;if(variant==="C")modal=k;}
+  else if(a==="dup"){const n=`${e.name} (copy)`;db[k].push({name:n,pre:false,stops:[...e.stops],used:[]});sel[k]=n;msg=`Duplicated as "${n}".`;}
+  else if(a==="add"){e.stops.push("#ffffff");}
+  else if(a==="rm"){e.stops.splice(i,1);}
+  else if(a==="up"){[e.stops[i-1],e.stops[i]]=[e.stops[i],e.stops[i-1]];}
+  else if(a==="down"){[e.stops[i+1],e.stops[i]]=[e.stops[i],e.stops[i+1]];}
+  else if(a==="save"){msg="Saved.";}
+  else if(a==="del"){
+    if(e.used.length){msg=`Cannot delete "${e.name}": still used by ${e.used.join(", ")}. Switch those to another ${k} first.`;}
+    else{db[k]=db[k].filter(x=>x!==e);sel[k]=db[k][0].name;modal=null;}
+  }
+  render();
+});
+document.getElementById("root").addEventListener("input",ev=>{
+  const t=ev.target, a=t.dataset.act; if(!a)return; const k=t.dataset.k, e=cur(k);
+  if(a==="stop"){e.stops[+t.dataset.i]=t.value;t.nextElementSibling.textContent=t.value;
+    document.querySelectorAll(".bar-prev").forEach(b=>b.style.background=css(e));}
+  if(a==="name"){e.name=t.value;sel[k]=t.value;}
+});
+render();
+</script>
+{% endblock javascripts %}
