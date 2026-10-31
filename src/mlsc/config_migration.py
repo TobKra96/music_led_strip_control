@@ -17,7 +17,7 @@ from pathlib import Path
 from loguru import logger
 
 from mlsc.config_converter.config_converter_service import ConfigConverterService
-from mlsc.config_converter.config_converter_v4 import MigrationReport
+from mlsc.config_converter.config_converter_v4 import ConfigConverterV4, MigrationReport
 from mlsc.webserver.schemas.config_validator_service import ConfigValidatorService
 
 CURRENT_VERSION = 4
@@ -108,6 +108,20 @@ def coerce_string_booleans(config: dict, report: MigrationReport) -> None:
                 report.add("info", "string_boolean", path, f"Converted {value!r} to a boolean.", value)
 
 
+def _devices(config: dict) -> dict[str, dict]:
+    return {"default_device": config.get("default_device") or {}, **{f"device_configs.{k}": v for k, v in config.get("device_configs", {}).items()}}
+
+
+def has_stale_mqtt(config: dict) -> bool:
+    """Whether a config of the current version still carries MQTT output settings, as early 3.0 dev builds wrote them."""
+    return any("output_mqtt" in device.get("output", {}) or device.get("output_type") == "output_mqtt" for device in _devices(config).values())
+
+
+def strip_mqtt(config: dict, report: MigrationReport) -> None:
+    for path, device in _devices(config).items():
+        ConfigConverterV4.convert_mqtt_output(device, path, report)
+
+
 def list_audio_devices() -> list[dict] | None:
     """Return the input devices as `{"index", "name", "host_api"}`, or None when audio cannot be queried."""
     try:
@@ -133,6 +147,7 @@ def migrate_data(data: dict, audio_devices: list[dict] | None = None) -> tuple[d
 
     try:
         config, report = ConfigConverterService.migrate(copy.deepcopy(data), audio_devices=audio_devices)
+        strip_mqtt(config, report)  # A config already at the current version can still carry MQTT settings from early dev builds.
         fill_defaults(config, load_template())
         coerce_string_booleans(config, report)
     except Exception as e:
@@ -217,10 +232,12 @@ def prepare_config(
 
     if target.exists():
         try:
-            version = json.loads(target.read_text(encoding="utf-8")).get("version", 1)
+            current = json.loads(target.read_text(encoding="utf-8"))
+            version = current.get("version", 1)
+            stale_mqtt = version == CURRENT_VERSION and has_stale_mqtt(current)
         except (OSError, ValueError, AttributeError):
             return None
-        if version == CURRENT_VERSION:
+        if version == CURRENT_VERSION and not stale_mqtt:
             return None
         return _migrate_or_refuse(target, config_dir, audio_devices)
 

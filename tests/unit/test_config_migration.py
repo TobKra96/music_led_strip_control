@@ -355,3 +355,35 @@ def test_cli_config_migrate_prefers_the_current_config_over_a_legacy_one(legacy,
 
     assert cli.main(["config", "migrate"]) == 0
     assert json.loads((config_dir / "config.json").read_text())["version"] == 4
+
+
+def config_with_stale_mqtt():
+    config = current_config()
+    config["default_device"]["output"]["output_mqtt"] = {"MQTT_Broker": "broker", "MQTT_Path": "mlsc"}
+    config["default_device"]["output_type"] = "output_mqtt"
+    return config
+
+
+def test_prepare_config_removes_mqtt_settings_from_a_current_config(target_dir):
+    target_dir.mkdir()
+    (target_dir / "config.json").write_text(json.dumps(config_with_stale_mqtt()))
+
+    result = config_migration.prepare_config(target_dir, audio_devices=no_audio)
+
+    migrated = json.loads((target_dir / "config.json").read_text())
+    assert "output_mqtt" not in migrated["default_device"]["output"]
+    assert migrated["default_device"]["output_type"] == "output_dummy"
+    assert {entry["code"] for entry in result.report.to_dict()["entries"]} >= {"mqtt_output_removed"}
+    assert (target_dir / "config.v4.bak.json").is_file()
+
+
+def test_prepare_config_removes_mqtt_settings_from_extra_devices(target_dir):
+    config = current_config()
+    config["device_configs"] = {"device_1": json.loads(json.dumps(config["default_device"]))}
+    config["device_configs"]["device_1"]["output"]["output_mqtt"] = {"MQTT_Broker": "b", "MQTT_Path": "p"}
+    target_dir.mkdir()
+    (target_dir / "config.json").write_text(json.dumps(config))
+
+    config_migration.prepare_config(target_dir, audio_devices=no_audio)
+
+    assert "output_mqtt" not in json.loads((target_dir / "config.json").read_text())["device_configs"]["device_1"]["output"]
