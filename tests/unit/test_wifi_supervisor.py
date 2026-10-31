@@ -194,7 +194,7 @@ def test_the_hotspot_password_is_the_one_from_the_boot_partition(rig):
 
     rig.supervisor.set_hotspot(True)
 
-    assert rig.wifi.status().hotspot.password == "my-own-password"
+    assert rig.wifi.status().hotspot.password == "my-own-password"  # ruff: ignore[hardcoded-password-string]
 
 
 def test_a_generated_password_is_written_to_the_boot_partition_and_reused(rig):
@@ -212,7 +212,7 @@ def test_a_too_short_password_file_is_ignored(rig):
 
     rig.supervisor.set_hotspot(True)
 
-    assert rig.wifi.status().hotspot.password != "short"
+    assert rig.wifi.status().hotspot.password != "short"  # ruff: ignore[hardcoded-password-string]
 
 
 def test_turning_the_hotspot_off_is_kept_while_ethernet_is_up(rig):
