@@ -298,7 +298,7 @@ TWO_ADAPTERS = "eth0:ethernet:connected\nwlan0:wifi:unavailable\nwlan1:wifi:disc
 def adapter_manager(devices, radio="enabled:enabled", interface=None, ap_support=None):
     answers = {LIST_DEVICES: (0, devices), RADIO: (0, radio), REG_GET_COMMAND: (0, REG_GET), LIST_CONNECTIONS: (0, CONNECTIONS)}
     for name, supported in (ap_support or {}).items():
-        answers[("nmcli", "-t", "-g", "WIFI-PROPERTIES.AP", "device", "show", name)] = (0, "yes" if supported else "no")
+        answers["nmcli", "-t", "-g", "WIFI-PROPERTIES.AP", "device", "show", name] = (0, "yes" if supported else "no")
     runner = FakeRunner(answers)
     return NmcliWifiManager(runner, interface=interface), runner
 
@@ -399,17 +399,17 @@ class Sleeper:
     def __init__(self) -> None:
         self.slept = 0
 
-    def __call__(self, seconds):
+    def __call__(self, seconds) -> None:
         self.slept += seconds
 
 
 def switched_off_manager(becomes_ready_after=1):
-    """A Pi whose radio is off until `nmcli radio wifi on` ran and `becomes_ready_after` seconds passed."""
+    """Build a Pi whose radio is off until `nmcli radio wifi on` ran and `becomes_ready_after` seconds passed."""
     sleeper = Sleeper()
     state = {"on": False}
     runner = FakeRunner({LIST_DEVICES: (0, "wlan0:wifi:unavailable"), REG_GET_COMMAND: (0, REG_GET)})
 
-    def answer(command, timeout=None):
+    def answer(command, timeout=None):  # ruff: ignore[unused-function-argument]
         runner.calls.append(command)
         if tuple(command) == ("nmcli", "radio", "wifi", "on"):
             state["on"] = True
@@ -465,11 +465,11 @@ def test_a_connect_without_the_secret_names_the_network_and_asks_for_the_passwor
 
 
 def duplicated_hotspot_manager(profiles):
-    """A Pi that has `profiles` profiles named like the Hotspot; deleting by name removes one at a time."""
+    """Build a Pi that has `profiles` profiles named like the Hotspot; deleting by name removes one at a time."""
     state = {"profiles": profiles}
     runner = FakeRunner({LIST_DEVICES: (0, DEVICES), AP_SUPPORT: (0, "yes"), HOTSPOT_BASE: (0, "ok")})
 
-    def answer(command, timeout=None):
+    def answer(command, timeout=None):  # ruff: ignore[unused-function-argument]
         runner.calls.append(command)
         if tuple(command) == LIST_CONNECTIONS:
             return 0, "Wired connection 1:802-3-ethernet" + "\nMLSC-Hotspot:802-11-wireless" * state["profiles"]
@@ -497,3 +497,14 @@ def test_start_hotspot_replaces_the_profiles_a_earlier_start_left_behind():
     assert state["profiles"] == 0
     assert list(HOTSPOT_BASE) in runner.calls
     assert runner.calls.index(list(DELETE_HOTSPOT)) < runner.calls.index(list(HOTSPOT_BASE))
+
+
+def test_status_of_the_hotspot_reads_the_first_profile_when_old_duplicates_remain():
+    wifi, _ = manager_with({
+        DEVICE_SHOW: (0, "GENERAL.CONNECTION:MLSC-Hotspot\nIP4.ADDRESS[1]:10.42.0.1/24"),
+        HOTSPOT_SECRETS: (0, "AAA\n11111111\n\nMLSC-DBEE\nHcEO1F99PVLB"),
+    })
+
+    hotspot = wifi.status().hotspot
+
+    assert (hotspot.ssid, hotspot.password) == ("AAA", "11111111")

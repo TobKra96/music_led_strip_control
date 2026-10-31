@@ -268,7 +268,8 @@ class NmcliWifiManager(WifiManager):
         if code != 0:
             return None
         # `-g` escapes colons and backslashes like `-t` does.
-        ssid, _, password = output.partition("\n")
+        # Profiles that an earlier version left behind with the same name add their own lines: the first one is read.
+        ssid, password, *_ = [*output.split("\n"), "", ""]
         return HotspotInfo(split_terse(ssid)[0], split_terse(password)[0] or None)
 
     def _connection_names(self, *, wifi_only: bool = False) -> set[str]:

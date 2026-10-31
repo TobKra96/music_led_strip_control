@@ -225,7 +225,8 @@ def test_put_radio_on_an_unsupported_host_is_a_503(monkeypatch):
 def test_the_wifi_settings_page_renders_with_its_script_and_a_menu_entry(wifi, monkeypatch):
     client = make_client(wifi, monkeypatch)
     client.application.add_url_rule("/logout", "authentication_api.logout", lambda: "")  # The sidebar links to the v1 logout.
-    monkeypatch.setattr(Executer.instance, "device_executer", SimpleNamespace(get_devices=dict, get_groups=dict, get_assigned_groups=dict), raising=False)
+    devices = SimpleNamespace(get_devices=dict, get_groups=dict, get_assigned_groups=dict)
+    monkeypatch.setattr(Executer.instance, "device_executer", devices, raising=False)
 
     response = client.get("/settings/wifi_settings")
 
