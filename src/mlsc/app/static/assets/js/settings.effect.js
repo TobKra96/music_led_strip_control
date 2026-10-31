@@ -120,7 +120,7 @@ $(() => {
                 el.trigger('change');
             });
             unsaved.markClean();
-        }).catch(error => new Toast(`Error while loading effect settings. ${error.summary}`).error());
+        }).catch(error => new Toast(`Error while loading effect settings. ${error.summary ?? error.message}`).error());
     }
 
     /**

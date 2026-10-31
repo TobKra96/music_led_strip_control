@@ -114,15 +114,6 @@ class Device {
     }
 
     /**
-     * Call API to get all settings of one effect.
-     * @param {string} effectId
-     * @return {Promise.<object>}
-     */
-    getEffectSettings(effectId) {
-        return api.get(`/devices/${this.id}/effects/${effectId}/settings`);
-    }
-
-    /**
      * Whether `Random Cycle` runs on this device, or on any device of this group.
      * @return {Promise.<boolean>}
      */
