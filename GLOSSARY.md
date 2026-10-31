@@ -107,3 +107,11 @@ _Avoid_: Built-in, Default
 **Custom Entry**:
 A Gradient or Colour the user created, duplicated or kept from an older config. It can be edited and deleted.
 _Avoid_: User entry
+
+**Usage**:
+A place where a Gradient or Colour is selected: one effect setting of a Device or Group. The list of Usages blocks deleting a Custom Entry and is rewritten when it is renamed.
+_Avoid_: Reference, Dependency
+
+**Missing Reference**:
+A Usage whose Gradient or Colour name no longer exists. The effect shows a predefined default instead, and the UI flags it.
+_Avoid_: Broken link
