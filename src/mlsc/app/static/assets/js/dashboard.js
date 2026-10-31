@@ -13,7 +13,7 @@ $(() => {
     });
 
     if (!jinja_devices.length) {
-        new Toast('No devices found. Create a new device in "Device Settings".', true).info();
+        new Toast('No devices found. Create a new device in "Devices".', true).info();
         return;
     }
 

@@ -1,6 +1,6 @@
 {% extends "layouts/base.html" %}
 
-{% block title %} Device Settings {% endblock %}
+{% block title %} Devices {% endblock %}
 
 <!-- Specific CSS goes HERE -->
 {% block stylesheets %}
@@ -21,12 +21,12 @@
                     <div class="row align-items-center">
                         <div class="col-md-12">
                             <div class="page-header-title">
-                                <h5 class="m-b-10">Device Settings</h5>
+                                <h5 class="m-b-10">Devices</h5>
                             </div>
                             <ul class="breadcrumb">
                                 <li class="breadcrumb-item"><a href="{{ url_for('home_blueprint.index') }}"><i class="feather icon-home"></i></a></li>
                                 <li class="breadcrumb-item"><a href="javascript:">Settings</a></li>
-                                <li class="breadcrumb-item"><a href="javascript:">Device Settings</a></li>
+                                <li class="breadcrumb-item"><a href="javascript:">Devices</a></li>
                             </ul>
                         </div>
                     </div>
@@ -137,7 +137,7 @@
                                                         </label>
                                                         <input name="device_groups:tags" id="device_groups" type="option" class="form-control device_setting_input tagin" value="" required>
                                                         <datalist id="device_group_options"></datalist>
-                                                        <small id="device_group_hint" class="form-text text-muted d-none">No groups defined yet. Create them in <a href="/settings/general_settings">General Settings</a>.</small>
+                                                        <small id="device_group_hint" class="form-text text-muted d-none">No groups defined yet. Create them in <a href="/settings/general_settings">General</a>.</small>
                                                     </div>
                                                     <div class="form-group">
                                                         <label>LED Brightness <span for="led_brightness" class="mb-0 badge badge-secondary"></span></label>

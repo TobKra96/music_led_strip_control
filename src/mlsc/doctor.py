@@ -87,7 +87,7 @@ def _check_outputs(config: dict | None, host: Host) -> list[Check]:
         output = OUTPUTS.get(output_type)
         if output is None:
             message = f"The output type {output_type!r} is not supported."
-            diagnosis = Diagnosis.error(message, "Choose local GPIO, UDP or mock in the device settings.")
+            diagnosis = Diagnosis.error(message, "Choose local GPIO, UDP or mock on the Devices page.")
         else:
             try:
                 diagnosis = output.diagnose(device_config, host)

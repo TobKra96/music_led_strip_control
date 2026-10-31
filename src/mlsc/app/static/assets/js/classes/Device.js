@@ -6,7 +6,7 @@ const effectManager = new EffectManager();
 
 // Do not init tagin if it is not on the page.
 const taginEl = document.querySelector('.tagin');
-// Only groups defined in General Settings are allowed as device groups.
+// Only groups defined on the General page are allowed as device groups.
 const taginOptions = {
     enter: true,
     resolve: (name) => Object.keys(jinja_groups.groups).find(groupId => jinja_groups.groups[groupId] === name)
@@ -263,7 +263,7 @@ class Device {
 }
 
 /**
- * Populate selected device groups on Device Settings page.
+ * Populate selected device groups on the Devices page.
  * @param {Object} deviceGroups
  */
 const _populateDeviceGroups = (deviceGroups) => {
