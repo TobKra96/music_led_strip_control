@@ -60,6 +60,10 @@ _Avoid_: Brightness limit
 The Pi's own Wi-Fi network, which the user can choose as a saved mode when no router is available.
 _Avoid_: Access point, AP
 
+**Wi-Fi Adapter**:
+The Wi-Fi hardware MLSC manages: automatically the best usable one, or the one pinned in the config. Other adapters on the host are left alone.
+_Avoid_: Wi-Fi device, interface
+
 **Setup Fallback**:
 An automatic, temporary Hotspot raised when the Pi has no usable connection, so the user can reach the UI and join a network. Never saved as the Wi-Fi mode.
 _Avoid_: Setup mode, rescue AP
