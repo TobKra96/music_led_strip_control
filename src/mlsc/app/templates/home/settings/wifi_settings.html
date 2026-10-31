@@ -46,8 +46,6 @@
                         </div>
                         <div id="operation" class="alert d-none" role="status" data-unsaved-ignore></div>
 
-                        <button type="button" id="wifi_wizard_btn" class="btn btn-outline-primary mb-3">Start the Wi-Fi Setup Wizard</button>
-
                         <div id="status_card" class="card d-none">
                             <div class="card-header">
                                 <h5>Status</h5>
@@ -122,6 +120,14 @@
                             <div class="card-block">
                                 <p id="saved_empty" class="text-muted mb-0">No saved networks in range. Scan to see them.</p>
                                 <ul id="saved" class="wifi-networks mb-0"></ul>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-block">
+                                <div class="d-flex flex-md-row flex-column justify-content-md-end">
+                                    <button type="button" id="wifi_wizard_btn" class="btn btn-secondary m-0">Setup Wizard</button>
+                                </div>
                             </div>
                         </div>
                     </div>
