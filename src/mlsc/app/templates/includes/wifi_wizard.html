@@ -1,0 +1,67 @@
+<div class="modal fade" id="modal_wifi_wizard" tabindex="-1" role="dialog" aria-labelledby="modal_wifi_wizard_title" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modal_wifi_wizard_title">Wi-Fi Setup <small class="text-muted" id="wwz_progress"></small></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            </div>
+            <div class="modal-body">
+                <div id="wwz_blocked" class="alert alert-warning d-none" role="alert">
+                    <strong id="wwz_block_text" class="d-block"></strong>
+                    <span id="wwz_block_fix"></span>
+                    <button type="button" id="wwz_radio_btn" class="btn btn-sm btn-primary d-none mt-2">Turn Wi-Fi on</button>
+                </div>
+
+                <div id="wwz_steps">
+                    <div class="wifi-wizard-step" data-step="welcome">
+                        <h5>Put the Pi on your home Wi-Fi</h5>
+                        <p id="wwz_hotspot" class="text-muted d-none"></p>
+                        <p>You pick your network and enter its password. Then the Pi leaves its own Hotspot and joins it.</p>
+                        <div class="alert alert-warning">This device loses its connection to the Pi at that moment. Rejoin your home Wi-Fi afterwards and open the address shown at the end.</div>
+                        <p class="mb-0">If the Pi cannot join within 45 seconds, the Hotspot comes back and you can try again.</p>
+                    </div>
+
+                    <div class="wifi-wizard-step d-none" data-step="network">
+                        <h5>Pick your network</h5>
+                        <button type="button" id="wwz_scan_btn" class="btn btn-sm btn-primary mb-2"><span class="feather icon-refresh-cw"></span> Scan again</button>
+                        <div id="wwz_networks" class="list-group mb-2"></div>
+                        <p id="wwz_scan_empty" class="text-muted d-none">No networks found. Move the Pi closer to the router, or type a hidden network below.</p>
+                        <div class="form-group">
+                            <label for="wwz_ssid">Network name</label>
+                            <input id="wwz_ssid" type="text" class="form-control" maxlength="32" autocapitalize="off" spellcheck="false">
+                            <small class="form-text text-muted">Type it for a hidden network.</small>
+                        </div>
+                    </div>
+
+                    <div class="wifi-wizard-step d-none" data-step="password">
+                        <h5>Password for <span id="wwz_password_ssid"></span></h5>
+                        <div id="wwz_password_group" class="form-group">
+                            <label for="wwz_password">Password</label>
+                            <input id="wwz_password" type="password" class="form-control" maxlength="63" autocomplete="new-password">
+                            <small class="form-text text-muted">MLSC does not keep the password: the system does.</small>
+                        </div>
+                        <p id="wwz_open_hint" class="text-muted d-none">This is an open network and needs no password.</p>
+                    </div>
+
+                    <div class="wifi-wizard-step d-none" data-step="apply">
+                        <h5>Joining the network…</h5>
+                        <p>This page can stop answering now. That is expected: if nothing changes, rejoin your home Wi-Fi and open the address shown in the last step of this wizard, <code>http://mlsc.local</code> with the port of this page.</p>
+                        <p class="mb-0">Time left to connect: <strong id="wwz_countdown"></strong> s</p>
+                    </div>
+
+                    <div class="wifi-wizard-step d-none" data-step="result">
+                        <div id="wwz_result" class="alert" role="status"></div>
+                        <div id="wwz_address_row" class="input-group d-none">
+                            <code id="wwz_address" class="form-control"></code>
+                            <div class="input-group-append"><button type="button" id="wwz_copy_btn" class="btn btn-outline-primary">Copy</button></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary m-0" id="wwz_back">Back</button>
+                <button type="button" class="btn btn-primary m-0 ml-3" id="wwz_next">Next</button>
+            </div>
+        </div>
+    </div>
+</div>

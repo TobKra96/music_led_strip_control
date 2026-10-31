@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { ROLLBACK_SECONDS, addressOf, operationView, pageView, secondsLeft, signalLabel, signalLevel, hotspotProblem, connectProblem } from '../../src/mlsc/app/static/assets/js/classes/WifiView.js';
+import { ROLLBACK_SECONDS, addressOf, operationView, pageView, secondsLeft, signalLabel, signalLevel, hotspotProblem, connectProblem, shouldAutoOpen, wizardBlock, wizardResult } from '../../src/mlsc/app/static/assets/js/classes/WifiView.js';
 
 const ready = {
     supported: true, hotspot_supported: true, country: 'DE', interface: 'wlan0', radio: 'ready',
@@ -194,5 +194,35 @@ describe('connectProblem', () => {
 
     it('rejects a password outside 8 to 63 characters for a secured network', () => {
         expect(connectProblem('Home', 'short', networks)).toBe('A Wi-Fi password has 8 to 63 characters.');
+    });
+});
+
+describe('Setup Wizard', () => {
+    const fallback = { ...ready, mode: 'hotspot', connected: false, ssid: null, ip: null, hotspot: { ssid: 'MLSC-1A2B', password: null } };
+
+    it('opens by itself only on the Hotspot without a client connection, and not after being closed', () => {
+        expect(shouldAutoOpen(fallback, false)).toBe(true);
+        expect(shouldAutoOpen(fallback, true)).toBe(false);
+        expect(shouldAutoOpen(ready, false)).toBe(false);
+        expect(shouldAutoOpen({ ...fallback, supported: false }, false)).toBe(false);
+    });
+
+    it('runs when Wi-Fi is ready and shows the fix for each blocker instead', () => {
+        expect(wizardBlock(fallback)).toBeNull();
+        expect(wizardBlock({ ...fallback, supported: false }).text).toContain('unsupported');
+        const off = wizardBlock({ ...fallback, radio: 'switched_off', diagnosis: warning('Wi-Fi is switched off.', 'Turn it on.') });
+        expect(off).toEqual({ text: 'Wi-Fi is switched off.', fix: 'Turn it on.', canEnableRadio: true });
+        const country = wizardBlock({ ...fallback, country: null, diagnosis: warning('No Wi-Fi country is set.', 'Run raspi-config.') });
+        expect(country).toMatchObject({ text: 'No Wi-Fi country is set.', canEnableRadio: false });
+    });
+
+    it('tells the user where to go on success and why it failed otherwise', () => {
+        const address = 'http://mlsc.local:5000';
+
+        expect(wizardResult({ state: 'confirmed', error: null }, 'Home', address)).toEqual({ success: true, text: expect.stringContaining(address) });
+        const failed = wizardResult({ state: 'rolled_back', error: 'No IP address.' }, 'Home', address);
+        expect(failed.success).toBe(false);
+        expect(failed.text).toContain('No IP address.');
+        expect(failed.text).toContain('Hotspot');
     });
 });

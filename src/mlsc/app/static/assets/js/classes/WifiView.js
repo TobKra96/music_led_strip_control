@@ -104,6 +104,42 @@ export const hotspotProblem = (ssid, password) => {
 };
 
 /**
+ * Whether the Setup Wizard opens by itself: the user reached the Pi over its Hotspot, so it has no client connection.
+ * @param {object} status The body of `GET /api/v2/wifi/status`.
+ * @param {boolean} dismissed Whether the user closed the wizard already in this browser session.
+ * @return {boolean}
+ */
+export const shouldAutoOpen = (status, dismissed) => status.supported && status.mode === 'hotspot' && !status.connected && !dismissed;
+
+/**
+ * Whether the wizard can run, checked before the first step so that a problem is not found at the end.
+ * @param {object} status The body of `GET /api/v2/wifi/status`.
+ * @return {{text: string, fix: string|null, canEnableRadio: boolean}|null} What to show instead of the steps, `null` when ready.
+ */
+export const wizardBlock = (status) => {
+    if (!status.supported) {
+        return { text: 'Wi-Fi setup is unsupported on this host: NetworkManager is not available.', fix: status.diagnosis.suggested_fix, canEnableRadio: false };
+    }
+    if (status.radio === 'ready' && status.diagnosis.status === 'ok') return null;
+    return { text: status.diagnosis.message, fix: status.diagnosis.suggested_fix, canEnableRadio: status.radio === 'switched_off' };
+};
+
+/**
+ * What the last step tells the user.
+ * @param {{state: string, error: string|null}} operation The final state of the `wifi` Operation.
+ * @param {string} ssid The network that was joined.
+ * @param {string} address From `addressOf`.
+ * @return {{success: boolean, text: string}}
+ */
+export const wizardResult = (operation, ssid, address) => {
+    if (operation.state === 'confirmed') {
+        return { success: true, text: `The Pi joined ${ssid}. Rejoin your home Wi-Fi on this device, then open ${address}.` };
+    }
+    const reason = operation.error ? ` ${operation.error}` : '';
+    return { success: false, text: `The Pi could not join ${ssid}.${reason} The Hotspot is coming back: rejoin it, then try again.` };
+};
+
+/**
  * What is wrong with the network name and password typed in, before the request is sent. A saved network needs no password.
  * @param {string} ssid
  * @param {string} password
