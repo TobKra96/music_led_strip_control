@@ -3,6 +3,7 @@ from dataclasses import dataclass, field
 
 from loguru import logger
 
+from mlsc.color_registry import CONFIG_KEYS, MAX_NAME_LENGTH, find_name, rename_usages
 from mlsc.config_converter.config_converter_base import ConfigConverterBase
 
 # Old `led_strip` value -> (chip_family, colour_order, white_channel, lossy_reason).
@@ -186,6 +187,51 @@ class ConfigConverterV4(ConfigConverterBase):
         if "device_id" in general_settings:
             report.add("info", "device_id_removed", "general_settings.device_id",
                        "Removed the microphone index, which the audio device name replaces.", general_settings.pop("device_id"))
+
+    @staticmethod
+    def _clashes(config: dict, template: dict):
+        """Yield `(kind, name)` of every Custom Entry that shares a name with a Predefined Entry: edited, or spelled in another case."""
+        for kind, section in CONFIG_KEYS.items():
+            predefined = template.get(section, {})
+            for name, value in config.get(section, {}).items():
+                stored = find_name(predefined, name)
+                if stored is not None and (stored != name or predefined[stored] != value):
+                    yield kind, name
+
+    @staticmethod
+    def has_entry_clashes(config: dict, template: dict) -> bool:
+        return next(ConfigConverterV4._clashes(config, template), None) is not None
+
+    @staticmethod
+    def migrate_entry_clashes(config: dict, template: dict, report: MigrationReport) -> None:
+        """Rename Custom Entries that clash with a Predefined name to `<name> (custom)` and restore the template's Predefined Entries.
+
+        Usages follow the rename. A config without clashes is left untouched, so the step is idempotent.
+        """
+        for kind, name in list(ConfigConverterV4._clashes(config, template)):
+            section = CONFIG_KEYS[kind]
+            entries = config[section]
+            new = ConfigConverterV4._custom_name(entries, name)
+            entries[new] = entries.pop(name)
+
+            rename_usages(config, kind, name, new)
+            default_effects = config.get("default_device", {}).get("effects", {})
+            rename_usages({"device_configs": {"default_device": {"effects": default_effects}}}, kind, name, new)
+
+            report.add("info", "entry_renamed", f"{section}.{name}",
+                       f"A {kind} named {name!r} clashed with a predefined {kind}. Your version is now {new!r}; references were updated.", name)
+            predefined = template[section]
+            restored = find_name(predefined, name)
+            entries[restored] = copy.deepcopy(predefined[restored])
+
+    @staticmethod
+    def _custom_name(existing, name: str) -> str:
+        for number in range(1, 1000):
+            suffix = " (custom)" if number == 1 else f" (custom {number})"
+            candidate = f"{name[:MAX_NAME_LENGTH - len(suffix)].rstrip()}{suffix}"
+            if find_name(existing, candidate) is None:
+                return candidate
+        return f"{name[:MAX_NAME_LENGTH - 10]} (custom)"
 
     @staticmethod
     def id_counters(config: dict) -> dict:

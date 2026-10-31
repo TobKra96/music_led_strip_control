@@ -148,7 +148,9 @@ def migrate_data(data: dict, audio_devices: list[dict] | None = None) -> tuple[d
     try:
         config, report = ConfigConverterService.migrate(copy.deepcopy(data), audio_devices=audio_devices)
         strip_mqtt(config, report)  # A config already at the current version can still carry MQTT settings from early dev builds.
-        fill_defaults(config, load_template())
+        template = load_template()
+        fill_defaults(config, template)
+        ConfigConverterV4.migrate_entry_clashes(config, template, report)
         coerce_string_booleans(config, report)
     except Exception as e:
         raise ConfigMigrationError(f"The config could not be migrated: {e!r}") from e
@@ -234,7 +236,7 @@ def prepare_config(
         try:
             current = json.loads(target.read_text(encoding="utf-8"))
             version = current.get("version", 1)
-            stale_mqtt = version == CURRENT_VERSION and has_stale_mqtt(current)
+            stale_mqtt = version == CURRENT_VERSION and (has_stale_mqtt(current) or ConfigConverterV4.has_entry_clashes(current, load_template()))
         except (OSError, ValueError, AttributeError):
             return None
         if version == CURRENT_VERSION and not stale_mqtt:

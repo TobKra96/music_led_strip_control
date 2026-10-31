@@ -7,7 +7,7 @@ import pytest
 
 from mlsc import cli, config_migration
 from mlsc.audio_capture.fake import FakeCapture
-from mlsc.config_migration import ConfigMigrationError
+from mlsc.config_migration import ConfigMigrationError, load_template, migrate_data
 from mlsc.config_service import ConfigService
 
 pytestmark = pytest.mark.unit
@@ -387,3 +387,16 @@ def test_prepare_config_removes_mqtt_settings_from_extra_devices(target_dir):
     config_migration.prepare_config(target_dir, audio_devices=no_audio)
 
     assert "output_mqtt" not in json.loads((target_dir / "config.json").read_text())["device_configs"]["device_1"]["output"]
+
+
+def test_migrate_data_renames_clashing_entries_even_at_the_current_version():
+    template = load_template()
+    config = copy.deepcopy(template)
+    config["colors"]["red"] = [1, 2, 3]
+
+    migrated, report = migrate_data(config)
+
+    assert migrated["colors"]["red"] == template["colors"]["red"]
+    assert migrated["colors"]["red (custom)"] == [1, 2, 3]
+    assert [e["code"] for e in report.entries if e["code"] == "entry_renamed"] == ["entry_renamed"]
+    assert not migrate_data(migrated)[1].entries

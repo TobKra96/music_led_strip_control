@@ -320,3 +320,125 @@ def test_golden_real_configs_migrate_to_the_expected_v4(name):
     assert report.from_version == (1 if name == "v1" else 2)
     assert {d["chip_family"] for d in config["device_configs"].values()} == {"sk6812", "ws2811"}
     assert config["audio"]["device_name"] == "USB Mic"
+
+
+# --- Predefined / Custom Entry clashes ---
+
+TEMPLATE = {"colors": {"red": [255, 0, 0], "blue": [0, 0, 255]}, "gradients": {"spectral": [[255, 0, 0], [0, 0, 255]]}}
+
+
+def clash_config(colors=None, gradients=None, **effects):
+    return {
+        "colors": colors if colors is not None else copy.deepcopy(TEMPLATE["colors"]),
+        "gradients": gradients if gradients is not None else copy.deepcopy(TEMPLATE["gradients"]),
+        "default_device": {"effects": {}},
+        "device_configs": {"device_0": {"effects": {"effect_gradient": {"gradient": "spectral"}, "effect_single": {"color": "red"}, **effects}}},
+    }
+
+
+def resolve(config):
+    report = MigrationReport()
+    ConfigConverterV4.migrate_entry_clashes(config, TEMPLATE, report)
+    return config, report
+
+
+def renames(report):
+    return [e for e in report.entries if e["code"] == "entry_renamed"]
+
+
+def test_untouched_predefined_entries_are_left_alone():
+    config, report = resolve(clash_config())
+
+    assert config == clash_config()
+    assert not report.entries
+
+
+def test_edited_predefined_colour_is_renamed_and_the_template_restored():
+    config, report = resolve(clash_config(colors={"red": [200, 0, 0], "blue": [0, 0, 255]}))
+
+    assert config["colors"] == {"red": [255, 0, 0], "blue": [0, 0, 255], "red (custom)": [200, 0, 0]}
+    assert len(renames(report)) == 1
+    assert renames(report)[0]["path"] == "colors.red"
+
+
+def test_edited_predefined_gradient_is_renamed_and_references_follow():
+    stops = [[1, 2, 3], [4, 5, 6]]
+    config, _ = resolve(clash_config(gradients={"spectral": stops}))
+
+    assert config["gradients"] == {"spectral": TEMPLATE["gradients"]["spectral"], "spectral (custom)": stops}
+    assert config["device_configs"]["device_0"]["effects"]["effect_gradient"]["gradient"] == "spectral (custom)"
+
+
+def test_references_follow_a_colour_rename_but_not_a_gradient_with_the_same_name():
+    config, _ = resolve(clash_config(colors={"red": [1, 1, 1]}))
+
+    effects = config["device_configs"]["device_0"]["effects"]
+    assert effects["effect_single"]["color"] == "red (custom)"
+    assert effects["effect_gradient"]["gradient"] == "spectral"
+
+
+def test_custom_entry_clashing_case_insensitively_is_renamed():
+    config, report = resolve(clash_config(colors={"red": [255, 0, 0], "RED": [9, 9, 9]}))
+
+    assert config["colors"]["RED (custom)"] == [9, 9, 9]
+    assert config["colors"]["red"] == [255, 0, 0]
+    assert "RED" not in config["colors"]
+    assert renames(report)[0]["original"] == "RED"
+
+
+def test_case_insensitive_clash_without_the_predefined_present_restores_it():
+    config, _ = resolve(clash_config(colors={"Red": [9, 9, 9]}))
+
+    assert config["colors"] == {"red": [255, 0, 0], "Red (custom)": [9, 9, 9]}
+
+
+def test_entry_dropped_from_the_template_stays_as_a_plain_custom_entry():
+    config, report = resolve(clash_config(colors={"red": [255, 0, 0], "old": [1, 2, 3]}))
+
+    assert config["colors"]["old"] == [1, 2, 3]
+    assert not report.entries
+
+
+def test_custom_name_already_taken_gets_a_numbered_suffix():
+    config, _ = resolve(clash_config(colors={"red": [1, 1, 1], "red (custom)": [2, 2, 2]}))
+
+    assert config["colors"]["red (custom)"] == [2, 2, 2]
+    assert config["colors"]["red (custom 2)"] == [1, 1, 1]
+
+
+def test_renamed_name_is_trimmed_to_the_maximum_length():
+    template = {"colors": {"x" * 32: [0, 0, 0]}, "gradients": {}}
+    config = {"colors": {"x" * 32: [1, 1, 1]}, "gradients": {}, "device_configs": {}}
+
+    ConfigConverterV4.migrate_entry_clashes(config, template, MigrationReport())
+
+    renamed = next(name for name in config["colors"] if name != "x" * 32)
+    assert len(renamed) <= 32
+    assert renamed.endswith(" (custom)")
+
+
+def test_default_device_references_follow_too():
+    config = clash_config(colors={"red": [1, 1, 1]})
+    config["default_device"]["effects"] = {"effect_single": {"color": "red"}}
+
+    resolve(config)
+
+    assert config["default_device"]["effects"]["effect_single"]["color"] == "red (custom)"
+
+
+def test_entry_clash_step_is_idempotent():
+    config, _ = resolve(clash_config(colors={"red": [200, 0, 0], "BLUE": [9, 9, 9]}))
+    again = copy.deepcopy(config)
+
+    _, report = resolve(again)
+
+    assert again == config
+    assert not report.entries
+
+
+def test_has_entry_clashes_tells_migrated_from_unmigrated_configs():
+    clashing = clash_config(colors={"red": [200, 0, 0]})
+    migrated, _ = resolve(copy.deepcopy(clashing))
+
+    assert ConfigConverterV4.has_entry_clashes(clashing, TEMPLATE)
+    assert not ConfigConverterV4.has_entry_clashes(migrated, TEMPLATE)
