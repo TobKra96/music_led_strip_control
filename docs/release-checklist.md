@@ -27,6 +27,7 @@ Use a Pi 4 with a real strip and live audio capture. Install the build under tes
 - [ ] **nmcli option names.** On the shipped NetworkManager (`nmcli --version`), first make sure Wi-Fi is on (`nmcli radio`, `rfkill list`). Compare what the Wi-Fi Settings page (#307) and `/api/v2/wifi/*` (the paths are in the OpenAPI docs) do for status, scan, connect, forget and Hotspot on and off with the same `nmcli` commands by hand. Fix any option name nmcli rejects in `NmcliWifiManager` and refresh the recorded nmcli output in the tests.
 - [ ] **Wi-Fi Settings page (#307).** On a Pi, from the page: scan, connect, forget, Hotspot on and off, and a Wi-Fi Rollback after a wrong password (the countdown shows and the previous mode returns). With two Wi-Fi adapters, check the page names the one in use (or the pinned `wifi.interface`). With the radio soft-blocked (`sudo rfkill block wifi`), check the "Wi-Fi is switched off" banner and that "Turn Wi-Fi on" works.
 - [ ] **Wi-Fi Setup Wizard (#308).** Once it is built, from a phone on a freshly booted Pi with no known network: join the Hotspot, run the wizard, join your home Wi-Fi and open `http://mlsc.local:8080`. Repeat with a wrong password and check the Hotspot comes back.
+- [ ] **Gradients & Colours editor.** Edit a gradient used by a running effect on one Device while a second Device runs another effect: only the Device that uses the gradient restarts and its strip shows the new colours.
 - [ ] **Discovery.** `avahi-daemon` is running and `http://mlsc.local:8080` opens from a phone on the same network, including after the Wi-Fi Rollback.
 
 ## 4. Decisions
@@ -37,4 +38,4 @@ Use a Pi 4 with a real strip and live audio capture. Install the build under tes
 
 - [ ] Tag the release commit: `git tag v3.0.0rc1 && git push origin v3.0.0rc1`. The **Publish** workflow uploads to PyPI.
 - [ ] On a clean Pi: `uv tool install "music-led-strip-control[pi]"` (add `--prerelease allow` for an rc), then `sudo mlsc service install`, and open the web UI.
-- [ ] Write the GitHub release notes and mark rc tags as pre-release.
+- [ ] Write the GitHub release notes from [release-notes.md](release-notes.md) and mark rc tags as pre-release.

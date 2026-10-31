@@ -74,6 +74,7 @@ def _blueprint(kind, plural, field, create_model, update_model, out_model, list_
     @api.post("", summary=f"Create a {kind}", responses={"201": out_model, **WRITE_ERRORS, **CONFLICT_ERRORS, **REFRESH_ERRORS})
     @api_login_required
     def create_entry(body: create_model):
+        """Answer `AlreadyExists` (409) for a name that exists, ignoring case. Restarts no device."""
         return entries().create_entry(kind, body.name, getattr(body, field)), 201
 
     @api.get("/<name>", summary=f"Get a {kind}", responses={"200": out_model, **READ_ERRORS})
@@ -84,14 +85,20 @@ def _blueprint(kind, plural, field, create_model, update_model, out_model, list_
     @api.patch("/<name>", summary=f"Edit or rename a {kind}", responses={"200": out_model, **WRITE_ERRORS, **CONFLICT_ERRORS, **REFRESH_ERRORS})
     @api_login_required
     def update_entry(path: EntryPath, body: update_model):
-        """Rewrite every usage on a rename, which restarts the devices that use the entry. Predefined entries answer `PredefinedEntryReadOnly`."""
+        """Rewrite every usage on a rename, which restarts the devices that use the entry. 
+        Predefined entries answer `PredefinedEntryReadOnly` (409), an existing name `AlreadyExists` (409).
+        `RefreshFailed` (500) means the change is saved but the devices did not restart.
+        """
         patch = require_patch(body.model_dump(exclude_unset=True))
         return entries().update_entry(kind, path.name, patch.get("name"), patch.get(field))
 
     @api.delete("/<name>", summary=f"Delete a {kind}", responses={"204": None, **READ_ERRORS, **CONFLICT_ERRORS})
     @api_login_required
     def delete_entry(path: EntryPath):
-        """Blocked with `EntryInUse` (its `usages` member lists where) while an effect setting still uses the entry."""
+        """Block with `EntryInUse` (409) while an effect setting uses the entry; its `usages` member lists where.
+
+        Predefined entries answer `PredefinedEntryReadOnly` (409).
+        """
         entries().delete_entry(kind, path.name)
         return "", 204
 

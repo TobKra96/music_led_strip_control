@@ -6333,6 +6333,7 @@
         ]
       },
       "post": {
+        "description": "Answer `AlreadyExists` (409) for a name that exists, ignoring case. Restarts no device.",
         "operationId": "colors_api_v2_create_entry_post",
         "requestBody": {
           "content": {
@@ -6424,7 +6425,7 @@
     },
     "/api/v2/colors/{name}": {
       "delete": {
-        "description": "Blocked with `EntryInUse` (its `usages` member lists where) while an effect setting still uses the entry.",
+        "description": "Block with `EntryInUse` (409) while an effect setting uses the entry; its `usages` member lists where.<br/><br/>Predefined entries answer `PredefinedEntryReadOnly` (409).",
         "operationId": "colors_api_v2_delete_entry__name__delete",
         "parameters": [
           {
@@ -6552,7 +6553,7 @@
         ]
       },
       "patch": {
-        "description": "Rewrite every usage on a rename, which restarts the devices that use the entry. Predefined entries answer `PredefinedEntryReadOnly`.",
+        "description": "Rewrite every usage on a rename, which restarts the devices that use the entry. <br/>Predefined entries answer `PredefinedEntryReadOnly` (409), an existing name `AlreadyExists` (409).<br/>`RefreshFailed` (500) means the change is saved but the devices did not restart.",
         "operationId": "colors_api_v2_update_entry__name__patch",
         "parameters": [
           {
@@ -10665,6 +10666,7 @@
         ]
       },
       "post": {
+        "description": "Answer `AlreadyExists` (409) for a name that exists, ignoring case. Restarts no device.",
         "operationId": "gradients_api_v2_create_entry_post",
         "requestBody": {
           "content": {
@@ -10756,7 +10758,7 @@
     },
     "/api/v2/gradients/{name}": {
       "delete": {
-        "description": "Blocked with `EntryInUse` (its `usages` member lists where) while an effect setting still uses the entry.",
+        "description": "Block with `EntryInUse` (409) while an effect setting uses the entry; its `usages` member lists where.<br/><br/>Predefined entries answer `PredefinedEntryReadOnly` (409).",
         "operationId": "gradients_api_v2_delete_entry__name__delete",
         "parameters": [
           {
@@ -10884,7 +10886,7 @@
         ]
       },
       "patch": {
-        "description": "Rewrite every usage on a rename, which restarts the devices that use the entry. Predefined entries answer `PredefinedEntryReadOnly`.",
+        "description": "Rewrite every usage on a rename, which restarts the devices that use the entry. <br/>Predefined entries answer `PredefinedEntryReadOnly` (409), an existing name `AlreadyExists` (409).<br/>`RefreshFailed` (500) means the change is saved but the devices did not restart.",
         "operationId": "gradients_api_v2_update_entry__name__patch",
         "parameters": [
           {

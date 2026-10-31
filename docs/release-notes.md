@@ -1,0 +1,19 @@
+# Release notes
+
+## 3.0.0 (unreleased)
+
+### Gradients & Colours
+
+- New **Gradients & Colours** page under Settings to create, edit, rename, duplicate and delete your own gradients and colours. Predefined entries are read-only; duplicate one to get an editable copy.
+- Editing an entry that a running effect uses restarts only the Devices that use it.
+- API: `/api/v2/gradients` and `/api/v2/colors` (see the OpenAPI docs for the `PredefinedEntryReadOnly`, `EntryInUse` and `RefreshFailed` problems).
+
+### Upgrading: entries renamed to `(custom)`
+
+Predefined names are now reserved. When an older config is migrated:
+
+- A predefined gradient or colour you had edited is renamed `<name> (custom)` and the shipped version is restored.
+- A custom entry whose name matches a predefined one (ignoring case) is renamed `<name> (custom)`.
+- Effect settings that used the old name follow the rename, so nothing changes visually.
+
+Every rename is listed in the Migration Report of the Config Migration. Check it after upgrading if you want to know which of your entries were renamed.
