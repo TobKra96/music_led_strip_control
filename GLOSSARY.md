@@ -115,3 +115,11 @@ _Avoid_: Reference, Dependency
 **Missing Reference**:
 A Usage whose Gradient or Colour name no longer exists. The effect shows a predefined default instead, and the UI flags it.
 _Avoid_: Broken link
+
+**Power Action**:
+A reboot or shutdown of the machine MLSC runs on, requested from the web UI.
+_Avoid_: Restart, Power command
+
+**Server Logs**:
+The lines MLSC itself has written during the current boot, as shown on the System Status page.
+_Avoid_: Journal, Console
