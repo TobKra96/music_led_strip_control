@@ -1,6 +1,7 @@
 import { initPickr, formatRGB, parseRGB } from './classes/Pickr.js';
 import { api } from './classes/Api.js';
 import { Device } from './classes/Device.js';
+import { loadEffectSettings, saveEffectSettings as saveSettings } from './classes/EffectSettings.js';
 import Toast from './classes/Toast.js';
 import UnsavedChanges from './classes/UnsavedChanges.js';
 
@@ -94,22 +95,16 @@ $(() => {
      * Populate effect settings with config values.
      */
     const setLocalSettings = () => {
-        if (dm.current.isGroup) {
-            // TODO: Implement UI/UX for populating settings when a group is selected.
-            // Options: load the default values, leave inputs blank, or show settings of first device.
-            new Toast('Displaying effect settings for groups is not supported yet.').error();
-            console.log('Not supported yet.');
-
-            // Reset form, slider labels and color picker to default values for now.
-            $('#settingsForm').get(0).reset();
-            $('#settingsForm span.badge').text('');
-            $('#color_picker').css('background-color', 'rgb(255, 255, 255)');
-            // A group view has nothing to save, so it never warns.
-            unsaved.markClean();
-            return;
-        }
-
-        dm.current.getEffectSettings(effectIdentifier).then((settings) => {
+        loadEffectSettings(dm.current, effectIdentifier).then((settings) => {
+            if (settings === null) {
+                // A group without devices has nothing to show: reset form, slider labels and color picker to default values.
+                $('#settingsForm').get(0).reset();
+                $('#settingsForm span.badge').text('');
+                $('#color_picker').css('background-color', 'rgb(255, 255, 255)');
+                unsaved.markClean();
+                new Toast('This group has no devices.').info();
+                return;
+            }
             $.each(settings, (key, value) => {
                 const el = $(`#${key}`);
                 if (el.is(':checkbox')) {
@@ -134,13 +129,6 @@ $(() => {
     const saveEffectSettings = () => {
         if (!dm.current) return;
 
-        if (dm.current.isGroup) {
-            // TODO: Pass group of devices to API.
-            new Toast('Saving effect settings for groups is not supported yet.').error();
-            console.log('Not supported yet.');
-            return;
-        }
-
         // Serialize effect settings as JSON.
         const serializedForm = $('#settingsForm .setting_input').serializeJSON({
             checkboxUncheckedValue: 'false',
@@ -150,11 +138,11 @@ $(() => {
         });
 
         // Save effect settings to config.
-        api.patch(`/devices/${dm.current.id}/effects/${effectIdentifier}/settings`, serializedForm).then(() => {
+        saveSettings(dm.current, effectIdentifier, serializedForm).then(() => {
             unsaved.markClean();
             new Toast('Effect settings saved.').success();
         }).catch((error) => {
-            new Toast(`Error while saving effect settings. ${error.summary}`).error();
+            new Toast(`Error while saving effect settings. ${error.summary ?? error.message}`).error();
         });
     }
 
