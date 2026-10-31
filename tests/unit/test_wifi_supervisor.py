@@ -311,7 +311,7 @@ def test_a_newer_change_ends_the_operation_it_replaces(rig):
 def test_wifi_state_is_published_on_mode_connection_and_fallback_changes_only(rig):
     rig.run(5)
     rig.run(5)
-    assert rig.wifi_states() == [{"mode": CLIENT, "connected": False, "fallback": False}]
+    assert rig.wifi_states() == [{"mode": CLIENT, "connected": False, "fallback": False, "radio": "ready"}]
 
     rig.run(60)
 
@@ -319,3 +319,43 @@ def test_wifi_state_is_published_on_mode_connection_and_fallback_changes_only(ri
     count = len(rig.wifi_states())
     rig.run(10)
     assert len(rig.wifi_states()) == count
+
+
+@pytest.fixture
+def off_rig(fake_clock, tmp_path):
+    return Rig(fake_clock, tmp_path, radio="switched_off")
+
+
+def test_nothing_is_done_about_wifi_while_the_radio_is_not_ready(off_rig):
+    off_rig.run(600)
+
+    assert off_rig.supervisor.fallback_active is False
+    assert off_rig.wifi.status().mode == CLIENT
+
+
+def test_the_fallback_timers_start_fresh_when_the_radio_comes_back(off_rig):
+    off_rig.run(600)
+    off_rig.wifi.enable_radio()
+
+    off_rig.run(55)
+    assert off_rig.supervisor.fallback_active is False
+
+    off_rig.run(10)
+    assert off_rig.supervisor.fallback_active is True
+
+
+def test_connect_and_hotspot_changes_fail_up_front_while_the_radio_is_not_ready(off_rig):
+    with pytest.raises(WifiError, match="Wi-Fi is switched off"):
+        off_rig.supervisor.connect("Home", "secret123")
+    with pytest.raises(WifiError, match="Wi-Fi is switched off"):
+        off_rig.supervisor.set_hotspot(True)
+
+    assert off_rig.wifi_operations() == []
+
+
+def test_wifi_state_carries_the_radio_and_follows_it(off_rig):
+    off_rig.run(5)
+    off_rig.wifi.enable_radio()
+    off_rig.run(5)
+
+    assert [state["radio"] for state in off_rig.wifi_states()] == ["switched_off", "ready"]

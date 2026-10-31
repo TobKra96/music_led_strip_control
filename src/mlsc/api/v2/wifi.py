@@ -1,3 +1,5 @@
+from typing import Literal
+
 from flask_openapi3 import APIBlueprint, Tag
 from pydantic import BaseModel, Field
 
@@ -19,10 +21,19 @@ class HotspotOut(BaseModel):
     password: str | None = Field(description="Shown to an authenticated session, or to anyone while the PIN lock is off.")
 
 
+class DiagnosisOut(BaseModel):
+    status: str = Field(description="`ok` or `warning`.")
+    message: str
+    suggested_fix: str | None
+
+
 class WifiStatusOut(BaseModel):
     supported: bool = Field(description="`false` without NetworkManager (Windows, WSL, other Linux): the panel is hidden or says so.")
     hotspot_supported: bool = Field(description="Whether the adapter can run a Hotspot.")
     country: str | None = Field(description="The Wi-Fi country, `null` when it is not set.")
+    interface: str | None = Field(description="The Wi-Fi Adapter MLSC works with. The configured one when it is missing, `null` when there is none.")
+    radio: str = Field(description="The state of the Wi-Fi Radio: `ready`, `switched_off`, `blocked`, `unavailable` or `no_adapter`.")
+    diagnosis: DiagnosisOut = Field(description="What to tell the user about the Wi-Fi. The banner text of the page.")
     mode: str = Field(description="`client` or `hotspot`.")
     connected: bool
     ssid: str | None = Field(description="The network the Pi is connected to.")
@@ -51,6 +62,10 @@ class ForgetBody(BaseModel):
     ssid: str = Field(min_length=1, max_length=32)
 
 
+class RadioBody(BaseModel):
+    enabled: Literal[True] = Field(description="Only switching the radio on is possible: switching it off could cut off the user.")
+
+
 class HotspotBody(BaseModel):
     enabled: bool
     ssid: str | None = Field(default=None, min_length=1, max_length=32, description="Generated when left out.")
@@ -76,8 +91,11 @@ def _status() -> dict:
     wifi = _wifi()
     capabilities, status = wifi.capabilities(), wifi.status()
     hotspot = {"ssid": status.hotspot.ssid, "password": status.hotspot.password} if status.hotspot else None
+    diagnosis = wifi.diagnose()
     return {
         "supported": capabilities.supported, "hotspot_supported": capabilities.hotspot, "country": capabilities.country,
+        "interface": capabilities.interface, "radio": capabilities.radio,
+        "diagnosis": {"status": diagnosis.status.value, "message": diagnosis.message, "suggested_fix": diagnosis.suggested_fix},
         "mode": status.mode, "connected": status.connected, "ssid": status.ssid, "ip": status.ip, "hotspot": hotspot,
     }
 
@@ -120,7 +138,12 @@ def connect(body: ConnectBody):
 @api_login_required
 def forget(body: ForgetBody):
     wifi = _require_supported()
-    _change(lambda: wifi.forget(body.ssid))
+
+    def forget_when_ready() -> None:
+        wifi.require_ready()
+        wifi.forget(body.ssid)
+
+    _change(forget_when_ready)
     return "", 204
 
 
@@ -135,3 +158,15 @@ def put_hotspot(body: HotspotBody):
     _require_supported()
     return _change(lambda: _supervisor().set_hotspot(body.enabled, body.ssid, body.password))
 
+
+
+@wifi_api.put("/radio", summary="Switch the Wi-Fi on", responses={"200": WifiStatusOut, **CHANGE_ERRORS})
+@api_login_required
+def put_radio(body: RadioBody):  # ruff: ignore[unused-function-argument]
+    """Only possible while the radio is `switched_off`; the other states are rejected with the message of the state.
+
+    Waits up to about 10 seconds for the adapter to come up and answers with the new status. There is no off:
+    it would cut off a user who reached the page over Wi-Fi.
+    """
+    wifi = _require_supported()
+    return _change(wifi.enable_radio)

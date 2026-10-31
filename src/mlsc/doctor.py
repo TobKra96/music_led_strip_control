@@ -18,6 +18,7 @@ from mlsc.outputs.output_raspi import OutputRaspi
 from mlsc.outputs.output_udp import OutputUDP
 from mlsc.webserver.schemas.config_validator_service import ConfigValidatorService
 from mlsc.wifi.credentials import GENERATED_FILE
+from mlsc.wifi.nmcli import NmcliWifiManager
 
 OUTPUTS: dict[str, type[Output]] = {
     OutputsEnum.output_dummy.name: OutputMock,
@@ -39,7 +40,7 @@ def run_checks(config_dir: Path, host: Host | None = None, capture_factory: Call
     checks = [config_check]
     checks.extend(_check_outputs(config, host))
     checks.append(Check("audio", _check_audio(config, capture_factory)))
-    checks.append(Check("wifi", _check_wifi(host)))
+    checks.append(Check("wifi", _check_wifi(host, (config or {}).get("wifi", {}).get("interface"))))
     checks.append(Check("hotspot", _check_hotspot(host)))
     checks.append(Check("permissions", _check_permissions(config_dir)))
     return checks
@@ -108,18 +109,13 @@ def _check_audio(config: dict | None, capture_factory: Callable) -> Diagnosis:
     return Diagnosis.ok(f"{len(devices)} audio input device(s) found.")
 
 
-def _check_wifi(host: Host) -> Diagnosis:
+def _check_wifi(host: Host, interface: str | None = None) -> Diagnosis:
     if sys.platform != "linux":
         return Diagnosis.ok("Wi-Fi management is only used on Linux.")
     if host.which("nmcli") is None:
         message = "NetworkManager (nmcli) is not installed, so MLSC cannot manage Wi-Fi."
         return Diagnosis.warning(message, "Install NetworkManager or manage Wi-Fi yourself.")
-    code, output = host.run(["nmcli", "-t", "-f", "STATE", "general"])
-    if code != 0:
-        return Diagnosis.warning(f"NetworkManager did not answer: {output}", "Start it with: sudo systemctl start NetworkManager")
-    if not output.strip().startswith("connected"):
-        return Diagnosis.warning(f"The network state is {output.strip()!r}.", "Connect to a network or start the Hotspot.")
-    return Diagnosis.ok("NetworkManager reports a connection.")
+    return NmcliWifiManager(host.run, interface).diagnose()
 
 
 def _check_hotspot(host: Host) -> Diagnosis:

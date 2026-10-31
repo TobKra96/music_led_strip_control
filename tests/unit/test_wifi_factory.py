@@ -41,3 +41,16 @@ def test_the_backend_defaults_to_the_environment(monkeypatch):
     monkeypatch.setenv(BACKEND_ENV_VAR, "mock")
 
     assert create_wifi_manager(host=FakeHost(None), platform="win32").capabilities().supported is True
+
+
+def test_a_pinned_interface_reaches_the_mock_backend():
+    manager = create_wifi_manager("mock", FakeHost(None), platform="win32", interface="wlan1")
+
+    assert manager.capabilities().radio == "no_adapter"
+    assert manager.capabilities().interface == "wlan1"
+
+
+def test_an_empty_interface_means_the_automatic_pick():
+    manager = create_wifi_manager("mock", FakeHost(None), platform="win32", interface="")
+
+    assert manager.capabilities().radio == "ready"

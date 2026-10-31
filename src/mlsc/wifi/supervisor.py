@@ -13,7 +13,7 @@ from loguru import logger
 
 from mlsc.operations import Operation, OperationRegistry, OperationState
 from mlsc.wifi.credentials import HotspotCredentials
-from mlsc.wifi.manager import CLIENT, HOTSPOT, WifiError, WifiManager, WifiStatus
+from mlsc.wifi.manager import CLIENT, HOTSPOT, RADIO_READY, WifiError, WifiManager, WifiStatus
 
 BOOT_FALLBACK_SECONDS = 60
 LOST_FALLBACK_SECONDS = 300
@@ -86,10 +86,12 @@ class WifiSupervisor:
 
     def connect(self, ssid: str, password: str | None) -> None:
         """Join a network. If that does not end in a connection with an IP within the Rollback time, go back to the previous mode."""
+        self._manager.require_ready()
         self._apply(lambda: self._manager.connect(ssid, password), CLIENT)
 
     def set_hotspot(self, enabled: bool, ssid: str | None = None, password: str | None = None) -> None:
         """Save the Hotspot as the Wi-Fi mode (or return to client mode). A missing SSID or password comes from the credentials."""
+        self._manager.require_ready()
         if enabled:
             self._apply(lambda: self._manager.start_hotspot(ssid or self._credentials.ssid(), password or self._credentials.password()), HOTSPOT)
         else:
@@ -97,6 +99,11 @@ class WifiSupervisor:
 
     def tick(self) -> None:
         with self._lock:
+            if self._manager.radio() != RADIO_READY:
+                # Nothing to supervise without a working radio; the timers start fresh when it returns.
+                self._lost_since = None
+                self._publish_state()
+                return
             self._check_rollback()
             if self._pending is None:
                 self._supervise_fallback()
@@ -149,11 +156,11 @@ class WifiSupervisor:
             self._operations.resolve(operation, state, error)
 
     def _publish_state(self) -> None:
-        """Publish `wifi.state` when the mode, the connection or the Setup Fallback changed since the last time."""
+        """Publish `wifi.state` when the mode, the connection, the radio or the Setup Fallback changed since the last time."""
         if self._publish is None:
             return
         status = self._manager.status()
-        state = {"mode": status.mode, "connected": status.connected, "fallback": self.fallback_active}
+        state = {"mode": status.mode, "connected": status.connected, "fallback": self.fallback_active, "radio": self._manager.radio()}
         if state != self._published_state:
             self._published_state = state
             self._publish("wifi.state", state)

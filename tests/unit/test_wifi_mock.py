@@ -136,3 +136,72 @@ def test_diagnose_uses_the_shared_diagnosis(kwargs, status, fragment):
 
     assert diagnosis.status is status
     assert fragment in diagnosis.message
+
+
+def test_the_mock_reports_wlan0_as_its_adapter_and_is_ready():
+    capabilities = MockWifiManager().capabilities()
+
+    assert (capabilities.interface, capabilities.radio) == ("wlan0", "ready")
+
+
+def test_a_pinned_adapter_that_does_not_exist_is_no_adapter_and_names_the_pin():
+    wifi = MockWifiManager(pinned_interface="wlan1")
+
+    capabilities = wifi.capabilities()
+    diagnosis = wifi.diagnose()
+
+    assert (capabilities.radio, capabilities.interface) == ("no_adapter", "wlan1")
+    assert diagnosis.status is Status.WARNING
+    assert diagnosis.message == "The configured Wi-Fi adapter wlan1 was not found."
+
+
+@pytest.mark.parametrize(("radio", "message", "fix"), [
+    ("no_adapter", "No Wi-Fi adapter was found.", "Plug in a Wi-Fi adapter, or manage the network yourself."),
+    ("blocked", "Wi-Fi is blocked by a hardware switch.", "Switch the hardware Wi-Fi switch on."),
+    ("switched_off", "Wi-Fi is switched off.", "Turn it on from the Wi-Fi page, or run: sudo nmcli radio wifi on"),
+    ("unavailable", "The Wi-Fi adapter wlan0 is not available.", "Check the adapter's driver and firmware (dmesg | grep -i wlan)."),
+])
+def test_every_radio_state_but_ready_is_a_warning_with_the_agreed_wording(radio, message, fix):
+    diagnosis = MockWifiManager(radio=radio).diagnose()
+
+    assert (diagnosis.status, diagnosis.message, diagnosis.suggested_fix) == (Status.WARNING, message, fix)
+
+
+def test_a_radio_that_is_not_ready_beats_the_hotspot_and_country_warnings():
+    diagnosis = MockWifiManager(radio="switched_off", hotspot_supported=False, country=None).diagnose()
+
+    assert diagnosis.message == "Wi-Fi is switched off."
+
+
+def test_changes_fail_up_front_with_the_message_of_the_radio_state():
+    wifi = MockWifiManager(networks=[HOME], radio="blocked")
+
+    with pytest.raises(WifiError, match="hardware switch"):
+        wifi.require_ready()
+
+
+def test_enable_radio_brings_a_switched_off_radio_to_ready():
+    wifi = MockWifiManager(radio="switched_off")
+
+    wifi.enable_radio()
+
+    assert wifi.capabilities().radio == "ready"
+
+
+def test_enable_radio_refuses_other_states_with_their_message():
+    with pytest.raises(WifiError, match="hardware switch"):
+        MockWifiManager(radio="blocked").enable_radio()
+
+
+def test_enable_radio_fails_when_the_radio_stays_unusable():
+    wifi = MockWifiManager(radio="switched_off", radio_stuck=True)
+
+    with pytest.raises(WifiError):
+        wifi.enable_radio()
+
+
+def test_enable_radio_is_refused_for_a_missing_pinned_adapter_even_when_the_radio_is_off():
+    wifi = MockWifiManager(radio="switched_off", pinned_interface="wlan1")
+
+    with pytest.raises(WifiError, match="wlan1 was not found"):
+        wifi.enable_radio()

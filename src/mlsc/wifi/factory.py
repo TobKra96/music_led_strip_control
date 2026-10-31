@@ -13,15 +13,17 @@ BACKEND_ENV_VAR = "MLSC_WIFI_BACKEND"
 DEMO_NETWORKS = (MockNetwork("Home", 80, "WPA2", "password"), MockNetwork("Guest", 55, None), MockNetwork("Neighbour", 30, "WPA2", "password"))
 
 
-def create_wifi_manager(backend: str | None = None, host: Host | None = None, platform: str = sys.platform) -> WifiManager:
+def create_wifi_manager(backend: str | None = None, host: Host | None = None, platform: str = sys.platform,
+                        interface: str | None = None) -> WifiManager:
     """`nmcli` where NetworkManager is installed, otherwise a manager that reports Wi-Fi as unsupported.
 
     `mock` (or `MLSC_WIFI_BACKEND=mock`) selects a Mock with demo networks, for developing the UI without a radio.
+    `interface` pins the Wi-Fi Adapter (the `wifi.interface` config key); empty means the automatic pick.
     """
     backend = backend or os.environ.get(BACKEND_ENV_VAR, "auto")
     host = host or Host()
     if backend == "mock":
-        return MockWifiManager(networks=DEMO_NETWORKS)
+        return MockWifiManager(networks=DEMO_NETWORKS, pinned_interface=interface or None)
     if platform == "linux" and host.which("nmcli") is not None:
-        return NmcliWifiManager(host.run)
+        return NmcliWifiManager(host.run, interface)
     return MockWifiManager(supported=False)

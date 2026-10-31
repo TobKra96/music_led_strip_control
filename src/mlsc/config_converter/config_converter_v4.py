@@ -30,7 +30,7 @@ FALLBACK_LED_STRIP = ("ws2812", "grb", False)
 DEFAULT_LED_PIN = 18
 MAX_LED_PIN = 27  # Highest BCM GPIO on the 40-pin header.
 DEFAULT_POWER_LIMIT = {"enabled": False, "supply_amps": 5.0, "ma_per_led": 60, "mode": "warn"}
-DEFAULT_WIFI = {"hotspot_ssid": "mlsc", "mode": "client", "setup_fallback": True}
+DEFAULT_WIFI = {"hotspot_ssid": "mlsc", "interface": "", "mode": "client", "setup_fallback": True}
 
 
 @dataclass

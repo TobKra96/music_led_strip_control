@@ -39,7 +39,7 @@ class Executer:
         self.microphone_settings_executer = MicrophoneSettingsExecuter(
             config_lock, notification_queue_in, notification_queue_out, effects_queue, audio_backend)
         host = Host()
-        self.wifi_manager = create_wifi_manager(host=host)
+        self.wifi_manager = create_wifi_manager(host=host, interface=ConfigService.instance(config_lock).config["wifi"].get("interface"))
         self.wifi_supervisor = WifiSupervisor(
             self.wifi_manager, ConfigWifiSettings(ConfigService.instance(config_lock)), time.monotonic, host.ethernet_up,
             HotspotCredentials(host.boot_dir(), host.mac_address), operations.registry, lambda event, data: sse.broker.publish(event, data))

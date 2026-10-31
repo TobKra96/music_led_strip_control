@@ -238,7 +238,8 @@ def test_audio_section_carries_over_settings_and_adds_gain():
 def test_wifi_section_has_no_passwords():
     wifi = upgrade(v3_config())[0]["wifi"]
 
-    assert set(wifi) == {"hotspot_ssid", "mode", "setup_fallback"}
+    assert set(wifi) == {"hotspot_ssid", "interface", "mode", "setup_fallback"}
+    assert wifi["interface"] == ""
     assert wifi["setup_fallback"] is True
 
 

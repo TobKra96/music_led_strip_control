@@ -49,6 +49,7 @@ class WifiStateEvent(BaseModel):
     mode: str = Field(description="`client` or `hotspot`.")
     connected: bool
     fallback: bool = Field(description="Whether a Setup Fallback hotspot is up.")
+    radio: str = Field(description="The state of the Wi-Fi Radio: `ready`, `switched_off`, `blocked`, `unavailable` or `no_adapter`.")
 
 
 EVENT_PAYLOADS: dict[str, type[BaseModel]] = {

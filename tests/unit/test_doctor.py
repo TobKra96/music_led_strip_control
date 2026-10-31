@@ -10,10 +10,19 @@ from mlsc.host import Host
 pytestmark = [pytest.mark.unit, pytest.mark.usefixtures("clean_config_env")]
 
 
+# Ethernet is up and the Wi-Fi adapter is ready, but not connected to a network.
+HEALTHY_NMCLI = {
+    ("nmcli", "-t", "-f", "DEVICE,TYPE,STATE", "device"): (0, "eth0:ethernet:connected\nwlan0:wifi:disconnected"),
+    ("nmcli", "-t", "-f", "WIFI-HW,WIFI", "radio"): (0, "enabled:enabled"),
+    ("nmcli", "-t", "-g", "WIFI-PROPERTIES.AP", "device", "show", "wlan0"): (0, "yes"),
+    ("iw", "reg", "get"): (0, "global\ncountry DE: DFS-ETSI"),
+}
+
+
 class QuietHost(Host):
-    def __init__(self, nmcli=True, nmcli_state=(0, "connected"), ws281x=True) -> None:
+    def __init__(self, nmcli=True, nmcli_state=None, ws281x=True) -> None:
         self.nmcli = nmcli
-        self.nmcli_state = nmcli_state
+        self.nmcli_state = {**HEALTHY_NMCLI, **(nmcli_state or {})}
         self.ws281x = ws281x
         self.model = None
         self.gpio_memory = True
@@ -34,8 +43,8 @@ class QuietHost(Host):
     def which(self, command):
         return f"/usr/bin/{command}" if self.nmcli else None
 
-    def run(self, command):  # ruff: ignore[unused-method-argument]
-        return self.nmcli_state
+    def run(self, command):
+        return self.nmcli_state.get(tuple(command), (1, "unexpected command"))
 
 
 class FakeCapture:
@@ -179,20 +188,30 @@ def test_wifi_without_networkmanager_is_a_warning(config_dir, monkeypatch):
     assert "NetworkManager" in result.message
 
 
-def test_wifi_disconnected_is_a_warning(config_dir, monkeypatch):
+def test_wifi_switched_off_is_a_warning_even_while_ethernet_is_connected(config_dir, monkeypatch):
     monkeypatch.setattr(doctor.sys, "platform", "linux")
+    host = QuietHost(nmcli_state={("nmcli", "-t", "-f", "WIFI-HW,WIFI", "radio"): (0, "enabled:disabled")})
 
-    result = checks_by_name(config_dir, host=QuietHost(nmcli_state=(0, "disconnected")))["wifi"]
+    result = checks_by_name(config_dir, host=host)["wifi"]
+
+    assert result.status is Status.WARNING
+    assert result.message == "Wi-Fi is switched off."
+    assert "nmcli radio wifi on" in result.suggested_fix
+
+
+def test_wifi_that_networkmanager_does_not_answer_for_is_a_warning(config_dir, monkeypatch):
+    monkeypatch.setattr(doctor.sys, "platform", "linux")
+    host = QuietHost(nmcli_state={("nmcli", "-t", "-f", "DEVICE,TYPE,STATE", "device"): (8, "NetworkManager is not running")})
+
+    result = checks_by_name(config_dir, host=host)["wifi"]
 
     assert result.status is Status.WARNING
 
 
-def test_wifi_command_failure_is_a_warning(config_dir, monkeypatch):
+def test_wifi_that_is_ready_is_ok(config_dir, monkeypatch):
     monkeypatch.setattr(doctor.sys, "platform", "linux")
 
-    result = checks_by_name(config_dir, host=QuietHost(nmcli_state=(8, "NetworkManager is not running")))["wifi"]
-
-    assert result.status is Status.WARNING
+    assert checks_by_name(config_dir)["wifi"].status is Status.OK
 
 
 def test_wifi_is_skipped_off_linux(config_dir, monkeypatch):
@@ -221,12 +240,6 @@ def test_writable_probe_reports_a_missing_directory_under_a_read_only_parent(tmp
     monkeypatch.setattr(doctor.os, "access", lambda *_: False)
 
     assert "no write permission" in doctor._unwritable_reason(tmp_path / "new")  # ruff: ignore[private-member-access]
-
-
-def test_wifi_connected_without_internet_is_fine(config_dir, monkeypatch):
-    monkeypatch.setattr(doctor.sys, "platform", "linux")
-
-    assert checks_by_name(config_dir, host=QuietHost(nmcli_state=(0, "connected (local only)")))["wifi"].status is Status.OK
 
 
 def test_incomplete_output_settings_are_an_error_not_a_crash(config_dir, monkeypatch):

@@ -110,8 +110,8 @@ def test_capabilities_have_no_country_when_iw_is_missing():
     assert wifi.capabilities().country is None
 
 
-@pytest.mark.parametrize("devices", [(127, "nmcli: command not found"), (0, "eth0:ethernet:connected")])
-def test_unsupported_without_nmcli_or_a_wifi_device(devices):
+@pytest.mark.parametrize("devices", [(127, "nmcli: command not found")])
+def test_unsupported_without_nmcli(devices):
     wifi, _ = manager_with({LIST_DEVICES: devices})
 
     assert wifi.capabilities().supported is False
@@ -289,3 +289,165 @@ def test_status_of_the_hotspot_unescapes_the_credentials():
     hotspot = wifi.status().hotspot
 
     assert (hotspot.ssid, hotspot.password) == ("My:Net", "pw:with\\colon")
+
+
+RADIO = ("nmcli", "-t", "-f", "WIFI-HW,WIFI", "radio")
+TWO_ADAPTERS = "eth0:ethernet:connected\nwlan0:wifi:unavailable\nwlan1:wifi:disconnected\nlo:loopback:unmanaged"
+
+
+def adapter_manager(devices, radio="enabled:enabled", interface=None, ap_support=None):
+    answers = {LIST_DEVICES: (0, devices), RADIO: (0, radio), REG_GET_COMMAND: (0, REG_GET), LIST_CONNECTIONS: (0, CONNECTIONS)}
+    for name, supported in (ap_support or {}).items():
+        answers[("nmcli", "-t", "-g", "WIFI-PROPERTIES.AP", "device", "show", name)] = (0, "yes" if supported else "no")
+    runner = FakeRunner(answers)
+    return NmcliWifiManager(runner, interface=interface), runner
+
+
+def test_the_automatic_pick_skips_an_unavailable_adapter():
+    wifi, _ = adapter_manager(TWO_ADAPTERS, ap_support={"wlan1": True})
+
+    capabilities = wifi.capabilities()
+
+    assert (capabilities.interface, capabilities.radio) == ("wlan1", "ready")
+
+
+def test_the_automatic_pick_prefers_the_adapter_holding_the_connection():
+    devices = "wlan0:wifi:disconnected\nwlan1:wifi:connected"
+
+    wifi, _ = adapter_manager(devices, ap_support={"wlan0": True, "wlan1": False})
+
+    assert wifi.capabilities().interface == "wlan1"
+
+
+def test_the_automatic_pick_then_prefers_hotspot_support_then_the_first_name():
+    devices = "wlan1:wifi:disconnected\nwlan0:wifi:disconnected\nwlan2:wifi:disconnected"
+
+    first, _ = adapter_manager(devices, ap_support={"wlan0": False, "wlan1": False, "wlan2": False})
+    capable, _ = adapter_manager(devices, ap_support={"wlan0": False, "wlan1": False, "wlan2": True})
+
+    assert first.capabilities().interface == "wlan0"
+    assert capable.capabilities().interface == "wlan2"
+
+
+def test_without_a_usable_adapter_the_first_one_is_still_returned_and_is_unavailable():
+    wifi, _ = adapter_manager("wlan0:wifi:unavailable\nwlan1:wifi:unmanaged", ap_support={"wlan0": False})
+
+    capabilities = wifi.capabilities()
+
+    assert (capabilities.interface, capabilities.radio) == ("wlan0", "unavailable")
+
+
+def test_a_pinned_adapter_is_used_even_when_another_one_is_better():
+    wifi, runner = adapter_manager(TWO_ADAPTERS, interface="wlan0")
+
+    assert wifi.capabilities().interface == "wlan0"
+    assert wifi.status().ssid is None
+    assert not any("wlan1" in call for call in runner.calls)
+
+
+def test_a_missing_pinned_adapter_is_no_adapter_and_every_change_fails_with_its_message():
+    wifi, runner = adapter_manager(TWO_ADAPTERS, interface="wlan9")
+
+    capabilities = wifi.capabilities()
+
+    assert (capabilities.radio, capabilities.interface, capabilities.pinned, capabilities.supported) == ("no_adapter", "wlan9", True, True)
+    for change in (lambda: wifi.connect("Home", "x"), lambda: wifi.forget("Home"), lambda: wifi.start_hotspot(None, None)):
+        with pytest.raises(WifiError, match="configured Wi-Fi adapter wlan9 was not found"):
+            change()
+    assert not runner.ran("nmcli", "device", "wifi", "connect")
+
+
+def test_networkmanager_without_a_wifi_device_is_no_adapter_but_still_supported():
+    wifi, _ = adapter_manager("eth0:ethernet:connected")
+
+    capabilities = wifi.capabilities()
+
+    assert (capabilities.supported, capabilities.radio, capabilities.pinned) == (True, "no_adapter", False)
+
+
+def test_networkmanager_that_does_not_answer_is_unsupported():
+    wifi = NmcliWifiManager(FakeRunner({}))
+
+    assert wifi.capabilities().supported is False
+
+
+@pytest.mark.parametrize(("radio", "state"), [
+    ("disabled:enabled", "blocked"),
+    ("enabled:disabled", "switched_off"),
+    ("disabled:disabled", "blocked"),
+    ("enabled:enabled", "ready"),
+])
+def test_the_radio_state_comes_from_nmcli_radio(radio, state):
+    wifi, _ = adapter_manager("wlan0:wifi:disconnected", radio=radio, ap_support={"wlan0": True})
+
+    assert wifi.capabilities().radio == state
+
+
+def test_an_adapter_that_nmcli_calls_unavailable_while_the_radio_is_on_is_unavailable():
+    wifi, _ = adapter_manager("wlan0:wifi:unavailable", ap_support={"wlan0": True})
+
+    assert wifi.radio() == "unavailable"
+
+
+def test_the_status_of_an_unusable_radio_is_a_disconnected_client():
+    wifi, _ = adapter_manager("wlan0:wifi:unavailable", radio="enabled:disabled")
+
+    assert wifi.status().connected is False
+
+
+class Sleeper:
+    def __init__(self) -> None:
+        self.slept = 0
+
+    def __call__(self, seconds):
+        self.slept += seconds
+
+
+def switched_off_manager(becomes_ready_after=1):
+    """A Pi whose radio is off until `nmcli radio wifi on` ran and `becomes_ready_after` seconds passed."""
+    sleeper = Sleeper()
+    state = {"on": False}
+    runner = FakeRunner({LIST_DEVICES: (0, "wlan0:wifi:unavailable"), REG_GET_COMMAND: (0, REG_GET)})
+
+    def answer(command, timeout=None):
+        runner.calls.append(command)
+        if tuple(command) == ("nmcli", "radio", "wifi", "on"):
+            state["on"] = True
+            return 0, ""
+        if tuple(command) == LIST_DEVICES:
+            ready = state["on"] and sleeper.slept >= becomes_ready_after
+            return 0, "wlan0:wifi:disconnected" if ready else "wlan0:wifi:unavailable"
+        if tuple(command) == RADIO:
+            return 0, "enabled:enabled" if state["on"] else "enabled:disabled"
+        return 0, ""
+
+    return NmcliWifiManager(answer, sleep=sleeper), runner, sleeper
+
+
+def test_enable_radio_unblocks_rfkill_switches_nmcli_on_and_waits_for_the_adapter():
+    wifi, runner, sleeper = switched_off_manager(becomes_ready_after=3)
+
+    wifi.enable_radio()
+
+    assert runner.ran("rfkill", "unblock", "wifi")
+    assert runner.ran("nmcli", "radio", "wifi", "on")
+    assert 3 <= sleeper.slept <= 10
+    assert wifi.radio() == "ready"
+
+
+def test_enable_radio_fails_when_the_adapter_stays_unavailable():
+    wifi, _, sleeper = switched_off_manager(becomes_ready_after=999)
+
+    with pytest.raises(WifiError):
+        wifi.enable_radio()
+
+    assert sleeper.slept <= 10
+
+
+def test_enable_radio_is_refused_unless_the_radio_is_switched_off():
+    wifi, runner = adapter_manager("wlan0:wifi:disconnected", radio="disabled:enabled")
+
+    with pytest.raises(WifiError, match="hardware switch"):
+        wifi.enable_radio()
+
+    assert not runner.ran("nmcli", "radio", "wifi", "on")

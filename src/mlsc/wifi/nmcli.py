@@ -2,11 +2,28 @@
 from __future__ import annotations
 
 import re
+import time
 from collections.abc import Callable
+from dataclasses import dataclass
 
 from loguru import logger
 
-from mlsc.wifi.manager import CLIENT, HOTSPOT, Capabilities, HotspotInfo, Network, WifiError, WifiManager, WifiStatus
+from mlsc.wifi.manager import (
+    CLIENT,
+    HOTSPOT,
+    RADIO_BLOCKED,
+    RADIO_NO_ADAPTER,
+    RADIO_READY,
+    RADIO_SWITCHED_OFF,
+    RADIO_UNAVAILABLE,
+    Capabilities,
+    HotspotInfo,
+    Network,
+    WifiError,
+    WifiManager,
+    WifiStatus,
+    radio_problem,
+)
 
 HOTSPOT_CONNECTION = "MLSC-Hotspot"
 CONNECT_TIMEOUT_SECONDS = 60
@@ -14,6 +31,8 @@ WIFI_TYPE = "802-11-wireless"
 UNSET_COUNTRY = "00"
 NO_CONNECTION = ("", "--")
 NO_SECURITY = ("", "--")
+RADIO_WAIT_SECONDS = 10
+UNUSABLE_STATES = {"unavailable", "unmanaged"}
 COUNTRY_PATTERN = re.compile(r"^country (\w\w):", re.MULTILINE)
 
 # Runs a command line and returns its exit code and combined output; `Host.run` fits.
@@ -34,15 +53,56 @@ def split_terse(line: str) -> list[str]:
     return fields
 
 
+@dataclass(frozen=True)
+class _Adapter:
+    """The Wi-Fi Adapter MLSC works with, or None when there is none, and the state of its radio."""
+
+    name: str | None
+    radio: str
+    pinned: bool
+
+
 class NmcliWifiManager(WifiManager):
-    def __init__(self, run: CommandRunner) -> None:
+    def __init__(self, run: CommandRunner, interface: str | None = None, sleep: Callable[[float], None] = time.sleep) -> None:
+        """`interface` pins the Wi-Fi Adapter (the `wifi.interface` config key); without it the best usable one is picked."""
         self._run = run
+        self._interface = interface or None
+        self._sleep = sleep
 
     def capabilities(self) -> Capabilities:
-        device = self._wifi_device()
-        if device is None:
+        adapter = self._adapter()
+        if adapter is None:
             return Capabilities(supported=False, hotspot=False, country=None)
-        return Capabilities(supported=True, hotspot=self._supports_access_point(device), country=self._country())
+        hotspot = adapter.name is not None and self._supports_access_point(adapter.name)
+        return Capabilities(True, hotspot, self._country(), adapter.radio, adapter.name or self._interface, adapter.pinned)
+
+    def radio(self) -> str:
+        adapter = self._adapter()
+        return adapter.radio if adapter else RADIO_READY
+
+    def require_ready(self) -> None:
+        self._require_device()
+
+    def enable_radio(self) -> None:
+        adapter = self._adapter()
+        if adapter is None:
+            msg = "Wi-Fi management is not supported on this host."
+            raise WifiError(msg)
+        if adapter.radio == RADIO_READY:
+            return
+        if adapter.radio != RADIO_SWITCHED_OFF:
+            raise WifiError(self._problem_message(adapter))
+        self._run(["rfkill", "unblock", "wifi"])
+        code, output = self._run(["nmcli", "radio", "wifi", "on"])
+        if code != 0:
+            raise WifiError(_error_text(output))
+        for _ in range(RADIO_WAIT_SECONDS):
+            if self.radio() == RADIO_READY:
+                return
+            self._sleep(1)
+        if self.radio() != RADIO_READY:
+            msg = "Wi-Fi was switched on, but the adapter did not come up."
+            raise WifiError(msg)
 
     def status(self) -> WifiStatus:
         device = self._wifi_device()
@@ -123,18 +183,53 @@ class NmcliWifiManager(WifiManager):
         return len(re.findall(r"^Station ", output, re.MULTILINE))
 
     def _wifi_device(self) -> str | None:
+        adapter = self._adapter()
+        return adapter.name if adapter else None
+
+    def _adapter(self) -> _Adapter | None:
+        """Pick the Wi-Fi Adapter. None when NetworkManager does not answer."""
         code, output = self._run(["nmcli", "-t", "-f", "DEVICE,TYPE,STATE", "device"])
         if code != 0:
             return None
-        rows = (split_terse(line) for line in output.splitlines())
-        return next((row[0] for row in rows if row[1:2] == ["wifi"]), None)
+        rows = sorted(row for row in (split_terse(line) for line in output.splitlines()) if row[1:2] == ["wifi"])
+        adapters = {row[0]: (row[2:3] or [""])[0] for row in rows}
+        if self._interface:
+            chosen = self._interface if self._interface in adapters else None
+        else:
+            chosen = self._best(adapters)
+        if chosen is None:
+            return _Adapter(None, RADIO_NO_ADAPTER, pinned=self._interface is not None)
+        return _Adapter(chosen, self._radio_state(adapters[chosen]), pinned=self._interface is not None)
+
+    def _best(self, adapters: dict[str, str]) -> str | None:
+        """The usable adapter holding the connection, else one with Hotspot support, else the first; with none usable, the first."""
+        usable = [name for name, state in adapters.items() if state not in UNUSABLE_STATES]
+        if len(usable) > 1:
+            usable.sort(key=lambda name: (adapters[name] != "connected", not self._supports_access_point(name)))
+        return (usable or list(adapters))[0] if adapters else None
+
+    def _radio_state(self, adapter_state: str) -> str:
+        code, output = self._run(["nmcli", "-t", "-f", "WIFI-HW,WIFI", "radio"])
+        hardware, software = [*split_terse(output.strip()), "enabled", "enabled"][:2] if code == 0 else ("enabled", "enabled")
+        if hardware == "disabled":
+            return RADIO_BLOCKED
+        if software == "disabled":
+            return RADIO_SWITCHED_OFF
+        return RADIO_UNAVAILABLE if adapter_state == "unavailable" else RADIO_READY
+
+    def _problem_message(self, adapter: _Adapter) -> str:
+        capabilities = Capabilities(True, False, None, adapter.radio, adapter.name or self._interface, adapter.pinned)
+        problem = radio_problem(capabilities)
+        return problem.message if problem else ""
 
     def _require_device(self) -> str:
-        device = self._wifi_device()
-        if device is None:
+        adapter = self._adapter()
+        if adapter is None:
             msg = "Wi-Fi management is not supported on this host."
             raise WifiError(msg)
-        return device
+        if adapter.name is None or adapter.radio != RADIO_READY:
+            raise WifiError(self._problem_message(adapter))
+        return adapter.name
 
     def _supports_access_point(self, device: str) -> bool:
         code, output = self._run(["nmcli", "-t", "-g", "WIFI-PROPERTIES.AP", "device", "show", device])

@@ -677,6 +677,7 @@
     },
     "wifi": {
         "hotspot_ssid": "mlsc",
+        "interface": "",
         "mode": "client",
         "setup_fallback": true
     },

@@ -3147,7 +3147,7 @@
             "type": "string"
           },
           "status": {
-            "description": "`ok`, `warning` or `error`.",
+            "description": "`ok` or `warning`.",
             "title": "Status",
             "type": "string"
           },
@@ -6739,6 +6739,21 @@
         "title": "Problem",
         "type": "object"
       },
+      "RadioBody": {
+        "properties": {
+          "enabled": {
+            "const": true,
+            "description": "Only switching the radio on is possible: switching it off could cut off the user.",
+            "title": "Enabled",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "enabled"
+        ],
+        "title": "RadioBody",
+        "type": "object"
+      },
       "ReportEntry": {
         "properties": {
           "code": {
@@ -6903,12 +6918,18 @@
             "description": "`client` or `hotspot`.",
             "title": "Mode",
             "type": "string"
+          },
+          "radio": {
+            "description": "The state of the Wi-Fi Radio: `ready`, `switched_off`, `blocked`, `unavailable` or `no_adapter`.",
+            "title": "Radio",
+            "type": "string"
           }
         },
         "required": [
           "mode",
           "connected",
-          "fallback"
+          "fallback",
+          "radio"
         ],
         "title": "WifiStateEvent",
         "type": "object"
@@ -6931,6 +6952,10 @@
             "description": "The Wi-Fi country, `null` when it is not set.",
             "title": "Country"
           },
+          "diagnosis": {
+            "$ref": "#/components/schemas/DiagnosisOut",
+            "description": "What to tell the user about the Wi-Fi. The banner text of the page."
+          },
           "hotspot": {
             "anyOf": [
               {
@@ -6947,6 +6972,18 @@
             "title": "Hotspot Supported",
             "type": "boolean"
           },
+          "interface": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The Wi-Fi Adapter MLSC works with. The configured one when it is missing, `null` when there is none.",
+            "title": "Interface"
+          },
           "ip": {
             "anyOf": [
               {
@@ -6961,6 +6998,11 @@
           "mode": {
             "description": "`client` or `hotspot`.",
             "title": "Mode",
+            "type": "string"
+          },
+          "radio": {
+            "description": "The state of the Wi-Fi Radio: `ready`, `switched_off`, `blocked`, `unavailable` or `no_adapter`.",
+            "title": "Radio",
             "type": "string"
           },
           "ssid": {
@@ -6985,6 +7027,9 @@
           "supported",
           "hotspot_supported",
           "country",
+          "interface",
+          "radio",
+          "diagnosis",
           "mode",
           "connected",
           "ssid",
@@ -13202,6 +13247,78 @@
           }
         },
         "summary": "Switch the Hotspot on or off",
+        "tags": [
+          "Wi-Fi"
+        ]
+      }
+    },
+    "/api/v2/wifi/radio": {
+      "put": {
+        "description": "Only possible while the radio is `switched_off`; the other states are rejected with the message of the state.<br/><br/>Waits up to about 10 seconds for the adapter to come up and answers with the new status. There is no off:<br/>it would cut off a user who reached the page over Wi-Fi.",
+        "operationId": "wifi_api_v2_put_radio_radio_put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RadioBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WifiStatusOut"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "415": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unsupported Media Type"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "summary": "Switch the Wi-Fi on",
         "tags": [
           "Wi-Fi"
         ]

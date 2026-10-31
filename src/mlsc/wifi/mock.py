@@ -5,9 +5,23 @@ import secrets
 from collections.abc import Iterable
 from dataclasses import dataclass
 
-from mlsc.wifi.manager import CLIENT, HOTSPOT, Capabilities, HotspotInfo, Network, WifiError, WifiManager, WifiStatus
+from mlsc.wifi.manager import (
+    CLIENT,
+    HOTSPOT,
+    RADIO_NO_ADAPTER,
+    RADIO_READY,
+    RADIO_SWITCHED_OFF,
+    Capabilities,
+    HotspotInfo,
+    Network,
+    WifiError,
+    WifiManager,
+    WifiStatus,
+    radio_problem,
+)
 
 MOCK_IP = "192.168.1.50"
+MOCK_INTERFACE = "wlan0"
 DEFAULT_HOTSPOT_SSID = "MLSC-0000"
 GENERATED_PASSWORD_BYTES = 6
 
@@ -22,12 +36,16 @@ class MockNetwork:
 
 class MockWifiManager(WifiManager):
     def __init__(self, networks: Iterable[MockNetwork] = (), *, supported: bool = True, hotspot_supported: bool = True,
-                 country: str | None = "DE", failing_connects: Iterable[str] = ()) -> None:
+                 country: str | None = "DE", failing_connects: Iterable[str] = (), radio: str = RADIO_READY,
+                 pinned_interface: str | None = None, radio_stuck: bool = False) -> None:
         self._networks = {network.ssid: network for network in networks}
         self._supported = supported
         self._hotspot_supported = hotspot_supported
         self._country = country
         self._failing_connects = set(failing_connects)
+        self._radio = radio
+        self._pinned = pinned_interface
+        self._radio_stuck = radio_stuck
         self._known: set[str] = set()
         self._connected: str | None = None
         self._hotspot: HotspotInfo | None = None
@@ -35,7 +53,9 @@ class MockWifiManager(WifiManager):
         self.drop_on_failed_connect = False
 
     def capabilities(self) -> Capabilities:
-        return Capabilities(self._supported, self._supported and self._hotspot_supported, self._country)
+        radio = RADIO_NO_ADAPTER if self._pinned not in {None, MOCK_INTERFACE} else self._radio
+        return Capabilities(self._supported, self._supported and self._hotspot_supported, self._country, radio,
+                            self._pinned or MOCK_INTERFACE, pinned=self._pinned is not None)
 
     def status(self) -> WifiStatus:
         if self._hotspot is not None:
@@ -84,6 +104,16 @@ class MockWifiManager(WifiManager):
 
     def hotspot_clients(self) -> int:
         return self.clients if self._hotspot is not None else 0
+
+    def enable_radio(self) -> None:
+        capabilities = self.capabilities()
+        problem = radio_problem(capabilities)
+        if problem is not None and capabilities.radio != RADIO_SWITCHED_OFF:
+            raise WifiError(problem.message)
+        if self._radio_stuck:
+            msg = "Wi-Fi could not be switched on."
+            raise WifiError(msg)
+        self._radio = RADIO_READY
 
     def _require_supported(self) -> None:
         if not self._supported:

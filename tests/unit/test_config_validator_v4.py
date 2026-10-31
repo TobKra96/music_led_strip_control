@@ -46,6 +46,7 @@ def test_version_other_than_4_is_rejected(config):
     (("audio", "min_frequency"), -5),
     (("audio", "min_volume_threshold"), -0.1),
     (("wifi", "setup_fallback"), "yes"),
+    (("wifi", "interface"), 5),
     (("id_counters", "device"), -1),
     (("id_counters", "group"), 1.5),
 ])
