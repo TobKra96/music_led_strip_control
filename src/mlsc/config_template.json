@@ -676,6 +676,7 @@
         "min_volume_threshold": 0.001
     },
     "wifi": {
+        "hotspot_ip": "",
         "hotspot_ssid": "mlsc",
         "interface": "",
         "mode": "client",

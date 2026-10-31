@@ -50,6 +50,7 @@ const render = () => {
         $('#hotspot_current_ssid').text(view.hotspot.ssid);
         // The API leaves the password out for an unauthenticated session while the PIN lock is on.
         $('#hotspot_current_password').text(view.hotspot.password || 'hidden');
+        $('#hotspot_current_address').text(view.hotspot.address || 'unknown');
     }
 };
 
@@ -226,12 +227,14 @@ const setHotspot = (enabled) => {
     if (enabled) {
         const ssid = $('#hotspot_ssid').val().trim();
         const password = $('#hotspot_password').val();
-        const problem = hotspotProblem(ssid, password);
+        const ip = $('#hotspot_ip').val().trim();
+        const problem = hotspotProblem(ssid, password, ip);
         if (problem) {
             new Toast(problem).warning();
-            $('#hotspot_password').trigger('focus');
+            $(problem.includes('address') ? '#hotspot_ip' : '#hotspot_password').trigger('focus');
             return Promise.resolve();
         }
+        if (ip) body.ip = ip;
         if (ssid) body.ssid = ssid;
         if (password) body.password = password;
     }

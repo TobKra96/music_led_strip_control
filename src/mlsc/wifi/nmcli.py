@@ -8,6 +8,7 @@ from dataclasses import dataclass
 
 from loguru import logger
 
+from mlsc.wifi.hotspot_address import PREFIX_LENGTH
 from mlsc.wifi.manager import (
     CLIENT,
     HOTSPOT,
@@ -34,6 +35,7 @@ NO_SECURITY = ("", "--")
 MAX_HOTSPOT_PROFILES = 10
 RADIO_WAIT_SECONDS = 10
 UNUSABLE_STATES = {"unavailable", "unmanaged"}
+IP_ADDRESS_LINE = re.compile(r"^\d+:\s+(\S+)\s+inet\s+(\S+)")
 COUNTRY_PATTERN = re.compile(r"^country (\w\w):", re.MULTILINE)
 
 # Runs a command line and returns its exit code and combined output; `Host.run` fits.
@@ -111,7 +113,7 @@ class NmcliWifiManager(WifiManager):
             return WifiStatus(CLIENT, connected=False, ssid=None, ip=None, hotspot=None)
         connection, ip = self._active_connection(device)
         if connection == HOTSPOT_CONNECTION:
-            return WifiStatus(HOTSPOT, connected=False, ssid=None, ip=ip, hotspot=self._hotspot_info())
+            return WifiStatus(HOTSPOT, connected=False, ssid=None, ip=ip, hotspot=self._hotspot_info(ip))
         return WifiStatus(CLIENT, connected=connection is not None, ssid=connection, ip=ip, hotspot=None)
 
     def scan(self) -> list[Network]:
@@ -154,7 +156,7 @@ class NmcliWifiManager(WifiManager):
         if code != 0:
             raise WifiError(_error_text(output))
 
-    def start_hotspot(self, ssid: str | None, password: str | None) -> None:
+    def start_hotspot(self, ssid: str | None, password: str | None, address: str | None = None) -> None:
         device = self._require_device()
         if not self._supports_access_point(device):
             msg = "The Wi-Fi adapter does not support the Hotspot."
@@ -166,6 +168,29 @@ class NmcliWifiManager(WifiManager):
         code, output = self._run(command)
         if code != 0:
             raise WifiError(_error_text(output, password))
+        if address:
+            self._set_hotspot_address(address)
+
+    def _set_hotspot_address(self, address: str) -> None:
+        """`nmcli device wifi hotspot` always starts on the default address: change the profile, then bring it up again (still `shared`: DHCP, DNS and NAT)."""
+        modify = ["nmcli", "connection", "modify", HOTSPOT_CONNECTION, "ipv4.addresses", f"{address}/{PREFIX_LENGTH}", "ipv4.method", "shared"]
+        for command in (modify, ["nmcli", "connection", "up", "id", HOTSPOT_CONNECTION]):
+            code, output = self._run(command)
+            if code != 0:
+                raise WifiError(_error_text(output))
+
+    def connected_networks(self) -> list[str]:
+        code, output = self._run(["ip", "-4", "-o", "addr", "show"])
+        if code != 0:
+            return []
+        device = self._wifi_device()
+        hotspot_device = device if device and self._active_connection(device)[0] == HOTSPOT_CONNECTION else None
+        networks = []
+        for line in output.splitlines():
+            match = IP_ADDRESS_LINE.match(line)
+            if match and match[1] != "lo" and match[1] != hotspot_device:
+                networks.append(match[2])
+        return networks
 
     def stop_hotspot(self) -> None:
         self._delete_hotspot_profiles()
@@ -262,7 +287,7 @@ class NmcliWifiManager(WifiManager):
                 ip = value.split("/")[0]
         return connection, ip
 
-    def _hotspot_info(self) -> HotspotInfo | None:
+    def _hotspot_info(self, address: str | None) -> HotspotInfo | None:
         command = ["nmcli", "-t", "-s", "-g", "802-11-wireless.ssid,802-11-wireless-security.psk", "connection", "show", HOTSPOT_CONNECTION]
         code, output = self._run(command)
         if code != 0:
@@ -270,7 +295,7 @@ class NmcliWifiManager(WifiManager):
         # `-g` escapes colons and backslashes like `-t` does.
         # Profiles that an earlier version left behind with the same name add their own lines: the first one is read.
         ssid, password, *_ = [*output.split("\n"), "", ""]
-        return HotspotInfo(split_terse(ssid)[0], split_terse(password)[0] or None)
+        return HotspotInfo(split_terse(ssid)[0], split_terse(password)[0] or None, address)
 
     def _connection_names(self, *, wifi_only: bool = False) -> set[str]:
         code, output = self._run(["nmcli", "-t", "-f", "NAME,TYPE", "connection", "show"])

@@ -96,7 +96,8 @@
                                     <p class="text-muted">Lets phones join the Pi directly, for use without a router. While it is on, the Pi is not connected to your home Wi-Fi.</p>
                                     <div id="hotspot_info" class="alert alert-info d-none" role="status" data-unsaved-ignore>
                                         Network name: <strong id="hotspot_current_ssid"></strong><br>
-                                        Password: <code id="hotspot_current_password"></code>
+                                        Password: <code id="hotspot_current_password"></code><br>
+                                        Address: <code id="hotspot_current_address"></code>
                                     </div>
                                     <div class="form-group">
                                         <label for="hotspot_ssid">Network name</label>
@@ -106,6 +107,11 @@
                                         <label for="hotspot_password">Password</label>
                                         <input id="hotspot_password" type="password" class="form-control" minlength="8" maxlength="63" placeholder="Generated when empty" autocomplete="new-password">
                                         <small class="form-text text-muted">At least 8 characters.</small>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="hotspot_ip">IP address</label>
+                                        <input id="hotspot_ip" type="text" class="form-control" maxlength="15" placeholder="10.42.0.1" inputmode="decimal" autocomplete="off" spellcheck="false">
+                                        <small class="form-text text-muted">Change it if 10.42.0.x clashes with a network you use, for example 192.168.50.1. It must be a private address outside the networks the Pi is connected to. Leave it empty to keep the saved address; enter 10.42.0.1 to go back to the default. Phones on the Hotspot are disconnected while it changes and must rejoin, and the page is then at the new address.</small>
                                     </div>
                                     <button type="button" id="hotspot_on_btn" class="btn btn-primary">Switch the Hotspot on</button>
                                     <button type="button" id="hotspot_off_btn" class="btn btn-outline-secondary d-none">Switch the Hotspot off</button>

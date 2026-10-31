@@ -13,6 +13,7 @@ from loguru import logger
 
 from mlsc.operations import Operation, OperationRegistry, OperationState
 from mlsc.wifi.credentials import HotspotCredentials
+from mlsc.wifi.hotspot_address import DEFAULT_HOTSPOT_ADDRESS, clashing_network, validate_hotspot_address
 from mlsc.wifi.manager import CLIENT, HOTSPOT, RADIO_READY, WifiError, WifiManager, WifiStatus
 
 BOOT_FALLBACK_SECONDS = 60
@@ -26,6 +27,7 @@ TICK_SECONDS = 5
 class WifiSettings(Protocol):
     mode: str
     setup_fallback: bool
+    hotspot_ip: str
 
 
 class ConfigWifiSettings:
@@ -47,6 +49,15 @@ class ConfigWifiSettings:
     def setup_fallback(self) -> bool:
         return self._config_service.config["wifi"]["setup_fallback"]
 
+    @property
+    def hotspot_ip(self) -> str:
+        return self._config_service.config["wifi"].get("hotspot_ip", "")
+
+    @hotspot_ip.setter
+    def hotspot_ip(self, address: str) -> None:
+        self._config_service.config["wifi"]["hotspot_ip"] = address
+        self._config_service.save_config()
+
 
 @dataclass(frozen=True)
 class _Pending:
@@ -57,6 +68,8 @@ class _Pending:
     mode: str
     fallback: bool
     status: WifiStatus
+    hotspot_ip: str = ""
+    needs_client: bool = False
     operation: Operation | None = None
 
 
@@ -89,11 +102,18 @@ class WifiSupervisor:
         self._manager.require_ready()
         self._apply(lambda: self._manager.connect(ssid, password), CLIENT)
 
-    def set_hotspot(self, enabled: bool, ssid: str | None = None, password: str | None = None) -> None:
-        """Save the Hotspot as the Wi-Fi mode (or return to client mode). A missing SSID or password comes from the credentials."""
+    def set_hotspot(self, enabled: bool, ssid: str | None = None, password: str | None = None, ip: str | None = None) -> None:
+        """Save the Hotspot as the Wi-Fi mode (or return to client mode). A missing SSID or password comes from the credentials.
+
+        `ip` is the Hotspot's address: None keeps the saved one, an empty string goes back to the default.
+        """
         self._manager.require_ready()
         if enabled:
-            self._apply(lambda: self._manager.start_hotspot(ssid or self._credentials.ssid(), password or self._credentials.password()), HOTSPOT)
+            if ip:
+                validate_hotspot_address(ip, self._manager.connected_networks())
+            address = self._settings.hotspot_ip if ip is None else ip
+            self._apply(lambda: self._manager.start_hotspot(
+                ssid or self._credentials.ssid(), password or self._credentials.password(), self._hotspot_address(address)), HOTSPOT, address)
         else:
             self._apply(self._manager.stop_hotspot, CLIENT)
 
@@ -116,12 +136,15 @@ class WifiSupervisor:
             except Exception:
                 logger.exception("The Wi-Fi supervisor failed.")
 
-    def _apply(self, change: Callable[[], None], target: str) -> None:
+    def _apply(self, change: Callable[[], None], target: str, hotspot_ip: str | None = None) -> None:
         with self._lock:
-            before = self._pending or _Pending(target, 0.0, self._settings.mode, self.fallback_active, self._manager.status())
+            status = self._manager.status()
+            before = self._pending or _Pending(target, 0.0, self._settings.mode, self.fallback_active, status, self._settings.hotspot_ip)
+            # A phone on the Hotspot is cut off by the change: only a phone coming back proves the new Hotspot works.
+            needs_client = before.needs_client or (target == HOTSPOT and status.mode == HOTSPOT and self._manager.hotspot_clients() > 0)
             operation = self._operations.begin("wifi") if self._operations else None
             self._end(before.operation, OperationState.FAILED, "Replaced by a newer Wi-Fi change.")
-            before = replace(before, target=target, deadline=self._clock() + ROLLBACK_SECONDS, operation=operation)
+            before = replace(before, target=target, deadline=self._clock() + ROLLBACK_SECONDS, needs_client=needs_client, operation=operation)
             try:
                 change()
             except WifiError as e:
@@ -130,6 +153,8 @@ class WifiSupervisor:
                 self._publish_state()
                 raise
             self._settings.mode = target
+            if hotspot_ip is not None:
+                self._settings.hotspot_ip = hotspot_ip
             self.fallback_active = False
             self._retry_deadline = None
             self._pending = before
@@ -140,7 +165,7 @@ class WifiSupervisor:
         if pending is None:
             return
         status = self._manager.status()
-        if status.mode == pending.target and (pending.target == HOTSPOT or _working(status) or self._ethernet_up()):
+        if status.mode == pending.target and self._proven(pending, status):
             self._pending = None
             self._ever_connected = self._ever_connected or pending.target == CLIENT
             self._lost_since = None
@@ -150,6 +175,25 @@ class WifiSupervisor:
             logger.warning("The Wi-Fi change did not result in a connection; returning to the {} mode.", pending.mode)
             self._revert(pending)
             self._end(pending.operation, OperationState.ROLLED_BACK, "The change did not result in a connection.")
+
+    def _proven(self, pending: _Pending, status: WifiStatus) -> bool:
+        if pending.target == HOTSPOT:
+            return not pending.needs_client or self._manager.hotspot_clients() > 0
+        return _working(status) or self._ethernet_up()
+
+    def _hotspot_address(self, saved: str | None = None) -> str | None:
+        """The address to raise the Hotspot on: None for the default. A saved address that clashes with a connected network now is skipped."""
+        address = self._settings.hotspot_ip if saved is None else saved
+        if not address or address == DEFAULT_HOTSPOT_ADDRESS:
+            return None
+        clash = clashing_network(address, self._manager.connected_networks())
+        if clash:
+            logger.warning("The Hotspot address {} overlaps the connected network {}; the default {} is used instead.", address, clash, DEFAULT_HOTSPOT_ADDRESS)
+            return None
+        return address
+
+    def _start_hotspot(self, address: str | None = None) -> None:
+        self._manager.start_hotspot(self._credentials.ssid(), self._credentials.password(), self._hotspot_address(address))
 
     def _end(self, operation: Operation | None, state: OperationState, error: str | None = None) -> None:
         if operation is not None and self._operations is not None:
@@ -174,10 +218,11 @@ class WifiSupervisor:
 
     def _revert(self, before: _Pending) -> None:
         self._settings.mode = before.mode
+        self._settings.hotspot_ip = before.hotspot_ip
         self._lost_since = None
         try:
             if before.status.mode == HOTSPOT:
-                self._manager.start_hotspot(self._credentials.ssid(), self._credentials.password())
+                self._start_hotspot()
                 self.fallback_active = before.fallback
                 self._schedule_retry()
                 return
@@ -222,13 +267,13 @@ class WifiSupervisor:
         """The saved mode is the Hotspot but it is not up, as after a reboot."""
         self._retry_at = now + RETRY_INTERVAL_SECONDS
         try:
-            self._manager.start_hotspot(self._credentials.ssid(), self._credentials.password())
+            self._start_hotspot()
         except WifiError as e:
             logger.warning("The Hotspot could not be raised: {}", e)
 
     def _raise_fallback(self) -> None:
         try:
-            self._manager.start_hotspot(self._credentials.ssid(), self._credentials.password())
+            self._start_hotspot()
         except WifiError as e:
             logger.warning("The Setup Fallback could not be raised: {}", e)
             return

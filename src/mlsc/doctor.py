@@ -18,6 +18,7 @@ from mlsc.outputs.output_raspi import OutputRaspi
 from mlsc.outputs.output_udp import OutputUDP
 from mlsc.webserver.schemas.config_validator_service import ConfigValidatorService
 from mlsc.wifi.credentials import GENERATED_FILE
+from mlsc.wifi.hotspot_address import DEFAULT_HOTSPOT_ADDRESS
 from mlsc.wifi.nmcli import NmcliWifiManager
 
 OUTPUTS: dict[str, type[Output]] = {
@@ -41,7 +42,7 @@ def run_checks(config_dir: Path, host: Host | None = None, capture_factory: Call
     checks.extend(_check_outputs(config, host))
     checks.append(Check("audio", _check_audio(config, capture_factory)))
     checks.append(Check("wifi", _check_wifi(host, (config or {}).get("wifi", {}).get("interface"))))
-    checks.append(Check("hotspot", _check_hotspot(host)))
+    checks.append(Check("hotspot", _check_hotspot(host, (config or {}).get("wifi", {}))))
     checks.append(Check("permissions", _check_permissions(config_dir)))
     return checks
 
@@ -118,13 +119,23 @@ def _check_wifi(host: Host, interface: str | None = None) -> Diagnosis:
     return NmcliWifiManager(host.run, interface).diagnose()
 
 
-def _check_hotspot(host: Host) -> Diagnosis:
+def _check_hotspot(host: Host, wifi_config: dict) -> Diagnosis:
+    address = f"The Hotspot address is {_hotspot_address(host, wifi_config)}."
     boot_dir = host.boot_dir()
     stored = boot_dir / GENERATED_FILE if boot_dir else None
     if stored is not None and stored.is_file():
         credentials = stored.read_text(encoding="utf-8", errors="replace").strip()
-        return Diagnosis.ok("\n".join([f"The Hotspot credentials are in {stored}:", credentials]))
-    return Diagnosis.ok("The Hotspot password is not generated yet; it is created when the Hotspot is first raised.")
+        return Diagnosis.ok("\n".join([f"The Hotspot credentials are in {stored}:", credentials, address]))
+    return Diagnosis.ok(f"The Hotspot password is not generated yet; it is created when the Hotspot is first raised. {address}")
+
+
+def _hotspot_address(host: Host, wifi_config: dict) -> str:
+    """The address the running Hotspot answers on, else the saved one, else the default."""
+    if sys.platform == "linux" and host.which("nmcli") is not None:
+        hotspot = NmcliWifiManager(host.run, wifi_config.get("interface")).status().hotspot
+        if hotspot is not None and hotspot.address:
+            return hotspot.address
+    return wifi_config.get("hotspot_ip") or DEFAULT_HOTSPOT_ADDRESS
 
 
 def _check_permissions(config_dir: Path) -> Diagnosis:

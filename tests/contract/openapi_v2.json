@@ -5756,6 +5756,20 @@
             "title": "Enabled",
             "type": "boolean"
           },
+          "ip": {
+            "anyOf": [
+              {
+                "maxLength": 15,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "The Hotspot's IPv4 address, saved with the Hotspot settings (netmask `/24`). A private address (`10/8`, `172.16/12`, `192.168/16`) that is not a network or broadcast address and does not overlap a network the Pi is connected to. Empty means the default `10.42.0.1`; left out keeps the saved one.",
+            "title": "Ip"
+          },
           "password": {
             "anyOf": [
               {
@@ -5795,6 +5809,19 @@
       },
       "HotspotOut": {
         "properties": {
+          "address": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "The IPv4 address the running Hotspot answers on. `null` when it cannot be read.",
+            "title": "Address"
+          },
           "password": {
             "anyOf": [
               {
@@ -13222,7 +13249,7 @@
     },
     "/api/v2/wifi/hotspot": {
       "put": {
-        "description": "On saves the Hotspot as the mode and drops a client connection. Off returns to the saved networks.<br/><br/>A change that does not end in a working connection within 45 seconds is rolled back to the previous mode.<br/>It is tracked as an `operation` event of kind `wifi`, and `wifi.state` events follow the mode and fallback.",
+        "description": "On saves the Hotspot as the mode and drops a client connection. Off returns to the saved networks.<br/><br/>A change that does not end in a working connection within 45 seconds is rolled back to the previous mode.<br/>A new address is rejected with a `422` naming the problem, such as the connected network it overlaps. Changing the address<br/>of a Hotspot that a phone is using is only confirmed once a phone is connected again, otherwise it is rolled back to the previous address.<br/>It is tracked as an `operation` event of kind `wifi`, and `wifi.state` events follow the mode and fallback.",
         "operationId": "wifi_api_v2_put_hotspot_hotspot_put",
         "requestBody": {
           "content": {

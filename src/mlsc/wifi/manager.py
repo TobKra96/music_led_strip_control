@@ -35,6 +35,7 @@ class Capabilities:
 class HotspotInfo:
     ssid: str
     password: str | None
+    address: str | None = None
 
 
 @dataclass(frozen=True)
@@ -89,8 +90,8 @@ class WifiManager(ABC):
     def forget(self, ssid: str) -> None: ...
 
     @abstractmethod
-    def start_hotspot(self, ssid: str | None, password: str | None) -> None:
-        """Raise the Hotspot. A missing SSID or password is generated."""
+    def start_hotspot(self, ssid: str | None, password: str | None, address: str | None = None) -> None:
+        """Raise the Hotspot. A missing SSID or password is generated. A missing address is NetworkManager's default `10.42.0.1`; the netmask is /24."""
 
     @abstractmethod
     def stop_hotspot(self) -> None: ...
@@ -112,6 +113,10 @@ class WifiManager(ABC):
     def hotspot_clients(self) -> int:
         """How many devices are connected to the Hotspot. 0 when it is down. At least 1 when the host cannot tell."""
         return 0
+
+    def connected_networks(self) -> list[str]:
+        """The IPv4 networks (CIDR, such as `192.168.1.20/24`) the host is connected to, not counting the Hotspot's own."""
+        return []
 
     def diagnose(self) -> Diagnosis:
         capabilities = self.capabilities()

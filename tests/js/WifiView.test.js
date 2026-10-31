@@ -60,10 +60,10 @@ describe('pageView', () => {
     });
 
     it('summarises the Hotspot with its name', () => {
-        const view = pageView({ ...ready, mode: 'hotspot', connected: false, ssid: null, ip: '10.42.0.1', hotspot: { ssid: 'MLSC-1234', password: 'abcd1234' } }, session);
+        const view = pageView({ ...ready, mode: 'hotspot', connected: false, ssid: null, ip: '10.42.0.1', hotspot: { ssid: 'MLSC-1234', password: 'abcd1234', address: '10.42.0.1' } }, session);
 
         expect(view.summary).toBe('Hotspot MLSC-1234 is on, IP address 10.42.0.1.');
-        expect(view.hotspot).toEqual({ ssid: 'MLSC-1234', password: 'abcd1234' });
+        expect(view.hotspot).toEqual({ ssid: 'MLSC-1234', password: 'abcd1234', address: '10.42.0.1' });
     });
 
     it('summarises a Pi without a connection', () => {
@@ -164,6 +164,24 @@ describe('hotspotProblem', () => {
     it('rejects a password longer than 63 characters and a name longer than 32', () => {
         expect(hotspotProblem('', 'x'.repeat(64))).toBe('The Hotspot password can have at most 63 characters.');
         expect(hotspotProblem('n'.repeat(33), '')).toBe('The Hotspot name can have at most 32 characters.');
+    });
+});
+
+describe('hotspotProblem with an address', () => {
+    it.each(['10.1.2.3', '172.16.0.1', '172.31.5.9', '192.168.50.1'])('accepts the private address %s', (ip) => {
+        expect(hotspotProblem('', '', ip)).toBeNull();
+    });
+
+    it.each(['192.168.1', 'abc', '1.2.3.4.5', '192.168.1.300', '192.168.1.1/24'])('rejects %s as not an IPv4 address', (ip) => {
+        expect(hotspotProblem('', '', ip)).toBe('The Hotspot address must be an IPv4 address such as 192.168.50.1.');
+    });
+
+    it.each(['8.8.8.8', '172.32.0.1', '172.15.0.1', '192.169.0.1'])('rejects the public address %s', (ip) => {
+        expect(hotspotProblem('', '', ip)).toContain('must be a private address');
+    });
+
+    it.each(['192.168.50.0', '192.168.50.255'])('rejects the network or broadcast address %s', (ip) => {
+        expect(hotspotProblem('', '', ip)).toContain('network and broadcast');
     });
 });
 

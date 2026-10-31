@@ -19,6 +19,7 @@ CHANGE_ERRORS = {"401": Problem, "415": Problem, "422": Problem, "503": Problem}
 class HotspotOut(BaseModel):
     ssid: str
     password: str | None = Field(description="Shown to an authenticated session, or to anyone while the PIN lock is off.")
+    address: str | None = Field(default=None, description="The IPv4 address the running Hotspot answers on. `null` when it cannot be read.")
 
 
 class DiagnosisOut(BaseModel):
@@ -70,6 +71,10 @@ class HotspotBody(BaseModel):
     enabled: bool
     ssid: str | None = Field(default=None, min_length=1, max_length=32, description="Generated when left out.")
     password: str | None = Field(default=None, min_length=8, max_length=63, description="Generated when left out.")
+    ip: str | None = Field(default=None, max_length=15, description=(
+        "The Hotspot's IPv4 address, saved with the Hotspot settings (netmask `/24`). A private address (`10/8`, `172.16/12`, `192.168/16`) "
+        "that is not a network or broadcast address and does not overlap a network the Pi is connected to. "
+        "Empty means the default `10.42.0.1`; left out keeps the saved one."))
 
 
 def _wifi() -> WifiManager:
@@ -90,7 +95,7 @@ def _require_supported() -> WifiManager:
 def _status() -> dict:
     wifi = _wifi()
     capabilities, status = wifi.capabilities(), wifi.status()
-    hotspot = {"ssid": status.hotspot.ssid, "password": status.hotspot.password} if status.hotspot else None
+    hotspot = {"ssid": status.hotspot.ssid, "password": status.hotspot.password, "address": status.hotspot.address} if status.hotspot else None
     diagnosis = wifi.diagnose()
     return {
         "supported": capabilities.supported, "hotspot_supported": capabilities.hotspot, "country": capabilities.country,
@@ -153,10 +158,12 @@ def put_hotspot(body: HotspotBody):
     """On saves the Hotspot as the mode and drops a client connection. Off returns to the saved networks.
 
     A change that does not end in a working connection within 45 seconds is rolled back to the previous mode.
+    A new address is rejected with a `422` naming the problem, such as the connected network it overlaps. Changing the address
+    of a Hotspot that a phone is using is only confirmed once a phone is connected again, otherwise it is rolled back to the previous address.
     It is tracked as an `operation` event of kind `wifi`, and `wifi.state` events follow the mode and fallback.
     """
     _require_supported()
-    return _change(lambda: _supervisor().set_hotspot(body.enabled, body.ssid, body.password))
+    return _change(lambda: _supervisor().set_hotspot(body.enabled, body.ssid, body.password, body.ip))
 
 
 

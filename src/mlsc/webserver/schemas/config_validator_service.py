@@ -1434,10 +1434,11 @@ audio_schema = {
 wifi_schema = {
     "type": "object",
     "additionalProperties": False,
-    "maxProperties": 4,
+    "maxProperties": 5,
     "minProperties": 3,
     "required": ["hotspot_ssid", "mode", "setup_fallback"],
     "properties": {
+        "hotspot_ip": {"type": "string"},
         "hotspot_ssid": {"type": "string"},
         "interface": {"type": "string"},
         "mode": {"type": "string"},

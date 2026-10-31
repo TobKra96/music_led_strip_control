@@ -5,6 +5,7 @@ import secrets
 from collections.abc import Iterable
 from dataclasses import dataclass
 
+from mlsc.wifi.hotspot_address import DEFAULT_HOTSPOT_ADDRESS
 from mlsc.wifi.manager import (
     CLIENT,
     HOTSPOT,
@@ -50,6 +51,7 @@ class MockWifiManager(WifiManager):
         self._connected: str | None = None
         self._hotspot: HotspotInfo | None = None
         self.clients = 0
+        self.networks_in_use: list[str] = []
         self.drop_on_failed_connect = False
 
     def capabilities(self) -> Capabilities:
@@ -91,16 +93,20 @@ class MockWifiManager(WifiManager):
         if self._connected == ssid:
             self._connected = None
 
-    def start_hotspot(self, ssid: str | None, password: str | None) -> None:
+    def start_hotspot(self, ssid: str | None, password: str | None, address: str | None = None) -> None:
         self._require_supported()
         if not self._hotspot_supported:
             msg = "The Wi-Fi adapter does not support the Hotspot."
             raise WifiError(msg)
         self._connected = None
-        self._hotspot = HotspotInfo(ssid or DEFAULT_HOTSPOT_SSID, password or secrets.token_urlsafe(GENERATED_PASSWORD_BYTES))
+        self._hotspot = HotspotInfo(ssid or DEFAULT_HOTSPOT_SSID, password or secrets.token_urlsafe(GENERATED_PASSWORD_BYTES),
+                                    address or DEFAULT_HOTSPOT_ADDRESS)
 
     def stop_hotspot(self) -> None:
         self._hotspot = None
+
+    def connected_networks(self) -> list[str]:
+        return list(self.networks_in_use)
 
     def hotspot_clients(self) -> int:
         return self.clients if self._hotspot is not None else 0

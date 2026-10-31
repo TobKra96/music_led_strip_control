@@ -220,6 +220,34 @@ def test_wifi_is_skipped_off_linux(config_dir, monkeypatch):
     assert checks_by_name(config_dir)["wifi"].status is Status.OK
 
 
+def test_hotspot_check_shows_the_default_address_without_a_saved_one(config_dir, monkeypatch):
+    monkeypatch.setattr(doctor.sys, "platform", "win32")
+    write_config(config_dir)
+
+    assert "The Hotspot address is 10.42.0.1." in checks_by_name(config_dir)["hotspot"].message
+
+
+def test_hotspot_check_shows_the_saved_address(config_dir, monkeypatch):
+    monkeypatch.setattr(doctor.sys, "platform", "win32")
+    write_config(config_dir)
+    config = json.loads((config_dir / "config.json").read_text())
+    config["wifi"]["hotspot_ip"] = "192.168.50.1"
+    (config_dir / "config.json").write_text(json.dumps(config))
+
+    assert "The Hotspot address is 192.168.50.1." in checks_by_name(config_dir)["hotspot"].message
+
+
+def test_hotspot_check_shows_the_address_of_the_running_hotspot(config_dir, monkeypatch):
+    monkeypatch.setattr(doctor.sys, "platform", "linux")
+    write_config(config_dir)
+    host = QuietHost(nmcli_state={
+        ("nmcli", "-t", "-f", "GENERAL.CONNECTION,IP4.ADDRESS", "device", "show", "wlan0"): (0, "GENERAL.CONNECTION:MLSC-Hotspot\nIP4.ADDRESS[1]:10.9.0.1/24"),
+        ("nmcli", "-t", "-s", "-g", "802-11-wireless.ssid,802-11-wireless-security.psk", "connection", "show", "MLSC-Hotspot"): (0, "MLSC-1\npassword1"),
+    })
+
+    assert "The Hotspot address is 10.9.0.1." in checks_by_name(config_dir, host=host)["hotspot"].message
+
+
 def test_unwritable_config_dir_is_an_error(config_dir, monkeypatch):
     monkeypatch.setattr(doctor, "_unwritable_reason", lambda _path: "denied")
 

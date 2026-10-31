@@ -26,7 +26,7 @@ const summaryOf = (status) => {
  * @param {{pin_required: boolean}} session The body of `GET /api/v2/auth/session`.
  * @return {{unsupported: boolean, banner: {level: string, text: string, fix: string|null}|null, showStatus: boolean,
  *   showClient: boolean, showHotspot: boolean, showRadioButton: boolean, authWarning: boolean, summary: string,
- *   interface: string|null, hotspot: {ssid: string, password: string|null}|null}}
+ *   interface: string|null, hotspot: {ssid: string, password: string|null, address: string|null}|null}}
  */
 export const pageView = (status, session) => {
     const usable = status.supported && status.radio === 'ready';
@@ -91,16 +91,35 @@ const SIGNAL_LABELS = ['Very weak', 'Weak', 'Good', 'Strong', 'Strong'];
 export const signalLabel = signal => SIGNAL_LABELS[signalLevel(signal)];
 
 /**
- * What is wrong with the Hotspot name and password typed in, as the server would reject it. Empty means generated.
- * @param {string} ssid
- * @param {string} password
+ * What is wrong with a Hotspot address: it has to be a private IPv4 host address.
+ * @param {string} ip
  * @return {string|null}
  */
-export const hotspotProblem = (ssid, password) => {
+const addressProblem = (ip) => {
+    const parts = ip.split('.');
+    if (parts.length !== 4 || !parts.every(part => /^\d{1,3}$/.test(part) && Number(part) <= 255)) {
+        return 'The Hotspot address must be an IPv4 address such as 192.168.50.1.';
+    }
+    const [a, b, , d] = parts.map(Number);
+    const isPrivate = a === 10 || (a === 172 && b >= 16 && b <= 31) || (a === 192 && b === 168);
+    if (!isPrivate) return 'The Hotspot address must be a private address: 10.x.x.x, 172.16.x.x to 172.31.x.x or 192.168.x.x.';
+    if (d === 0 || d === 255) return 'The Hotspot address cannot end in .0 or .255, those are the network and broadcast addresses.';
+    return null;
+};
+
+/**
+ * What is wrong with the Hotspot name, password and address typed in, as the server would reject it. Empty means generated
+ * (or, for the address, the default). Whether the address overlaps a connected network is only known to the server.
+ * @param {string} ssid
+ * @param {string} password
+ * @param {string} [ip]
+ * @return {string|null}
+ */
+export const hotspotProblem = (ssid, password, ip = '') => {
     if (ssid.length > 32) return 'The Hotspot name can have at most 32 characters.';
     if (password && password.length < 8) return 'The Hotspot password needs at least 8 characters.';
     if (password.length > 63) return 'The Hotspot password can have at most 63 characters.';
-    return null;
+    return ip ? addressProblem(ip) : null;
 };
 
 /**

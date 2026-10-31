@@ -30,7 +30,7 @@ FALLBACK_LED_STRIP = ("ws2812", "grb", False)
 DEFAULT_LED_PIN = 18
 MAX_LED_PIN = 27  # Highest BCM GPIO on the 40-pin header.
 DEFAULT_POWER_LIMIT = {"enabled": False, "supply_amps": 5.0, "ma_per_led": 60, "mode": "warn"}
-DEFAULT_WIFI = {"hotspot_ssid": "mlsc", "interface": "", "mode": "client", "setup_fallback": True}
+DEFAULT_WIFI = {"hotspot_ip": "", "hotspot_ssid": "mlsc", "interface": "", "mode": "client", "setup_fallback": True}
 
 
 @dataclass
@@ -76,7 +76,7 @@ class ConfigConverterV4(ConfigConverterBase):
         self.convert_devices(config, report)
         self.add_audio_section(config, general_settings, audio_devices, report)
         self.drop_legacy_keys(config, general_settings, report)
-        config.setdefault("wifi", copy.deepcopy(DEFAULT_WIFI))
+        config.setdefault("wifi", copy.deepcopy(DEFAULT_WIFI)).setdefault("hotspot_ip", "")
         config["id_counters"] = self.id_counters(config)
         config["version"] = 4
 

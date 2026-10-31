@@ -238,7 +238,7 @@ def test_audio_section_carries_over_settings_and_adds_gain():
 def test_wifi_section_has_no_passwords():
     wifi = upgrade(v3_config())[0]["wifi"]
 
-    assert set(wifi) == {"hotspot_ssid", "interface", "mode", "setup_fallback"}
+    assert set(wifi) == {"hotspot_ip", "hotspot_ssid", "interface", "mode", "setup_fallback"}
     assert not wifi["interface"]
     assert wifi["setup_fallback"] is True
 
@@ -251,7 +251,7 @@ def test_existing_audio_and_wifi_sections_are_preserved():
     new_config, _ = upgrade(config)
 
     assert new_config["audio"] == {"source": "browser"}
-    assert new_config["wifi"] == {"mode": "hotspot"}
+    assert new_config["wifi"] == {"mode": "hotspot", "hotspot_ip": ""}
 
 
 def test_id_counters_are_one_past_the_highest_existing_id():

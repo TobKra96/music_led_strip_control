@@ -20,6 +20,7 @@ CAFE = MockNetwork("Cafe", signal=40, security=None)
 class Settings:
     mode: str = CLIENT
     setup_fallback: bool = True
+    hotspot_ip: str = ""
 
 
 def make_client(wifi, monkeypatch, *, auth_enabled=False):
@@ -100,12 +101,31 @@ def test_hotspot_on_returns_its_credentials_and_off_drops_it(client):
 
     assert on.status_code == 200
     assert on.get_json()["mode"] == "hotspot"
-    assert on.get_json()["hotspot"] == {"ssid": "MLSC-ab12", "password": "hotspotpw"}
+    assert on.get_json()["hotspot"] == {"ssid": "MLSC-ab12", "password": "hotspotpw", "address": "10.42.0.1"}
 
     off = client.put("/api/v2/wifi/hotspot", json={"enabled": False})
 
     assert off.get_json()["mode"] == "client"
     assert off.get_json()["hotspot"] is None
+
+
+def test_hotspot_takes_an_address_and_reports_it(client):
+    response = client.put("/api/v2/wifi/hotspot", json={"enabled": True, "ip": "192.168.50.1"})
+
+    assert response.status_code == 200
+    assert response.get_json()["hotspot"]["address"] == "192.168.50.1"
+    assert client.get("/api/v2/wifi/status").get_json()["hotspot"]["address"] == "192.168.50.1"
+
+
+def test_hotspot_rejects_an_address_that_overlaps_the_connected_network_naming_it(wifi, monkeypatch):
+    wifi.networks_in_use = ["192.168.1.20/24"]
+    client = make_client(wifi, monkeypatch)
+
+    response = client.put("/api/v2/wifi/hotspot", json={"enabled": True, "ip": "192.168.1.1"})
+
+    assert response.status_code == 422
+    assert "192.168.1.0/24" in response.get_json()["detail"]
+    assert client.get("/api/v2/wifi/status").get_json()["mode"] == "client"
 
 
 def test_hotspot_without_adapter_support_is_a_problem(monkeypatch):

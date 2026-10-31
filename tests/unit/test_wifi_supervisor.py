@@ -17,6 +17,7 @@ HOME = MockNetwork("Home", signal=80, security="WPA2", password="secret123")  # 
 class Settings:
     mode: str = CLIENT
     setup_fallback: bool = True
+    hotspot_ip: str = ""
 
 
 class Rig:
@@ -359,3 +360,124 @@ def test_wifi_state_carries_the_radio_and_follows_it(off_rig):
     off_rig.run(5)
 
     assert [state["radio"] for state in off_rig.wifi_states()] == ["switched_off", "ready"]
+
+
+def hotspot_address(rig):
+    return rig.wifi.status().hotspot.address
+
+
+def test_the_hotspot_uses_the_default_address_unless_one_is_saved(rig):
+    rig.supervisor.set_hotspot(True)
+
+    assert hotspot_address(rig) == "10.42.0.1"
+    assert not rig.settings.hotspot_ip
+
+
+def test_a_chosen_address_is_saved_and_used(rig):
+    rig.supervisor.set_hotspot(True, ip="192.168.50.1")
+
+    assert hotspot_address(rig) == "192.168.50.1"
+    assert rig.settings.hotspot_ip == "192.168.50.1"
+
+
+def test_an_empty_address_goes_back_to_the_default(rig):
+    rig.supervisor.set_hotspot(True, ip="192.168.50.1")
+    rig.supervisor.set_hotspot(True, ip="")
+
+    assert hotspot_address(rig) == "10.42.0.1"
+    assert not rig.settings.hotspot_ip
+
+
+def test_leaving_the_address_out_keeps_the_saved_one(rig):
+    rig.settings.hotspot_ip = "192.168.50.1"
+    rig.supervisor.set_hotspot(True)
+
+    assert hotspot_address(rig) == "192.168.50.1"
+
+
+def test_an_address_that_overlaps_a_connected_network_is_rejected_before_anything_changes(rig):
+    rig.wifi.networks_in_use = ["192.168.1.20/24"]
+    rig.connect_home()
+
+    with pytest.raises(WifiError, match=r"192\.168\.1\.0/24"):
+        rig.supervisor.set_hotspot(True, ip="192.168.1.1")
+
+    assert rig.wifi.status().mode == CLIENT
+    assert not rig.settings.hotspot_ip
+    assert not rig.wifi_operations()
+
+
+def test_a_public_address_is_rejected(rig):
+    with pytest.raises(WifiError, match="private"):
+        rig.supervisor.set_hotspot(True, ip="8.8.8.8")
+
+
+def test_a_saved_address_that_now_clashes_falls_back_to_the_default_when_raised(rig):
+    rig.settings.hotspot_ip = "192.168.1.1"
+    rig.settings.mode = HOTSPOT
+    rig.wifi.networks_in_use = ["192.168.1.20/24"]
+
+    rig.run(10)
+
+    assert hotspot_address(rig) == "10.42.0.1"
+    assert rig.settings.hotspot_ip == "192.168.1.1"
+
+
+def test_the_default_is_raised_even_when_it_clashes_too(rig):
+    rig.settings.hotspot_ip = "192.168.1.1"
+    rig.settings.mode = HOTSPOT
+    rig.wifi.networks_in_use = ["192.168.1.20/24", "10.42.0.7/24"]
+
+    rig.run(10)
+
+    assert hotspot_address(rig) == "10.42.0.1"
+
+
+def test_the_setup_fallback_raises_the_hotspot_on_the_saved_address(rig):
+    rig.settings.hotspot_ip = "192.168.50.1"
+
+    rig.run(65)
+
+    assert rig.supervisor.fallback_active
+    assert hotspot_address(rig) == "192.168.50.1"
+
+
+def test_an_address_change_with_a_phone_on_the_hotspot_needs_a_phone_to_reach_the_new_address(rig):
+    rig.supervisor.set_hotspot(True)
+    rig.run(10)
+    rig.wifi.clients = 1
+
+    rig.supervisor.set_hotspot(True, ip="192.168.50.1")
+    rig.wifi.clients = 0
+    rig.run(40)
+    assert rig.wifi_operations()[-1]["state"] == OperationState.PENDING.value
+
+    rig.wifi.clients = 1
+    rig.run(5)
+
+    assert rig.wifi_operations()[-1]["state"] == OperationState.CONFIRMED.value
+    assert hotspot_address(rig) == "192.168.50.1"
+
+
+def test_an_address_change_nobody_reaches_is_rolled_back_to_the_previous_address(rig):
+    rig.supervisor.set_hotspot(True, ip="192.168.40.1")
+    rig.run(10)
+    rig.wifi.clients = 1
+
+    rig.supervisor.set_hotspot(True, ip="192.168.50.1")
+    rig.wifi.clients = 0
+    rig.run(50)
+
+    assert rig.wifi_operations()[-1]["state"] == OperationState.ROLLED_BACK.value
+    assert hotspot_address(rig) == "192.168.40.1"
+    assert rig.settings.hotspot_ip == "192.168.40.1"
+
+
+def test_an_address_change_without_a_phone_on_the_hotspot_confirms_at_once(rig):
+    rig.supervisor.set_hotspot(True)
+    rig.run(10)
+
+    rig.supervisor.set_hotspot(True, ip="192.168.50.1")
+    rig.run(5)
+
+    assert rig.wifi_operations()[-1]["state"] == OperationState.CONFIRMED.value

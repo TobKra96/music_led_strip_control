@@ -508,3 +508,68 @@ def test_status_of_the_hotspot_reads_the_first_profile_when_old_duplicates_remai
     hotspot = wifi.status().hotspot
 
     assert (hotspot.ssid, hotspot.password) == ("AAA", "11111111")
+
+
+MODIFY_ADDRESS = ("nmcli", "connection", "modify", "MLSC-Hotspot", "ipv4.addresses", "192.168.50.1/24", "ipv4.method", "shared")
+BRING_UP = ("nmcli", "connection", "up", "id", "MLSC-Hotspot")
+IP_ADDRESSES = ("ip", "-4", "-o", "addr", "show")
+IP_OUTPUT = (
+   "1: lo    inet 127.0.0.1/8 scope host lo valid_lft forever preferred_lft forever\n"
+   "2: eth0    inet 192.168.0.7/24 brd 192.168.0.255 scope global eth0 valid_lft forever preferred_lft forever\n"
+   "3: wlan0    inet 192.168.1.50/24 brd 192.168.1.255 scope global dynamic wlan0 valid_lft 86000sec preferred_lft 86000sec"
+)
+
+
+def test_start_hotspot_with_an_address_sets_it_on_the_profile_and_brings_it_up_again():
+    wifi, runner = manager_with({HOTSPOT_BASE: (0, "ok"), MODIFY_ADDRESS: (0, ""), BRING_UP: (0, "ok")})
+
+    wifi.start_hotspot(None, None, "192.168.50.1")
+
+    assert runner.calls[-2:] == [list(MODIFY_ADDRESS), list(BRING_UP)]
+
+
+def test_start_hotspot_without_an_address_keeps_the_networkmanager_default():
+    wifi, runner = manager_with({HOTSPOT_BASE: (0, "ok")})
+
+    wifi.start_hotspot(None, None)
+
+    assert not runner.ran("nmcli", "connection", "modify")
+
+
+@pytest.mark.parametrize("failing", [MODIFY_ADDRESS, BRING_UP])
+def test_start_hotspot_fails_when_the_address_cannot_be_applied(failing):
+    wifi, _ = manager_with({HOTSPOT_BASE: (0, "ok"), MODIFY_ADDRESS: (0, ""), BRING_UP: (0, "ok"), failing: (1, "Error: no address")})
+
+    with pytest.raises(WifiError, match="no address"):
+        wifi.start_hotspot(None, None, "192.168.50.1")
+
+
+def test_status_of_the_hotspot_reports_its_real_address():
+    wifi, _ = manager_with({
+        DEVICE_SHOW: (0, "GENERAL.CONNECTION:MLSC-Hotspot\nIP4.ADDRESS[1]:192.168.50.1/24"),
+        HOTSPOT_SECRETS: (0, "MLSC-ab12\nhunter22pw"),
+    })
+
+    assert wifi.status().hotspot.address == "192.168.50.1"
+
+
+def test_connected_networks_lists_the_subnets_without_loopback():
+    wifi, _ = manager_with({IP_ADDRESSES: (0, IP_OUTPUT)})
+
+    assert wifi.connected_networks() == ["192.168.0.7/24", "192.168.1.50/24"]
+
+
+def test_connected_networks_leaves_out_the_hotspots_own_subnet():
+    wifi, _ = manager_with({
+        IP_ADDRESSES: (0, IP_OUTPUT.replace("192.168.1.50/24", "10.42.0.1/24")),
+        DEVICE_SHOW: (0, "GENERAL.CONNECTION:MLSC-Hotspot\nIP4.ADDRESS[1]:10.42.0.1/24"),
+        HOTSPOT_SECRETS: (0, "MLSC-ab12\nhunter22pw"),
+    })
+
+    assert wifi.connected_networks() == ["192.168.0.7/24"]
+
+
+def test_connected_networks_is_empty_when_ip_fails():
+    wifi, _ = manager_with({IP_ADDRESSES: (127, "ip: command not found")})
+
+    assert wifi.connected_networks() == []
