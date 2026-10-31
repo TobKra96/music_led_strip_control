@@ -14,7 +14,7 @@ pytestmark = pytest.mark.unit
 class _OutQueue:
     """Plays the NotificationService: answers each refresh request with `reply`."""
 
-    def __init__(self, inbox, reply):
+    def __init__(self, inbox, reply) -> None:
         self.inbox = inbox
         self.reply = reply
         self.requested = []
@@ -30,7 +30,7 @@ def make_executer(reply=NotificationEnum.config_refresh_finished):
     executer = ExecuterBase.__new__(ExecuterBase)
     executer.notification_queue_in = inbox
     executer.notification_queue_out = _OutQueue(inbox, reply)
-    executer._config_instance = type("C", (), {"config": {
+    executer._config_instance = type("C", (), {"config": {  # ruff: ignore[private-member-access]
         "device_configs": {
             "0": {"effects": {"effect_bars": {"color_mode": "mine"}}},
             "1": {"effects": {"effect_bars": {"color_mode": "spectral"}}},
