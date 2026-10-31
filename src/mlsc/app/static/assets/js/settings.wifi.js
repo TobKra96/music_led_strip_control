@@ -2,7 +2,7 @@ import { api } from './classes/Api.js';
 import { events } from './classes/Events.js';
 import Toast from './classes/Toast.js';
 import UnsavedChanges from './classes/UnsavedChanges.js';
-import { addressOf, operationView, pageView, secondsLeft, signalLabel, signalLevel } from './classes/WifiView.js';
+import { addressOf, operationView, pageView, secondsLeft, signalLabel, signalLevel, hotspotProblem } from './classes/WifiView.js';
 
 const unsaved = new UnsavedChanges(document.getElementById('settingsForm'));
 const address = addressOf(window.location);
@@ -188,6 +188,12 @@ const setHotspot = (enabled) => {
     if (enabled) {
         const ssid = $('#hotspot_ssid').val().trim();
         const password = $('#hotspot_password').val();
+        const problem = hotspotProblem(ssid, password);
+        if (problem) {
+            new Toast(problem).warning();
+            $('#hotspot_password').trigger('focus');
+            return Promise.resolve();
+        }
         if (ssid) body.ssid = ssid;
         if (password) body.password = password;
     }

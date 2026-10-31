@@ -89,3 +89,16 @@ const SIGNAL_LABELS = ['Very weak', 'Weak', 'Good', 'Strong', 'Strong'];
  * @return {string}
  */
 export const signalLabel = signal => SIGNAL_LABELS[signalLevel(signal)];
+
+/**
+ * What is wrong with the Hotspot name and password typed in, as the server would reject it. Empty means generated.
+ * @param {string} ssid
+ * @param {string} password
+ * @return {string|null}
+ */
+export const hotspotProblem = (ssid, password) => {
+    if (ssid.length > 32) return 'The Hotspot name can have at most 32 characters.';
+    if (password && password.length < 8) return 'The Hotspot password needs at least 8 characters.';
+    if (password.length > 63) return 'The Hotspot password can have at most 63 characters.';
+    return null;
+};

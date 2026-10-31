@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { ROLLBACK_SECONDS, addressOf, operationView, pageView, secondsLeft, signalLabel, signalLevel } from '../../src/mlsc/app/static/assets/js/classes/WifiView.js';
+import { ROLLBACK_SECONDS, addressOf, operationView, pageView, secondsLeft, signalLabel, signalLevel, hotspotProblem } from '../../src/mlsc/app/static/assets/js/classes/WifiView.js';
 
 const ready = {
     supported: true, hotspot_supported: true, country: 'DE', interface: 'wlan0', radio: 'ready',
@@ -144,5 +144,25 @@ describe('signalLevel', () => {
 
     it('agrees with the label: a network with no bars is Very weak', () => {
         expect(signalLabel(10)).toBe('Very weak');
+    });
+});
+
+describe('hotspotProblem', () => {
+    it('accepts empty fields, which the server fills in', () => {
+        expect(hotspotProblem('', '')).toBeNull();
+    });
+
+    it('accepts a name and a password of 8 to 63 characters', () => {
+        expect(hotspotProblem('My Hotspot', '12345678')).toBeNull();
+        expect(hotspotProblem('', 'x'.repeat(63))).toBeNull();
+    });
+
+    it('rejects a password shorter than 8 characters before it is sent', () => {
+        expect(hotspotProblem('', '1234567')).toBe('The Hotspot password needs at least 8 characters.');
+    });
+
+    it('rejects a password longer than 63 characters and a name longer than 32', () => {
+        expect(hotspotProblem('', 'x'.repeat(64))).toBe('The Hotspot password can have at most 63 characters.');
+        expect(hotspotProblem('n'.repeat(33), '')).toBe('The Hotspot name can have at most 32 characters.');
     });
 });
