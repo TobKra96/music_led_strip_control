@@ -1,0 +1,236 @@
+{% extends "layouts/base.html" %}
+{# PROTOTYPE (throwaway): three layouts of the System page, ?variant=A|B|C. Stub data only, nothing calls the API. #}
+{% block title %} System (prototype) {% endblock %}
+
+{% block stylesheets %}
+<style>
+    .logpane { background: #14181f; color: #d6dbe3; font: 12px/1.5 monospace; height: 340px; overflow: auto; padding: 10px 12px; border-radius: 4px; white-space: pre-wrap; }
+    .logpane .t { color: #7d8794; } .logpane .WARNING { color: #e5b94a; } .logpane .ERROR, .logpane .CRITICAL { color: #ff6b6b; }
+    .power-reason { font-size: 12px; margin-top: 6px; }
+    .pt-bar { position: fixed; bottom: 14px; left: 50%; transform: translateX(-50%); background: #111; color: #fff; padding: 8px 16px; border-radius: 30px; z-index: 5000; box-shadow: 0 4px 14px rgba(0,0,0,.4); display: flex; gap: 14px; align-items: center; font-size: 13px; }
+    .pt-bar a { color: #fff; }
+    .pt-bar select { background: #333; color: #fff; border: 0; border-radius: 4px; }
+    .going-banner { display: none; }
+</style>
+{% endblock stylesheets %}
+
+{% block content %}
+{% set title = 'System Status' if variant == 'B' else 'System' %}
+<div class="pcoded-content">
+    <div class="pcoded-inner-content">
+        <div class="page-header"><div class="page-block"><div class="row align-items-center"><div class="col-md-12">
+            <div class="page-header-title"><h5 class="m-b-10">{{ title }}</h5></div>
+            <ul class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('home_blueprint.index') }}"><i class="feather icon-home"></i></a></li>
+                {% if variant == 'C' %}<li class="breadcrumb-item"><a href="javascript:">Settings</a></li>{% endif %}
+                <li class="breadcrumb-item"><a href="javascript:">{{ title }}</a></li>
+            </ul>
+        </div></div></div></div>
+
+        <div class="main-body"><div class="page-wrapper">
+
+{# ===================== VARIANT A: own top-level page, two columns ===================== #}
+{% if variant == 'A' %}
+            <div class="going-banner alert alert-info mt-4" data-going></div>
+            <div class="row mt-4">
+                <div class="col-lg-4" data-power-area>
+                    <div class="card">
+                        <div class="card-header"><h5><i class="feather icon-power text-c-red"></i> Power</h5></div>
+                        <div class="card-block">
+                            <p class="text-muted">Acts on the whole machine MLSC runs on, not only the service.</p>
+                            <button class="btn btn-warning btn-block" data-power="reboot"><i class="feather icon-refresh-cw"></i> Reboot</button>
+                            <div class="power-reason text-muted" data-power-reason="reboot"></div>
+                            <button class="btn btn-danger btn-block mt-3" data-power="shutdown"><i class="feather icon-power"></i> Shut down</button>
+                            <div class="power-reason text-muted" data-power-reason="shutdown"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-8">
+                    <div class="card">
+                        <div class="card-header"><h5><i class="feather icon-file-text text-c-blue"></i> Server logs</h5></div>
+                        <div class="card-block">
+                            <div class="row mb-2">
+                                <div class="col-md-5 mb-2"><input class="form-control form-control-sm" placeholder="Filter text" data-log-filter></div>
+                                <div class="col-6 col-md-2 mb-2"><select class="form-control form-control-sm" data-log-level><option value="">All levels</option><option>INFO</option><option>WARNING</option><option>ERROR</option></select></div>
+                                <div class="col-6 col-md-2 mb-2"><select class="form-control form-control-sm" data-log-lines><option>100</option><option selected>200</option><option>500</option><option>1000</option></select></div>
+                                <div class="col-md-3 mb-2 text-md-right">
+                                    <button class="btn btn-sm btn-primary" data-log-refresh><i class="feather icon-refresh-cw"></i></button>
+                                    <label class="ml-2 mb-0 small"><input type="checkbox" data-log-auto> Auto</label>
+                                </div>
+                            </div>
+                            <div class="alert alert-warning py-2 small" data-log-note>Logs are kept in memory and are cleared when the machine restarts.</div>
+                            <div class="logpane" data-log-pane></div>
+                            <div class="text-muted" data-log-unavail></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+{# ===================== VARIANT B: appended to the existing System Status page ===================== #}
+{% elif variant == 'B' %}
+            <div class="going-banner alert alert-info mt-4" data-going></div>
+            <div class="row mt-4"><div class="col-12">
+                <div class="card"><div class="card-block text-muted text-center py-4">[ existing System Status cards: CPU, Memory, Services, Version ... ]</div></div>
+            </div></div>
+            <div class="row">
+                <div class="col-12" data-power-area>
+                    <div class="card">
+                        <div class="card-block d-flex flex-wrap align-items-center">
+                            <h5 class="mb-0 mr-auto"><i class="feather icon-power text-c-red"></i> Power</h5>
+                            <div class="mr-3 text-center"><button class="btn btn-outline-warning" data-power="reboot">Reboot</button><div class="power-reason text-muted" data-power-reason="reboot"></div></div>
+                            <div class="text-center"><button class="btn btn-outline-danger" data-power="shutdown">Shut down</button><div class="power-reason text-muted" data-power-reason="shutdown"></div></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <div class="accordion" id="accLogs">
+                        <div class="card p-0">
+                            <div class="card-header" data-toggle="collapse" data-target="#collapseLogs" style="cursor:pointer"><h5><i class="feather icon-file-text text-c-blue"></i> Server logs</h5><i class="fa-solid fa-chevron-down text-c-blue float-right mt-1"></i></div>
+                            <div id="collapseLogs" class="card-body p-0 collapse show"><div class="card-block">
+                                <div class="form-inline mb-2">
+                                    <input class="form-control form-control-sm mr-2" placeholder="Filter" data-log-filter>
+                                    <select class="form-control form-control-sm mr-2" data-log-level><option value="">All</option><option>INFO</option><option>WARNING</option><option>ERROR</option></select>
+                                    <select class="form-control form-control-sm mr-2" data-log-lines><option>100</option><option selected>200</option><option>500</option><option>1000</option></select>
+                                    <button class="btn btn-sm btn-primary mr-2" data-log-refresh>Refresh</button>
+                                    <label class="mb-0 small"><input type="checkbox" data-log-auto> Auto-refresh</label>
+                                </div>
+                                <div class="small text-muted mb-2" data-log-note>Logs are kept in memory and are cleared when the machine restarts.</div>
+                                <div class="logpane" data-log-pane></div>
+                                <div class="text-muted" data-log-unavail></div>
+                            </div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+{# ===================== VARIANT C: Settings > System, tabs ===================== #}
+{% else %}
+            <div class="going-banner alert alert-info mt-4" data-going></div>
+            <div class="row mt-4"><div class="col-lg-9">
+                <div class="card">
+                    <div class="card-block">
+                        <ul class="nav nav-tabs mb-3">
+                            <li class="nav-item"><a class="nav-link active" data-toggle="tab" href="#tabPower">Power</a></li>
+                            <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#tabLogs">Logs</a></li>
+                        </ul>
+                        <div class="tab-content">
+                            <div class="tab-pane fade show active" id="tabPower" data-power-area>
+                                <h6>Reboot</h6><p class="text-muted mb-2">Restart this machine. Strips go dark for about a minute.</p>
+                                <button class="btn btn-warning btn-sm" data-power="reboot">Reboot...</button><div class="power-reason text-muted" data-power-reason="reboot"></div>
+                                <hr>
+                                <h6>Shut down</h6><p class="text-muted mb-2">Power off this machine. It must be switched on by hand afterwards.</p>
+                                <button class="btn btn-danger btn-sm" data-power="shutdown">Shut down...</button><div class="power-reason text-muted" data-power-reason="shutdown"></div>
+                            </div>
+                            <div class="tab-pane fade" id="tabLogs">
+                                <div class="d-flex flex-wrap mb-2">
+                                    <input class="form-control form-control-sm w-auto mr-2 mb-2" placeholder="Filter text" data-log-filter>
+                                    <select class="form-control form-control-sm w-auto mr-2 mb-2" data-log-level><option value="">All levels</option><option>INFO</option><option>WARNING</option><option>ERROR</option></select>
+                                    <select class="form-control form-control-sm w-auto mr-2 mb-2" data-log-lines><option>100</option><option selected>200</option><option>500</option><option>1000</option></select>
+                                    <button class="btn btn-sm btn-primary mr-2 mb-2" data-log-refresh>Refresh</button>
+                                    <label class="mb-2 small align-self-center"><input type="checkbox" data-log-auto> Auto-refresh</label>
+                                </div>
+                                <div class="alert alert-warning py-2 small" data-log-note>Logs are kept in memory and are cleared when the machine restarts.</div>
+                                <div class="logpane" data-log-pane></div>
+                                <div class="text-muted" data-log-unavail></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div></div>
+{% endif %}
+        </div></div>
+    </div>
+</div>
+
+<!-- confirmation modal (shared by all variants) -->
+<div class="modal fade" id="powerModal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content">
+    <div class="modal-header"><h5 class="modal-title" id="pm_title"></h5></div>
+    <div class="modal-body" id="pm_body"></div>
+    <div class="modal-footer"><button class="btn btn-danger" id="pm_confirm"></button><button class="btn btn-secondary" id="pm_cancel" data-dismiss="modal">Cancel</button></div>
+</div></div></div>
+
+<div class="pt-bar">
+    <a href="?variant={{ {'A':'C','B':'A','C':'B'}[variant] }}">&larr;</a>
+    <span><b>{{ variant }}</b> {{ {'A':'own page, 2 cols','B':'on System Status','C':'Settings tabs'}[variant] }}</span>
+    <a href="?variant={{ {'A':'B','B':'C','C':'A'}[variant] }}">&rarr;</a>
+    <span>|</span>
+    <label class="mb-0">Host <select id="pt_host"><option value="ok">Pi, root</option><option value="dev">Dev host</option></select></label>
+    <label class="mb-0">Logs <select id="pt_logs"><option value="ok">available</option><option value="volatile">volatile journal</option><option value="none">unavailable</option><option value="empty">no match</option></select></label>
+</div>
+{% endblock content %}
+
+{% block javascripts %}
+<script>
+$(function () {
+    var variant = "{{ variant }}";
+    // sidebar: show where this variant lives in the nav
+    var $sys = $('.pcoded-inner-navbar a[href$="/system_status"]').closest('li');
+    if (variant === 'A') {
+        $sys.removeClass('active');
+        $sys.after('<li class="nav-item active"><a href="javascript:" class="nav-link"><span class="pcoded-micon"><i class="feather icon-server"></i></span><span class="pcoded-mtext">System</span></a></li>');
+    } else if (variant === 'B') {
+        $sys.addClass('active');
+    } else {
+        $sys.removeClass('active');
+        var $set = $('#settings_list');
+        $set.closest('li').addClass('pcoded-trigger active');
+        $set.append('<li class="active"><a href="javascript:">System</a></li>');
+    }
+
+    var REASON = "MLSC needs to run as root (the service does this).";
+    var TEXT = {
+        reboot: { title: "Reboot this machine?", body: "The LED strips go dark and this page is unreachable for about a minute while it restarts. Server logs may be cleared by the restart.", btn: "Reboot", going: "Rebooting... the LED strips are off. This page reconnects when the machine is back." },
+        shutdown: { title: "Shut down this machine?", body: "The LED strips go dark and this page stays unreachable. The machine has to be switched on by hand: it cannot be started from here.", btn: "Shut down", going: "Shutting down... the machine must be switched on by hand." }
+    };
+    var LOGS = [
+        ["12:01:02", "INFO", "mlsc.service", "MLSC 2.4.0 starting"], ["12:01:03", "INFO", "mlsc.audio", "Audio device 'USB Audio' opened at 44100 Hz"],
+        ["12:01:04", "WARNING", "mlsc.outputs", "Strip 'desk' slow: 38 fps below target 60"], ["12:01:09", "INFO", "mlsc.webserver", "Listening on 0.0.0.0:8080"],
+        ["12:03:44", "ERROR", "mlsc.wifi", "nmcli exited 4: device not ready"], ["12:05:10", "INFO", "mlsc.effects", "Effect changed to effect_energy"]
+    ];
+    var host = 'ok', logs = 'ok', timer;
+
+    function renderPower() {
+        $('[data-power]').each(function () {
+            var a = $(this).data('power'), blocked = host === 'dev';
+            $(this).prop('disabled', blocked);
+            $('[data-power-reason="' + a + '"]').text(blocked ? REASON : '');
+        });
+    }
+    function renderLogs() {
+        var $p = $('[data-log-pane]'), $u = $('[data-log-unavail]'), $n = $('[data-log-note]');
+        $n.toggle(logs === 'volatile');
+        if (logs === 'none') { $p.hide(); $u.show().text("Logs are only available when MLSC runs as the systemd service."); return; }
+        $u.hide(); $p.show();
+        var q = ($('[data-log-filter]').first().val() || '').toLowerCase(), lv = $('[data-log-level]').first().val(), out = [];
+        if (logs !== 'empty') LOGS.forEach(function (l) {
+            if (lv && l[1] !== lv) return;
+            if (q && (l[2] + l[3]).toLowerCase().indexOf(q) < 0) return;
+            out.push('<span class="t">' + l[0] + '</span> <span class="' + l[1] + '">' + l[1].padEnd(7) + '</span> ' + l[2] + ' - ' + l[3]);
+        });
+        $p.html(out.length ? out.join('\n') : '<span class="t">No matching lines</span>');
+        $p.scrollTop($p[0].scrollHeight);
+    }
+    $('#pt_host').on('change', function () { host = this.value; renderPower(); });
+    $('#pt_logs').on('change', function () { logs = this.value; renderLogs(); });
+    $('[data-log-filter]').on('input', renderLogs);
+    $('[data-log-level],[data-log-lines]').on('change', renderLogs);
+    $('[data-log-refresh]').on('click', renderLogs);
+    $('[data-log-auto]').on('change', function () { clearInterval(timer); if (this.checked) timer = setInterval(renderLogs, 5000); });
+
+    var action;
+    $('[data-power]').on('click', function () {
+        action = $(this).data('power');
+        $('#pm_title').text(TEXT[action].title); $('#pm_body').text(TEXT[action].body);
+        $('#pm_confirm').text(TEXT[action].btn).toggleClass('btn-warning', action === 'reboot').toggleClass('btn-danger', action === 'shutdown');
+        $('#powerModal').modal('show');
+    });
+    $('#powerModal').on('shown.bs.modal', function () { $('#pm_cancel').focus(); });
+    $('#pm_confirm').on('click', function () {
+        $('#powerModal').modal('hide');
+        $('[data-going]').show().text(TEXT[action].going);
+        $('[data-power-area]').hide();
+    });
+    renderPower(); renderLogs();
+});
+</script>
+{% endblock javascripts %}

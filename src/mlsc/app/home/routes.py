@@ -30,6 +30,13 @@ def route_system_status():
     return render_template("home/system_status.html", segment=segment)
 
 
+@blueprint.get("/system_prototype")
+@login_required
+def route_system_prototype():
+    # PROTOTYPE: throwaway, see templates/home/prototype_system.html
+    return render_template("home/prototype_system.html", segment="system_status", variant=request.args.get("variant", "A").upper())
+
+
 @blueprint.get("/effects/<template>")
 @login_required
 def route_effect_settings(template: str):
