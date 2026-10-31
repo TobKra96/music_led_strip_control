@@ -91,3 +91,19 @@ _Avoid_: Upgrade, converter
 **Migration Report**:
 The structured record of what a Config Migration changed and which values could not be carried over exactly.
 _Avoid_: Migration log
+
+**Gradient**:
+A named list of colour stops that an effect spreads along the strip. Either predefined or custom.
+_Avoid_: Palette, Colour scheme
+
+**Colour**:
+A named single RGB value that an effect can use. Either predefined or custom.
+_Avoid_: Swatch
+
+**Predefined Entry**:
+A Gradient or Colour that ships with MLSC. It is read-only; a custom copy can be made from it.
+_Avoid_: Built-in, Default
+
+**Custom Entry**:
+A Gradient or Colour the user created, duplicated or kept from an older config. It can be edited and deleted.
+_Avoid_: User entry
