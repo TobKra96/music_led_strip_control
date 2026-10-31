@@ -13,12 +13,22 @@ def run_server() -> int:
     return run()
 
 
-def _not_implemented(name: str):
-    def handler(_: argparse.Namespace) -> int:
-        print(f"mlsc {name}: not implemented yet", file=sys.stderr)  # ruff: ignore[print]
-        return 1
+def _service(args: argparse.Namespace) -> int:
+    from mlsc import service  # ruff: ignore[import-outside-top-level] Only needed for `service`.
+    from mlsc.host import Host  # ruff: ignore[import-outside-top-level] Only needed for `service`.
 
-    return handler
+    manager = service.ServiceManager(Host())
+    try:
+        if args.service_command == "status":
+            code, output = manager.status()
+            print(output)  # ruff: ignore[print]
+            return code
+        for line in getattr(manager, args.service_command)():
+            print(line)  # ruff: ignore[print]
+    except service.ServiceError as e:
+        print(f"mlsc service {args.service_command}: {e}", file=sys.stderr)  # ruff: ignore[print]
+        return 1
+    return 0
 
 
 def _doctor(_: argparse.Namespace) -> int:
@@ -86,7 +96,7 @@ def build_parser() -> argparse.ArgumentParser:
     service = sub.add_parser("service", help="manage the systemd service", parents=[common])
     service_sub = service.add_subparsers(dest="service_command", metavar="ACTION", required=True)
     for action in ("install", "uninstall", "status", "restart"):
-        service_sub.add_parser(action, help=f"{action} the service", parents=[common]).set_defaults(handler=_not_implemented(f"service {action}"))
+        service_sub.add_parser(action, help=f"{action} the service", parents=[common]).set_defaults(handler=_service)
 
     sub.add_parser("doctor", help="check the setup", parents=[common]).set_defaults(handler=_doctor)
 

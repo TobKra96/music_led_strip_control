@@ -43,18 +43,11 @@ def test_config_path_prints_the_config_file(capsys, tmp_path):
     assert capsys.readouterr().out.strip() == str(tmp_path.resolve() / "config.json")
 
 
-@pytest.mark.parametrize(
-    "argv",
-    [
-        ["service", "install"],
-        ["service", "uninstall"],
-        ["service", "status"],
-        ["service", "restart"],
-    ],
-)
-def test_stub_subcommands_report_not_implemented(argv, capsys):
-    assert cli.main(argv) == 1
-    assert "not implemented" in capsys.readouterr().err
+def test_service_subcommand_reports_errors_without_systemd(capsys, monkeypatch):
+    monkeypatch.setattr("mlsc.host.Host.which", lambda *_: None)
+
+    assert cli.main(["service", "restart"]) == 1
+    assert "systemd was not found" in capsys.readouterr().err
 
 
 def test_version_flag(capsys):
@@ -63,3 +56,20 @@ def test_version_flag(capsys):
 
     assert exc.value.code == 0
     assert __version__ in capsys.readouterr().out
+
+
+def test_service_status_prints_systemctl_output_and_its_exit_code(capsys, monkeypatch):
+    monkeypatch.setattr("mlsc.host.Host.which", lambda *_: "/usr/bin/systemctl")
+    monkeypatch.setattr("mlsc.host.Host.run", lambda *_, **__: (3, "inactive"))
+
+    assert cli.main(["service", "status"]) == 3
+    assert capsys.readouterr().out.strip() == "inactive"
+
+
+def test_service_restart_reports_success(capsys, monkeypatch):
+    monkeypatch.setattr("mlsc.host.Host.which", lambda *_: "/usr/bin/systemctl")
+    monkeypatch.setattr("mlsc.host.Host.run", lambda *_, **__: (0, ""))
+    monkeypatch.setattr("mlsc.service.running_as_root", lambda: True)
+
+    assert cli.main(["service", "restart"]) == 0
+    assert "Restarted" in capsys.readouterr().out

@@ -1,285 +1,49 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Setup script for MLSC
+# Thin bootstrapper for MLSC: installs the system packages and uv, installs the package and calls `mlsc service install`.
 # https://github.com/TobKra96/music_led_strip_control
 
 if [[ $EUID -eq 0 ]]; then
-    echo "Do not run this script as root." >&2
+    echo "Do not run this script as root. It asks for sudo where needed." >&2
     exit 1
 fi
 
-INST_DIR="/share" # Installation location
-PROJ_DIR="music_led_strip_control" # Project location
-PROJ_NAME="MLSC" # Project abbreviation
-VENV_NAME=".venv" # Virtualenv name
-# ASOUND_DIR="/etc/asound.conf" # Asound config location
-# ALSA_DIR="/usr/share/alsa/alsa.conf" # Alsa config location
-SERVICE_NAME="mlsc.service" # MLSC systemd service name
-SERVICE_FILE="/etc/systemd/system/${SERVICE_NAME}" # MLSC systemd service location
-GIT_BRANCH="master"
+PACKAGE="music-led-strip-control[pi]"
 UV_BIN="$HOME/.local/bin/uv"
 
-
-# Colors
-CDEF="\033[0m"          # Default color
-CCIN="\033[0;36m"       # Info color
-CGSC="\033[0;32m"       # Success color
-CRER="\033[0;31m"       # Error color
-CWAR="\033[0;33m"       # Warning color
-b_CDEF="\033[1;37m"     # Bold default color
-b_CCIN="\033[1;36m"     # Bold info color
-b_CGSC="\033[1;32m"     # Bold success color
-b_CRER="\033[1;31m"     # Bold error color
-b_CWAR="\033[1;33m"     # Bold warning color
-
-
-# Print message with flag type to change message color.
-function prompt {
-    local arg1="${1:-}"
-    local all="$*"
-    shift || true
-    case $arg1 in
-        "-s"|"--success")
-        echo -e "${b_CGSC}${@}${CDEF}";;  # Print success message
-        "-e"|"--error")
-        echo -e "${b_CRER}${@}${CDEF}";;  # Print error message
-        "-w"|"--warning")
-        echo -e "${b_CWAR}${@}${CDEF}";;  # Print warning message
-        "-i"|"--info")
-        echo -e "${b_CCIN}${@}${CDEF}";;  # Print info message
-        *)
-        echo -e "$all";;                  # Print generic message
-    esac
-}
-
-
-# Confirm action before proceeding.
-function confirm {
-    while true; do
-        prompt -w "$*? [y/N] "
-        read -r yn </dev/tty
-        case $yn in
-            [Yy]*) prompt -s "Proceeding..."; return 0;;
-            [Nn]*) prompt -i "Skipped."; return 1;;
-            [Qq]*) prompt -e "Setup exited."; exit 0;;
-            '') prompt -i "Skipped."; return 1;;
-        esac
-    done
-}
-
-
-# Output help information.
 function usage {
-    if [ -n "$1" ]; then
-        echo -e "${CRER}$1${CDEF}\n";
-    fi
-    prompt -i "Usage:"
-    prompt -i "  bash $0 [options]"
-    echo ""
-    prompt -i "OPTIONS"
-    prompt -i "  -b, --branch        git branch to use (master, dev_2.3)"
-    prompt -i "  -h, --help          show this list of command-line options"
-    echo ""
-    prompt -i "Example:"
-    prompt -i "  bash $0 --branch dev_2.3"
-    if [ -n "$1" ]; then
-        exit 1
-    fi
-    exit 0
+    echo "Usage: bash $0 [options]"
+    echo
+    echo "OPTIONS"
+    echo "  -s, --source SPEC   package to install (default: $PACKAGE), for example 'git+https://github.com/TobKra96/music_led_strip_control@dev_3.0'"
+    echo "  -h, --help          show this list of command-line options"
+    exit "${1:-0}"
 }
 
-# Parse arguments.
 while [[ $# -gt 0 ]]; do case $1 in
-    -b|--branch) GIT_BRANCH="$2"; shift;shift;;
-    -h|--help) usage;shift;;
-    *) usage "Unknown argument passed: $1";shift;shift;;
+    -s|--source) PACKAGE="${2:?--source needs a value}"; shift 2;;
+    -h|--help) usage;;
+    *) echo "Unknown argument passed: $1" >&2; usage 1;;
 esac; done
 
-
-case "$GIT_BRANCH" in
-    master|dev_2.3)
-        ;;
-    *)
-        prompt -w "Branch '$GIT_BRANCH' not found. Falling back to 'master'."
-        GIT_BRANCH="master"
-        ;;
-esac
-
-
-echo
-prompt -s "\t          *********************"
-prompt -s "\t          *  Installing $PROJ_NAME  *"
-prompt -s "\t          *********************"
-echo
-
-# Update packages:
-prompt -i "\n[1/4] Updating and installing required packages..."
+echo "[1/3] Installing the system packages..."
+# libportaudio2: audio input. build-essential, python3-dev: build rpi_ws281x. git: for --source git+https URLs.
 sudo apt-get update -qq
+sudo apt-get -y --no-install-recommends install git python3-dev libportaudio2 build-essential curl
 
-# Install required packages:
-# git: For cloning the MLSC repository.
-# python3-dev / build-essential: For building rpi_ws281x module.
-# libportaudio2: PortAudio runtime that sounddevice uses for audio input.
-sudo apt-get -y --no-install-recommends install git python3-dev libportaudio2 build-essential
-
-# Install uv for managing Python packages and virtual environment:
+echo "[2/3] Installing MLSC..."
 if [[ -x "$UV_BIN" ]]; then
-    # Upgrade uv to the latest version if already installed.
     "$UV_BIN" self update
 else
     curl -LsSf https://astral.sh/uv/install.sh | sh
 fi
+"$UV_BIN" tool install --force "$PACKAGE"
+MLSC_BIN="$("$UV_BIN" tool dir --bin)/mlsc"
 
-if [[ ! -x "$UV_BIN" ]]; then
-    echo "uv installation failed or uv not found at $UV_BIN" >&2
-    exit 1
-fi
-
-prompt -s "\nPackages updated and installed."
-
-
-# Install MLSC:
-prompt -i "\n[2/4] Installing $PROJ_NAME..."
-if [[ ! -d "$INST_DIR" ]]; then
-	sudo mkdir "$INST_DIR"
-    sudo chown -R "$USER:$USER" "$INST_DIR" # Allow uv to work here.
-fi
-cd "$INST_DIR"
-
-# Create virtual environment in the installation directory.
-if [[ ! -d "$VENV_NAME" ]]; then
-	"$UV_BIN" venv "$VENV_NAME" --system-site-packages
-    prompt -s "\nVirtual environment ${VENV_NAME} created."
-fi
-
-if [[ -d "$PROJ_DIR" ]]; then
-    confirm "${PROJ_NAME} is already installed. Do you want to reinstall it"
-    if [[ $? -eq 0 ]]; then
-
-        service_was_active=false
-        if [[ -f "$SERVICE_FILE" ]] && sudo systemctl is-active --quiet "$SERVICE_NAME"; then
-            service_was_active=true
-            sudo systemctl stop "$SERVICE_NAME"
-            prompt -s "\nAutostart for ${PROJ_NAME} stopped."
-        fi
-
-        if [[ -d "${PROJ_DIR}_bak" ]]; then
-            sudo rm -rf -- "${PROJ_DIR}_bak" # sudo required here because of __pycache__ files generated by root user.
-            prompt -s "\nPrevious ${PROJ_NAME} backup deleted."
-        fi
-
-        mv -T -- "$PROJ_DIR" "${PROJ_DIR}_bak"
-        prompt -s "\nNew backup of ${PROJ_NAME} created."
-
-        git clone --depth 1 --branch "$GIT_BRANCH" \
-            https://github.com/TobKra96/music_led_strip_control.git "$PROJ_DIR"
-
-        prompt -s "\nConfig is stored in .mlsc, in the same directory as the MLSC installation."
-
-        if [[ "$service_was_active" == true ]]; then
-            sudo systemctl start "$SERVICE_NAME"
-            prompt -s "\nAutostart for ${PROJ_NAME} restarted."
-        fi
-    fi
-else
-    git clone --depth 1 --branch "$GIT_BRANCH" \
-        https://github.com/TobKra96/music_led_strip_control.git "$PROJ_DIR"
-fi
-
-# Install/update MLSC and its dependencies from the checkout (the [pi] extra provides rpi_ws281x).
-"$UV_BIN" pip install --upgrade "${PROJ_DIR}[pi]" --python "${INST_DIR}/${VENV_NAME}/bin/python"
-
-
-# Setup microphone:
-prompt -i "\n[3/4] Skipping deprecated microphone configuration..."
-# prompt -i "\n[3/4] Configuring microphone settings..."
-# if [[ ! -f $ASOUND_DIR ]]; then
-#     sudo touch $ASOUND_DIR
-#     prompt -s "\n$ASOUND_DIR created."
-# else
-#     sudo mv $ASOUND_DIR "$ASOUND_DIR.bak"
-#     prompt -s "\nBackup of existing $ASOUND_DIR created."
-# fi
-# sudo echo -e 'pcm.!default {\n    type hw\n    card 1\n}\nctl.!default {\n    type hw\n    card 1\n}' > $ASOUND_DIR
-# prompt -s "\nNew configuration for $ASOUND_DIR saved."
-
-# if [[ ! -f $ALSA_DIR ]]; then
-#     sudo touch $ALSA_DIR
-#     prompt -s "\n$ALSA_DIR created."
-# else
-#     sudo cp $ALSA_DIR "$ALSA_DIR.bak"
-#     prompt -s "\nBackup of existing $ALSA_DIR created."
-# fi
-# sed -i -e '/defaults.ctl.card 0/c\defaults.ctl.card 1' \
-#     -i -e '/defaults.pcm.card 0/c\defaults.pcm.card 1' \
-#     -e '/pcm.front cards.pcm.front/ s/^#*/#/' \
-#     -e '/pcm.rear cards.pcm.rear/ s/^#*/#/' \
-#     -e '/pcm.center_lfe cards.pcm.center_lfe/ s/^#*/#/' \
-#     -e '/pcm.side cards.pcm.side/ s/^#*/#/' \
-#     -e '/pcm.surround21 cards.pcm.surround21/ s/^#*/#/' \
-#     -e '/pcm.surround40 cards.pcm.surround40/ s/^#*/#/' \
-#     -e '/pcm.surround41 cards.pcm.surround41/ s/^#*/#/' \
-#     -e '/pcm.surround50 cards.pcm.surround50/ s/^#*/#/' \
-#     -e '/pcm.surround51 cards.pcm.surround51/ s/^#*/#/' \
-#     -e '/pcm.surround71 cards.pcm.surround71/ s/^#*/#/' \
-#     -e '/pcm.iec958 cards.pcm.iec958/ s/^#*/#/' \
-#     -e '/pcm.spdif iec958/ s/^#*/#/' \
-#     -e '/pcm.hdmi cards.pcm.hdmi/ s/^#*/#/' \
-#     -e '/pcm.dmix cards.pcm.dmix/ s/^#*/#/' \
-#     -e '/pcm.dsnoop cards.pcm.dsnoop/ s/^#*/#/' \
-#     -e '/pcm.modem cards.pcm.modem/ s/^#*/#/' \
-#     -e '/pcm.phoneline cards.pcm.phoneline/ s/^#*/#/' $ALSA_DIR
-
-# prompt -s "\nNew configuration for $ALSA_DIR saved."
-
-
-# Create systemd service:
-prompt -i "\n[4/4] Creating autostart service for ${PROJ_NAME}..."
-
-if [[ ! -f "$SERVICE_FILE" ]]; then
-    sudo tee "$SERVICE_FILE" >/dev/null <<EOF
-[Unit]
-Description=Music LED Strip Control
-After=network.target
-
-[Service]
-Type=simple
-User=root
-WorkingDirectory=${INST_DIR}/${PROJ_DIR}
-Environment=MLSC_CONFIG_DIR=${INST_DIR}/.mlsc
-ExecStart=${INST_DIR}/${VENV_NAME}/bin/mlsc run
-Restart=on-abnormal
-RestartSec=10
-KillMode=control-group
-
-[Install]
-WantedBy=multi-user.target
-EOF
-
-    sudo systemctl daemon-reload
-    prompt -s "\nAutostart script for ${PROJ_NAME} created in '${SERVICE_FILE}'."
-else
-    prompt -s "\nAutostart script for ${PROJ_NAME} already exists in '${SERVICE_FILE}'."
-fi
-
-
-# Enable systemd service
-if [[ -f "$SERVICE_FILE" ]]; then
-    if ! sudo systemctl is-enabled --quiet "${SERVICE_NAME}"; then
-        confirm "Do you want to enable autostart for ${PROJ_NAME}"
-        if [[ $? -eq 0 ]]; then
-            sudo systemctl enable "${SERVICE_NAME}"
-            prompt -s "\nAutostart for ${PROJ_NAME} enabled."
-        fi
-    fi
-fi
-
+echo "[3/3] Installing the service..."
+sudo "$MLSC_BIN" service install
 
 echo
-prompt -s "\t          ********************************************"
-prompt -s "\t          *       ${PROJ_NAME} installation completed!       *"
-prompt -s "\t          * Please reboot your system (sudo reboot). *"
-prompt -s "\t          ********************************************"
-
-exit 0
+echo "MLSC is installed and running. Open http://$(hostname).local:8080 and check 'mlsc service status'."
+echo "Upgrading from 2.x? Run 'mlsc config migrate' first. Your 2.x clone and config are left untouched."

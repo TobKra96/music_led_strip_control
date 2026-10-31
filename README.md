@@ -26,7 +26,7 @@
     <li>
       <a href="#installing">Installing</a>
       <ul>
-        <li><a href="#automated-installation">Automated installation</a></li>
+        <li><a href="#installation">Installation</a></li>
       </ul>
     </li>
     <li><a href="#demo">Demo</a></li>
@@ -54,18 +54,23 @@
 
 Please check if your hardware is listed inside the [Compatible Hardware List](https://github.com/TobKra96/music_led_strip_control/wiki/Compatible-Hardware-List).
 
-### Automated installation
-Run the following command in your terminal:
+### Installation
+
+On Raspberry Pi OS Bookworm or Trixie:
+
 ```bash
-curl -sSL https://raw.githubusercontent.com/TobKra96/music_led_strip_control/master/setup.sh | bash -s -- -b master
+sudo apt install libportaudio2 build-essential python3-dev
+uv tool install "music-led-strip-control[pi]"    # or: pipx install "music-led-strip-control[pi]"
+sudo "$(command -v mlsc)" service install
 ```
 
-The script also accepts some options:
+`setup.sh` runs these steps for you:
 
-* `-b`, `--branch`       git branch to use (`master`, `dev_2.3`)
-* `-h`, `--help`         show this list of command-line options
+```bash
+curl -sSL https://raw.githubusercontent.com/TobKra96/music_led_strip_control/master/setup.sh | bash
+```
 
-After the installation completes, please check the [Installation Guide](https://github.com/TobKra96/music_led_strip_control/wiki/Installation-Guide#iv-configure-music-led-strip-control) to configure the initial settings.
+See the [installation guide](docs/installation.md) for the service commands, upgrading from 2.x and the experimental Pi 5 notes.
 
 Also, check out the tutorial video I created for the installation:
 
