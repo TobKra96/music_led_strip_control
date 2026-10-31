@@ -6,13 +6,14 @@ const API_V2 = '/api/v2';
 export class ApiError extends Error {
     /**
      * @param {number} status HTTP status, `0` when the server could not be reached.
-     * @param {{code?: string, title?: string, detail?: string, errors?: Array.<{field: string, detail: string}>}} problem
+     * @param {{code?: string, title?: string, detail?: string, errors?: Array.<{field: string, detail: string}>, usages?: Array.<{target: string, effect: string, setting: string}>}} problem
      */
     constructor(status, problem = {}) {
         super(problem.detail || problem.title || 'Unable to reach the server.');
         this.status = status;
         this.code = problem.code;
         this.errors = problem.errors || [];
+        this.usages = problem.usages;
     }
 
     /**

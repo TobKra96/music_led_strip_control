@@ -8,8 +8,10 @@
  * Initialize Pickr if required elements are present.
  * @param {string} parent - Color picker element id.
  * @param {string} input - Input field element class or id.
+ * @param {function(string): void} [onChange] - Called with the "rgb(r, g, b)" text whenever the picked colour changes.
+ * @param {string} [color] - Initial colour as "rgb(r, g, b)", white by default.
  */
-const initPickr = (parent, input) => {
+const initPickr = (parent, input, onChange, color = 'rgb(255,255,255)') => {
     const parentEl = document.querySelector(parent);
     const inputEl = document.querySelector(input);
 
@@ -21,7 +23,7 @@ const initPickr = (parent, input) => {
         el: parentEl,
         input: inputEl,  // Custom option to pass input field to Pickr.
         theme: 'monolith',
-        default: 'rgb(255,255,255)',
+        default: color,
         position: 'left-middle',
         lockOpacity: false,
         comparison: false,
@@ -59,6 +61,7 @@ const initPickr = (parent, input) => {
 
     }).on('change', (/** @type {HSVaColor} */ c, /** @type {Source} */ s, /** @type {Pickr} */ pickr) => {
         _updateStyles(pickr);
+        if (onChange) onChange(pickr.options.input.value);
     });
 }
 

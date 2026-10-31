@@ -1,0 +1,104 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Gradients &amp; Colours {% endblock %}
+
+<!-- Specific CSS goes HERE -->
+{% block stylesheets %}
+<link rel="stylesheet" href="{{ url_for('static', filename='assets/plugins/pickr/css/monolith.min.css') }}">
+<style>
+    .entry-item { cursor: pointer; padding: 8px; border-radius: 6px; border: 1px solid transparent; }
+    .entry-item:hover { background: rgba(128, 128, 128, .12); }
+    .entry-item.selected { border-color: #04a9f5; background: rgba(4, 169, 245, .08); }
+    .entry-bar { height: 14px; border-radius: 4px; width: 100%; }
+    .entry-swatch { width: 28px; height: 28px; border-radius: 50%; border: 1px solid rgba(128, 128, 128, .5); flex: none; }
+    #preview_bar { height: 34px; border-radius: 6px; border: 1px solid rgba(128, 128, 128, .4); }
+    .stop-row { display: flex; gap: 8px; align-items: center; margin-bottom: 6px; }
+    .stop-picker { width: 44px; height: 34px; border-radius: 4px; border: 1px solid rgba(128, 128, 128, .5); flex: none; cursor: pointer; }
+    .stop-picker.read-only { cursor: default; }
+    .stop-input { max-width: 170px; }
+</style>
+{% endblock stylesheets %}
+
+{% block content %}
+
+<div class="pcoded-content">
+    <div class="pcoded-inner-content">
+
+        {% include 'includes/toasts.html' %}
+
+        <!-- [ breadcrumb ] start -->
+        <div class="page-header">
+            <div class="page-block">
+                <div class="row align-items-center">
+                    <div class="col-md-12">
+                        <div class="page-header-title">
+                            <h5 class="m-b-10">Gradients &amp; Colours</h5>
+                        </div>
+                        <ul class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="{{ url_for('home_blueprint.index') }}"><i class="feather icon-home"></i></a></li>
+                            <li class="breadcrumb-item"><a href="javascript:">Settings</a></li>
+                            <li class="breadcrumb-item"><a href="javascript:">Gradients &amp; Colours</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- [ breadcrumb ] end -->
+        <div class="main-body">
+            <div class="page-wrapper">
+                <!-- [ Main Content ] start -->
+
+                <div class="card">
+                    <div class="card-block">
+                        <ul class="nav nav-tabs mb-3" id="kind_tabs" role="tablist">
+                            <li class="nav-item"><a class="nav-link active" href="javascript:" data-kind="gradient">Gradients</a></li>
+                            <li class="nav-item"><a class="nav-link" href="javascript:" data-kind="colour">Colours</a></li>
+                        </ul>
+                        <div class="row">
+                            <div class="col-md-5 mb-3">
+                                <div id="entry_list"></div>
+                                <button type="button" id="new_btn" class="btn btn-sm btn-primary mt-2">+ New gradient</button>
+                            </div>
+                            <div class="col-md-7">
+                                <div id="editor" class="d-none">
+                                    <div id="notice" class="alert alert-info py-2 d-none"></div>
+                                    <label for="entry_name" class="mb-1">Name <span id="predefined_badge" class="badge badge-secondary d-none">Predefined</span></label>
+                                    <input id="entry_name" class="form-control mb-2" maxlength="32" spellcheck="false" autocomplete="off">
+                                    <div id="preview_bar" class="mb-3" role="img" aria-label="Preview"></div>
+                                    <label id="stops_label" class="mb-1">Colour stops (evenly spaced)</label>
+                                    <div id="stops"></div>
+                                    <button type="button" id="add_stop_btn" class="btn btn-sm btn-outline-primary mb-3">+ Add stop</button>
+                                    <div id="usages_box" class="alert alert-warning py-2 d-none">
+                                        <strong>Used by</strong>
+                                        <ul id="usages" class="mb-0 pl-3"></ul>
+                                    </div>
+                                    <div id="save_warning" class="alert alert-warning py-2 d-none"></div>
+                                    <div class="mt-2">
+                                        <button type="button" id="save_btn" class="btn btn-primary btn-sm">Save</button>
+                                        <button type="button" id="duplicate_btn" class="btn btn-outline-secondary btn-sm">Duplicate</button>
+                                        <button type="button" id="delete_btn" class="btn btn-outline-danger btn-sm">Delete</button>
+                                    </div>
+                                    <div id="message" class="alert mt-3 py-2 d-none" role="status"></div>
+                                </div>
+                                <p id="editor_empty" class="text-muted">Select an entry.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- [ Main Content ] end -->
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+<script src="{{ url_for('static', filename='assets/plugins/pickr/js/pickr.min.js') }}" type="module"></script>
+<script>
+    const jinja_devices = JSON.parse('{{ devices|tojson|safe }}');
+</script>
+<script src="{{ url_for('static', filename='assets/js/settings.gradient_colour.js') }}" type="module"></script>
+{% endblock javascripts %}

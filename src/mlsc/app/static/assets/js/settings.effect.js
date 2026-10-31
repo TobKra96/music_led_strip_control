@@ -2,6 +2,7 @@ import { initPickr, formatRGB, parseRGB } from './classes/Pickr.js';
 import { api } from './classes/Api.js';
 import { Device } from './classes/Device.js';
 import { loadEffectSettings, saveEffectSettings as saveSettings } from './classes/EffectSettings.js';
+import { isMissingReference, missingLabel } from './classes/GradientColourView.js';
 import Toast from './classes/Toast.js';
 import UnsavedChanges from './classes/UnsavedChanges.js';
 
@@ -92,6 +93,23 @@ $(() => {
     });
 
     /**
+     * Keep a Missing Reference visible: a name without an entry gets its own option, flagged as missing,
+     * so the dropdown does not silently show another entry that the effect does not use.
+     * @param {JQuery} select
+     * @param {string} value Stored name.
+     * @return {string} The value to select: the option that matches the name ignoring case, as names are unique that way.
+     */
+    const flagMissingReference = (select, value) => {
+        select.find('option[data-missing]').remove();
+        const names = select.find('option').map((_, option) => option.value).get();
+        if (isMissingReference(value, names)) {
+            select.append($('<option data-missing></option>').val(value).text(missingLabel(value)));
+            return value;
+        }
+        return names.find(name => name.toLowerCase() === String(value).toLowerCase()) ?? value;
+    };
+
+    /**
      * Populate effect settings with config values.
      */
     const setLocalSettings = () => {
@@ -114,6 +132,8 @@ $(() => {
                     $(`span[for='${key}']`).text(value);
                 } else if (el.hasClass('color_input')) {
                     $('.color_input').val(formatRGB(value));
+                } else if (el.is('select.colors, select.gradients')) {
+                    el.val(flagMissingReference(el, value));
                 } else {
                     el.val(value);
                 }
