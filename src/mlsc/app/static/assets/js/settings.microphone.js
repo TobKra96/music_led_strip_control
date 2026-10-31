@@ -143,9 +143,12 @@ const save = async () => {
     }
 };
 
+/** Reset to the defaults, behind the confirmation. */
 const reset = async () => {
-    const $button = $('#reset_btn').prop('disabled', true);
+    const $button = $('#reset_btn, #save_btn').prop('disabled', true);
     try {
+        // The defaults select a device, so the browser has nothing to stream to.
+        await browserMicrophone.stop();
         const operation = await waitForOperation(await api.delete('/microphone'));
         if (operation.state === 'confirmed') {
             new Toast('Microphone settings reset to default.').success();
