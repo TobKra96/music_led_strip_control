@@ -40,6 +40,8 @@ const render = () => {
     $('#saved_card').toggleClass('d-none', !view.showClient);
 
     const hotspotUp = Boolean(view.hotspot);
+    $('#hotspot_state').text(hotspotUp ? 'On' : 'Off').toggleClass('badge_green', hotspotUp).toggleClass('badge-secondary', !hotspotUp);
+    $('#hotspot_on_btn').toggleClass('d-none', hotspotUp);
     $('#hotspot_info').toggleClass('d-none', !hotspotUp);
     $('#hotspot_off_btn').toggleClass('d-none', !hotspotUp);
     if (hotspotUp) {
@@ -189,11 +191,15 @@ const setHotspot = (enabled) => {
         if (ssid) body.ssid = ssid;
         if (password) body.password = password;
     }
+    const $button = $(enabled ? '#hotspot_on_btn' : '#hotspot_off_btn');
+    const label = $button.text();
+    $button.text(enabled ? 'Switching on…' : 'Switching off…');
     return change('#hotspot_on_btn, #hotspot_off_btn', async () => {
         status = await api.put('/wifi/hotspot', body);
         $('#hotspot_password').val('');
         render();
-    }, `Could not switch the Hotspot ${enabled ? 'on' : 'off'}.`);
+        new Toast(`The Hotspot is ${status.hotspot ? 'on' : 'off'}.`).success();
+    }, `Could not switch the Hotspot ${enabled ? 'on' : 'off'}.`).finally(() => $button.text(label));
 };
 
 const enableRadio = () => change('#radio_btn', async () => {
