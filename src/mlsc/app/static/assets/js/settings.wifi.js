@@ -139,9 +139,30 @@ const showOperation = () => {
     setAlert($('#operation'), view.level, view.text);
 };
 
+/** Tell the user something is happening before the server has published the Operation. */
+const showProgress = (level, text) => {
+    clearInterval(countdownTimer);
+    operation = null;
+    setAlert($('#operation'), level, text);
+};
+
+/** The Operations whose outcome was already announced with a toast. */
+const announced = new Set();
+
+/** Announce the outcome of a Wi-Fi change once, with a toast next to the message in the panel. */
+const announce = (event) => {
+    if (event.state === 'pending' || announced.has(event.id)) return;
+    announced.add(event.id);
+    const toast = new Toast(operationView(event, 0, address).text);
+    if (event.state === 'confirmed') toast.success();
+    else if (event.state === 'rolled_back') toast.warning();
+    else toast.error();
+};
+
 /** Follow the `wifi` Operations the server publishes: the countdown of the Wi-Fi Rollback and its outcome. */
 const onOperation = (event) => {
     if (event.kind !== 'wifi') return;
+    announce(event);
     if (!operation || operation.id !== event.id) operationStartedAt = Date.now();
     operation = event;
     clearInterval(countdownTimer);
@@ -172,11 +193,23 @@ const connect = () => {
         $(password || !ssid ? '#ssid' : '#password').trigger('focus');
         return Promise.resolve();
     }
+    const $button = $('#connect_btn');
+    const label = $button.text();
+    $button.html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Connecting…');
+    showProgress('info', `Connecting to ${ssid}… this can take up to a minute.`);
     return change('#connect_btn', async () => {
-        status = await api.post('/wifi/connect', { ssid, password: password || null });
+        try {
+            status = await api.post('/wifi/connect', { ssid, password: password || null });
+        } catch (error) {
+            showProgress('danger', `Could not join ${ssid}. ${error.message}`);
+            throw error;
+        }
         $('#password').val('');
         render();
-    }, 'Could not join the network.');
+        const joined = status.connected && status.ssid === ssid;
+        showProgress(joined ? 'success' : 'info', joined ? `Connected to ${ssid}. Checking that the connection holds…` : `Joined ${ssid}. Waiting for an IP address…`);
+        if (joined) new Toast(`Connected to ${ssid}.`).success();
+    }, 'Could not join the network.').finally(() => $button.text(label));
 };
 
 const forget = (ssid) => {
