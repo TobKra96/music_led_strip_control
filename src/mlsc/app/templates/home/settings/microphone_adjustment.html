@@ -116,7 +116,8 @@
                                     </div>
 
                                     <div class="mt-2 d-flex flex-md-row flex-column justify-content-md-end">
-                                        <button type="button" id="save_btn" class="btn btn-success m-0">Save</button>
+                                        <button type="button" id="save_btn" class="btn btn-success m-0 mb-3 mb-md-0">Save</button>
+                                        <button type="button" id="reset_btn" class="btn btn-danger m-0 ml-md-3">Reset</button>
                                     </div>
                                 </div>
                             </div>
@@ -153,6 +154,26 @@
                                     <label for="test_audio" class="d-block mb-1"><small>Play recording: what MLSC hears</small></label>
                                     <audio id="test_audio" controls preload="none" class="w-100"></audio>
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal fade" id="modal_reset_microphone" tabindex="-1" role="dialog" aria-labelledby="modal_reset_microphone_title" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="modal_reset_microphone_title">Confirmation</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true" class="feather icon-x"></span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <p>Are you sure you want to reset the microphone settings to default settings?</p>
+                            </div>
+                            <div class="p-4 mt-4 d-flex flex-md-row flex-column justify-content-md-end">
+                                <button type="button" class="btn btn-secondary m-0 mb-3 mb-md-0" data-dismiss="modal">Close</button>
+                                <button type="button" class="btn btn-danger m-0 ml-md-3" id="reset_btn_modal">Reset</button>
                             </div>
                         </div>
                     </div>

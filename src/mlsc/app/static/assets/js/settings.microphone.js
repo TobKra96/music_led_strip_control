@@ -143,6 +143,23 @@ const save = async () => {
     }
 };
 
+const reset = async () => {
+    const $button = $('#reset_btn').prop('disabled', true);
+    try {
+        const operation = await waitForOperation(await api.delete('/microphone'));
+        if (operation.state === 'confirmed') {
+            new Toast('Microphone settings reset to default.').success();
+        } else {
+            new Toast(`The default settings did not work and were rolled back. ${operation.error || ''}`).error();
+        }
+        await load();
+    } catch (error) {
+        new Toast(`Could not reset the microphone settings. ${error.summary || ''}`).error();
+    } finally {
+        $button.prop('disabled', false);
+    }
+};
+
 const BROWSER_STATES = {
     starting: ['alert-info', 'Starting…'],
     streaming: ['alert-success', 'Streaming from this browser. Keep this page open.'],
@@ -297,6 +314,11 @@ $(() => {
             .catch(error => new Toast(`Could not set the hardware gain. ${error.summary || ''}`).error());
     });
     $('#save_btn').on('click', save);
+    $('#reset_btn').on('click', () => { $('#modal_reset_microphone').modal('show'); });
+    $('#reset_btn_modal').on('click', () => {
+        $('#modal_reset_microphone').modal('hide');
+        reset();
+    });
     $('#test_btn').on('click', test);
     $('#browser_btn').on('click', toggleBrowserStream);
     // Give the claim back instead of leaving the server to time out. `keepalive` lets the request outlive the page.

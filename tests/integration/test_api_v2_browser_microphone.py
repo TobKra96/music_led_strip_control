@@ -155,3 +155,17 @@ def test_the_microphone_test_says_when_no_browser_streams(executer, fake_clock, 
 
     assert result["result"] == "waiting_for_browser"
     assert "Stream from this browser" in result["hint"]
+
+
+def test_deleting_the_settings_applies_the_template_defaults(client, executer, monkeypatch):
+    defaults = {"source": "device", "gain": 1.0}
+    applied = []
+    executer._config_instance.load_template = lambda: {"audio": defaults}  # ruff: ignore[private-member-access]
+    monkeypatch.setattr(executer, "apply", lambda patch: applied.append(patch) or SimpleNamespace(id="op"))
+    monkeypatch.setattr("mlsc.api.v2.microphone.accepted", lambda operation: ({"id": operation.id}, 202))
+
+    response = client.delete("/api/v2/microphone")
+
+    assert response.status_code == 202
+    assert applied == [defaults]
+    assert applied[0] is not defaults

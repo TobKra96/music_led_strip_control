@@ -11692,6 +11692,46 @@
       }
     },
     "/api/v2/microphone": {
+      "delete": {
+        "description": "Run as an Operation, like a change: the audio stream restarts with the defaults and rolls back when no audio arrives.",
+        "operationId": "microphone_api_v2_reset_microphone_delete",
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OperationOut"
+                }
+              }
+            },
+            "description": "Accepted"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        },
+        "summary": "Reset the microphone settings to the defaults",
+        "tags": [
+          "Microphone"
+        ]
+      },
       "get": {
         "operationId": "microphone_api_v2_get_microphone_get",
         "responses": {

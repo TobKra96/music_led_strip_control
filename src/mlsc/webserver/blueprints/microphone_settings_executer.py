@@ -161,6 +161,10 @@ class MicrophoneSettingsExecuter(ExecuterBase):
 
     # Apply
 
+    def reset(self) -> Operation:
+        """Apply the default microphone settings the same way as a change."""
+        return self.apply(copy.deepcopy(self._config_instance.load_template()["audio"]))
+
     def apply(self, patch: dict) -> Operation:
         """Save `patch` and restart the audio stream as an Operation that rolls back to the last working settings when no audio arrives."""
         previous = self.get_settings()

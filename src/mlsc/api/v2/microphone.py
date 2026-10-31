@@ -124,6 +124,13 @@ def patch_microphone(body: MicrophonePatch):
     return accepted(_executer().apply(patch))
 
 
+@microphone_api.delete("", summary="Reset the microphone settings to the defaults", responses={"202": OperationOut, "401": Problem})
+@api_login_required
+def reset_microphone():
+    """Run as an Operation, like a change: the audio stream restarts with the defaults and rolls back when no audio arrives."""
+    return accepted(_executer().reset())
+
+
 @microphone_api.get("/status", summary="Get the status of the audio stream", responses={"200": AudioStatusOut, "401": Problem})
 @api_login_required
 def get_status():
