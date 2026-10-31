@@ -241,8 +241,10 @@ def test_hotspot_check_shows_the_address_of_the_running_hotspot(config_dir, monk
     monkeypatch.setattr(doctor.sys, "platform", "linux")
     write_config(config_dir)
     host = QuietHost(nmcli_state={
-        ("nmcli", "-t", "-f", "GENERAL.CONNECTION,IP4.ADDRESS", "device", "show", "wlan0"): (0, "GENERAL.CONNECTION:MLSC-Hotspot\nIP4.ADDRESS[1]:10.9.0.1/24"),
-        ("nmcli", "-t", "-s", "-g", "802-11-wireless.ssid,802-11-wireless-security.psk", "connection", "show", "MLSC-Hotspot"): (0, "MLSC-1\npassword1"),
+        ("nmcli", "-t", "-f", "GENERAL.CONNECTION,IP4.ADDRESS", "device", "show", "wlan0"):
+             (0, "GENERAL.CONNECTION:MLSC-Hotspot\nIP4.ADDRESS[1]:10.9.0.1/24"),
+        ("nmcli", "-t", "-s", "-g", "802-11-wireless.ssid,802-11-wireless-security.psk", "connection", "show", "MLSC-Hotspot"):
+             (0, "MLSC-1\npassword1"),
     })
 
     assert "The Hotspot address is 10.9.0.1." in checks_by_name(config_dir, host=host)["hotspot"].message

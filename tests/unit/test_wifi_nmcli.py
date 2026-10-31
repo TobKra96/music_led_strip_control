@@ -513,7 +513,8 @@ def test_status_of_the_hotspot_reads_the_first_profile_when_old_duplicates_remai
 ADD_BASE = ("nmcli", "connection", "add", "type", "wifi", "ifname", "wlan0", "con-name", "MLSC-Hotspot", "autoconnect", "no",
             "ssid", "MLSC-ab12", "802-11-wireless.mode", "ap", "802-11-wireless.band", "bg",
             "ipv4.method", "shared", "ipv4.addresses", "192.168.50.1/24",
-            "wifi-sec.key-mgmt", "wpa-psk", "wifi-sec.proto", "rsn", "wifi-sec.pairwise", "ccmp", "wifi-sec.group", "ccmp", "wifi-sec.psk", "hunter22pw")
+            "wifi-sec.key-mgmt", "wpa-psk", "wifi-sec.proto", "rsn", "wifi-sec.pairwise", "ccmp", "wifi-sec.group", "ccmp",
+            "wifi-sec.psk", "hunter22pw")
 BRING_UP = ("nmcli", "connection", "up", "id", "MLSC-Hotspot")
 IP_ADDRESSES = ("ip", "-4", "-o", "addr", "show")
 IP_OUTPUT = (
@@ -523,7 +524,7 @@ IP_OUTPUT = (
 )
 
 
-def test_start_hotspot_with_an_address_creates_the_profile_with_it_before_activating(monkeypatch):
+def test_start_hotspot_with_an_address_creates_the_profile_with_it_before_activating():
     wifi, runner = manager_with({ADD_BASE: (0, "ok"), BRING_UP: (0, "ok")})
 
     wifi.start_hotspot("MLSC-ab12", "hunter22pw", "192.168.50.1")
@@ -559,7 +560,8 @@ def test_start_hotspot_fails_when_the_profile_cannot_be_added_and_hides_the_pass
 
 
 def test_start_hotspot_removes_the_profile_when_it_cannot_be_brought_up():
-    wifi, runner = manager_with({ADD_BASE: (0, "ok"), BRING_UP: (1, "Error: no address"), LIST_CONNECTIONS: (0, CONNECTIONS + "\nMLSC-Hotspot:802-11-wireless"),
+    wifi, runner = manager_with({ADD_BASE: (0, "ok"), BRING_UP: (1, "Error: no address"),
+                                 LIST_CONNECTIONS: (0, CONNECTIONS + "\nMLSC-Hotspot:802-11-wireless"),
                                  DELETE_HOTSPOT: (0, "deleted")})
 
     with pytest.raises(WifiError, match="no address"):
