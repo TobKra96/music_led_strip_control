@@ -122,3 +122,22 @@ def test_find_problems_collapses_repeats_with_a_count():
         "2026-01-01 10:00:00.000 | ERROR    | mlsc.mic:f:1 - No audio (x3)",
         "2026-01-01 10:00:07.000 | WARNING  | mlsc.x:f:2 - other",
     ]
+
+
+def test_stop_process_tree_also_stops_the_children():
+    import subprocess
+    import sys
+
+    import psutil
+
+    code = (
+        "import subprocess, sys, time; "
+        "c = subprocess.Popen([sys.executable, '-c', 'import time; time.sleep(60)']); print(c.pid, flush=True); time.sleep(60)"
+    )
+    parent = subprocess.Popen([sys.executable, "-c", code], stdout=subprocess.PIPE, text=True)
+    child = psutil.Process(int(parent.stdout.readline()))
+
+    bench.stop_process_tree(parent)
+
+    assert not child.is_running() or child.status() == psutil.STATUS_ZOMBIE
+    assert parent.poll() is not None

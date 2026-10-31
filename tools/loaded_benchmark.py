@@ -6,7 +6,7 @@ of each Output from the app's own `FPS:` log lines. Run it on the Pi with live a
 
     sudo python tools/loaded_benchmark.py --leds 60 300 900 --effect effect_wave --out results.json
 
-Stop `mlsc.service` first. Use `--output output_dummy` to rehearse without a strip. Standard library only.
+Stop `mlsc.service` first. Use `--output output_dummy` to rehearse without a strip. Needs only what MLSC itself needs.
 """
 from __future__ import annotations
 
@@ -24,6 +24,8 @@ import threading
 import time
 import urllib.request
 from pathlib import Path
+
+import psutil
 
 WIRE_US_PER_LED = 39  # Measured on a Pi 4 (#225), about 25,600 divided by the LED count.
 # The effect service logs the same FPS line; only the Output rate is the strip frame rate.
@@ -153,6 +155,22 @@ def start_web_load(port: int, clients: int, stop: threading.Event) -> None:
         threading.Thread(target=_poll, args=(f"{base}/api/v2/system/performance", stop), daemon=True).start()
 
 
+def stop_process_tree(proc: subprocess.Popen, timeout: float = 15) -> None:
+    # The app starts a process per service and its main process does not stop them on SIGTERM, so stop the whole tree.
+    try:
+        tree = [*psutil.Process(proc.pid).children(recursive=True), psutil.Process(proc.pid)]
+    except psutil.NoSuchProcess:
+        return
+    for process in tree:
+        with contextlib.suppress(psutil.NoSuchProcess):
+            process.terminate()
+    _, alive = psutil.wait_procs(tree, timeout=timeout)
+    for process in alive:
+        with contextlib.suppress(psutil.NoSuchProcess):
+            process.kill()
+    proc.wait()
+
+
 def run_once(args, leds: int) -> dict:
     with tempfile.TemporaryDirectory() as tmp:
         config_dir = Path(tmp)
@@ -173,11 +191,7 @@ def run_once(args, leds: int) -> dict:
             system = system_info()
         finally:
             stop.set()
-            proc.terminate()
-            try:
-                proc.wait(15)
-            except subprocess.TimeoutExpired:
-                proc.kill()
+            stop_process_tree(proc)
     report = build_report(fps, leds=leds, target_fps=args.fps, duration=args.duration, system=system, clients=args.clients,
                           problems=problems, output=args.output)
     report["web_failures"] = len(web_failures)  # Many failures mean the load did not reach the server (is auth on?).
