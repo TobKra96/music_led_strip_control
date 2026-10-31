@@ -85,7 +85,8 @@ def _blueprint(kind, plural, field, create_model, update_model, out_model, list_
     @api.patch("/<name>", summary=f"Edit or rename a {kind}", responses={"200": out_model, **WRITE_ERRORS, **CONFLICT_ERRORS, **REFRESH_ERRORS})
     @api_login_required
     def update_entry(path: EntryPath, body: update_model):
-        """Rewrite every usage on a rename, which restarts the devices that use the entry. 
+        """Rewrite every usage on a rename, which restarts the devices that use the entry.
+
         Predefined entries answer `PredefinedEntryReadOnly` (409), an existing name `AlreadyExists` (409).
         `RefreshFailed` (500) means the change is saved but the devices did not restart.
         """
