@@ -17,6 +17,7 @@ from mlsc.outputs.output_mock import OutputMock
 from mlsc.outputs.output_raspi import OutputRaspi
 from mlsc.outputs.output_udp import OutputUDP
 from mlsc.webserver.schemas.config_validator_service import ConfigValidatorService
+from mlsc.wifi.credentials import GENERATED_FILE
 
 OUTPUTS: dict[str, type[Output]] = {
     OutputsEnum.output_dummy.name: OutputMock,
@@ -39,6 +40,7 @@ def run_checks(config_dir: Path, host: Host | None = None, capture_factory: Call
     checks.extend(_check_outputs(config, host))
     checks.append(Check("audio", _check_audio(config, capture_factory)))
     checks.append(Check("wifi", _check_wifi(host)))
+    checks.append(Check("hotspot", _check_hotspot(host)))
     checks.append(Check("permissions", _check_permissions(config_dir)))
     return checks
 
@@ -118,6 +120,15 @@ def _check_wifi(host: Host) -> Diagnosis:
     if not output.strip().startswith("connected"):
         return Diagnosis.warning(f"The network state is {output.strip()!r}.", "Connect to a network or start the Hotspot.")
     return Diagnosis.ok("NetworkManager reports a connection.")
+
+
+def _check_hotspot(host: Host) -> Diagnosis:
+    boot_dir = host.boot_dir()
+    stored = boot_dir / GENERATED_FILE if boot_dir else None
+    if stored is not None and stored.is_file():
+        credentials = stored.read_text(encoding="utf-8", errors="replace").strip()
+        return Diagnosis.ok("\n".join([f"The Hotspot credentials are in {stored}:", credentials]))
+    return Diagnosis.ok("The Hotspot password is not generated yet; it is created when the Hotspot is first raised.")
 
 
 def _check_permissions(config_dir: Path) -> Diagnosis:

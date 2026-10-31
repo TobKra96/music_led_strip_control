@@ -31,6 +31,8 @@ class MockWifiManager(WifiManager):
         self._known: set[str] = set()
         self._connected: str | None = None
         self._hotspot: HotspotInfo | None = None
+        self.clients = 0
+        self.drop_on_failed_connect = False
 
     def capabilities(self) -> Capabilities:
         return Capabilities(self._supported, self._supported and self._hotspot_supported, self._country)
@@ -52,6 +54,8 @@ class MockWifiManager(WifiManager):
             msg = f"The network {ssid} was not found."
             raise WifiError(msg)
         if ssid in self._failing_connects or (network.security is not None and password != network.password):
+            if self.drop_on_failed_connect:
+                self._connected = None
             msg = f"Could not connect to {ssid}: check the password."
             raise WifiError(msg)
         self._hotspot = None
@@ -77,6 +81,9 @@ class MockWifiManager(WifiManager):
 
     def stop_hotspot(self) -> None:
         self._hotspot = None
+
+    def hotspot_clients(self) -> int:
+        return self.clients if self._hotspot is not None else 0
 
     def _require_supported(self) -> None:
         if not self._supported:

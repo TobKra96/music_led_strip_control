@@ -70,6 +70,10 @@ class WifiManager(ABC):
     @abstractmethod
     def stop_hotspot(self) -> None: ...
 
+    def hotspot_clients(self) -> int:
+        """How many devices are connected to the Hotspot. 0 when it is down. At least 1 when the host cannot tell."""
+        return 0
+
     def diagnose(self) -> Diagnosis:
         capabilities = self.capabilities()
         if not capabilities.supported:

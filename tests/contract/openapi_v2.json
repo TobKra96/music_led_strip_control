@@ -13137,7 +13137,7 @@
     },
     "/api/v2/wifi/hotspot": {
       "put": {
-        "description": "On raises the Hotspot, which drops a client connection. Off returns to the saved networks.",
+        "description": "On saves the Hotspot as the mode and drops a client connection. Off returns to the saved networks.<br/><br/>A change that does not end in a working connection within 45 seconds is rolled back to the previous mode.",
         "operationId": "wifi_api_v2_put_hotspot_hotspot_put",
         "requestBody": {
           "content": {

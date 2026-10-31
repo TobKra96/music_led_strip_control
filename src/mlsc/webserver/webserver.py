@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import threading
 from time import sleep
 from types import SimpleNamespace
 
@@ -79,6 +80,11 @@ class Webserver:
             publishers.append(start_status_publisher(create_mic_level_publisher(mic_level), MIC_LEVEL_POLL_SECONDS))
         if audio_status is not None:
             publishers.append(start_status_publisher(create_audio_status_publisher(audio_status), AUDIO_STATUS_POLL_SECONDS))
+
+        if Executer.instance.wifi_manager.capabilities().supported:
+            wifi_stop = threading.Event()
+            threading.Thread(target=Executer.instance.wifi_supervisor.run_forever, args=(wifi_stop,), daemon=True).start()
+            publishers.append(SimpleNamespace(stop=wifi_stop.set))
 
         if preview_channel is not None:
             publishers.append(SimpleNamespace(stop=start_preview_hub(PreviewHub(preview_channel, sse.broker.publish))))

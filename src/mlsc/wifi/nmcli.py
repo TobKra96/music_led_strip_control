@@ -112,6 +112,16 @@ class NmcliWifiManager(WifiManager):
         if code != 0:
             raise WifiError(_error_text(output))
 
+    def hotspot_clients(self) -> int:
+        device = self._wifi_device()
+        if device is None:
+            return 0
+        code, output = self._run(["iw", "dev", device, "station", "dump"])
+        if code != 0:
+            # Unknown counts as "someone is connected": the retry would otherwise cut off a phone that is setting the Pi up.
+            return 1
+        return len(re.findall(r"^Station ", output, re.MULTILINE))
+
     def _wifi_device(self) -> str | None:
         code, output = self._run(["nmcli", "-t", "-f", "DEVICE,TYPE,STATE", "device"])
         if code != 0:

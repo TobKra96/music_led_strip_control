@@ -73,6 +73,7 @@ def test_everything_healthy(config_dir):
         "output device_0": Status.OK,
         "audio": Status.OK,
         "wifi": Status.OK,
+        "hotspot": Status.OK,
         "permissions": Status.OK,
     }
 

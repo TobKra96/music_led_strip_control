@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from types import SimpleNamespace
 
 import pytest
@@ -5,7 +6,9 @@ import pytest
 from mlsc.api.v2 import register_api_v2
 from mlsc.app import create_app
 from mlsc.webserver.executer import Executer
-from mlsc.wifi import MockNetwork, MockWifiManager
+from mlsc.wifi import CLIENT, MockNetwork, MockWifiManager
+from mlsc.wifi.credentials import HotspotCredentials
+from mlsc.wifi.supervisor import WifiSupervisor
 
 pytestmark = pytest.mark.integration
 
@@ -13,8 +16,15 @@ HOME = MockNetwork("Home", signal=80, security="WPA2", password="secret123")  # 
 CAFE = MockNetwork("Cafe", signal=40, security=None)
 
 
+@dataclass
+class Settings:
+    mode: str = CLIENT
+    setup_fallback: bool = True
+
+
 def make_client(wifi, monkeypatch, *, auth_enabled=False):
-    monkeypatch.setattr(Executer, "instance", SimpleNamespace(wifi_manager=wifi), raising=False)
+    supervisor = WifiSupervisor(wifi, Settings(), lambda: 0.0, lambda: False, HotspotCredentials(None, lambda: None))
+    monkeypatch.setattr(Executer, "instance", SimpleNamespace(wifi_manager=wifi, wifi_supervisor=supervisor), raising=False)
     app = create_app()
     app.config["AUTH_ENABLED"] = auth_enabled
     app.secret_key = "test"  # ruff: ignore[hardcoded-password-string]

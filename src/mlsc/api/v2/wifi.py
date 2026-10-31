@@ -6,6 +6,7 @@ from mlsc.api.v2.security import api_login_required
 from mlsc.webserver.executer import Executer
 from mlsc.webserver.messages import WifiChangeFailed, WifiUnsupported
 from mlsc.wifi import WifiError, WifiManager
+from mlsc.wifi.supervisor import WifiSupervisor
 
 tag = Tag(name="Wi-Fi", description="Join a network, forget one, or raise the Hotspot")
 wifi_api = APIBlueprint("wifi_api_v2", __name__, url_prefix="/api/v2/wifi", abp_tags=[tag])
@@ -60,6 +61,10 @@ def _wifi() -> WifiManager:
     return Executer.instance.wifi_manager
 
 
+def _supervisor() -> WifiSupervisor:
+    return Executer.instance.wifi_supervisor
+
+
 def _require_supported() -> WifiManager:
     wifi = _wifi()
     if not wifi.capabilities().supported:
@@ -103,8 +108,8 @@ def scan():
 @api_login_required
 def connect(body: ConnectBody):
     """The connection is saved by the system under the SSID. A wrong password is a `422` and leaves nothing saved."""
-    wifi = _require_supported()
-    return _change(lambda: wifi.connect(body.ssid, body.password))
+    _require_supported()
+    return _change(lambda: _supervisor().connect(body.ssid, body.password))
 
 
 @wifi_api.post("/forget", summary="Forget a saved Wi-Fi network", responses={"204": None, **CHANGE_ERRORS})
@@ -118,7 +123,10 @@ def forget(body: ForgetBody):
 @wifi_api.put("/hotspot", summary="Switch the Hotspot on or off", responses={"200": WifiStatusOut, **CHANGE_ERRORS})
 @api_login_required
 def put_hotspot(body: HotspotBody):
-    """On raises the Hotspot, which drops a client connection. Off returns to the saved networks."""
-    wifi = _require_supported()
-    return _change(lambda: wifi.start_hotspot(body.ssid, body.password) if body.enabled else wifi.stop_hotspot())
+    """On saves the Hotspot as the mode and drops a client connection. Off returns to the saved networks.
+
+    A change that does not end in a working connection within 45 seconds is rolled back to the previous mode.
+    """
+    _require_supported()
+    return _change(lambda: _supervisor().set_hotspot(body.enabled, body.ssid, body.password))
 

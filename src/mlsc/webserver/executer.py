@@ -1,3 +1,7 @@
+import time
+
+from mlsc.config_service import ConfigService
+from mlsc.host import Host
 from mlsc.webserver.blueprints.authentication_executer import AuthenticationExecuter
 from mlsc.webserver.blueprints.device_executer import DeviceExecuter
 from mlsc.webserver.blueprints.device_settings_executer import DeviceSettingsExecuter
@@ -7,7 +11,9 @@ from mlsc.webserver.blueprints.general_executer import GeneralExecuter
 from mlsc.webserver.blueprints.general_settings_executer import GeneralSettingsExecuter
 from mlsc.webserver.blueprints.microphone_settings_executer import MicrophoneSettingsExecuter
 from mlsc.webserver.blueprints.system_info_executer import SystemInfoExecuter
+from mlsc.wifi.credentials import HotspotCredentials
 from mlsc.wifi.factory import create_wifi_manager
+from mlsc.wifi.supervisor import ConfigWifiSettings, WifiSupervisor
 
 
 class Executer:
@@ -30,6 +36,10 @@ class Executer:
             config_lock, notification_queue_in, notification_queue_out, effects_queue, audio_backend)
         self.microphone_settings_executer = MicrophoneSettingsExecuter(
             config_lock, notification_queue_in, notification_queue_out, effects_queue, audio_backend)
-        self.wifi_manager = create_wifi_manager()
+        host = Host()
+        self.wifi_manager = create_wifi_manager(host=host)
+        self.wifi_supervisor = WifiSupervisor(
+            self.wifi_manager, ConfigWifiSettings(ConfigService.instance(config_lock)), time.monotonic, host.ethernet_up,
+            HotspotCredentials(host.boot_dir(), host.mac_address))
 
         Executer.instance = self

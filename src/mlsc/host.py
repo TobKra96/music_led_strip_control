@@ -11,6 +11,9 @@ from pathlib import Path
 DEVICE_TREE_MODEL = Path("/proc/device-tree/model")
 BOOT_CONFIGS = (Path("/boot/firmware/config.txt"), Path("/boot/config.txt"))
 GPIO_MEMORY = "/dev/mem"
+BOOT_DIRS = (Path("/boot/firmware"), Path("/boot"))
+NET_CLASS = Path("/sys/class/net")
+WIFI_INTERFACE_PREFIXES = ("wl",)
 COMMAND_TIMEOUT_SECONDS = 5
 
 
@@ -53,6 +56,35 @@ class Host:
                     if param.startswith("audio="):
                         enabled = param == "audio=on"
             return enabled
+        return False
+
+    def boot_dir(self) -> Path | None:
+        """The boot partition, where the user can leave files for MLSC. None where there is none."""
+        return next((path for path in BOOT_DIRS if path.is_dir()), None)
+
+    def mac_address(self) -> str | None:
+        """The MAC address of the first Wi-Fi interface, or None."""
+        for interface in sorted(NET_CLASS.glob("wl*")):
+            try:
+                return (interface / "address").read_text().strip()
+            except OSError:
+                continue
+        return None
+
+    def ethernet_up(self) -> bool:
+        """Whether a wired interface has a link."""
+        try:
+            interfaces = sorted(NET_CLASS.iterdir())
+        except OSError:
+            return False
+        for interface in interfaces:
+            if interface.name == "lo" or interface.name.startswith(WIFI_INTERFACE_PREFIXES) or not (interface / "device").exists():
+                continue
+            try:
+                if (interface / "operstate").read_text().strip() == "up":
+                    return True
+            except OSError:
+                continue
         return False
 
     def which(self, command: str) -> str | None:
