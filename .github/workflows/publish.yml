@@ -1,0 +1,80 @@
+name: Publish
+
+# `v*` tags publish to PyPI (a tag like v3.0.0rc1 is a pre-release, installed with `--pre`).
+# Manual dispatch publishes the current commit to TestPyPI, to rehearse a release.
+# Both use Trusted Publishing: no API token is stored. Register the publisher on PyPI and TestPyPI
+# (owner TobKra96, repository music_led_strip_control, workflow publish.yml, environments pypi and testpypi).
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build distributions
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: astral-sh/setup-uv@v10.3.2
+
+      - name: Check the tag matches the package version
+        if: github.ref_type == 'tag'
+        run: |
+          version=$(uv run --no-project --python 3.13 python -c "import tomllib; print(tomllib.load(open('pyproject.toml', 'rb'))['project']['version'])")
+          tag="${GITHUB_REF_NAME#v}"
+          if [ "$version" != "$tag" ]; then
+            echo "pyproject.toml says $version but the tag is $GITHUB_REF_NAME" >&2
+            exit 1
+          fi
+
+      - name: Build the sdist and wheel
+        run: uv build
+
+      - name: Check the wheel installs and runs
+        run: |
+          uv venv --python 3.13 "$RUNNER_TEMP/smoke"
+          uv pip install --python "$RUNNER_TEMP/smoke/bin/python" dist/*.whl
+          "$RUNNER_TEMP/smoke/bin/mlsc" --version
+          "$RUNNER_TEMP/smoke/bin/python" -c "from importlib.resources import files; r = files('mlsc'); assert (r / 'config_template.json').is_file() and (r / 'app/static/assets/js/app.js').is_file() and (r / 'app/templates/home/dashboard.html').is_file()"
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: dist
+          path: dist/
+
+  publish-testpypi:
+    name: Publish to TestPyPI
+    if: github.event_name == 'workflow_dispatch'
+    needs: build
+    runs-on: ubuntu-latest
+    environment: testpypi
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          name: dist
+          path: dist/
+
+      - uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          repository-url: https://test.pypi.org/legacy/
+          skip-existing: true
+
+  publish-pypi:
+    name: Publish to PyPI
+    if: github.ref_type == 'tag'
+    needs: build
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          name: dist
+          path: dist/
+
+      - uses: pypa/gh-action-pypi-publish@release/v1
