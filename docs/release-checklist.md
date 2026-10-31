@@ -26,6 +26,7 @@ Use a Pi 4 with a real strip and live audio capture. Install the build under tes
 - [ ] **Concurrent Hotspot and client mode.** `iw list` shows `#{ AP } <= 1, #{ managed } <= 1` under "valid interface combinations" on the Pi. Record the result for the deferred concurrent-mode work (decision #232).
 - [ ] **nmcli option names.** On the shipped NetworkManager (`nmcli --version`), first make sure Wi-Fi is on (`nmcli radio`, `rfkill list`). Until the Wi-Fi Settings page exists (#307), call the `/api/v2/wifi/*` endpoints (the paths are in the OpenAPI docs) for status, scan, connect, forget and Hotspot on and off, and compare with the same `nmcli` commands by hand. Fix any option name nmcli rejects in `NmcliWifiManager` and refresh the recorded nmcli output in the tests.
 - [ ] **Wi-Fi Settings page (#307).** Once it is built, repeat scan, connect, forget, Hotspot on and off and a Wi-Fi Rollback after a wrong password from the page on a Pi.
+- [ ] **Wi-Fi Setup Wizard (#308).** Once it is built, from a phone on a freshly booted Pi with no known network: join the Hotspot, run the wizard, join your home Wi-Fi and open `http://mlsc.local:8080`. Repeat with a wrong password and check the Hotspot comes back.
 - [ ] **Discovery.** `avahi-daemon` is running and `http://mlsc.local:8080` opens from a phone on the same network, including after the Wi-Fi Rollback.
 
 ## 4. Decisions
