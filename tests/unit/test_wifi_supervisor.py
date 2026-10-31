@@ -295,7 +295,7 @@ def test_a_failed_connect_ends_its_operation_and_names_the_error(rig):
         rig.supervisor.connect("Home", "wrong-password")
 
     last = rig.wifi_operations()[-1]
-    assert last["state"] in (OperationState.ROLLED_BACK, OperationState.FAILED)
+    assert last["state"] in {OperationState.ROLLED_BACK, OperationState.FAILED}
     assert last["error"]
 
 
