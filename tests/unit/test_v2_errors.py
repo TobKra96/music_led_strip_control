@@ -1,7 +1,7 @@
 import gc
 
 from mlsc.api.v2.errors import Problem
-from mlsc.webserver.messages import _Message  # ruff: ignore[import-private-name]
+from mlsc.webserver.messages import RefreshFailed, _Message  # ruff: ignore[import-private-name]
 
 
 def test_problem_code_enum_includes_a_message_defined_after_the_errors_module_was_imported():
@@ -16,3 +16,8 @@ def test_problem_code_enum_includes_a_message_defined_after_the_errors_module_wa
         gc.collect()
 
     assert "LateArrival" not in Problem.model_json_schema()["properties"]["code"]["enum"]
+
+
+def test_refresh_failed_is_a_server_error_problem_code():
+    assert RefreshFailed.code == 500
+    assert "RefreshFailed" in Problem.model_json_schema()["properties"]["code"]["enum"]

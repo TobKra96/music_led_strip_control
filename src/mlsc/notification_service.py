@@ -1,5 +1,5 @@
 import sys
-from time import sleep
+from time import monotonic, sleep
 
 from loguru import logger
 
@@ -9,6 +9,8 @@ from mlsc.queue_wrapper import QueueWrapper
 
 
 class NotificationService:
+    _refresh_timeout = 30
+
     def start(self, config_lock, notification_queue_device_manager_in,
               notification_queue_device_manager_out, notification_queue_audio_in,
               notification_queue_audio_out, notification_queue_webserver_in,
@@ -90,7 +92,8 @@ class NotificationService:
         logger.debug("3. Wait")
         device_ready = False
         effect_ready = False
-        while processes_not_ready:
+        deadline = monotonic() + self._refresh_timeout
+        while processes_not_ready and monotonic() < deadline:
 
             # Check the notification queue of device_manager, if it is ready to continue.
             if (not self._notification_queue_device_manager_out.empty()):
@@ -108,6 +111,10 @@ class NotificationService:
 
             if device_ready and effect_ready:
                 processes_not_ready = False
+
+        # Tell the webserver how the refresh ended; it may be waiting for it.
+        self._notification_queue_webserver_in.put_none_blocking(NotificationItem(
+            NotificationEnum.config_refresh_failed if processes_not_ready else NotificationEnum.config_refresh_finished, device_id))
 
         # 4. Continue the processes.
         self._notification_queue_device_manager_in.put_blocking(

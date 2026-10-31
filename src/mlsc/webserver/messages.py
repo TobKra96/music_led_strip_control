@@ -226,6 +226,10 @@ class ServerError(_Message):
     _code = HTTPStatus.INTERNAL_SERVER_ERROR.value
 
 
+class RefreshFailed(ServerError):
+    _message = "The change is saved, but applying it to the running devices failed or timed out."
+
+
 class TooManyStreams(_Message):
     _message = "Too many event streams."
     _code = HTTPStatus.SERVICE_UNAVAILABLE.value

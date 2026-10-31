@@ -1,16 +1,20 @@
 import atexit
+import queue
 from collections.abc import Mapping
 from functools import wraps
+from time import monotonic
 
 from apscheduler.schedulers.background import BackgroundScheduler
 from jsonschema import Draft202012Validator, ValidationError, validate
 from loguru import logger
 
+from mlsc.color_registry import find_usages
 from mlsc.config_service import ConfigService
 from mlsc.effect_item import EffectItem
 from mlsc.effects_enum import EffectsEnum
 from mlsc.notification_enum import NotificationEnum
 from mlsc.notification_item import NotificationItem
+from mlsc.webserver.messages import RefreshFailed
 
 scheduler = BackgroundScheduler()
 
@@ -128,6 +132,37 @@ class ExecuterBase:
 
     def refresh_device(self, device_id):
         self.put_into_notification_queue(NotificationEnum.config_refresh, device_id)
+
+    def refresh_devices_using(self, kind: str, name: str, timeout: float = 60) -> None:
+        """Restart the Devices that use the Colour or Gradient `name`, and wait until each has applied the saved config.
+
+        Raise `ProblemError(RefreshFailed)` if a refresh fails or takes longer than `timeout` seconds. The config stays saved.
+        """
+        device_ids = list(dict.fromkeys(usage["target"] for usage in find_usages(self._config, kind, name)))
+        deadline = monotonic() + timeout
+        for device_id in device_ids:
+            self._refresh_and_wait(device_id, deadline)
+
+    def _refresh_and_wait(self, device_id: str, deadline: float) -> None:
+        from mlsc.api.v2.errors import ProblemError  # Imported late: the api package imports the executers.
+
+        while True:  # Forget answers to refreshes nobody waits for any more.
+            try:
+                self.notification_queue_in.get_nowait()
+            except queue.Empty:
+                break
+        self.refresh_device(device_id)
+        while True:
+            try:
+                answer = self.notification_queue_in.get(timeout=max(deadline - monotonic(), 0))
+            except queue.Empty:
+                raise ProblemError(RefreshFailed) from None
+            if answer.device_id != device_id:
+                continue
+            if answer.notification_enum is NotificationEnum.config_refresh_finished:
+                return
+            if answer.notification_enum is NotificationEnum.config_refresh_failed:
+                raise ProblemError(RefreshFailed)
 
     @staticmethod
     def validate_data_in(dictionary: dict, keys: tuple) -> bool:
