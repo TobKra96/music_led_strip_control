@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import re
+import secrets
 import time
 from collections.abc import Callable
 from dataclasses import dataclass
@@ -33,6 +34,8 @@ UNSET_COUNTRY = "00"
 NO_CONNECTION = ("", "--")
 NO_SECURITY = ("", "--")
 MAX_HOTSPOT_PROFILES = 10
+DEFAULT_HOTSPOT_SSID = "MLSC-Hotspot"
+GENERATED_PASSWORD_BYTES = 9
 RADIO_WAIT_SECONDS = 10
 UNUSABLE_STATES = {"unavailable", "unmanaged"}
 IP_ADDRESS_LINE = re.compile(r"^\d+:\s+(\S+)\s+inet\s+(\S+)")
@@ -162,22 +165,31 @@ class NmcliWifiManager(WifiManager):
             msg = "The Wi-Fi adapter does not support the Hotspot."
             raise WifiError(msg)
         self._delete_hotspot_profiles()
+        if address:
+            self._start_hotspot_on(device, ssid, password, address)
+            return
         command = ["nmcli", "device", "wifi", "hotspot", "ifname", device, "con-name", HOTSPOT_CONNECTION]
         command += ["ssid", ssid] if ssid else []
         command += ["password", password] if password else []
         code, output = self._run(command)
         if code != 0:
             raise WifiError(_error_text(output, password))
-        if address:
-            self._set_hotspot_address(address)
 
-    def _set_hotspot_address(self, address: str) -> None:
-        """`nmcli device wifi hotspot` always starts on the default address: change the profile, then bring it up again (still `shared`: DHCP, DNS and NAT)."""
-        modify = ["nmcli", "connection", "modify", HOTSPOT_CONNECTION, "ipv4.addresses", f"{address}/{PREFIX_LENGTH}", "ipv4.method", "shared"]
-        for command in (modify, ["nmcli", "connection", "up", "id", HOTSPOT_CONNECTION]):
-            code, output = self._run(command)
-            if code != 0:
-                raise WifiError(_error_text(output))
+    def _start_hotspot_on(self, device: str, ssid: str | None, password: str | None, address: str) -> None:
+        """Add the profile with its address before it is activated: `nmcli device wifi hotspot` would first raise it on the default address,
+        which can overlap the network the user is avoiding. The settings are those of `nmcli device wifi hotspot`; still `shared` (DHCP, DNS and NAT)."""
+        password = password or secrets.token_urlsafe(GENERATED_PASSWORD_BYTES)
+        add = ["nmcli", "connection", "add", "type", "wifi", "ifname", device, "con-name", HOTSPOT_CONNECTION, "autoconnect", "no",
+               "ssid", ssid or DEFAULT_HOTSPOT_SSID, "802-11-wireless.mode", "ap", "802-11-wireless.band", "bg",
+               "ipv4.method", "shared", "ipv4.addresses", f"{address}/{PREFIX_LENGTH}",
+               "wifi-sec.key-mgmt", "wpa-psk", "wifi-sec.proto", "rsn", "wifi-sec.pairwise", "ccmp", "wifi-sec.group", "ccmp", "wifi-sec.psk", password]
+        code, output = self._run(add)
+        if code != 0:
+            raise WifiError(_error_text(output, password))
+        code, output = self._run(["nmcli", "connection", "up", "id", HOTSPOT_CONNECTION])
+        if code != 0:
+            self._delete_hotspot_profiles()
+            raise WifiError(_error_text(output, password))
 
     def connected_networks(self) -> list[str]:
         code, output = self._run(["ip", "-4", "-o", "addr", "show"])
