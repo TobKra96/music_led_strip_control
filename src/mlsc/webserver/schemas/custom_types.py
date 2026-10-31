@@ -32,3 +32,10 @@ valid_setting_key_type = {
     "type": "string",
     "pattern": valid_setting_key,
 }
+
+MAX_ENTRY_NAME_LENGTH = 32
+MIN_GRADIENT_STOPS = 2
+MAX_GRADIENT_STOPS = 16
+
+valid_entry_name = rf"^(?!\s)[\w -]{{1,{MAX_ENTRY_NAME_LENGTH}}}(?<!\s)$"
+""" Names of colours and gradients: letters (also non-ASCII), digits, spaces, dashes and underscores, without leading or trailing whitespace. """

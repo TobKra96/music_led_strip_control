@@ -2,18 +2,36 @@ import numpy as np
 from loguru import logger
 from scipy.ndimage import gaussian_filter1d
 
+from mlsc.color_registry import COLOUR, FALLBACK_NAMES, GRADIENT
+
+
+class GradientTable(dict):
+    """Pre-rendered gradients by name. A Missing Reference renders as a copy of the fallback gradient instead of raising.
+
+    The copy is stored, so effects that roll their gradient in place keep their own state. The stored setting is never touched.
+    """
+
+    def __missing__(self, name: str) -> np.ndarray:
+        fallback = FALLBACK_NAMES[GRADIENT]
+        if fallback not in self:
+            raise KeyError(name)
+        logger.warning(f"Gradient '{name}' has not been defined, using '{fallback}'.")
+        self[name] = self[fallback].copy()
+        return self[name]
+
 
 class ColorService:
     def __init__(self, config, device_config) -> None:
         self._config = config
         self._device_config = device_config
-        self.full_gradients = {}
-        self.full_fadegradients = {}
-        self.full_slide = {}
-        self.full_bubble = {}
+        self.full_gradients = GradientTable()
+        self.full_fadegradients = GradientTable()
+        self.full_slide = GradientTable()
+        self.full_bubble = GradientTable()
+        self._warned_colours = set()
 
     def build_gradients(self):
-        self.full_gradients = {}
+        self.full_gradients = GradientTable()
 
         for key in self._config["gradients"]:
             not_mirrored_gradient = self._easing_gradient_generator(
@@ -30,7 +48,7 @@ class ColorService:
             )
 
     def build_fadegradients(self):
-        self.full_fadegradients = {}
+        self.full_fadegradients = GradientTable()
 
         for gradient in self._config["gradients"]:
             not_mirrored_gradient = self._easing_gradient_generator(
@@ -105,13 +123,16 @@ class ColorService:
         """
         if colour in self._config["colors"]:
             return self._config["colors"][colour]
-        logger.error(f"Color '{colour}' has not been defined.")
-        return (0, 0, 0)
+        fallback = FALLBACK_NAMES[COLOUR]
+        if colour not in self._warned_colours:
+            self._warned_colours.add(colour)
+            logger.warning(f"Color '{colour}' has not been defined, using '{fallback}'.")
+        return self._config["colors"][fallback]
 
     def build_slidearrays(self):
         led_count = self._device_config["led_count"]
 
-        self.full_slide = {}
+        self.full_slide = GradientTable()
 
         for gradient in self._config["gradients"]:
             for color in self._config["gradients"][gradient]:
@@ -133,7 +154,7 @@ class ColorService:
         effect_config = self._device_config["effects"]["effect_bubble"]
         repeat_count = effect_config["bubble_repeat"]
 
-        self.full_bubble = {}
+        self.full_bubble = GradientTable()
 
         for gradient in self._config["gradients"]:
             gradient_color_count = len(self._config["gradients"][gradient])

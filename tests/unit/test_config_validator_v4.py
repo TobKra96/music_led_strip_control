@@ -114,3 +114,68 @@ def test_the_supply_voltage_of_the_power_limit_is_optional_and_positive(config):
     assert not errors(config)
     limit["supply_volts"] = 0
     assert errors(config)
+
+
+# Colours and gradients are user-defined: effects may reference any current name.
+
+
+def test_effect_may_reference_a_custom_colour_and_gradient(config):
+    config["colors"]["mine"] = [1, 2, 3]
+    config["gradients"]["Mine Too"] = [[0, 0, 0], [255, 255, 255]]
+    config["default_device"]["effects"]["effect_beat"]["color"] = "mine"
+    config["default_device"]["effects"]["effect_gradient"]["gradient"] = "Mine Too"
+
+    assert errors(config) == []
+
+
+def test_effect_referencing_a_missing_colour_is_rejected(config):
+    config["default_device"]["effects"]["effect_beat"]["color"] = "ghost"
+
+    assert errors(config)
+
+
+def test_effect_referencing_a_missing_gradient_is_rejected(config):
+    config["default_device"]["effects"]["effect_gradient"]["gradient"] = "ghost"
+
+    assert errors(config)
+
+
+def test_references_are_checked_against_the_right_kind(config):
+    config["colors"]["only a colour"] = [1, 2, 3]
+    config["default_device"]["effects"]["effect_gradient"]["gradient"] = "only a colour"
+
+    assert errors(config)
+
+
+def test_a_predefined_name_may_be_missing_from_the_config(config):
+    del config["colors"]["pink"]
+    del config["gradients"]["jungle"]
+    for device in [config["default_device"], *config["device_configs"].values()]:
+        for effect in device["effects"].values():
+            if isinstance(effect, dict):
+                stale = {key: value for key, value in effect.items() if isinstance(value, str) and value in {"pink", "jungle"}}
+                renamed = {key: "red" if value == "pink" else "spectral" for key, value in stale.items()}
+                effect.update(renamed)
+
+    assert errors(config) == []
+
+
+@pytest.mark.parametrize("name", ["", " lead", "trail ", "x" * 33, "bad/name"])
+def test_bad_entry_names_are_rejected(config, name):
+    config["colors"][name] = [1, 2, 3]
+
+    assert errors(config)
+
+
+@pytest.mark.parametrize("value", [[1, 2], [1, 2, 256], [1, 2, "3"]])
+def test_bad_colour_values_are_rejected(config, value):
+    config["colors"]["mine"] = value
+
+    assert errors(config)
+
+
+@pytest.mark.parametrize("stops", [[[1, 2, 3]], [[1, 2, 3]] * 17, [[1, 2, 3], [1, 2, 999]]])
+def test_bad_gradient_stops_are_rejected(config, stops):
+    config["gradients"]["mine"] = stops
+
+    assert errors(config)

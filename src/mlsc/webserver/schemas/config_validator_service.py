@@ -3,7 +3,14 @@ from __future__ import annotations
 from jsonschema import Draft202012Validator, validate  # ruff: ignore[unused-import]
 from loguru import logger
 
-from mlsc.webserver.schemas.custom_types import valid_device_id, valid_group_id, valid_name_type
+from mlsc.webserver.schemas.custom_types import (
+    MAX_GRADIENT_STOPS,
+    MIN_GRADIENT_STOPS,
+    valid_device_id,
+    valid_entry_name,
+    valid_group_id,
+    valid_name_type,
+)
 
 # Enums
 effect_enum = [
@@ -1610,21 +1617,7 @@ device_schema = {
 colors_schema = {
     "type": "object",
     "additionalProperties": False,
-    "maxProperties": 10,
-    "minProperties": 10,
-    "required": color_enum,
-    "properties": {
-        "black": {"$ref": "#/$defs/rgb"},
-        "blue": {"$ref": "#/$defs/rgb"},
-        "cyan": {"$ref": "#/$defs/rgb"},
-        "green": {"$ref": "#/$defs/rgb"},
-        "orange": {"$ref": "#/$defs/rgb"},
-        "pink": {"$ref": "#/$defs/rgb"},
-        "purple": {"$ref": "#/$defs/rgb"},
-        "red": {"$ref": "#/$defs/rgb"},
-        "white": {"$ref": "#/$defs/rgb"},
-        "yellow": {"$ref": "#/$defs/rgb"}
-    }
+    "patternProperties": {valid_entry_name: {"$ref": "#/$defs/rgb"}}
 }
 
 development_config_schema = {
@@ -1739,87 +1732,12 @@ general_settings_schema = {
 gradients_schema = {
     "type": "object",
     "additionalProperties": False,
-    "maxProperties": 13,
-    "minProperties": 13,
-    "required": gradient_enum,
-    "properties": {
-        "dancefloor": {
+    "patternProperties": {
+        valid_entry_name: {
             "type": "array",
             "items": {"$ref": "#/$defs/rgb"},
-            "maxItems": 4,
-            "minItems": 4
-        },
-        "fruity": {
-            "type": "array",
-            "items": {"$ref": "#/$defs/rgb"},
-            "maxItems": 2,
-            "minItems": 2
-        },
-        "jamaica": {
-            "type": "array",
-            "items": {"$ref": "#/$defs/rgb"},
-            "maxItems": 2,
-            "minItems": 2
-        },
-        "jungle": {
-            "type": "array",
-            "items": {"$ref": "#/$defs/rgb"},
-            "maxItems": 3,
-            "minItems": 3
-        },
-        "jupiter": {
-            "type": "array",
-            "items": {"$ref": "#/$defs/rgb"},
-            "maxItems": 2,
-            "minItems": 2
-        },
-        "ocean": {
-            "type": "array",
-            "items": {"$ref": "#/$defs/rgb"},
-            "maxItems": 3,
-            "minItems": 3
-        },
-        "peach": {
-            "type": "array",
-            "items": {"$ref": "#/$defs/rgb"},
-            "maxItems": 2,
-            "minItems": 2
-        },
-        "pulse": {
-            "type": "array",
-            "items": {"$ref": "#/$defs/rgb"},
-            "maxItems": 3,
-            "minItems": 3
-        },
-        "rust": {
-            "type": "array",
-            "items": {"$ref": "#/$defs/rgb"},
-            "maxItems": 2,
-            "minItems": 2
-        },
-        "safari": {
-            "type": "array",
-            "items": {"$ref": "#/$defs/rgb"},
-            "maxItems": 3,
-            "minItems": 3
-        },
-        "spectral": {
-            "type": "array",
-            "items": {"$ref": "#/$defs/rgb"},
-            "maxItems": 8,
-            "minItems": 8
-        },
-        "sunny": {
-            "type": "array",
-            "items": {"$ref": "#/$defs/rgb"},
-            "maxItems": 4,
-            "minItems": 4
-        },
-        "sunset": {
-            "type": "array",
-            "items": {"$ref": "#/$defs/rgb"},
-            "maxItems": 3,
-            "minItems": 3
+            "maxItems": MAX_GRADIENT_STOPS,
+            "minItems": MIN_GRADIENT_STOPS
         }
     }
 }
@@ -1913,14 +1831,23 @@ class ConfigValidatorService:
     def _get_schema() -> dict:
         return schema
 
+    def _schema_for(self: ConfigValidatorService, config, *, allow_unknown_keys: bool = False) -> dict:
+        """Return the schema with the colour and gradient settings accepting any current name of that kind."""
+        names = {
+            id(color_enum): list(config["colors"]) if isinstance(config, dict) and isinstance(config.get("colors"), dict) else color_enum,
+            id(gradient_enum): list(config["gradients"]) if isinstance(config, dict) and isinstance(config.get("gradients"), dict) else gradient_enum,
+        }
+        current = with_current_names(self.schema, names)
+        return remove_unknown_key_limits(current) if allow_unknown_keys else current
+
     def errors(self: ConfigValidatorService, config, *, allow_unknown_keys: bool = False) -> list[str]:
         """Return a message per schema violation. `allow_unknown_keys` ignores keys the schema does not know."""
-        schema = remove_unknown_key_limits(self.schema) if allow_unknown_keys else self.schema
+        schema = self._schema_for(config, allow_unknown_keys=allow_unknown_keys)
         v = Draft202012Validator(schema, format_checker=Draft202012Validator.FORMAT_CHECKER)
         return [f"{e.json_path}: {e.message}" for e in sorted(v.iter_errors(config), key=lambda e: e.json_path)]
 
     def validate_config(self: ConfigValidatorService, config):
-        v = Draft202012Validator(self.schema, format_checker=Draft202012Validator.FORMAT_CHECKER)
+        v = Draft202012Validator(self._schema_for(config), format_checker=Draft202012Validator.FORMAT_CHECKER)
         errors = sorted(v.iter_errors(config), key=lambda e: e.path)
         for e in errors:
             logger.error(f"\nError text: {e.message}.\nError path: {e.json_path}\n")
@@ -1928,6 +1855,15 @@ class ConfigValidatorService:
         # Validate will raise exception if given json is not
         # what is described in schema.
         # validate(instance=config, schema=self.schema)
+
+
+def with_current_names(schema: dict | list, names: dict[int, list[str]]) -> dict | list:
+    """Replace every enum that is one of the predefined name lists (matched by identity) with the names in `names`, keyed by `id()` of that list."""
+    if isinstance(schema, dict):
+        return {key: names.get(id(value), value) if key == "enum" else with_current_names(value, names) for key, value in schema.items()}
+    if isinstance(schema, list):
+        return [with_current_names(item, names) for item in schema]
+    return schema
 
 
 def remove_required_keys(schema: dict | list) -> dict | list:

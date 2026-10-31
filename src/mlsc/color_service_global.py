@@ -3,6 +3,9 @@ from time import time
 import numpy as np
 from loguru import logger
 
+from mlsc.color_registry import COLOUR, FALLBACK_NAMES
+from mlsc.color_service import GradientTable
+
 
 class ColorServiceGlobal:
     def __init__(self, config) -> None:
@@ -15,10 +18,11 @@ class ColorServiceGlobal:
             device_config = self._config["default_device"]
 
         self._device_config = device_config
-        self.full_gradients = {}
-        self.full_fadegradients = {}
-        self.full_slide = {}
-        self.full_bubble = {}
+        self.full_gradients = GradientTable()
+        self.full_fadegradients = GradientTable()
+        self.full_slide = GradientTable()
+        self.full_bubble = GradientTable()
+        self._warned_colours = set()
 
         self.build_gradients()
         self.current_fade_color = {}
@@ -30,7 +34,7 @@ class ColorServiceGlobal:
     def build_gradients(self):
         led_count = 1000
 
-        self.full_gradients = {}
+        self.full_gradients = GradientTable()
 
         for key in self._config["gradients"]:
             not_mirrored_gradient = self._easing_gradient_generator(
@@ -105,8 +109,11 @@ class ColorServiceGlobal:
         """
         if colour in self._config["colors"]:
             return self._config["colors"][colour]
-        logger.error(f"Color '{colour}' has not been defined.")
-        return (0, 0, 0)
+        fallback = FALLBACK_NAMES[COLOUR]
+        if colour not in self._warned_colours:
+            self._warned_colours.add(colour)
+            logger.warning(f"Color '{colour}' has not been defined, using '{fallback}'.")
+        return self._config["colors"][fallback]
 
     def get_global_fade_color(self, fade_speed, fade_gradient, fade_reverse):
         current_time = int(round(time() * 1000))
