@@ -77,8 +77,8 @@
                     <div class="card">
                         <div class="card-block d-flex flex-wrap align-items-center">
                             <h5 class="mb-0 mr-auto"><i class="feather icon-power text-c-red"></i> Power</h5>
-                            <div class="mr-3 text-center"><button class="btn btn-outline-warning" data-power="reboot">Reboot</button><div class="power-reason text-muted" data-power-reason="reboot"></div></div>
-                            <div class="text-center"><button class="btn btn-outline-danger" data-power="shutdown">Shut down</button><div class="power-reason text-muted" data-power-reason="shutdown"></div></div>
+                            <div class="mr-3 text-center"><button class="btn btn-warning" data-power="reboot">Reboot</button><div class="power-reason text-muted" data-power-reason="reboot"></div></div>
+                            <div class="text-center"><button class="btn btn-danger" data-power="shutdown">Shut down</button><div class="power-reason text-muted" data-power-reason="shutdown"></div></div>
                         </div>
                     </div>
                 </div>
@@ -91,8 +91,8 @@
                                     <input class="form-control form-control-sm mr-2" placeholder="Filter" data-log-filter>
                                     <select class="form-control form-control-sm mr-2" data-log-level><option value="">All</option><option>INFO</option><option>WARNING</option><option>ERROR</option></select>
                                     <select class="form-control form-control-sm mr-2" data-log-lines><option>100</option><option selected>200</option><option>500</option><option>1000</option></select>
-                                    <button class="btn btn-sm btn-primary mr-2" data-log-refresh>Refresh</button>
-                                    <label class="mb-0 small"><input type="checkbox" data-log-auto> Auto-refresh</label>
+                                    <button class="btn btn-sm btn-primary mr-2 py-0" style="height: calc(1.5em + .5rem + 2px);" data-log-refresh>Refresh</button>
+                                    <label class="mb-0 small"><input type="checkbox" class="mr-2" data-log-auto>Auto-refresh</label>
                                 </div>
                                 <div class="small text-muted mb-2" data-log-note>Logs are kept in memory and are cleared when the machine restarts.</div>
                                 <div class="logpane" data-log-pane></div>
