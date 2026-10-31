@@ -87,6 +87,16 @@ class Host:
                 continue
         return False
 
+    def power_action_block(self, action: str) -> str | None:  # ruff: ignore[unused-method-argument]
+        """Why a Power Action cannot run here, or None when it can. Needs Linux, `systemctl` and root."""
+        if sys.platform != "linux":
+            return "Rebooting and shutting down are only possible on Linux."
+        if self.which("systemctl") is None:
+            return "`systemctl` was not found on this system."
+        if os.geteuid() != 0:
+            return "MLSC must run as root to reboot or shut down the machine."
+        return None
+
     def which(self, command: str) -> str | None:
         return shutil.which(command)
 

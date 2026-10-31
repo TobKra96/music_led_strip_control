@@ -5522,6 +5522,51 @@
         "title": "PinSettings",
         "type": "object"
       },
+      "PowerAcceptedOut": {
+        "properties": {
+          "action": {
+            "title": "Action",
+            "type": "string"
+          },
+          "status": {
+            "description": "Always `accepted`: the machine goes down shortly after the response.",
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "action",
+          "status"
+        ],
+        "title": "PowerAcceptedOut",
+        "type": "object"
+      },
+      "PowerActionOut": {
+        "properties": {
+          "available": {
+            "title": "Available",
+            "type": "boolean"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Why the action cannot run on this host. `null` when it can.",
+            "title": "Reason"
+          }
+        },
+        "required": [
+          "available",
+          "reason"
+        ],
+        "title": "PowerActionOut",
+        "type": "object"
+      },
       "PowerOut": {
         "properties": {
           "amps": {
@@ -5585,6 +5630,7 @@
               "MixerNotFound",
               "NotFound",
               "OperationNotFound",
+              "PowerActionBlocked",
               "PredefinedEntryReadOnly",
               "RecordingNotFound",
               "RefreshFailed",
@@ -12950,6 +12996,119 @@
         ]
       }
     },
+    "/api/v2/system/power": {
+      "get": {
+        "operationId": "system_api_v2_get_power_power_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PowerOut"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        },
+        "summary": "Check whether the machine can be rebooted or shut down",
+        "tags": [
+          "System"
+        ]
+      }
+    },
+    "/api/v2/system/reboot": {
+      "post": {
+        "description": "`409` with `PowerActionBlocked` when the host cannot do it (see `GET /system/power`).",
+        "operationId": "system_api_v2_reboot_reboot_post",
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PowerAcceptedOut"
+                }
+              }
+            },
+            "description": "Accepted"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "415": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unsupported Media Type"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "Reboot the machine",
+        "tags": [
+          "System"
+        ]
+      }
+    },
     "/api/v2/system/services": {
       "get": {
         "operationId": "system_api_v2_get_services_services_get",
@@ -12986,6 +13145,78 @@
           }
         },
         "summary": "Get the status of the system services",
+        "tags": [
+          "System"
+        ]
+      }
+    },
+    "/api/v2/system/shutdown": {
+      "post": {
+        "description": "`409` with `PowerActionBlocked` when the host cannot do it (see `GET /system/power`).",
+        "operationId": "system_api_v2_shutdown_shutdown_post",
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PowerAcceptedOut"
+                }
+              }
+            },
+            "description": "Accepted"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "415": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unsupported Media Type"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "Shut the machine down",
         "tags": [
           "System"
         ]

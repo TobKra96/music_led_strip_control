@@ -8,7 +8,7 @@ from mlsc.api.v2.errors import READ_ERRORS, Problem, ProblemError
 from mlsc.api.v2.security import api_login_required
 from mlsc.config_migration import REPORT_FILE
 from mlsc.webserver.executer import Executer
-from mlsc.webserver.messages import MigrationReportNotFound
+from mlsc.webserver.messages import MigrationReportNotFound, PowerActionBlocked, ServerError
 
 tag = Tag(name="System", description="Server and host information")
 system_api = APIBlueprint("system_api_v2", __name__, url_prefix="/api/v2/system", abp_tags=[tag])
@@ -94,3 +94,58 @@ def dismiss_migration_report():
         raise ProblemError(MigrationReportNotFound)
     path.replace(path.with_suffix(".dismissed.json"))
     return "", 204
+
+
+class PowerActionOut(BaseModel):
+    available: bool
+    reason: str | None = Field(description="Why the action cannot run on this host. `null` when it can.")
+
+
+class PowerOut(BaseModel):
+    reboot: PowerActionOut
+    shutdown: PowerActionOut
+
+
+class PowerAcceptedOut(BaseModel):
+    action: str
+    status: str = Field(description="Always `accepted`: the machine goes down shortly after the response.")
+
+
+POWER_ACTIONS = {"reboot": "reboot", "shutdown": "poweroff"}
+POWER_ERRORS = {"401": Problem, "409": Problem, "415": Problem, "500": Problem}
+
+
+def _power_action_out(action: str) -> dict:
+    reason = Executer.instance.host.power_action_block(action)
+    return {"available": reason is None, "reason": reason}
+
+
+@system_api.get("/power", summary="Check whether the machine can be rebooted or shut down", responses={"200": PowerOut, "401": Problem})
+@api_login_required
+def get_power():
+    return {action: _power_action_out(action) for action in POWER_ACTIONS}
+
+
+def _run_power_action(action: str):
+    host = Executer.instance.host
+    reason = host.power_action_block(action)
+    if reason is not None:
+        raise ProblemError(PowerActionBlocked, reason)
+    code, output = host.run(["systemctl", POWER_ACTIONS[action], "--no-block"])
+    if code != 0:
+        raise ProblemError(ServerError, output)
+    return {"action": action, "status": "accepted"}, 202
+
+
+@system_api.post("/reboot", summary="Reboot the machine", responses={"202": PowerAcceptedOut, **POWER_ERRORS})
+@api_login_required
+def reboot():
+    """`409` with `PowerActionBlocked` when the host cannot do it (see `GET /system/power`)."""
+    return _run_power_action("reboot")
+
+
+@system_api.post("/shutdown", summary="Shut the machine down", responses={"202": PowerAcceptedOut, **POWER_ERRORS})
+@api_login_required
+def shutdown():
+    """`409` with `PowerActionBlocked` when the host cannot do it (see `GET /system/power`)."""
+    return _run_power_action("shutdown")

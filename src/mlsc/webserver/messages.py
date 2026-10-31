@@ -216,6 +216,11 @@ class UnsupportedMediaType(_Message):
     _code = HTTPStatus.UNSUPPORTED_MEDIA_TYPE.value
 
 
+class PowerActionBlocked(_Message):
+    _message = "This power action cannot run on this host."
+    _code = HTTPStatus.CONFLICT.value
+
+
 class StreamGone(_Message):
     _message = "The stream is not open or has expired."
     _code = HTTPStatus.GONE.value
