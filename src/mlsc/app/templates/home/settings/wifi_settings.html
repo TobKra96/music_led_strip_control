@@ -65,11 +65,11 @@
                                     <h5>Join a network</h5>
                                 </div>
                                 <div class="card-block">
-                                    <div class="d-flex align-items-center mb-2">
-                                        <button type="button" id="scan_btn" class="btn btn-outline-primary btn-sm">Scan for networks</button>
+                                    <div class="d-flex align-items-center mb-3">
+                                        <button type="button" id="scan_btn" class="btn btn-primary m-0"><span class="feather icon-refresh-cw"></span> Scan for networks</button>
                                         <small id="scan_info" class="text-muted ml-3" data-unsaved-ignore></small>
                                     </div>
-                                    <ul id="networks" class="list-group mb-3" data-unsaved-ignore></ul>
+                                    <ul id="networks" class="wifi-networks" data-unsaved-ignore></ul>
 
                                     <div class="form-group">
                                         <label for="ssid">Network name</label>
@@ -115,7 +115,7 @@
                             </div>
                             <div class="card-block">
                                 <p id="saved_empty" class="text-muted mb-0">No saved networks in range. Scan to see them.</p>
-                                <ul id="saved" class="list-group"></ul>
+                                <ul id="saved" class="wifi-networks mb-0"></ul>
                             </div>
                         </div>
                     </div>

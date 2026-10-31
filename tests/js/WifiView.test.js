@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { ROLLBACK_SECONDS, addressOf, operationView, pageView, secondsLeft, signalLabel } from '../../src/mlsc/app/static/assets/js/classes/WifiView.js';
+import { ROLLBACK_SECONDS, addressOf, operationView, pageView, secondsLeft, signalLabel, signalLevel } from '../../src/mlsc/app/static/assets/js/classes/WifiView.js';
 
 const ready = {
     supported: true, hotspot_supported: true, country: 'DE', interface: 'wlan0', radio: 'ready',
@@ -134,5 +134,15 @@ describe('operationView', () => {
 describe('signalLabel', () => {
     it.each([[80, 'Strong'], [50, 'Good'], [30, 'Weak'], [5, 'Very weak']])('names %i as %s', (signal, label) => {
         expect(signalLabel(signal)).toBe(label);
+    });
+});
+
+describe('signalLevel', () => {
+    it.each([[100, 4], [80, 4], [70, 3], [50, 2], [45, 2], [30, 1], [20, 1], [10, 0], [0, 0]])('turns %i into %i of 4 bars', (signal, level) => {
+        expect(signalLevel(signal)).toBe(level);
+    });
+
+    it('agrees with the label: a network with no bars is Very weak', () => {
+        expect(signalLabel(10)).toBe('Very weak');
     });
 });

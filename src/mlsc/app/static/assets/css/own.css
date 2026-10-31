@@ -340,3 +340,81 @@ select.gradients {
 #device_group_pills .tagin-input:not(.tagin-input-hidden) {
     min-width: 140px;
 }
+
+/* Wi-Fi Settings: the list of scanned and saved networks */
+.wifi-networks {
+    list-style: none;
+    margin: 0 0 1rem;
+    padding: 0;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.25rem;
+}
+
+.wifi-network {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.6rem 0.9rem;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.wifi-network:last-child {
+    border-bottom: 0;
+}
+
+.wifi-network.selected {
+    background: rgba(52, 152, 219, 0.12);
+}
+
+.wifi-network-name {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-weight: 600;
+}
+
+.wifi-network-meta {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 400;
+    opacity: 0.7;
+}
+
+.wifi-signal {
+    display: inline-flex;
+    align-items: flex-end;
+    gap: 2px;
+    height: 16px;
+    flex: 0 0 auto;
+}
+
+.wifi-signal span {
+    width: 4px;
+    border-radius: 1px;
+    background: #cbd5e1;
+}
+
+.wifi-signal span:nth-child(1) { height: 25%; }
+.wifi-signal span:nth-child(2) { height: 50%; }
+.wifi-signal span:nth-child(3) { height: 75%; }
+.wifi-signal span:nth-child(4) { height: 100%; }
+.wifi-signal span.on { background: var(--brand-green); }
+.wifi-signal.weak span.on { background: var(--brand-red); }
+
+.wifi-lock {
+    flex: 0 0 auto;
+    width: 1.1rem;
+    text-align: center;
+}
+
+.wifi-network .btn {
+    margin: 0;
+    flex: 0 0 auto;
+}
+
+.wifi-empty {
+    padding: 0.9rem;
+    text-align: center;
+}

@@ -1249,3 +1249,25 @@ Navbar from style.css without navbar-dark
 .dark input[type="range"]::-ms-fill-upper {
     background-color: var(--slate-800);
 }
+
+/* Wi-Fi Settings */
+.dark .wifi-networks,
+.dark .wifi-network {
+    border-color: var(--slate-border-2);
+}
+
+.dark .wifi-network-name {
+    color: var(--slate-300);
+}
+
+.dark .wifi-signal span {
+    background: var(--slate-500);
+}
+
+.dark .wifi-signal span.on {
+    background: var(--brand-green);
+}
+
+.dark .wifi-signal.weak span.on {
+    background: var(--brand-red);
+}

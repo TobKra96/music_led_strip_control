@@ -76,7 +76,16 @@ export const operationView = (operation, left, address) => {
 };
 
 /**
+ * How many of the four signal bars to light.
+ * @param {number} signal 0 to 100.
+ * @return {number} 0 to 4.
+ */
+export const signalLevel = signal => [20, 40, 55, 75].filter(limit => signal >= limit).length;
+
+const SIGNAL_LABELS = ['Very weak', 'Weak', 'Good', 'Strong', 'Strong'];
+
+/**
  * @param {number} signal 0 to 100.
  * @return {string}
  */
-export const signalLabel = signal => (signal >= 70 ? 'Strong' : signal >= 45 ? 'Good' : signal >= 20 ? 'Weak' : 'Very weak');
+export const signalLabel = signal => SIGNAL_LABELS[signalLevel(signal)];

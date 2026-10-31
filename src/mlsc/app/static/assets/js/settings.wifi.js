@@ -2,7 +2,7 @@ import { api } from './classes/Api.js';
 import { events } from './classes/Events.js';
 import Toast from './classes/Toast.js';
 import UnsavedChanges from './classes/UnsavedChanges.js';
-import { addressOf, operationView, pageView, secondsLeft, signalLabel } from './classes/WifiView.js';
+import { addressOf, operationView, pageView, secondsLeft, signalLabel, signalLevel } from './classes/WifiView.js';
 
 const unsaved = new UnsavedChanges(document.getElementById('settingsForm'));
 const address = addressOf(window.location);
@@ -55,44 +55,73 @@ const loadStatus = async () => {
 };
 
 /**
- * Show a list entry for a scanned network.
- * @param {{ssid: string, signal: number, security: string|null, in_use: boolean, known: boolean}} network
+ * The four signal bars, lit up to the level of the signal.
+ * @param {number} signal 0 to 100.
  * @return {jQuery}
  */
-const networkItem = (network) => {
-    const $item = $('<li class="list-group-item d-flex justify-content-between align-items-center"></li>');
-    const $label = $('<span></span>').text(`${network.ssid} · ${signalLabel(network.signal)}${network.security ? ' · secured' : ' · open'}`);
-    if (network.in_use) $label.append($('<span class="badge badge-success ml-2">connected</span>'));
-    $item.append($label);
-    return $item;
+const signalBars = (signal) => {
+    const level = signalLevel(signal);
+    const text = `Signal: ${signalLabel(signal)}`;
+    const $bars = $('<span class="wifi-signal" role="img"></span>')
+        .attr('aria-label', text).attr('title', `${text} (${signal}%)`)
+        .toggleClass('weak', level <= 1);
+    for (let bar = 1; bar <= 4; bar += 1) $bars.append($('<span></span>').toggleClass('on', bar <= level));
+    return $bars;
 };
+
+/**
+ * Show a list entry for a scanned network: signal bars, the name, a lock for a secured network and the action.
+ * @param {{ssid: string, signal: number, security: string|null, in_use: boolean, known: boolean}} network
+ * @param {jQuery} $action
+ * @return {jQuery}
+ */
+const networkItem = (network, $action) => {
+    const secured = Boolean(network.security);
+    const $lock = $(`<span class="wifi-lock feather ${secured ? 'icon-lock' : 'icon-unlock'}" role="img"></span>`)
+        .attr('aria-label', secured ? 'Secured' : 'Open network')
+        .attr('title', secured ? `Secured (${network.security})` : 'Open network, no password');
+    const $name = $('<span class="wifi-network-name"></span>').text(network.ssid);
+    $name.append($('<span class="wifi-network-meta"></span>').text([signalLabel(network.signal), secured ? 'secured' : 'open'].join(' · ')));
+    const $item = $('<li class="wifi-network"></li>').attr('data-ssid', network.ssid).append(signalBars(network.signal), $name, $lock);
+    if (network.in_use) $item.append($('<span class="badge badge_green">connected</span>'));
+    return $item.append($action);
+};
+
+/** Mark the listed network whose name is typed in the form. */
+const markSelected = () => $('#networks .wifi-network').each(function () {
+    $(this).toggleClass('selected', $(this).attr('data-ssid') === $('#ssid').val());
+});
 
 const showNetworks = (networks) => {
     const $networks = $('#networks').empty();
     const $saved = $('#saved').empty();
     networks.sort((a, b) => b.signal - a.signal).forEach((network) => {
-        const $use = $('<button type="button" class="btn btn-sm btn-outline-primary">Use</button>').on('click', () => {
+        const $use = $('<button type="button" class="btn btn-primary btn-sm">Use</button>').on('click', () => {
             $('#ssid').val(network.ssid);
             $('#password').val('').trigger('focus');
+            markSelected();
         });
-        $networks.append(networkItem(network).append($use));
+        $networks.append(networkItem(network, $use));
         if (network.known) {
-            const $forget = $('<button type="button" class="btn btn-sm btn-outline-danger">Forget</button>').on('click', () => forget(network.ssid));
-            $saved.append(networkItem(network).append($forget));
+            const $forget = $('<button type="button" class="btn btn-outline-danger btn-sm"><span class="feather icon-trash-2"></span> Forget</button>')
+                .on('click', () => forget(network.ssid));
+            $saved.append(networkItem(network, $forget));
         }
     });
+    if (!networks.length) $networks.append('<li class="wifi-empty text-muted">No networks found. Move the Pi closer to a router, then scan again.</li>');
     $('#saved_empty').toggleClass('d-none', $saved.children().length > 0);
-    $('#scan_info').text(networks.length ? '' : 'No networks found.');
+    $('#scan_info').text(networks.length ? `${networks.length} network${networks.length === 1 ? '' : 's'} found` : '');
+    markSelected();
 };
 
 const scan = async () => {
-    const $button = $('#scan_btn').prop('disabled', true).text('Scanning…');
+    const $button = $('#scan_btn').prop('disabled', true).html('<span class="feather icon-refresh-cw"></span> Scanning…');
     try {
         showNetworks((await api.get('/wifi/scan')).networks);
     } catch (error) {
         new Toast(`Could not scan for networks. ${error.summary || ''}`).error();
     } finally {
-        $button.prop('disabled', false).text('Scan for networks');
+        $button.prop('disabled', false).html('<span class="feather icon-refresh-cw"></span> Scan for networks');
     }
 };
 
@@ -184,6 +213,7 @@ $(() => {
 
     $('#scan_btn').on('click', scan);
     $('#connect_btn').on('click', connect);
+    $('#ssid').on('input', markSelected);
     $('#hotspot_on_btn').on('click', () => setHotspot(true));
     $('#hotspot_off_btn').on('click', () => setHotspot(false));
     $('#radio_btn').on('click', enableRadio);
