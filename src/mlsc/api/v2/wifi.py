@@ -107,7 +107,11 @@ def scan():
 @wifi_api.post("/connect", summary="Join a Wi-Fi network", responses={"200": WifiStatusOut, **CHANGE_ERRORS})
 @api_login_required
 def connect(body: ConnectBody):
-    """The connection is saved by the system under the SSID. A wrong password is a `422` and leaves nothing saved."""
+    """The connection is saved by the system under the SSID. A wrong password is a `422` and leaves nothing saved.
+
+    The change is tracked as an `operation` event of kind `wifi`: `pending` until a connection with an IP is proven, then `confirmed`,
+    or `rolled_back` after 45 seconds without one. `wifi.state` events follow the mode and connection.
+    """
     _require_supported()
     return _change(lambda: _supervisor().connect(body.ssid, body.password))
 
@@ -126,6 +130,7 @@ def put_hotspot(body: HotspotBody):
     """On saves the Hotspot as the mode and drops a client connection. Off returns to the saved networks.
 
     A change that does not end in a working connection within 45 seconds is rolled back to the previous mode.
+    It is tracked as an `operation` event of kind `wifi`, and `wifi.state` events follow the mode and fallback.
     """
     _require_supported()
     return _change(lambda: _supervisor().set_hotspot(body.enabled, body.ssid, body.password))

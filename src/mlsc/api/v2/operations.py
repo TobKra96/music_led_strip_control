@@ -18,7 +18,7 @@ class OperationPath(BaseModel):
 
 class OperationOut(BaseModel):
     id: str
-    kind: str = Field(description="What is being changed, e.g. `output`.")
+    kind: str = Field(description="What is being changed, e.g. `output`, `microphone` or `wifi`.")
     state: OperationState
     attempts: int = Field(description="How many times the change was applied so far.")
     error: str | None = Field(description="Why the change was rolled back or failed.")

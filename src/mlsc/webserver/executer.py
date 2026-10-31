@@ -1,7 +1,9 @@
 import time
 
+from mlsc import operations
 from mlsc.config_service import ConfigService
 from mlsc.host import Host
+from mlsc.webserver import sse
 from mlsc.webserver.blueprints.authentication_executer import AuthenticationExecuter
 from mlsc.webserver.blueprints.device_executer import DeviceExecuter
 from mlsc.webserver.blueprints.device_settings_executer import DeviceSettingsExecuter
@@ -40,6 +42,6 @@ class Executer:
         self.wifi_manager = create_wifi_manager(host=host)
         self.wifi_supervisor = WifiSupervisor(
             self.wifi_manager, ConfigWifiSettings(ConfigService.instance(config_lock)), time.monotonic, host.ethernet_up,
-            HotspotCredentials(host.boot_dir(), host.mac_address))
+            HotspotCredentials(host.boot_dir(), host.mac_address), operations.registry, lambda event, data: sse.broker.publish(event, data))
 
         Executer.instance = self

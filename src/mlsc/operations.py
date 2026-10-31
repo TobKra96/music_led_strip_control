@@ -91,6 +91,18 @@ class OperationRegistry:
                 self._set_state(operation, OperationState.CONFIRMED)
         return operation
 
+    def begin(self, kind: str) -> Operation:
+        """Track a change that someone else applies and verifies; they end it with `resolve`."""
+        return self._create(kind)
+
+    def resolve(self, operation: Operation, state: OperationState, error: str | None = None) -> None:
+        """End an Operation made by `begin`. An Operation that already left `pending` stays as it is."""
+        with self._lock:
+            if operation.state is OperationState.PENDING:
+                operation.deadline = None
+                operation.rollback = None
+                self._set_state(operation, state, error)
+
     def tick(self) -> None:
         """Roll back every change whose confirmation deadline has passed."""
         now = self._clock()

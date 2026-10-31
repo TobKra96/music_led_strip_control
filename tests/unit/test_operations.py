@@ -203,3 +203,12 @@ def test_the_ticker_thread_stops_when_asked(registry):
     ticker.stop()
 
     assert not ticker.thread.is_alive()
+
+
+def test_an_operation_begun_by_the_caller_is_pending_until_resolved(registry, events):
+    operation = registry.begin("wifi")
+    registry.resolve(operation, OperationState.CONFIRMED)
+    registry.resolve(operation, OperationState.ROLLED_BACK, "late")
+
+    assert operation.state is OperationState.CONFIRMED
+    assert [data["state"] for _, data in events] == ["pending", "confirmed"]

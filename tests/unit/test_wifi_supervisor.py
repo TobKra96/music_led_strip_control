@@ -2,6 +2,7 @@ from dataclasses import dataclass
 
 import pytest
 
+from mlsc.operations import OperationRegistry, OperationState
 from mlsc.wifi import CLIENT, HOTSPOT, MockNetwork, MockWifiManager, WifiError
 from mlsc.wifi.credentials import HotspotCredentials
 from mlsc.wifi.supervisor import WifiSupervisor
@@ -26,7 +27,16 @@ class Rig:
         self.ethernet = False
         self.boot_dir = tmp_path
         credentials = HotspotCredentials(tmp_path, lambda: "aa:bb:cc:dd:12:34")
-        self.supervisor = WifiSupervisor(self.wifi, self.settings, fake_clock.time, lambda: self.ethernet, credentials)
+        self.events = []
+        self.operations = OperationRegistry(clock=fake_clock.time, publish=lambda name, data: self.events.append((name, data)))
+        self.supervisor = WifiSupervisor(self.wifi, self.settings, fake_clock.time, lambda: self.ethernet, credentials,
+                                         self.operations, lambda name, data: self.events.append((name, data)))
+
+    def wifi_operations(self):
+        return [data for name, data in self.events if name == "operation" and data["kind"] == "wifi"]
+
+    def wifi_states(self):
+        return [data for name, data in self.events if name == "wifi.state"]
 
     def run(self, seconds, step=5):
         for _ in range(seconds // step):
@@ -256,3 +266,56 @@ def test_a_saved_hotspot_mode_is_raised_again_after_a_restart(rig):
 
     assert rig.wifi.status().mode == HOTSPOT
     assert rig.supervisor.fallback_active is False
+
+
+def test_a_connect_is_a_pending_operation_that_is_confirmed_once_connected(rig):
+    rig.supervisor.connect("Home", "secret123")
+
+    assert [o["state"] for o in rig.wifi_operations()] == ["pending"]
+
+    rig.run(10)
+
+    assert [o["state"] for o in rig.wifi_operations()] == ["pending", "confirmed"]
+    assert len({o["id"] for o in rig.wifi_operations()}) == 1
+
+
+def test_a_change_that_does_not_connect_is_a_rolled_back_operation(rig):
+    rig.supervisor.set_hotspot(True)
+    rig.supervisor.set_hotspot(False)
+
+    rig.run(60)
+
+    last = rig.wifi_operations()[-1]
+    assert last["state"] == OperationState.ROLLED_BACK
+    assert last["error"]
+
+
+def test_a_failed_connect_ends_its_operation_and_names_the_error(rig):
+    with pytest.raises(WifiError):
+        rig.supervisor.connect("Home", "wrong-password")
+
+    last = rig.wifi_operations()[-1]
+    assert last["state"] in (OperationState.ROLLED_BACK, OperationState.FAILED)
+    assert last["error"]
+
+
+def test_a_newer_change_ends_the_operation_it_replaces(rig):
+    rig.supervisor.set_hotspot(True)
+    rig.supervisor.set_hotspot(False)
+
+    states = {o["id"]: o["state"] for o in rig.wifi_operations()}
+
+    assert sorted(states.values()) == ["failed", "pending"]
+
+
+def test_wifi_state_is_published_on_mode_connection_and_fallback_changes_only(rig):
+    rig.run(5)
+    rig.run(5)
+    assert rig.wifi_states() == [{"mode": CLIENT, "connected": False, "fallback": False}]
+
+    rig.run(60)
+
+    assert rig.wifi_states()[-1]["fallback"] is True
+    count = len(rig.wifi_states())
+    rig.run(10)
+    assert len(rig.wifi_states()) == count

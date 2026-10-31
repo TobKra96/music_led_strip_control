@@ -11,6 +11,7 @@ from typing import Protocol
 
 from loguru import logger
 
+from mlsc.operations import Operation, OperationRegistry, OperationState
 from mlsc.wifi.credentials import HotspotCredentials
 from mlsc.wifi.manager import CLIENT, HOTSPOT, WifiError, WifiManager, WifiStatus
 
@@ -56,6 +57,7 @@ class _Pending:
     mode: str
     fallback: bool
     status: WifiStatus
+    operation: Operation | None = None
 
 
 def _working(status: WifiStatus) -> bool:
@@ -64,12 +66,16 @@ def _working(status: WifiStatus) -> bool:
 
 class WifiSupervisor:
     def __init__(self, manager: WifiManager, settings: WifiSettings, clock: Callable[[], float],
-                 ethernet_up: Callable[[], bool], credentials: HotspotCredentials) -> None:
+                 ethernet_up: Callable[[], bool], credentials: HotspotCredentials,
+                 operations: OperationRegistry | None = None, publish: Callable[[str, dict], None] | None = None) -> None:
         self._manager = manager
         self._settings = settings
         self._clock = clock
         self._ethernet_up = ethernet_up
         self._credentials = credentials
+        self._operations = operations
+        self._publish = publish
+        self._published_state: dict | None = None
         self._lock = threading.RLock()
         self._lost_since: float | None = clock()
         self._ever_connected = False
@@ -94,6 +100,7 @@ class WifiSupervisor:
             self._check_rollback()
             if self._pending is None:
                 self._supervise_fallback()
+            self._publish_state()
 
     def run_forever(self, stop: threading.Event, interval: float = TICK_SECONDS) -> None:
         while not stop.wait(interval):
@@ -105,16 +112,21 @@ class WifiSupervisor:
     def _apply(self, change: Callable[[], None], target: str) -> None:
         with self._lock:
             before = self._pending or _Pending(target, 0.0, self._settings.mode, self.fallback_active, self._manager.status())
-            before = replace(before, target=target, deadline=self._clock() + ROLLBACK_SECONDS)
+            operation = self._operations.begin("wifi") if self._operations else None
+            self._end(before.operation, OperationState.FAILED, "Replaced by a newer Wi-Fi change.")
+            before = replace(before, target=target, deadline=self._clock() + ROLLBACK_SECONDS, operation=operation)
             try:
                 change()
-            except WifiError:
-                self._revert_if_changed(before)
+            except WifiError as e:
+                reverted = self._revert_if_changed(before)
+                self._end(operation, OperationState.ROLLED_BACK if reverted else OperationState.FAILED, str(e))
+                self._publish_state()
                 raise
             self._settings.mode = target
             self.fallback_active = False
             self._retry_deadline = None
             self._pending = before
+            self._publish_state()
 
     def _check_rollback(self) -> None:
         pending = self._pending
@@ -125,15 +137,33 @@ class WifiSupervisor:
             self._pending = None
             self._ever_connected = self._ever_connected or pending.target == CLIENT
             self._lost_since = None
+            self._end(pending.operation, OperationState.CONFIRMED)
         elif self._clock() >= pending.deadline:
             self._pending = None
             logger.warning("The Wi-Fi change did not result in a connection; returning to the {} mode.", pending.mode)
             self._revert(pending)
+            self._end(pending.operation, OperationState.ROLLED_BACK, "The change did not result in a connection.")
 
-    def _revert_if_changed(self, before: _Pending) -> None:
+    def _end(self, operation: Operation | None, state: OperationState, error: str | None = None) -> None:
+        if operation is not None and self._operations is not None:
+            self._operations.resolve(operation, state, error)
+
+    def _publish_state(self) -> None:
+        """Publish `wifi.state` when the mode, the connection or the Setup Fallback changed since the last time."""
+        if self._publish is None:
+            return
+        status = self._manager.status()
+        state = {"mode": status.mode, "connected": status.connected, "fallback": self.fallback_active}
+        if state != self._published_state:
+            self._published_state = state
+            self._publish("wifi.state", state)
+
+    def _revert_if_changed(self, before: _Pending) -> bool:
         now = self._manager.status()
-        if (now.mode, now.connected, now.ssid) != (before.status.mode, before.status.connected, before.status.ssid):
-            self._revert(before)
+        if (now.mode, now.connected, now.ssid) == (before.status.mode, before.status.connected, before.status.ssid):
+            return False
+        self._revert(before)
+        return True
 
     def _revert(self, before: _Pending) -> None:
         self._settings.mode = before.mode

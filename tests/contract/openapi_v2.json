@@ -6275,7 +6275,7 @@
             "type": "string"
           },
           "kind": {
-            "description": "What is being changed, e.g. `output`.",
+            "description": "What is being changed, e.g. `output`, `microphone` or `wifi`.",
             "title": "Kind",
             "type": "string"
           },
@@ -13001,7 +13001,7 @@
     },
     "/api/v2/wifi/connect": {
       "post": {
-        "description": "The connection is saved by the system under the SSID. A wrong password is a `422` and leaves nothing saved.",
+        "description": "The connection is saved by the system under the SSID. A wrong password is a `422` and leaves nothing saved.<br/><br/>The change is tracked as an `operation` event of kind `wifi`: `pending` until a connection with an IP is proven, then `confirmed`,<br/>or `rolled_back` after 45 seconds without one. `wifi.state` events follow the mode and connection.",
         "operationId": "wifi_api_v2_connect_connect_post",
         "requestBody": {
           "content": {
@@ -13137,7 +13137,7 @@
     },
     "/api/v2/wifi/hotspot": {
       "put": {
-        "description": "On saves the Hotspot as the mode and drops a client connection. Off returns to the saved networks.<br/><br/>A change that does not end in a working connection within 45 seconds is rolled back to the previous mode.",
+        "description": "On saves the Hotspot as the mode and drops a client connection. Off returns to the saved networks.<br/><br/>A change that does not end in a working connection within 45 seconds is rolled back to the previous mode.<br/>It is tracked as an `operation` event of kind `wifi`, and `wifi.state` events follow the mode and fallback.",
         "operationId": "wifi_api_v2_put_hotspot_hotspot_put",
         "requestBody": {
           "content": {
