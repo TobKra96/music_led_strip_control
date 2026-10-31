@@ -193,7 +193,8 @@ class ConfigConverterV4(ConfigConverterBase):
         """Yield `(kind, name)` of every Custom Entry that shares a name with a Predefined Entry: edited, or spelled in another case."""
         for kind, section in CONFIG_KEYS.items():
             predefined = template.get(section, {})
-            for name, value in config.get(section, {}).items():
+            entries = config.get(section)
+            for name, value in entries.items() if isinstance(entries, dict) else ():
                 stored = find_name(predefined, name)
                 if stored is not None and (stored != name or predefined[stored] != value):
                     yield kind, name
@@ -226,12 +227,13 @@ class ConfigConverterV4(ConfigConverterBase):
 
     @staticmethod
     def _custom_name(existing, name: str) -> str:
-        for number in range(1, 1000):
+        number = 1
+        while True:
             suffix = " (custom)" if number == 1 else f" (custom {number})"
             candidate = f"{name[:MAX_NAME_LENGTH - len(suffix)].rstrip()}{suffix}"
             if find_name(existing, candidate) is None:
                 return candidate
-        return f"{name[:MAX_NAME_LENGTH - 10]} (custom)"
+            number += 1
 
     @staticmethod
     def id_counters(config: dict) -> dict:
