@@ -118,6 +118,20 @@ class ConfigFileNotFound(NotFound):
     _message = "No config file selected."
 
 
+class EntryNotFound(NotFound):
+    _message = "There is no colour or gradient with this name."
+
+
+class PredefinedEntryReadOnly(_Message):
+    _message = "Predefined colours and gradients cannot be changed, renamed or deleted. Duplicate it to get an editable copy."
+    _code = HTTPStatus.CONFLICT.value
+
+
+class EntryInUse(_Message):
+    _message = "The colour or gradient is still used by effect settings."
+    _code = HTTPStatus.CONFLICT.value
+
+
 class LimitReached(_Message):
     _message = "Resource limit reached."
     _code = HTTPStatus.CONFLICT.value

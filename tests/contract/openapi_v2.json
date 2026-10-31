@@ -284,6 +284,97 @@
         "title": "BulkEffectBody",
         "type": "object"
       },
+      "ColourCreate": {
+        "properties": {
+          "name": {
+            "description": "1-32 letters, digits, spaces, `-` or `_`; unique among the colours regardless of case.",
+            "title": "Name",
+            "type": "string"
+          },
+          "rgb": {
+            "description": "`[r, g, b]`, each 0-255.",
+            "items": {
+              "type": "integer"
+            },
+            "title": "Rgb",
+            "type": "array"
+          }
+        },
+        "required": [
+          "name",
+          "rgb"
+        ],
+        "title": "ColourCreate",
+        "type": "object"
+      },
+      "ColourListOut": {
+        "items": {
+          "$ref": "#/components/schemas/ColourOut"
+        },
+        "title": "ColourListOut",
+        "type": "array"
+      },
+      "ColourOut": {
+        "properties": {
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "predefined": {
+            "description": "Predefined entries are read-only; duplicate one to edit a copy.",
+            "title": "Predefined",
+            "type": "boolean"
+          },
+          "rgb": {
+            "items": {
+              "type": "integer"
+            },
+            "title": "Rgb",
+            "type": "array"
+          }
+        },
+        "required": [
+          "name",
+          "rgb",
+          "predefined"
+        ],
+        "title": "ColourOut",
+        "type": "object"
+      },
+      "ColourUpdate": {
+        "properties": {
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Renames the entry and every usage of it.",
+            "title": "Name"
+          },
+          "rgb": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "integer"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Rgb"
+          }
+        },
+        "title": "ColourUpdate",
+        "type": "object"
+      },
       "ComponentVersion": {
         "properties": {
           "name": {
@@ -5634,6 +5725,106 @@
         "title": "GeneralSettingsPatch",
         "type": "object"
       },
+      "GradientCreate": {
+        "properties": {
+          "name": {
+            "description": "1-32 letters, digits, spaces, `-` or `_`; unique among the gradients regardless of case.",
+            "title": "Name",
+            "type": "string"
+          },
+          "stops": {
+            "description": "2-16 stops, each `[r, g, b]` with 0-255 per channel.",
+            "items": {
+              "items": {
+                "type": "integer"
+              },
+              "type": "array"
+            },
+            "title": "Stops",
+            "type": "array"
+          }
+        },
+        "required": [
+          "name",
+          "stops"
+        ],
+        "title": "GradientCreate",
+        "type": "object"
+      },
+      "GradientListOut": {
+        "items": {
+          "$ref": "#/components/schemas/GradientOut"
+        },
+        "title": "GradientListOut",
+        "type": "array"
+      },
+      "GradientOut": {
+        "properties": {
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "predefined": {
+            "description": "Predefined entries are read-only; duplicate one to edit a copy.",
+            "title": "Predefined",
+            "type": "boolean"
+          },
+          "stops": {
+            "items": {
+              "items": {
+                "type": "integer"
+              },
+              "type": "array"
+            },
+            "title": "Stops",
+            "type": "array"
+          }
+        },
+        "required": [
+          "name",
+          "stops",
+          "predefined"
+        ],
+        "title": "GradientOut",
+        "type": "object"
+      },
+      "GradientUpdate": {
+        "properties": {
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Renames the entry and every usage of it.",
+            "title": "Name"
+          },
+          "stops": {
+            "anyOf": [
+              {
+                "items": {
+                  "items": {
+                    "type": "integer"
+                  },
+                  "type": "array"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Stops"
+          }
+        },
+        "title": "GradientUpdate",
+        "type": "object"
+      },
       "GroupCreate": {
         "properties": {
           "name": {
@@ -6685,6 +6876,8 @@
               "DeviceNotFound",
               "DuplicateItem",
               "EffectNotFound",
+              "EntryInUse",
+              "EntryNotFound",
               "GroupAlreadyExists",
               "GroupLimitReached",
               "GroupNotFound",
@@ -6698,6 +6891,7 @@
               "MixerNotFound",
               "NotFound",
               "OperationNotFound",
+              "PredefinedEntryReadOnly",
               "RecordingNotFound",
               "RefreshFailed",
               "ServerError",
@@ -6756,6 +6950,22 @@
             "description": "URI that identifies the problem type.",
             "title": "Type",
             "type": "string"
+          },
+          "usages": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/Usage"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Where the entry is used (`EntryInUse`).",
+            "title": "Usages"
           }
         },
         "required": [
@@ -6913,6 +7123,37 @@
         ],
         "title": "TestPatternOut",
         "type": "object"
+      },
+      "Usage": {
+        "properties": {
+          "effect": {
+            "title": "Effect",
+            "type": "string"
+          },
+          "setting": {
+            "title": "Setting",
+            "type": "string"
+          },
+          "target": {
+            "description": "Id of the device that holds the setting.",
+            "title": "Target",
+            "type": "string"
+          }
+        },
+        "required": [
+          "target",
+          "effect",
+          "setting"
+        ],
+        "title": "Usage",
+        "type": "object"
+      },
+      "UsageListOut": {
+        "items": {
+          "$ref": "#/components/schemas/Usage"
+        },
+        "title": "UsageListOut",
+        "type": "array"
       },
       "VersionsOut": {
         "properties": {
@@ -7354,6 +7595,518 @@
         "summary": "Show the login state",
         "tags": [
           "Auth"
+        ]
+      }
+    },
+    "/api/v2/colors": {
+      "get": {
+        "operationId": "colors_api_v2_list_entries_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ColourListOut"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        },
+        "summary": "List the colors",
+        "tags": [
+          "Colors"
+        ]
+      },
+      "post": {
+        "operationId": "colors_api_v2_create_entry_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ColourCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ColourOut"
+                }
+              }
+            },
+            "description": "Created"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "415": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unsupported Media Type"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "Create a colour",
+        "tags": [
+          "Colors"
+        ]
+      }
+    },
+    "/api/v2/colors/{name}": {
+      "delete": {
+        "description": "Blocked with `EntryInUse` (its `usages` member lists where) while an effect setting still uses the entry.",
+        "operationId": "colors_api_v2_delete_entry__name__delete",
+        "parameters": [
+          {
+            "description": "Name of the entry, URL-encoded. Matched case-insensitively.",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "description": "Name of the entry, URL-encoded. Matched case-insensitively.",
+              "title": "Name",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        },
+        "summary": "Delete a colour",
+        "tags": [
+          "Colors"
+        ]
+      },
+      "get": {
+        "operationId": "colors_api_v2_get_entry__name__get",
+        "parameters": [
+          {
+            "description": "Name of the entry, URL-encoded. Matched case-insensitively.",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "description": "Name of the entry, URL-encoded. Matched case-insensitively.",
+              "title": "Name",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ColourOut"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        },
+        "summary": "Get a colour",
+        "tags": [
+          "Colors"
+        ]
+      },
+      "patch": {
+        "description": "Rewrite every usage on a rename, which restarts the devices that use the entry. Predefined entries answer `PredefinedEntryReadOnly`.",
+        "operationId": "colors_api_v2_update_entry__name__patch",
+        "parameters": [
+          {
+            "description": "Name of the entry, URL-encoded. Matched case-insensitively.",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "description": "Name of the entry, URL-encoded. Matched case-insensitively.",
+              "title": "Name",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ColourUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ColourOut"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "415": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unsupported Media Type"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "Edit or rename a colour",
+        "tags": [
+          "Colors"
+        ]
+      }
+    },
+    "/api/v2/colors/{name}/duplicate": {
+      "post": {
+        "description": "Name the copy `<name> (copy)`, `<name> (copy 2)` and so on, shortened to 32 characters.",
+        "operationId": "colors_api_v2_duplicate_entry__name__duplicate_post",
+        "parameters": [
+          {
+            "description": "Name of the entry, URL-encoded. Matched case-insensitively.",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "description": "Name of the entry, URL-encoded. Matched case-insensitively.",
+              "title": "Name",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ColourOut"
+                }
+              }
+            },
+            "description": "Created"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "415": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unsupported Media Type"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "Copy a colour",
+        "tags": [
+          "Colors"
+        ]
+      }
+    },
+    "/api/v2/colors/{name}/usages": {
+      "get": {
+        "operationId": "colors_api_v2_list_usages__name__usages_get",
+        "parameters": [
+          {
+            "description": "Name of the entry, URL-encoded. Matched case-insensitively.",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "description": "Name of the entry, URL-encoded. Matched case-insensitively.",
+              "title": "Name",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UsageListOut"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        },
+        "summary": "List where a colour is used",
+        "tags": [
+          "Colors"
         ]
       }
     },
@@ -11177,6 +11930,518 @@
         }
       }
     },
+    "/api/v2/gradients": {
+      "get": {
+        "operationId": "gradients_api_v2_list_entries_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GradientListOut"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        },
+        "summary": "List the gradients",
+        "tags": [
+          "Gradients"
+        ]
+      },
+      "post": {
+        "operationId": "gradients_api_v2_create_entry_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GradientCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GradientOut"
+                }
+              }
+            },
+            "description": "Created"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "415": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unsupported Media Type"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "Create a gradient",
+        "tags": [
+          "Gradients"
+        ]
+      }
+    },
+    "/api/v2/gradients/{name}": {
+      "delete": {
+        "description": "Blocked with `EntryInUse` (its `usages` member lists where) while an effect setting still uses the entry.",
+        "operationId": "gradients_api_v2_delete_entry__name__delete",
+        "parameters": [
+          {
+            "description": "Name of the entry, URL-encoded. Matched case-insensitively.",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "description": "Name of the entry, URL-encoded. Matched case-insensitively.",
+              "title": "Name",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        },
+        "summary": "Delete a gradient",
+        "tags": [
+          "Gradients"
+        ]
+      },
+      "get": {
+        "operationId": "gradients_api_v2_get_entry__name__get",
+        "parameters": [
+          {
+            "description": "Name of the entry, URL-encoded. Matched case-insensitively.",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "description": "Name of the entry, URL-encoded. Matched case-insensitively.",
+              "title": "Name",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GradientOut"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        },
+        "summary": "Get a gradient",
+        "tags": [
+          "Gradients"
+        ]
+      },
+      "patch": {
+        "description": "Rewrite every usage on a rename, which restarts the devices that use the entry. Predefined entries answer `PredefinedEntryReadOnly`.",
+        "operationId": "gradients_api_v2_update_entry__name__patch",
+        "parameters": [
+          {
+            "description": "Name of the entry, URL-encoded. Matched case-insensitively.",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "description": "Name of the entry, URL-encoded. Matched case-insensitively.",
+              "title": "Name",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GradientUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GradientOut"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "415": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unsupported Media Type"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "Edit or rename a gradient",
+        "tags": [
+          "Gradients"
+        ]
+      }
+    },
+    "/api/v2/gradients/{name}/duplicate": {
+      "post": {
+        "description": "Name the copy `<name> (copy)`, `<name> (copy 2)` and so on, shortened to 32 characters.",
+        "operationId": "gradients_api_v2_duplicate_entry__name__duplicate_post",
+        "parameters": [
+          {
+            "description": "Name of the entry, URL-encoded. Matched case-insensitively.",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "description": "Name of the entry, URL-encoded. Matched case-insensitively.",
+              "title": "Name",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GradientOut"
+                }
+              }
+            },
+            "description": "Created"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "415": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unsupported Media Type"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "Copy a gradient",
+        "tags": [
+          "Gradients"
+        ]
+      }
+    },
+    "/api/v2/gradients/{name}/usages": {
+      "get": {
+        "operationId": "gradients_api_v2_list_usages__name__usages_get",
+        "parameters": [
+          {
+            "description": "Name of the entry, URL-encoded. Matched case-insensitively.",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "description": "Name of the entry, URL-encoded. Matched case-insensitively.",
+              "title": "Name",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UsageListOut"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        },
+        "summary": "List where a gradient is used",
+        "tags": [
+          "Gradients"
+        ]
+      }
+    },
     "/api/v2/groups": {
       "get": {
         "operationId": "groups_api_v2_list_groups_get",
@@ -13548,6 +14813,14 @@
     {
       "description": "Join a network, forget one, or raise the Hotspot",
       "name": "Wi-Fi"
+    },
+    {
+      "description": "The named gradients that effects can use",
+      "name": "Gradients"
+    },
+    {
+      "description": "The named colors that effects can use",
+      "name": "Colors"
     }
   ]
 }

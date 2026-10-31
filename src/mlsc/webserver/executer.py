@@ -9,6 +9,7 @@ from mlsc.webserver.blueprints.device_executer import DeviceExecuter
 from mlsc.webserver.blueprints.device_settings_executer import DeviceSettingsExecuter
 from mlsc.webserver.blueprints.effect_executer import EffectExecuter
 from mlsc.webserver.blueprints.effect_settings_executer import EffectSettingsExecuter
+from mlsc.webserver.blueprints.entry_executer import EntryExecuter
 from mlsc.webserver.blueprints.general_executer import GeneralExecuter
 from mlsc.webserver.blueprints.general_settings_executer import GeneralSettingsExecuter
 from mlsc.webserver.blueprints.microphone_settings_executer import MicrophoneSettingsExecuter
@@ -29,6 +30,8 @@ class Executer:
         self.effect_executer = EffectExecuter(
             config_lock, notification_queue_in, notification_queue_out, effects_queue, audio_backend)
         self.effect_settings_executer = EffectSettingsExecuter(
+            config_lock, notification_queue_in, notification_queue_out, effects_queue, audio_backend)
+        self.entry_executer = EntryExecuter(
             config_lock, notification_queue_in, notification_queue_out, effects_queue, audio_backend)
         self.general_executer = GeneralExecuter(
             config_lock, notification_queue_in, notification_queue_out, effects_queue, audio_backend)

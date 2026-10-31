@@ -8,6 +8,7 @@ from flask_openapi3 import OpenAPI
 from mlsc.api.v2.auth import auth_api
 from mlsc.api.v2.devices import devices_api
 from mlsc.api.v2.effects import effects_api
+from mlsc.api.v2.entries import colors_api, gradients_api
 from mlsc.api.v2.errors import API_V2_PREFIX, register_error_handlers
 from mlsc.api.v2.event_payloads import document_events
 from mlsc.api.v2.events import events_api
@@ -26,7 +27,7 @@ from mlsc.api.v2.wifi import wifi_api
 SPEC_PATH = f"{API_V2_PREFIX}openapi.json"
 API_V2_BLUEPRINTS = (
     auth_api, devices_api, groups_api, effects_api, microphone_api, resources_api, settings_api, system_api, events_api, operations_api, test_patterns_api,
-    output_api, wifi_api,
+    output_api, wifi_api, gradients_api, colors_api,
 )
 
 
@@ -38,9 +39,11 @@ STATUS_DESCRIPTIONS = {
     "400": "Bad Request",
     "401": "Unauthorized",
     "404": "Not Found",
+    "409": "Conflict",
     "415": "Unsupported Media Type",
     "422": "Unprocessable Content",
     "429": "Too Many Requests",
+    "500": "Internal Server Error",
     "503": "Service Unavailable",
 }
 FRAMEWORK_VALIDATION_SCHEMA = "ValidationErrorModel"

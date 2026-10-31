@@ -25,6 +25,12 @@ class FieldError(BaseModel):
     detail: str
 
 
+class Usage(BaseModel):
+    target: str = Field(description="Id of the device that holds the setting.")
+    effect: str
+    setting: str
+
+
 class Problem(BaseModel):
     """RFC 9457 problem details."""
 
@@ -34,6 +40,7 @@ class Problem(BaseModel):
     detail: str | None = None
     code: str = Field(description="Stable error code; the v1 `message_id` where one exists.", json_schema_extra=lambda schema: schema.update(enum=error_codes()))
     errors: list[FieldError] | None = Field(default=None, description="Per-field validation errors.")
+    usages: list[Usage] | None = Field(default=None, description="Where the entry is used (`EntryInUse`).")
 
 
 READ_ERRORS = {"401": Problem, "404": Problem}
@@ -44,8 +51,10 @@ WRITE_ERRORS = {**READ_ERRORS, **BODY_ERRORS}
 class ProblemError(Exception):
     """Raised by v2 code to answer with a problem document. `message` is one of the sentinel classes in `messages.py`."""
 
-    def __init__(self, message: type[_Message], detail: str | None = None, errors: list[dict] | None = None, headers: dict | None = None) -> None:
+    def __init__(self, message: type[_Message], detail: str | None = None, errors: list[dict] | None = None, headers: dict | None = None,
+                 usages: list[dict] | None = None) -> None:
         super().__init__(message.message)
+        self.usages = usages
         self.message = message
         self.detail = detail if detail is not None else message.message
         self.errors = errors
@@ -57,12 +66,14 @@ def is_v2_request() -> bool:
 
 
 def problem_response(status: int, title: str, code: str, detail: str | None = None, errors: list[dict] | None = None,
-                     headers: dict | None = None) -> Response:
+                     headers: dict | None = None, usages: list[dict] | None = None) -> Response:
     body = {"type": f"{PROBLEM_TYPE_PREFIX}{code}", "title": title, "status": status, "code": code}
     if detail is not None:
         body["detail"] = detail
     if errors is not None:
         body["errors"] = errors
+    if usages is not None:
+        body["usages"] = usages
     response = jsonify(body)
     response.status_code = status
     response.mimetype = PROBLEM_MIMETYPE
@@ -72,7 +83,7 @@ def problem_response(status: int, title: str, code: str, detail: str | None = No
 
 
 def handle_problem_error(e: ProblemError) -> Response:
-    return problem_response(e.message.code, e.message.message, e.message.__name__, e.detail, e.errors, e.headers)
+    return problem_response(e.message.code, e.message.message, e.message.__name__, e.detail, e.errors, e.headers, e.usages)
 
 
 def handle_http_exception(e: HTTPException) -> Response:
