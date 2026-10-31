@@ -481,3 +481,15 @@ def test_an_address_change_without_a_phone_on_the_hotspot_confirms_at_once(rig):
     rig.run(5)
 
     assert rig.wifi_operations()[-1]["state"] == OperationState.CONFIRMED.value
+
+
+def test_reapplying_the_hotspot_on_the_same_address_with_a_phone_connected_confirms_at_once(rig):
+    rig.supervisor.set_hotspot(True, ip="192.168.50.1")
+    rig.run(10)
+    rig.wifi.clients = 1
+
+    rig.supervisor.set_hotspot(True, ssid="Other")
+    rig.wifi.clients = 0
+    rig.run(10)
+
+    assert rig.wifi_operations()[-1]["state"] == OperationState.CONFIRMED.value

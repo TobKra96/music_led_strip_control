@@ -172,7 +172,7 @@ describe('hotspotProblem with an address', () => {
         expect(hotspotProblem('', '', ip)).toBeNull();
     });
 
-    it.each(['192.168.1', 'abc', '1.2.3.4.5', '192.168.1.300', '192.168.1.1/24'])('rejects %s as not an IPv4 address', (ip) => {
+    it.each(['192.168.1', 'abc', '1.2.3.4.5', '192.168.1.300', '192.168.1.1/24', '192.168.050.1'])('rejects %s as not an IPv4 address', (ip) => {
         expect(hotspotProblem('', '', ip)).toBe('The Hotspot address must be an IPv4 address such as 192.168.50.1.');
     });
 

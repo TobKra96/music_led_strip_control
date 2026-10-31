@@ -97,7 +97,7 @@ export const signalLabel = signal => SIGNAL_LABELS[signalLevel(signal)];
  */
 const addressProblem = (ip) => {
     const parts = ip.split('.');
-    if (parts.length !== 4 || !parts.every(part => /^\d{1,3}$/.test(part) && Number(part) <= 255)) {
+    if (parts.length !== 4 || !parts.every(part => /^(0|[1-9]\d{0,2})$/.test(part) && Number(part) <= 255)) {
         return 'The Hotspot address must be an IPv4 address such as 192.168.50.1.';
     }
     const [a, b, , d] = parts.map(Number);

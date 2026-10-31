@@ -140,8 +140,10 @@ class WifiSupervisor:
         with self._lock:
             status = self._manager.status()
             before = self._pending or _Pending(target, 0.0, self._settings.mode, self.fallback_active, status, self._settings.hotspot_ip)
-            # A phone on the Hotspot is cut off by the change: only a phone coming back proves the new Hotspot works.
-            needs_client = before.needs_client or (target == HOTSPOT and status.mode == HOTSPOT and self._manager.hotspot_clients() > 0)
+            # A phone on the Hotspot is cut off by an address change: only a phone coming back proves the new Hotspot works.
+            moves_hotspot = target == HOTSPOT and status.mode == HOTSPOT and status.hotspot is not None and (
+                (self._hotspot_address(hotspot_ip) or DEFAULT_HOTSPOT_ADDRESS) != (status.hotspot.address or DEFAULT_HOTSPOT_ADDRESS))
+            needs_client = before.needs_client or (moves_hotspot and self._manager.hotspot_clients() > 0)
             operation = self._operations.begin("wifi") if self._operations else None
             self._end(before.operation, OperationState.FAILED, "Replaced by a newer Wi-Fi change.")
             before = replace(before, target=target, deadline=self._clock() + ROLLBACK_SECONDS, needs_client=needs_client, operation=operation)
