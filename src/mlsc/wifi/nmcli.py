@@ -31,6 +31,7 @@ WIFI_TYPE = "802-11-wireless"
 UNSET_COUNTRY = "00"
 NO_CONNECTION = ("", "--")
 NO_SECURITY = ("", "--")
+MAX_HOTSPOT_PROFILES = 10
 RADIO_WAIT_SECONDS = 10
 UNUSABLE_STATES = {"unavailable", "unmanaged"}
 COUNTRY_PATTERN = re.compile(r"^country (\w\w):", re.MULTILINE)
@@ -142,7 +143,7 @@ class NmcliWifiManager(WifiManager):
             if not was_known:
                 # nmcli keeps the profile of a failed first connection, which would then retry with the wrong password.
                 self._run(["nmcli", "connection", "delete", "id", ssid])
-            raise WifiError(_error_text(output, password))
+            raise WifiError(_connect_error(ssid, output, password))
 
     def forget(self, ssid: str) -> None:
         self._require_device()
@@ -158,6 +159,7 @@ class NmcliWifiManager(WifiManager):
         if not self._supports_access_point(device):
             msg = "The Wi-Fi adapter does not support the Hotspot."
             raise WifiError(msg)
+        self._delete_hotspot_profiles()
         command = ["nmcli", "device", "wifi", "hotspot", "ifname", device, "con-name", HOTSPOT_CONNECTION]
         command += ["ssid", ssid] if ssid else []
         command += ["password", password] if password else []
@@ -166,11 +168,16 @@ class NmcliWifiManager(WifiManager):
             raise WifiError(_error_text(output, password))
 
     def stop_hotspot(self) -> None:
-        if HOTSPOT_CONNECTION not in self._connection_names():
-            return
-        code, output = self._run(["nmcli", "connection", "delete", "id", HOTSPOT_CONNECTION])
-        if code != 0:
-            raise WifiError(_error_text(output))
+        self._delete_hotspot_profiles()
+
+    def _delete_hotspot_profiles(self) -> None:
+        """Delete every profile named like the Hotspot: `nmcli device wifi hotspot` adds a new one on each start."""
+        for _ in range(MAX_HOTSPOT_PROFILES):
+            if HOTSPOT_CONNECTION not in self._connection_names():
+                return
+            code, output = self._run(["nmcli", "connection", "delete", "id", HOTSPOT_CONNECTION])
+            if code != 0:
+                raise WifiError(_error_text(output))
 
     def hotspot_clients(self) -> int:
         device = self._wifi_device()
@@ -278,3 +285,10 @@ class NmcliWifiManager(WifiManager):
 def _error_text(output: str, secret: str | None = None) -> str:
     text = output.strip().removeprefix("Error:").strip() or "nmcli failed."
     return text.replace(secret, "***") if secret else text
+
+
+def _connect_error(ssid: str, output: str, password: str | None) -> str:
+    """The text for a failed connect. A missing or wrong password gets a plain sentence instead of nmcli's `--ask` hint."""
+    if "Secrets were required" in output:
+        return f"The password for {ssid} is missing or wrong. Enter it and try again."
+    return _error_text(output, password)

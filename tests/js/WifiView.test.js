@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { ROLLBACK_SECONDS, addressOf, operationView, pageView, secondsLeft, signalLabel, signalLevel, hotspotProblem } from '../../src/mlsc/app/static/assets/js/classes/WifiView.js';
+import { ROLLBACK_SECONDS, addressOf, operationView, pageView, secondsLeft, signalLabel, signalLevel, hotspotProblem, connectProblem } from '../../src/mlsc/app/static/assets/js/classes/WifiView.js';
 
 const ready = {
     supported: true, hotspot_supported: true, country: 'DE', interface: 'wlan0', radio: 'ready',
@@ -164,5 +164,35 @@ describe('hotspotProblem', () => {
     it('rejects a password longer than 63 characters and a name longer than 32', () => {
         expect(hotspotProblem('', 'x'.repeat(64))).toBe('The Hotspot password can have at most 63 characters.');
         expect(hotspotProblem('n'.repeat(33), '')).toBe('The Hotspot name can have at most 32 characters.');
+    });
+});
+
+describe('connectProblem', () => {
+    const networks = [
+        { ssid: 'Home', security: 'WPA2', known: false },
+        { ssid: 'Saved', security: 'WPA2', known: true },
+        { ssid: 'Cafe', security: null, known: false },
+    ];
+
+    it('asks for a name first', () => {
+        expect(connectProblem('', '', networks)).toBe('Enter or pick a network name first.');
+    });
+
+    it('asks for the password of a secured network that is not saved', () => {
+        expect(connectProblem('Home', '', networks)).toBe('Enter the password for Home.');
+    });
+
+    it('lets a saved network, an open network and one with a password through', () => {
+        expect(connectProblem('Saved', '', networks)).toBeNull();
+        expect(connectProblem('Cafe', '', networks)).toBeNull();
+        expect(connectProblem('Home', 'secret123', networks)).toBeNull();
+    });
+
+    it('lets a name that was not scanned through, such as a hidden network', () => {
+        expect(connectProblem('Hidden', '', networks)).toBeNull();
+    });
+
+    it('rejects a password outside 8 to 63 characters for a secured network', () => {
+        expect(connectProblem('Home', 'short', networks)).toBe('A Wi-Fi password has 8 to 63 characters.');
     });
 });

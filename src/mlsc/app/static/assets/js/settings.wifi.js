@@ -2,13 +2,15 @@ import { api } from './classes/Api.js';
 import { events } from './classes/Events.js';
 import Toast from './classes/Toast.js';
 import UnsavedChanges from './classes/UnsavedChanges.js';
-import { addressOf, operationView, pageView, secondsLeft, signalLabel, signalLevel, hotspotProblem } from './classes/WifiView.js';
+import { addressOf, operationView, pageView, secondsLeft, signalLabel, signalLevel, hotspotProblem, connectProblem } from './classes/WifiView.js';
 
 const unsaved = new UnsavedChanges(document.getElementById('settingsForm'));
 const address = addressOf(window.location);
 
 /** @type {object|null} The latest `GET /api/v2/wifi/status`. */
 let status = null;
+/** The networks of the last scan. */
+let networks = [];
 let session = { pin_required: true };
 /** The `wifi` Operation being followed, and when it was first seen pending. */
 let operation = null;
@@ -94,7 +96,8 @@ const markSelected = () => $('#networks .wifi-network').each(function () {
     $(this).toggleClass('selected', $(this).attr('data-ssid') === $('#ssid').val());
 });
 
-const showNetworks = (networks) => {
+const showNetworks = (found) => {
+    networks = found;
     const $networks = $('#networks').empty();
     const $saved = $('#saved').empty();
     networks.sort((a, b) => b.signal - a.signal).forEach((network) => {
@@ -162,11 +165,13 @@ const change = async (buttons, request, failure) => {
 
 const connect = () => {
     const ssid = $('#ssid').val().trim();
-    if (!ssid) {
-        new Toast('Enter or pick a network name first.').info();
+    const password = $('#password').val();
+    const problem = connectProblem(ssid, password, networks);
+    if (problem) {
+        new Toast(problem).warning();
+        $(password || !ssid ? '#ssid' : '#password').trigger('focus');
         return Promise.resolve();
     }
-    const password = $('#password').val();
     return change('#connect_btn', async () => {
         status = await api.post('/wifi/connect', { ssid, password: password || null });
         $('#password').val('');

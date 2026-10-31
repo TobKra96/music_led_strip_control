@@ -102,3 +102,18 @@ export const hotspotProblem = (ssid, password) => {
     if (password.length > 63) return 'The Hotspot password can have at most 63 characters.';
     return null;
 };
+
+/**
+ * What is wrong with the network name and password typed in, before the request is sent. A saved network needs no password.
+ * @param {string} ssid
+ * @param {string} password
+ * @param {Array.<{ssid: string, security: string|null, known: boolean}>} networks The last scan.
+ * @return {string|null}
+ */
+export const connectProblem = (ssid, password, networks) => {
+    if (!ssid) return 'Enter or pick a network name first.';
+    const network = networks.find(n => n.ssid === ssid);
+    if (network && network.security && !network.known && !password) return `Enter the password for ${ssid}.`;
+    if (password && (password.length < 8 || password.length > 63)) return 'A Wi-Fi password has 8 to 63 characters.';
+    return null;
+};

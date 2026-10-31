@@ -168,15 +168,15 @@ def test_connect_to_an_open_network_sends_no_password():
 
 
 def test_failed_connect_raises_and_removes_the_profile_nmcli_left_behind():
-    command = ("nmcli", "device", "wifi", "connect", "Cafe", "password", "wrong", "ifname", "wlan0")
+    command = ("nmcli", "device", "wifi", "connect", "Cafe", "password", "hunter22pw", "ifname", "wlan0")
     wifi, runner = manager_with({command: (4, "Error: Connection activation failed: Secrets were required, but not provided."),
                                  ("nmcli", "connection", "delete", "id", "Cafe"): (0, "deleted")})
 
-    with pytest.raises(WifiError, match="Secrets were required") as error:
-        wifi.connect("Cafe", "wrong")
+    with pytest.raises(WifiError, match="password for Cafe is missing or wrong") as error:
+        wifi.connect("Cafe", "hunter22pw")
 
     assert runner.ran("nmcli", "connection", "delete", "id", "Cafe")
-    assert "wrong" not in str(error.value)
+    assert "hunter22pw" not in str(error.value)
 
 
 def test_failed_connect_keeps_the_profile_of_an_already_saved_network():
@@ -451,3 +451,49 @@ def test_enable_radio_is_refused_unless_the_radio_is_switched_off():
         wifi.enable_radio()
 
     assert not runner.ran("nmcli", "radio", "wifi", "on")
+
+
+def test_a_connect_without_the_secret_names_the_network_and_asks_for_the_password():
+    command = ("nmcli", "device", "wifi", "connect", "In einem LAN", "ifname", "wlan0")
+    output = "Error: Connection activation failed: Secrets were required, but not provided."
+    wifi, _ = manager_with({command: (4, output), ("nmcli", "connection", "delete", "id", "In einem LAN"): (0, "")})
+
+    with pytest.raises(WifiError) as error:
+        wifi.connect("In einem LAN", None)
+
+    assert str(error.value) == "The password for In einem LAN is missing or wrong. Enter it and try again."
+
+
+def duplicated_hotspot_manager(profiles):
+    """A Pi that has `profiles` profiles named like the Hotspot; deleting by name removes one at a time."""
+    state = {"profiles": profiles}
+    runner = FakeRunner({LIST_DEVICES: (0, DEVICES), AP_SUPPORT: (0, "yes"), HOTSPOT_BASE: (0, "ok")})
+
+    def answer(command, timeout=None):
+        runner.calls.append(command)
+        if tuple(command) == LIST_CONNECTIONS:
+            return 0, "Wired connection 1:802-3-ethernet" + "\nMLSC-Hotspot:802-11-wireless" * state["profiles"]
+        if tuple(command) == DELETE_HOTSPOT:
+            state["profiles"] -= 1
+            return 0, "deleted"
+        return runner.answers.get(tuple(command), (1, f"unexpected command: {command}"))
+
+    return NmcliWifiManager(answer), runner, state
+
+
+def test_stop_hotspot_removes_every_profile_with_the_hotspot_name():
+    wifi, _, state = duplicated_hotspot_manager(2)
+
+    wifi.stop_hotspot()
+
+    assert state["profiles"] == 0
+
+
+def test_start_hotspot_replaces_the_profiles_a_earlier_start_left_behind():
+    wifi, runner, state = duplicated_hotspot_manager(2)
+
+    wifi.start_hotspot(None, None)
+
+    assert state["profiles"] == 0
+    assert list(HOTSPOT_BASE) in runner.calls
+    assert runner.calls.index(list(DELETE_HOTSPOT)) < runner.calls.index(list(HOTSPOT_BASE))
