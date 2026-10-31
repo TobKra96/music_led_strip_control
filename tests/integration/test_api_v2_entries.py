@@ -238,3 +238,13 @@ def test_a_copy_can_be_edited_and_renamed_like_any_custom_entry(client):
 
     assert client.patch(f"/api/v2/colors/{copy_name}", json={"rgb": [9, 9, 9]}).get_json()["rgb"] == [9, 9, 9]
     assert client.patch(f"/api/v2/colors/{copy_name}", json={"name": "Dark Red"}).get_json()["name"] == "Dark Red"
+
+
+def test_an_effect_setting_accepts_a_custom_gradient_and_rejects_an_unknown_name(client):
+    device_id = client.post("/api/v2/devices", json={}).get_json()["id"]
+    client.post("/api/v2/gradients", json={"name": "mine", "stops": STOPS})
+    path = f"/api/v2/devices/{device_id}/effects/{GRADIENT_EFFECT}/settings"
+
+    assert client.patch(path, json={GRADIENT_SETTING: "mine"}).status_code == 200
+    assert client.get(path).get_json()[GRADIENT_SETTING] == "mine"
+    assert client.patch(path, json={GRADIENT_SETTING: "nonexistent"}).status_code == 422

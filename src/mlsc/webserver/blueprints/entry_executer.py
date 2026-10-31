@@ -24,6 +24,10 @@ class EntryExecuter(ExecuterBase):
     def _entries(self, kind: str) -> dict:
         return self._config[CONFIG_KEYS[kind]]
 
+    def names(self, kind: str) -> list[str]:
+        """Return every current name of the kind, which is what an effect setting may hold."""
+        return list(self._entries(kind))
+
     def _predefined(self, kind: str) -> set[str]:
         template = self._config_instance.load_template() or {}
         return {name.casefold() for name in template.get(CONFIG_KEYS[kind], {})}

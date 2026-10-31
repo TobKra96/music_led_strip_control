@@ -707,18 +707,7 @@
         "additionalProperties": false,
         "properties": {
           "bass_color": {
-            "enum": [
-              "black",
-              "blue",
-              "cyan",
-              "green",
-              "orange",
-              "pink",
-              "purple",
-              "red",
-              "white",
-              "yellow"
-            ],
+            "description": "Name of a colour, see `/api/v2/colors`.",
             "title": "Bass Color",
             "type": "string"
           },
@@ -751,18 +740,7 @@
             "title": "Blur"
           },
           "brilliance_color": {
-            "enum": [
-              "black",
-              "blue",
-              "cyan",
-              "green",
-              "orange",
-              "pink",
-              "purple",
-              "red",
-              "white",
-              "yellow"
-            ],
+            "description": "Name of a colour, see `/api/v2/colors`.",
             "title": "Brilliance Color",
             "type": "string"
           },
@@ -790,18 +768,7 @@
             "type": "integer"
           },
           "lowmid_color": {
-            "enum": [
-              "black",
-              "blue",
-              "cyan",
-              "green",
-              "orange",
-              "pink",
-              "purple",
-              "red",
-              "white",
-              "yellow"
-            ],
+            "description": "Name of a colour, see `/api/v2/colors`.",
             "title": "Lowmid Color",
             "type": "string"
           },
@@ -823,18 +790,7 @@
             "type": "integer"
           },
           "mid_color": {
-            "enum": [
-              "black",
-              "blue",
-              "cyan",
-              "green",
-              "orange",
-              "pink",
-              "purple",
-              "red",
-              "white",
-              "yellow"
-            ],
+            "description": "Name of a colour, see `/api/v2/colors`.",
             "title": "Mid Color",
             "type": "string"
           },
@@ -860,18 +816,7 @@
             "type": "boolean"
           },
           "presence_color": {
-            "enum": [
-              "black",
-              "blue",
-              "cyan",
-              "green",
-              "orange",
-              "pink",
-              "purple",
-              "red",
-              "white",
-              "yellow"
-            ],
+            "description": "Name of a colour, see `/api/v2/colors`.",
             "title": "Presence Color",
             "type": "string"
           },
@@ -893,18 +838,7 @@
             "type": "integer"
           },
           "subbass_color": {
-            "enum": [
-              "black",
-              "blue",
-              "cyan",
-              "green",
-              "orange",
-              "pink",
-              "purple",
-              "red",
-              "white",
-              "yellow"
-            ],
+            "description": "Name of a colour, see `/api/v2/colors`.",
             "title": "Subbass Color",
             "type": "string"
           },
@@ -926,18 +860,7 @@
             "type": "integer"
           },
           "uppermid_color": {
-            "enum": [
-              "black",
-              "blue",
-              "cyan",
-              "green",
-              "orange",
-              "pink",
-              "purple",
-              "red",
-              "white",
-              "yellow"
-            ],
+            "description": "Name of a colour, see `/api/v2/colors`.",
             "title": "Uppermid Color",
             "type": "string"
           },
@@ -966,21 +889,7 @@
         "additionalProperties": false,
         "properties": {
           "color_mode": {
-            "enum": [
-              "dancefloor",
-              "fruity",
-              "jamaica",
-              "jungle",
-              "jupiter",
-              "ocean",
-              "peach",
-              "pulse",
-              "rust",
-              "safari",
-              "spectral",
-              "sunny",
-              "sunset"
-            ],
+            "description": "Name of a gradient, see `/api/v2/gradients`.",
             "title": "Color Mode",
             "type": "string"
           },
@@ -1021,18 +930,7 @@
         "additionalProperties": false,
         "properties": {
           "color": {
-            "enum": [
-              "black",
-              "blue",
-              "cyan",
-              "green",
-              "orange",
-              "pink",
-              "purple",
-              "red",
-              "white",
-              "yellow"
-            ],
+            "description": "Name of a colour, see `/api/v2/colors`.",
             "title": "Color",
             "type": "string"
           },
@@ -1052,21 +950,7 @@
             "title": "Decay"
           },
           "gradient": {
-            "enum": [
-              "dancefloor",
-              "fruity",
-              "jamaica",
-              "jungle",
-              "jupiter",
-              "ocean",
-              "peach",
-              "pulse",
-              "rust",
-              "safari",
-              "spectral",
-              "sunny",
-              "sunset"
-            ],
+            "description": "Name of a gradient, see `/api/v2/gradients`.",
             "title": "Gradient",
             "type": "string"
           },
@@ -1088,18 +972,7 @@
             "type": "integer"
           },
           "color": {
-            "enum": [
-              "black",
-              "blue",
-              "cyan",
-              "green",
-              "orange",
-              "pink",
-              "purple",
-              "red",
-              "white",
-              "yellow"
-            ],
+            "description": "Name of a colour, see `/api/v2/colors`.",
             "title": "Color",
             "type": "string"
           },
@@ -1139,18 +1012,7 @@
         "additionalProperties": false,
         "properties": {
           "color": {
-            "enum": [
-              "black",
-              "blue",
-              "cyan",
-              "green",
-              "orange",
-              "pink",
-              "purple",
-              "red",
-              "white",
-              "yellow"
-            ],
+            "description": "Name of a colour, see `/api/v2/colors`.",
             "title": "Color",
             "type": "string"
           },
@@ -1170,21 +1032,7 @@
             "title": "Decay"
           },
           "gradient": {
-            "enum": [
-              "dancefloor",
-              "fruity",
-              "jamaica",
-              "jungle",
-              "jupiter",
-              "ocean",
-              "peach",
-              "pulse",
-              "rust",
-              "safari",
-              "spectral",
-              "sunny",
-              "sunset"
-            ],
+            "description": "Name of a gradient, see `/api/v2/gradients`.",
             "title": "Gradient",
             "type": "string"
           },
@@ -1217,37 +1065,12 @@
             "title": "Bar Count"
           },
           "color": {
-            "enum": [
-              "black",
-              "blue",
-              "cyan",
-              "green",
-              "orange",
-              "pink",
-              "purple",
-              "red",
-              "white",
-              "yellow"
-            ],
+            "description": "Name of a colour, see `/api/v2/colors`.",
             "title": "Color",
             "type": "string"
           },
           "gradient": {
-            "enum": [
-              "dancefloor",
-              "fruity",
-              "jamaica",
-              "jungle",
-              "jupiter",
-              "ocean",
-              "peach",
-              "pulse",
-              "rust",
-              "safari",
-              "spectral",
-              "sunny",
-              "sunset"
-            ],
+            "description": "Name of a gradient, see `/api/v2/gradients`.",
             "title": "Gradient",
             "type": "string"
           },
@@ -1349,21 +1172,7 @@
             "type": "integer"
           },
           "gradient": {
-            "enum": [
-              "dancefloor",
-              "fruity",
-              "jamaica",
-              "jungle",
-              "jupiter",
-              "ocean",
-              "peach",
-              "pulse",
-              "rust",
-              "safari",
-              "spectral",
-              "sunny",
-              "sunset"
-            ],
+            "description": "Name of a gradient, see `/api/v2/gradients`.",
             "title": "Gradient",
             "type": "string"
           },
@@ -1412,18 +1221,7 @@
             "type": "integer"
           },
           "color": {
-            "enum": [
-              "black",
-              "blue",
-              "cyan",
-              "green",
-              "orange",
-              "pink",
-              "purple",
-              "red",
-              "white",
-              "yellow"
-            ],
+            "description": "Name of a colour, see `/api/v2/colors`.",
             "title": "Color",
             "type": "string"
           },
@@ -1432,21 +1230,7 @@
             "type": "boolean"
           },
           "gradient": {
-            "enum": [
-              "dancefloor",
-              "fruity",
-              "jamaica",
-              "jungle",
-              "jupiter",
-              "ocean",
-              "peach",
-              "pulse",
-              "rust",
-              "safari",
-              "spectral",
-              "sunny",
-              "sunset"
-            ],
+            "description": "Name of a gradient, see `/api/v2/gradients`.",
             "title": "Gradient",
             "type": "string"
           },
@@ -1528,21 +1312,7 @@
         "additionalProperties": false,
         "properties": {
           "gradient": {
-            "enum": [
-              "dancefloor",
-              "fruity",
-              "jamaica",
-              "jungle",
-              "jupiter",
-              "ocean",
-              "peach",
-              "pulse",
-              "rust",
-              "safari",
-              "spectral",
-              "sunny",
-              "sunset"
-            ],
+            "description": "Name of a gradient, see `/api/v2/gradients`.",
             "title": "Gradient",
             "type": "string"
           },
@@ -1609,18 +1379,7 @@
             "title": "Firebase Flicker Speed"
           },
           "firebase_maincolor": {
-            "enum": [
-              "black",
-              "blue",
-              "cyan",
-              "green",
-              "orange",
-              "pink",
-              "purple",
-              "red",
-              "white",
-              "yellow"
-            ],
+            "description": "Name of a colour, see `/api/v2/colors`.",
             "title": "Firebase Maincolor",
             "type": "string"
           },
@@ -1674,18 +1433,7 @@
             "title": "Sparks Fly Speed"
           },
           "sparks_maincolor": {
-            "enum": [
-              "black",
-              "blue",
-              "cyan",
-              "green",
-              "orange",
-              "pink",
-              "purple",
-              "red",
-              "white",
-              "yellow"
-            ],
+            "description": "Name of a colour, see `/api/v2/colors`.",
             "title": "Sparks Maincolor",
             "type": "string"
           },
@@ -1729,21 +1477,7 @@
         "additionalProperties": false,
         "properties": {
           "gradient": {
-            "enum": [
-              "dancefloor",
-              "fruity",
-              "jamaica",
-              "jungle",
-              "jupiter",
-              "ocean",
-              "peach",
-              "pulse",
-              "rust",
-              "safari",
-              "spectral",
-              "sunny",
-              "sunset"
-            ],
+            "description": "Name of a gradient, see `/api/v2/gradients`.",
             "title": "Gradient",
             "type": "string"
           },
@@ -1778,37 +1512,12 @@
             "type": "boolean"
           },
           "color": {
-            "enum": [
-              "black",
-              "blue",
-              "cyan",
-              "green",
-              "orange",
-              "pink",
-              "purple",
-              "red",
-              "white",
-              "yellow"
-            ],
+            "description": "Name of a colour, see `/api/v2/colors`.",
             "title": "Color",
             "type": "string"
           },
           "gradient": {
-            "enum": [
-              "dancefloor",
-              "fruity",
-              "jamaica",
-              "jungle",
-              "jupiter",
-              "ocean",
-              "peach",
-              "pulse",
-              "rust",
-              "safari",
-              "spectral",
-              "sunny",
-              "sunset"
-            ],
+            "description": "Name of a gradient, see `/api/v2/gradients`.",
             "title": "Gradient",
             "type": "string"
           },
@@ -1837,21 +1546,7 @@
         "additionalProperties": false,
         "properties": {
           "color_mode": {
-            "enum": [
-              "dancefloor",
-              "fruity",
-              "jamaica",
-              "jungle",
-              "jupiter",
-              "ocean",
-              "peach",
-              "pulse",
-              "rust",
-              "safari",
-              "spectral",
-              "sunny",
-              "sunset"
-            ],
+            "description": "Name of a gradient, see `/api/v2/gradients`.",
             "title": "Color Mode",
             "type": "string"
           },
@@ -1864,18 +1559,7 @@
             "type": "boolean"
           },
           "s_color": {
-            "enum": [
-              "black",
-              "blue",
-              "cyan",
-              "green",
-              "orange",
-              "pink",
-              "purple",
-              "red",
-              "white",
-              "yellow"
-            ],
+            "description": "Name of a colour, see `/api/v2/colors`.",
             "title": "S Color",
             "type": "string"
           },
@@ -2018,37 +1702,12 @@
             "type": "boolean"
           },
           "color": {
-            "enum": [
-              "black",
-              "blue",
-              "cyan",
-              "green",
-              "orange",
-              "pink",
-              "purple",
-              "red",
-              "white",
-              "yellow"
-            ],
+            "description": "Name of a colour, see `/api/v2/colors`.",
             "title": "Color",
             "type": "string"
           },
           "gradient": {
-            "enum": [
-              "dancefloor",
-              "fruity",
-              "jamaica",
-              "jungle",
-              "jupiter",
-              "ocean",
-              "peach",
-              "pulse",
-              "rust",
-              "safari",
-              "spectral",
-              "sunny",
-              "sunset"
-            ],
+            "description": "Name of a gradient, see `/api/v2/gradients`.",
             "title": "Gradient",
             "type": "string"
           },
@@ -2108,18 +1767,7 @@
             "type": "integer"
           },
           "high_color": {
-            "enum": [
-              "black",
-              "blue",
-              "cyan",
-              "green",
-              "orange",
-              "pink",
-              "purple",
-              "red",
-              "white",
-              "yellow"
-            ],
+            "description": "Name of a colour, see `/api/v2/colors`.",
             "title": "High Color",
             "type": "string"
           },
@@ -2147,18 +1795,7 @@
             "type": "integer"
           },
           "lows_color": {
-            "enum": [
-              "black",
-              "blue",
-              "cyan",
-              "green",
-              "orange",
-              "pink",
-              "purple",
-              "red",
-              "white",
-              "yellow"
-            ],
+            "description": "Name of a colour, see `/api/v2/colors`.",
             "title": "Lows Color",
             "type": "string"
           },
@@ -2180,18 +1817,7 @@
             "type": "integer"
           },
           "mids_color": {
-            "enum": [
-              "black",
-              "blue",
-              "cyan",
-              "green",
-              "orange",
-              "pink",
-              "purple",
-              "red",
-              "white",
-              "yellow"
-            ],
+            "description": "Name of a colour, see `/api/v2/colors`.",
             "title": "Mids Color",
             "type": "string"
           },
@@ -2218,18 +1844,7 @@
         "additionalProperties": false,
         "properties": {
           "segment_01_color": {
-            "enum": [
-              "black",
-              "blue",
-              "cyan",
-              "green",
-              "orange",
-              "pink",
-              "purple",
-              "red",
-              "white",
-              "yellow"
-            ],
+            "description": "Name of a colour, see `/api/v2/colors`.",
             "title": "Segment 01 Color",
             "type": "string"
           },
@@ -2244,18 +1859,7 @@
             "type": "integer"
           },
           "segment_02_color": {
-            "enum": [
-              "black",
-              "blue",
-              "cyan",
-              "green",
-              "orange",
-              "pink",
-              "purple",
-              "red",
-              "white",
-              "yellow"
-            ],
+            "description": "Name of a colour, see `/api/v2/colors`.",
             "title": "Segment 02 Color",
             "type": "string"
           },
@@ -2270,18 +1874,7 @@
             "type": "integer"
           },
           "segment_03_color": {
-            "enum": [
-              "black",
-              "blue",
-              "cyan",
-              "green",
-              "orange",
-              "pink",
-              "purple",
-              "red",
-              "white",
-              "yellow"
-            ],
+            "description": "Name of a colour, see `/api/v2/colors`.",
             "title": "Segment 03 Color",
             "type": "string"
           },
@@ -2296,18 +1889,7 @@
             "type": "integer"
           },
           "segment_04_color": {
-            "enum": [
-              "black",
-              "blue",
-              "cyan",
-              "green",
-              "orange",
-              "pink",
-              "purple",
-              "red",
-              "white",
-              "yellow"
-            ],
+            "description": "Name of a colour, see `/api/v2/colors`.",
             "title": "Segment 04 Color",
             "type": "string"
           },
@@ -2322,18 +1904,7 @@
             "type": "integer"
           },
           "segment_05_color": {
-            "enum": [
-              "black",
-              "blue",
-              "cyan",
-              "green",
-              "orange",
-              "pink",
-              "purple",
-              "red",
-              "white",
-              "yellow"
-            ],
+            "description": "Name of a colour, see `/api/v2/colors`.",
             "title": "Segment 05 Color",
             "type": "string"
           },
@@ -2348,18 +1919,7 @@
             "type": "integer"
           },
           "segment_06_color": {
-            "enum": [
-              "black",
-              "blue",
-              "cyan",
-              "green",
-              "orange",
-              "pink",
-              "purple",
-              "red",
-              "white",
-              "yellow"
-            ],
+            "description": "Name of a colour, see `/api/v2/colors`.",
             "title": "Segment 06 Color",
             "type": "string"
           },
@@ -2374,18 +1934,7 @@
             "type": "integer"
           },
           "segment_07_color": {
-            "enum": [
-              "black",
-              "blue",
-              "cyan",
-              "green",
-              "orange",
-              "pink",
-              "purple",
-              "red",
-              "white",
-              "yellow"
-            ],
+            "description": "Name of a colour, see `/api/v2/colors`.",
             "title": "Segment 07 Color",
             "type": "string"
           },
@@ -2400,18 +1949,7 @@
             "type": "integer"
           },
           "segment_08_color": {
-            "enum": [
-              "black",
-              "blue",
-              "cyan",
-              "green",
-              "orange",
-              "pink",
-              "purple",
-              "red",
-              "white",
-              "yellow"
-            ],
+            "description": "Name of a colour, see `/api/v2/colors`.",
             "title": "Segment 08 Color",
             "type": "string"
           },
@@ -2426,18 +1964,7 @@
             "type": "integer"
           },
           "segment_09_color": {
-            "enum": [
-              "black",
-              "blue",
-              "cyan",
-              "green",
-              "orange",
-              "pink",
-              "purple",
-              "red",
-              "white",
-              "yellow"
-            ],
+            "description": "Name of a colour, see `/api/v2/colors`.",
             "title": "Segment 09 Color",
             "type": "string"
           },
@@ -2452,18 +1979,7 @@
             "type": "integer"
           },
           "segment_10_color": {
-            "enum": [
-              "black",
-              "blue",
-              "cyan",
-              "green",
-              "orange",
-              "pink",
-              "purple",
-              "red",
-              "white",
-              "yellow"
-            ],
+            "description": "Name of a colour, see `/api/v2/colors`.",
             "title": "Segment 10 Color",
             "type": "string"
           },
@@ -2485,18 +2001,7 @@
         "additionalProperties": false,
         "properties": {
           "color": {
-            "enum": [
-              "black",
-              "blue",
-              "cyan",
-              "green",
-              "orange",
-              "pink",
-              "purple",
-              "red",
-              "white",
-              "yellow"
-            ],
+            "description": "Name of a colour, see `/api/v2/colors`.",
             "title": "Color",
             "type": "string"
           },
@@ -2529,21 +2034,7 @@
         "additionalProperties": false,
         "properties": {
           "gradient": {
-            "enum": [
-              "dancefloor",
-              "fruity",
-              "jamaica",
-              "jungle",
-              "jupiter",
-              "ocean",
-              "peach",
-              "pulse",
-              "rust",
-              "safari",
-              "spectral",
-              "sunny",
-              "sunset"
-            ],
+            "description": "Name of a gradient, see `/api/v2/gradients`.",
             "title": "Gradient",
             "type": "string"
           },
@@ -2574,18 +2065,7 @@
         "additionalProperties": false,
         "properties": {
           "color": {
-            "enum": [
-              "black",
-              "blue",
-              "cyan",
-              "green",
-              "orange",
-              "pink",
-              "purple",
-              "red",
-              "white",
-              "yellow"
-            ],
+            "description": "Name of a colour, see `/api/v2/colors`.",
             "title": "Color",
             "type": "string"
           },
@@ -2603,18 +2083,7 @@
         "additionalProperties": false,
         "properties": {
           "color": {
-            "enum": [
-              "black",
-              "blue",
-              "cyan",
-              "green",
-              "orange",
-              "pink",
-              "purple",
-              "red",
-              "white",
-              "yellow"
-            ],
+            "description": "Name of a colour, see `/api/v2/colors`.",
             "title": "Color",
             "type": "string"
           },
@@ -2653,21 +2122,7 @@
         "additionalProperties": false,
         "properties": {
           "gradient": {
-            "enum": [
-              "dancefloor",
-              "fruity",
-              "jamaica",
-              "jungle",
-              "jupiter",
-              "ocean",
-              "peach",
-              "pulse",
-              "rust",
-              "safari",
-              "spectral",
-              "sunny",
-              "sunset"
-            ],
+            "description": "Name of a gradient, see `/api/v2/gradients`.",
             "title": "Gradient",
             "type": "string"
           },
@@ -2705,21 +2160,7 @@
             "title": "Blur"
           },
           "gradient": {
-            "enum": [
-              "dancefloor",
-              "fruity",
-              "jamaica",
-              "jungle",
-              "jupiter",
-              "ocean",
-              "peach",
-              "pulse",
-              "rust",
-              "safari",
-              "spectral",
-              "sunny",
-              "sunset"
-            ],
+            "description": "Name of a gradient, see `/api/v2/gradients`.",
             "title": "Gradient",
             "type": "string"
           },
@@ -2767,53 +2208,17 @@
             "type": "integer"
           },
           "color": {
-            "enum": [
-              "black",
-              "blue",
-              "cyan",
-              "green",
-              "orange",
-              "pink",
-              "purple",
-              "red",
-              "white",
-              "yellow"
-            ],
+            "description": "Name of a colour, see `/api/v2/colors`.",
             "title": "Color",
             "type": "string"
           },
           "gradient": {
-            "enum": [
-              "dancefloor",
-              "fruity",
-              "jamaica",
-              "jungle",
-              "jupiter",
-              "ocean",
-              "peach",
-              "pulse",
-              "rust",
-              "safari",
-              "spectral",
-              "sunny",
-              "sunset"
-            ],
+            "description": "Name of a gradient, see `/api/v2/gradients`.",
             "title": "Gradient",
             "type": "string"
           },
           "max_vol_color": {
-            "enum": [
-              "black",
-              "blue",
-              "cyan",
-              "green",
-              "orange",
-              "pink",
-              "purple",
-              "red",
-              "white",
-              "yellow"
-            ],
+            "description": "Name of a colour, see `/api/v2/colors`.",
             "title": "Max Vol Color",
             "type": "string"
           },
@@ -2835,34 +2240,12 @@
         "additionalProperties": false,
         "properties": {
           "color_flash": {
-            "enum": [
-              "black",
-              "blue",
-              "cyan",
-              "green",
-              "orange",
-              "pink",
-              "purple",
-              "red",
-              "white",
-              "yellow"
-            ],
+            "description": "Name of a colour, see `/api/v2/colors`.",
             "title": "Color Flash",
             "type": "string"
           },
           "color_wave": {
-            "enum": [
-              "black",
-              "blue",
-              "cyan",
-              "green",
-              "orange",
-              "pink",
-              "purple",
-              "red",
-              "white",
-              "yellow"
-            ],
+            "description": "Name of a colour, see `/api/v2/colors`.",
             "title": "Color Wave",
             "type": "string"
           },
@@ -2913,21 +2296,7 @@
             "title": "Blur"
           },
           "color_mode": {
-            "enum": [
-              "dancefloor",
-              "fruity",
-              "jamaica",
-              "jungle",
-              "jupiter",
-              "ocean",
-              "peach",
-              "pulse",
-              "rust",
-              "safari",
-              "spectral",
-              "sunny",
-              "sunset"
-            ],
+            "description": "Name of a gradient, see `/api/v2/gradients`.",
             "title": "Color Mode",
             "type": "string"
           },
@@ -2972,34 +2341,12 @@
             "type": "integer"
           },
           "beat_color": {
-            "enum": [
-              "black",
-              "blue",
-              "cyan",
-              "green",
-              "orange",
-              "pink",
-              "purple",
-              "red",
-              "white",
-              "yellow"
-            ],
+            "description": "Name of a colour, see `/api/v2/colors`.",
             "title": "Beat Color",
             "type": "string"
           },
           "color": {
-            "enum": [
-              "black",
-              "blue",
-              "cyan",
-              "green",
-              "orange",
-              "pink",
-              "purple",
-              "red",
-              "white",
-              "yellow"
-            ],
+            "description": "Name of a colour, see `/api/v2/colors`.",
             "title": "Color",
             "type": "string"
           },
@@ -3266,18 +2613,7 @@
         "additionalProperties": false,
         "properties": {
           "bass_color": {
-            "enum": [
-              "black",
-              "blue",
-              "cyan",
-              "green",
-              "orange",
-              "pink",
-              "purple",
-              "red",
-              "white",
-              "yellow"
-            ],
+            "description": "Name of a colour, see `/api/v2/colors`.",
             "title": "Bass Color",
             "type": "string"
           },
@@ -3310,18 +2646,7 @@
             "title": "Blur"
           },
           "brilliance_color": {
-            "enum": [
-              "black",
-              "blue",
-              "cyan",
-              "green",
-              "orange",
-              "pink",
-              "purple",
-              "red",
-              "white",
-              "yellow"
-            ],
+            "description": "Name of a colour, see `/api/v2/colors`.",
             "title": "Brilliance Color",
             "type": "string"
           },
@@ -3349,18 +2674,7 @@
             "type": "integer"
           },
           "lowmid_color": {
-            "enum": [
-              "black",
-              "blue",
-              "cyan",
-              "green",
-              "orange",
-              "pink",
-              "purple",
-              "red",
-              "white",
-              "yellow"
-            ],
+            "description": "Name of a colour, see `/api/v2/colors`.",
             "title": "Lowmid Color",
             "type": "string"
           },
@@ -3382,18 +2696,7 @@
             "type": "integer"
           },
           "mid_color": {
-            "enum": [
-              "black",
-              "blue",
-              "cyan",
-              "green",
-              "orange",
-              "pink",
-              "purple",
-              "red",
-              "white",
-              "yellow"
-            ],
+            "description": "Name of a colour, see `/api/v2/colors`.",
             "title": "Mid Color",
             "type": "string"
           },
@@ -3419,18 +2722,7 @@
             "type": "boolean"
           },
           "presence_color": {
-            "enum": [
-              "black",
-              "blue",
-              "cyan",
-              "green",
-              "orange",
-              "pink",
-              "purple",
-              "red",
-              "white",
-              "yellow"
-            ],
+            "description": "Name of a colour, see `/api/v2/colors`.",
             "title": "Presence Color",
             "type": "string"
           },
@@ -3452,18 +2744,7 @@
             "type": "integer"
           },
           "subbass_color": {
-            "enum": [
-              "black",
-              "blue",
-              "cyan",
-              "green",
-              "orange",
-              "pink",
-              "purple",
-              "red",
-              "white",
-              "yellow"
-            ],
+            "description": "Name of a colour, see `/api/v2/colors`.",
             "title": "Subbass Color",
             "type": "string"
           },
@@ -3485,18 +2766,7 @@
             "type": "integer"
           },
           "uppermid_color": {
-            "enum": [
-              "black",
-              "blue",
-              "cyan",
-              "green",
-              "orange",
-              "pink",
-              "purple",
-              "red",
-              "white",
-              "yellow"
-            ],
+            "description": "Name of a colour, see `/api/v2/colors`.",
             "title": "Uppermid Color",
             "type": "string"
           },
@@ -3525,21 +2795,7 @@
         "additionalProperties": false,
         "properties": {
           "color_mode": {
-            "enum": [
-              "dancefloor",
-              "fruity",
-              "jamaica",
-              "jungle",
-              "jupiter",
-              "ocean",
-              "peach",
-              "pulse",
-              "rust",
-              "safari",
-              "spectral",
-              "sunny",
-              "sunset"
-            ],
+            "description": "Name of a gradient, see `/api/v2/gradients`.",
             "title": "Color Mode",
             "type": "string"
           },
@@ -3580,18 +2836,7 @@
         "additionalProperties": false,
         "properties": {
           "color": {
-            "enum": [
-              "black",
-              "blue",
-              "cyan",
-              "green",
-              "orange",
-              "pink",
-              "purple",
-              "red",
-              "white",
-              "yellow"
-            ],
+            "description": "Name of a colour, see `/api/v2/colors`.",
             "title": "Color",
             "type": "string"
           },
@@ -3611,21 +2856,7 @@
             "title": "Decay"
           },
           "gradient": {
-            "enum": [
-              "dancefloor",
-              "fruity",
-              "jamaica",
-              "jungle",
-              "jupiter",
-              "ocean",
-              "peach",
-              "pulse",
-              "rust",
-              "safari",
-              "spectral",
-              "sunny",
-              "sunset"
-            ],
+            "description": "Name of a gradient, see `/api/v2/gradients`.",
             "title": "Gradient",
             "type": "string"
           },
@@ -3647,18 +2878,7 @@
             "type": "integer"
           },
           "color": {
-            "enum": [
-              "black",
-              "blue",
-              "cyan",
-              "green",
-              "orange",
-              "pink",
-              "purple",
-              "red",
-              "white",
-              "yellow"
-            ],
+            "description": "Name of a colour, see `/api/v2/colors`.",
             "title": "Color",
             "type": "string"
           },
@@ -3698,18 +2918,7 @@
         "additionalProperties": false,
         "properties": {
           "color": {
-            "enum": [
-              "black",
-              "blue",
-              "cyan",
-              "green",
-              "orange",
-              "pink",
-              "purple",
-              "red",
-              "white",
-              "yellow"
-            ],
+            "description": "Name of a colour, see `/api/v2/colors`.",
             "title": "Color",
             "type": "string"
           },
@@ -3729,21 +2938,7 @@
             "title": "Decay"
           },
           "gradient": {
-            "enum": [
-              "dancefloor",
-              "fruity",
-              "jamaica",
-              "jungle",
-              "jupiter",
-              "ocean",
-              "peach",
-              "pulse",
-              "rust",
-              "safari",
-              "spectral",
-              "sunny",
-              "sunset"
-            ],
+            "description": "Name of a gradient, see `/api/v2/gradients`.",
             "title": "Gradient",
             "type": "string"
           },
@@ -3790,37 +2985,12 @@
             "title": "Bar Count"
           },
           "color": {
-            "enum": [
-              "black",
-              "blue",
-              "cyan",
-              "green",
-              "orange",
-              "pink",
-              "purple",
-              "red",
-              "white",
-              "yellow"
-            ],
+            "description": "Name of a colour, see `/api/v2/colors`.",
             "title": "Color",
             "type": "string"
           },
           "gradient": {
-            "enum": [
-              "dancefloor",
-              "fruity",
-              "jamaica",
-              "jungle",
-              "jupiter",
-              "ocean",
-              "peach",
-              "pulse",
-              "rust",
-              "safari",
-              "spectral",
-              "sunny",
-              "sunset"
-            ],
+            "description": "Name of a gradient, see `/api/v2/gradients`.",
             "title": "Gradient",
             "type": "string"
           },
@@ -3922,21 +3092,7 @@
             "type": "integer"
           },
           "gradient": {
-            "enum": [
-              "dancefloor",
-              "fruity",
-              "jamaica",
-              "jungle",
-              "jupiter",
-              "ocean",
-              "peach",
-              "pulse",
-              "rust",
-              "safari",
-              "spectral",
-              "sunny",
-              "sunset"
-            ],
+            "description": "Name of a gradient, see `/api/v2/gradients`.",
             "title": "Gradient",
             "type": "string"
           },
@@ -3985,18 +3141,7 @@
             "type": "integer"
           },
           "color": {
-            "enum": [
-              "black",
-              "blue",
-              "cyan",
-              "green",
-              "orange",
-              "pink",
-              "purple",
-              "red",
-              "white",
-              "yellow"
-            ],
+            "description": "Name of a colour, see `/api/v2/colors`.",
             "title": "Color",
             "type": "string"
           },
@@ -4005,21 +3150,7 @@
             "type": "boolean"
           },
           "gradient": {
-            "enum": [
-              "dancefloor",
-              "fruity",
-              "jamaica",
-              "jungle",
-              "jupiter",
-              "ocean",
-              "peach",
-              "pulse",
-              "rust",
-              "safari",
-              "spectral",
-              "sunny",
-              "sunset"
-            ],
+            "description": "Name of a gradient, see `/api/v2/gradients`.",
             "title": "Gradient",
             "type": "string"
           },
@@ -4101,21 +3232,7 @@
         "additionalProperties": false,
         "properties": {
           "gradient": {
-            "enum": [
-              "dancefloor",
-              "fruity",
-              "jamaica",
-              "jungle",
-              "jupiter",
-              "ocean",
-              "peach",
-              "pulse",
-              "rust",
-              "safari",
-              "spectral",
-              "sunny",
-              "sunset"
-            ],
+            "description": "Name of a gradient, see `/api/v2/gradients`.",
             "title": "Gradient",
             "type": "string"
           },
@@ -4182,18 +3299,7 @@
             "title": "Firebase Flicker Speed"
           },
           "firebase_maincolor": {
-            "enum": [
-              "black",
-              "blue",
-              "cyan",
-              "green",
-              "orange",
-              "pink",
-              "purple",
-              "red",
-              "white",
-              "yellow"
-            ],
+            "description": "Name of a colour, see `/api/v2/colors`.",
             "title": "Firebase Maincolor",
             "type": "string"
           },
@@ -4247,18 +3353,7 @@
             "title": "Sparks Fly Speed"
           },
           "sparks_maincolor": {
-            "enum": [
-              "black",
-              "blue",
-              "cyan",
-              "green",
-              "orange",
-              "pink",
-              "purple",
-              "red",
-              "white",
-              "yellow"
-            ],
+            "description": "Name of a colour, see `/api/v2/colors`.",
             "title": "Sparks Maincolor",
             "type": "string"
           },
@@ -4302,21 +3397,7 @@
         "additionalProperties": false,
         "properties": {
           "gradient": {
-            "enum": [
-              "dancefloor",
-              "fruity",
-              "jamaica",
-              "jungle",
-              "jupiter",
-              "ocean",
-              "peach",
-              "pulse",
-              "rust",
-              "safari",
-              "spectral",
-              "sunny",
-              "sunset"
-            ],
+            "description": "Name of a gradient, see `/api/v2/gradients`.",
             "title": "Gradient",
             "type": "string"
           },
@@ -4351,37 +3432,12 @@
             "type": "boolean"
           },
           "color": {
-            "enum": [
-              "black",
-              "blue",
-              "cyan",
-              "green",
-              "orange",
-              "pink",
-              "purple",
-              "red",
-              "white",
-              "yellow"
-            ],
+            "description": "Name of a colour, see `/api/v2/colors`.",
             "title": "Color",
             "type": "string"
           },
           "gradient": {
-            "enum": [
-              "dancefloor",
-              "fruity",
-              "jamaica",
-              "jungle",
-              "jupiter",
-              "ocean",
-              "peach",
-              "pulse",
-              "rust",
-              "safari",
-              "spectral",
-              "sunny",
-              "sunset"
-            ],
+            "description": "Name of a gradient, see `/api/v2/gradients`.",
             "title": "Gradient",
             "type": "string"
           },
@@ -4410,21 +3466,7 @@
         "additionalProperties": false,
         "properties": {
           "color_mode": {
-            "enum": [
-              "dancefloor",
-              "fruity",
-              "jamaica",
-              "jungle",
-              "jupiter",
-              "ocean",
-              "peach",
-              "pulse",
-              "rust",
-              "safari",
-              "spectral",
-              "sunny",
-              "sunset"
-            ],
+            "description": "Name of a gradient, see `/api/v2/gradients`.",
             "title": "Color Mode",
             "type": "string"
           },
@@ -4437,18 +3479,7 @@
             "type": "boolean"
           },
           "s_color": {
-            "enum": [
-              "black",
-              "blue",
-              "cyan",
-              "green",
-              "orange",
-              "pink",
-              "purple",
-              "red",
-              "white",
-              "yellow"
-            ],
+            "description": "Name of a colour, see `/api/v2/colors`.",
             "title": "S Color",
             "type": "string"
           },
@@ -4591,37 +3622,12 @@
             "type": "boolean"
           },
           "color": {
-            "enum": [
-              "black",
-              "blue",
-              "cyan",
-              "green",
-              "orange",
-              "pink",
-              "purple",
-              "red",
-              "white",
-              "yellow"
-            ],
+            "description": "Name of a colour, see `/api/v2/colors`.",
             "title": "Color",
             "type": "string"
           },
           "gradient": {
-            "enum": [
-              "dancefloor",
-              "fruity",
-              "jamaica",
-              "jungle",
-              "jupiter",
-              "ocean",
-              "peach",
-              "pulse",
-              "rust",
-              "safari",
-              "spectral",
-              "sunny",
-              "sunset"
-            ],
+            "description": "Name of a gradient, see `/api/v2/gradients`.",
             "title": "Gradient",
             "type": "string"
           },
@@ -4681,18 +3687,7 @@
             "type": "integer"
           },
           "high_color": {
-            "enum": [
-              "black",
-              "blue",
-              "cyan",
-              "green",
-              "orange",
-              "pink",
-              "purple",
-              "red",
-              "white",
-              "yellow"
-            ],
+            "description": "Name of a colour, see `/api/v2/colors`.",
             "title": "High Color",
             "type": "string"
           },
@@ -4720,18 +3715,7 @@
             "type": "integer"
           },
           "lows_color": {
-            "enum": [
-              "black",
-              "blue",
-              "cyan",
-              "green",
-              "orange",
-              "pink",
-              "purple",
-              "red",
-              "white",
-              "yellow"
-            ],
+            "description": "Name of a colour, see `/api/v2/colors`.",
             "title": "Lows Color",
             "type": "string"
           },
@@ -4753,18 +3737,7 @@
             "type": "integer"
           },
           "mids_color": {
-            "enum": [
-              "black",
-              "blue",
-              "cyan",
-              "green",
-              "orange",
-              "pink",
-              "purple",
-              "red",
-              "white",
-              "yellow"
-            ],
+            "description": "Name of a colour, see `/api/v2/colors`.",
             "title": "Mids Color",
             "type": "string"
           },
@@ -4791,18 +3764,7 @@
         "additionalProperties": false,
         "properties": {
           "segment_01_color": {
-            "enum": [
-              "black",
-              "blue",
-              "cyan",
-              "green",
-              "orange",
-              "pink",
-              "purple",
-              "red",
-              "white",
-              "yellow"
-            ],
+            "description": "Name of a colour, see `/api/v2/colors`.",
             "title": "Segment 01 Color",
             "type": "string"
           },
@@ -4817,18 +3779,7 @@
             "type": "integer"
           },
           "segment_02_color": {
-            "enum": [
-              "black",
-              "blue",
-              "cyan",
-              "green",
-              "orange",
-              "pink",
-              "purple",
-              "red",
-              "white",
-              "yellow"
-            ],
+            "description": "Name of a colour, see `/api/v2/colors`.",
             "title": "Segment 02 Color",
             "type": "string"
           },
@@ -4843,18 +3794,7 @@
             "type": "integer"
           },
           "segment_03_color": {
-            "enum": [
-              "black",
-              "blue",
-              "cyan",
-              "green",
-              "orange",
-              "pink",
-              "purple",
-              "red",
-              "white",
-              "yellow"
-            ],
+            "description": "Name of a colour, see `/api/v2/colors`.",
             "title": "Segment 03 Color",
             "type": "string"
           },
@@ -4869,18 +3809,7 @@
             "type": "integer"
           },
           "segment_04_color": {
-            "enum": [
-              "black",
-              "blue",
-              "cyan",
-              "green",
-              "orange",
-              "pink",
-              "purple",
-              "red",
-              "white",
-              "yellow"
-            ],
+            "description": "Name of a colour, see `/api/v2/colors`.",
             "title": "Segment 04 Color",
             "type": "string"
           },
@@ -4895,18 +3824,7 @@
             "type": "integer"
           },
           "segment_05_color": {
-            "enum": [
-              "black",
-              "blue",
-              "cyan",
-              "green",
-              "orange",
-              "pink",
-              "purple",
-              "red",
-              "white",
-              "yellow"
-            ],
+            "description": "Name of a colour, see `/api/v2/colors`.",
             "title": "Segment 05 Color",
             "type": "string"
           },
@@ -4921,18 +3839,7 @@
             "type": "integer"
           },
           "segment_06_color": {
-            "enum": [
-              "black",
-              "blue",
-              "cyan",
-              "green",
-              "orange",
-              "pink",
-              "purple",
-              "red",
-              "white",
-              "yellow"
-            ],
+            "description": "Name of a colour, see `/api/v2/colors`.",
             "title": "Segment 06 Color",
             "type": "string"
           },
@@ -4947,18 +3854,7 @@
             "type": "integer"
           },
           "segment_07_color": {
-            "enum": [
-              "black",
-              "blue",
-              "cyan",
-              "green",
-              "orange",
-              "pink",
-              "purple",
-              "red",
-              "white",
-              "yellow"
-            ],
+            "description": "Name of a colour, see `/api/v2/colors`.",
             "title": "Segment 07 Color",
             "type": "string"
           },
@@ -4973,18 +3869,7 @@
             "type": "integer"
           },
           "segment_08_color": {
-            "enum": [
-              "black",
-              "blue",
-              "cyan",
-              "green",
-              "orange",
-              "pink",
-              "purple",
-              "red",
-              "white",
-              "yellow"
-            ],
+            "description": "Name of a colour, see `/api/v2/colors`.",
             "title": "Segment 08 Color",
             "type": "string"
           },
@@ -4999,18 +3884,7 @@
             "type": "integer"
           },
           "segment_09_color": {
-            "enum": [
-              "black",
-              "blue",
-              "cyan",
-              "green",
-              "orange",
-              "pink",
-              "purple",
-              "red",
-              "white",
-              "yellow"
-            ],
+            "description": "Name of a colour, see `/api/v2/colors`.",
             "title": "Segment 09 Color",
             "type": "string"
           },
@@ -5025,18 +3899,7 @@
             "type": "integer"
           },
           "segment_10_color": {
-            "enum": [
-              "black",
-              "blue",
-              "cyan",
-              "green",
-              "orange",
-              "pink",
-              "purple",
-              "red",
-              "white",
-              "yellow"
-            ],
+            "description": "Name of a colour, see `/api/v2/colors`.",
             "title": "Segment 10 Color",
             "type": "string"
           },
@@ -5058,18 +3921,7 @@
         "additionalProperties": false,
         "properties": {
           "color": {
-            "enum": [
-              "black",
-              "blue",
-              "cyan",
-              "green",
-              "orange",
-              "pink",
-              "purple",
-              "red",
-              "white",
-              "yellow"
-            ],
+            "description": "Name of a colour, see `/api/v2/colors`.",
             "title": "Color",
             "type": "string"
           },
@@ -5102,21 +3954,7 @@
         "additionalProperties": false,
         "properties": {
           "gradient": {
-            "enum": [
-              "dancefloor",
-              "fruity",
-              "jamaica",
-              "jungle",
-              "jupiter",
-              "ocean",
-              "peach",
-              "pulse",
-              "rust",
-              "safari",
-              "spectral",
-              "sunny",
-              "sunset"
-            ],
+            "description": "Name of a gradient, see `/api/v2/gradients`.",
             "title": "Gradient",
             "type": "string"
           },
@@ -5147,18 +3985,7 @@
         "additionalProperties": false,
         "properties": {
           "color": {
-            "enum": [
-              "black",
-              "blue",
-              "cyan",
-              "green",
-              "orange",
-              "pink",
-              "purple",
-              "red",
-              "white",
-              "yellow"
-            ],
+            "description": "Name of a colour, see `/api/v2/colors`.",
             "title": "Color",
             "type": "string"
           },
@@ -5176,18 +4003,7 @@
         "additionalProperties": false,
         "properties": {
           "color": {
-            "enum": [
-              "black",
-              "blue",
-              "cyan",
-              "green",
-              "orange",
-              "pink",
-              "purple",
-              "red",
-              "white",
-              "yellow"
-            ],
+            "description": "Name of a colour, see `/api/v2/colors`.",
             "title": "Color",
             "type": "string"
           },
@@ -5226,21 +4042,7 @@
         "additionalProperties": false,
         "properties": {
           "gradient": {
-            "enum": [
-              "dancefloor",
-              "fruity",
-              "jamaica",
-              "jungle",
-              "jupiter",
-              "ocean",
-              "peach",
-              "pulse",
-              "rust",
-              "safari",
-              "spectral",
-              "sunny",
-              "sunset"
-            ],
+            "description": "Name of a gradient, see `/api/v2/gradients`.",
             "title": "Gradient",
             "type": "string"
           },
@@ -5278,21 +4080,7 @@
             "title": "Blur"
           },
           "gradient": {
-            "enum": [
-              "dancefloor",
-              "fruity",
-              "jamaica",
-              "jungle",
-              "jupiter",
-              "ocean",
-              "peach",
-              "pulse",
-              "rust",
-              "safari",
-              "spectral",
-              "sunny",
-              "sunset"
-            ],
+            "description": "Name of a gradient, see `/api/v2/gradients`.",
             "title": "Gradient",
             "type": "string"
           },
@@ -5340,53 +4128,17 @@
             "type": "integer"
           },
           "color": {
-            "enum": [
-              "black",
-              "blue",
-              "cyan",
-              "green",
-              "orange",
-              "pink",
-              "purple",
-              "red",
-              "white",
-              "yellow"
-            ],
+            "description": "Name of a colour, see `/api/v2/colors`.",
             "title": "Color",
             "type": "string"
           },
           "gradient": {
-            "enum": [
-              "dancefloor",
-              "fruity",
-              "jamaica",
-              "jungle",
-              "jupiter",
-              "ocean",
-              "peach",
-              "pulse",
-              "rust",
-              "safari",
-              "spectral",
-              "sunny",
-              "sunset"
-            ],
+            "description": "Name of a gradient, see `/api/v2/gradients`.",
             "title": "Gradient",
             "type": "string"
           },
           "max_vol_color": {
-            "enum": [
-              "black",
-              "blue",
-              "cyan",
-              "green",
-              "orange",
-              "pink",
-              "purple",
-              "red",
-              "white",
-              "yellow"
-            ],
+            "description": "Name of a colour, see `/api/v2/colors`.",
             "title": "Max Vol Color",
             "type": "string"
           },
@@ -5408,34 +4160,12 @@
         "additionalProperties": false,
         "properties": {
           "color_flash": {
-            "enum": [
-              "black",
-              "blue",
-              "cyan",
-              "green",
-              "orange",
-              "pink",
-              "purple",
-              "red",
-              "white",
-              "yellow"
-            ],
+            "description": "Name of a colour, see `/api/v2/colors`.",
             "title": "Color Flash",
             "type": "string"
           },
           "color_wave": {
-            "enum": [
-              "black",
-              "blue",
-              "cyan",
-              "green",
-              "orange",
-              "pink",
-              "purple",
-              "red",
-              "white",
-              "yellow"
-            ],
+            "description": "Name of a colour, see `/api/v2/colors`.",
             "title": "Color Wave",
             "type": "string"
           },
@@ -5486,21 +4216,7 @@
             "title": "Blur"
           },
           "color_mode": {
-            "enum": [
-              "dancefloor",
-              "fruity",
-              "jamaica",
-              "jungle",
-              "jupiter",
-              "ocean",
-              "peach",
-              "pulse",
-              "rust",
-              "safari",
-              "spectral",
-              "sunny",
-              "sunset"
-            ],
+            "description": "Name of a gradient, see `/api/v2/gradients`.",
             "title": "Color Mode",
             "type": "string"
           },
@@ -5545,34 +4261,12 @@
             "type": "integer"
           },
           "beat_color": {
-            "enum": [
-              "black",
-              "blue",
-              "cyan",
-              "green",
-              "orange",
-              "pink",
-              "purple",
-              "red",
-              "white",
-              "yellow"
-            ],
+            "description": "Name of a colour, see `/api/v2/colors`.",
             "title": "Beat Color",
             "type": "string"
           },
           "color": {
-            "enum": [
-              "black",
-              "blue",
-              "cyan",
-              "green",
-              "orange",
-              "pink",
-              "purple",
-              "red",
-              "white",
-              "yellow"
-            ],
+            "description": "Name of a colour, see `/api/v2/colors`.",
             "title": "Color",
             "type": "string"
           },

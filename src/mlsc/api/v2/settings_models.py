@@ -4,11 +4,20 @@ The rules (types, ranges, enums) are written once, in the config validator schem
 The models are derived from them at import time, so the OpenAPI document spells out every setting and pydantic produces the field errors.
 Every model is a partial update: all fields are optional and unknown fields are rejected.
 """
+from collections.abc import Callable
 from typing import Annotated, Any, Literal, Union
 
-from pydantic import BaseModel, ConfigDict, Field, StringConstraints, create_model
+from pydantic import AfterValidator, BaseModel, ConfigDict, Field, StringConstraints, create_model
 
-from mlsc.webserver.schemas.config_validator_service import audio_schema, definitions, device_schema, general_settings_schema
+from mlsc.color_registry import COLOUR, CONFIG_KEYS, GRADIENT
+from mlsc.webserver.schemas.config_validator_service import (
+    audio_schema,
+    color_enum,
+    definitions,
+    device_schema,
+    general_settings_schema,
+    gradient_enum,
+)
 
 _IPV4 = r"^((25[0-5]|2[0-4]\d|1?\d?\d)\.){3}(25[0-5]|2[0-4]\d|1?\d?\d)$"
 _SCALARS = {"integer": int, "number": int | float, "string": str, "boolean": bool}
@@ -41,9 +50,24 @@ def _resolve(schema: dict[str, Any]) -> dict[str, Any]:
     return definitions[schema["$ref"].rsplit("/", 1)[-1]]
 
 
+def _current_name(kind: str) -> Callable[[str], str]:
+    """Accept the name of any colour or gradient that exists now, custom ones included."""
+    def check(value: str) -> str:
+        from mlsc.webserver.executer import Executer  # ruff: ignore[import-outside-top-level]  # Imported late: the executers import the API models.
+
+        if value not in Executer.instance.entry_executer.names(kind):
+            msg = f"There is no {kind} named {value!r}."
+            raise ValueError(msg)
+        return value
+    return check
+
+
 def _annotation(name: str, schema: dict[str, Any]) -> Any:  # ruff: ignore[any-type]
     """Return the type that accepts the same values as the JSON schema `schema`."""
     schema = _resolve(schema)
+    for kind, predefined in ((COLOUR, color_enum), (GRADIENT, gradient_enum)):
+        if schema.get("enum") is predefined:
+            return Annotated[str, AfterValidator(_current_name(kind)), Field(description=f"Name of a {kind}, see `/api/v2/{CONFIG_KEYS[kind]}`.")]
     if "enum" in schema:
         return Literal[tuple(schema["enum"])]
     if "const" in schema:
