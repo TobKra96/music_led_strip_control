@@ -58,13 +58,15 @@ class Device:
         self.__audio_queue = QueueWrapper(Queue(2))
         self.__output_queue = QueueWrapper(Queue(2))
 
-    def refresh_config(self, config, device_config):
+    def refresh_config(self, config, device_config, color_service_global=None):
         logger.info(f'Refreshing config of device: {self.__device_config["device_name"]}')
 
         self.stop_device()
 
         self.__config = config
         self.__device_config = device_config
+        if color_service_global is not None:
+            self.__color_service_global = color_service_global
 
         self.create_queues()
         self.create_processes()

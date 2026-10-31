@@ -162,12 +162,14 @@ class DeviceManager:
         logger.debug("Entering reload_config()")
         ConfigService.instance(self._config_lock).load_config()
         self._config = ConfigService.instance(self._config_lock).config
+        self._color_service_global = ColorServiceGlobal(self._config)
         logger.debug("Leaving reload_config()")
 
     def restart_device(self, device_id):
         logger.debug(f"Restarting {device_id}")
         try:
-            self._devices[device_id].refresh_config(self._config, self._config["device_configs"][device_id])
+            self._devices[device_id].refresh_config(
+                self._config, self._config["device_configs"][device_id], self._color_service_global)
         except TypeError:
             logger.error(f"Could not restart device {device_id}.")
         logger.debug(f"Restarted {device_id}")
