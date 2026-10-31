@@ -67,3 +67,47 @@ def test_parse_fps_skips_the_effect_service_lines():
     ]
 
     assert bench.parse_fps(lines) == {"Strip A": [28.0]}
+
+
+def test_find_problems_keeps_warnings_and_errors_only():
+    lines = [
+        "x | INFO     | mlsc.main:start:1 - fine",
+        "x | WARNING  | mlsc.output_service:start:60 - Permission denied. Using the Mock Output instead.",
+        "\x1b[31mx | ERROR    | mlsc.x:y:1 - boom\x1b[0m",
+    ]
+
+    assert bench.find_problems(lines) == [
+        "x | WARNING  | mlsc.output_service:start:60 - Permission denied. Using the Mock Output instead.",
+        "x | ERROR    | mlsc.x:y:1 - boom",
+    ]
+
+
+def test_a_run_that_fell_back_to_the_mock_output_is_invalid():
+    problems = ["x | WARNING  | y - Local GPIO output needs Linux. Using the Mock Output instead."]
+
+    report = bench.build_report({"A": [60.0]}, leds=900, target_fps=60, duration=30, system={}, clients=2, problems=problems)
+
+    assert report["devices"]["A"]["verdict"] == "invalid: mock output"
+    assert report["problems"] == problems
+
+
+def test_the_mock_output_is_not_a_problem_when_it_was_asked_for():
+    problems = ["x | WARNING  | y - something Mock Output"]
+
+    report = bench.build_report({"A": [60.0]}, leds=60, target_fps=60, duration=30, system={}, clients=2, problems=problems, output="output_dummy")
+
+    assert report["devices"]["A"]["verdict"] == "ok"
+
+
+def test_find_problems_collapses_repeats_with_a_count():
+    lines = [
+        "2026-01-01 10:00:00.000 | ERROR    | mlsc.mic:f:1 - No audio",
+        "2026-01-01 10:00:03.000 | ERROR    | mlsc.mic:f:1 - No audio",
+        "2026-01-01 10:00:06.000 | ERROR    | mlsc.mic:f:1 - No audio",
+        "2026-01-01 10:00:07.000 | WARNING  | mlsc.x:f:2 - other",
+    ]
+
+    assert bench.find_problems(lines) == [
+        "2026-01-01 10:00:00.000 | ERROR    | mlsc.mic:f:1 - No audio (x3)",
+        "2026-01-01 10:00:07.000 | WARNING  | mlsc.x:f:2 - other",
+    ]

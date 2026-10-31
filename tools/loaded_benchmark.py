@@ -28,6 +28,7 @@ from pathlib import Path
 WIRE_US_PER_LED = 39  # Measured on a Pi 4 (#225), about 25,600 divided by the LED count.
 # The effect service logs the same FPS line; only the Output rate is the strip frame rate.
 OUTPUT_LOGGER = "mlsc.output_service"
+MOCK_OUTPUT = "output_dummy"
 ANSI = re.compile(r"\x1b\[[\d;]*m")
 FPS_LINE = re.compile(r"FPS: (?P<fps>[\d.]+) \| Device: (?P<device>.+?)\s*$")
 ROOT = Path(__file__).resolve().parents[1]
@@ -41,6 +42,20 @@ def parse_fps(lines) -> dict[str, list[float]]:
         if OUTPUT_LOGGER in text and (match := FPS_LINE.search(text)):
             result.setdefault(match["device"], []).append(float(match["fps"]))
     return result
+
+
+def find_problems(lines) -> list[str]:
+    # The warning and error lines of the app log, without colour codes. A repeated message is kept once, with its count.
+    first: dict[str, str] = {}
+    counts: dict[str, int] = {}
+    for line in lines:
+        text = ANSI.sub("", line).rstrip()
+        if " | WARNING " not in text and " | ERROR " not in text:
+            continue
+        message = text.split(" | ", 1)[1]  # Without the timestamp.
+        first.setdefault(message, text)
+        counts[message] = counts.get(message, 0) + 1
+    return [f"{text} (x{counts[message]})" if counts[message] > 1 else text for message, text in first.items()]
 
 
 def summarise(samples: list[float]) -> dict:
@@ -60,15 +75,18 @@ def verdict(mean: float | None, expected: float) -> str:
     return "ok" if mean >= expected * 0.9 else "below target"
 
 
-def build_report(fps: dict[str, list[float]], *, leds: int, target_fps: int, duration: int, system: dict, clients: int) -> dict:
+def build_report(fps: dict[str, list[float]], *, leds: int, target_fps: int, duration: int, system: dict, clients: int,
+                 problems: list[str] | None = None, output: str = "output_raspi") -> dict:
     expected = expected_max_fps(leds, target_fps)
+    problems = problems or []
+    fell_back = output != MOCK_OUTPUT and any("Mock Output" in problem for problem in problems)
     devices = {}
     for name, samples in fps.items():
         summary = summarise(samples)
-        devices[name] = {**summary, "verdict": verdict(summary["mean"], expected)}
+        devices[name] = {**summary, "verdict": "invalid: mock output" if fell_back else verdict(summary["mean"], expected)}
     return {
         "leds": leds, "target_fps": target_fps, "expected_fps": round(expected, 1), "duration_s": duration,
-        "web_clients": clients, "system": system, "devices": devices,
+        "web_clients": clients, "system": system, "devices": devices, "problems": problems,
     }
 
 
@@ -149,6 +167,7 @@ def run_once(args, leds: int) -> dict:
             mark = len(lines)
             time.sleep(args.duration)
             fps = parse_fps(lines[mark:])
+            problems = find_problems(lines)
             system = system_info()
         finally:
             stop.set()
@@ -157,7 +176,8 @@ def run_once(args, leds: int) -> dict:
                 proc.wait(15)
             except subprocess.TimeoutExpired:
                 proc.kill()
-    report = build_report(fps, leds=leds, target_fps=args.fps, duration=args.duration, system=system, clients=args.clients)
+    report = build_report(fps, leds=leds, target_fps=args.fps, duration=args.duration, system=system, clients=args.clients,
+                          problems=problems, output=args.output)
     report["web_failures"] = len(web_failures)  # Many failures mean the load did not reach the server (is auth on?).
     web_failures.clear()
     return report
@@ -181,7 +201,7 @@ def main(argv=None) -> int:
     for leds in args.leds:
         print(f"=== {leds} LEDs ===", flush=True)  # ruff: ignore[print]
         runs.append(run_once(args, leds))
-        print(json.dumps(runs[-1]["devices"], indent=1), flush=True)  # ruff: ignore[print]
+        print(json.dumps({"devices": runs[-1]["devices"], "problems": runs[-1]["problems"]}, indent=1), flush=True)  # ruff: ignore[print]
     Path(args.out).write_text(json.dumps(runs, indent=1), encoding="utf-8")
     print(f"Wrote {args.out}")  # ruff: ignore[print]
     return 0
