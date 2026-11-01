@@ -420,8 +420,9 @@ select.gradients {
 }
 
 /* Power card on the System Status page */
-.mlsc-power-actions { gap: 1rem; }
-.mlsc-power-action { flex: 1 1 8rem; }
+.mlsc-power-actions { gap: 0.5rem; }
+.mlsc-power-action { flex: 1 1 0; min-width: 7rem; }
+.mlsc-power-action .btn { width: 100%; }
 .mlsc-power-modal {
     position: fixed;
     inset: 0;
