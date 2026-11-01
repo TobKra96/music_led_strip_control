@@ -78,8 +78,10 @@ export default class PowerCard {
 
         this.root.innerHTML = `
             <div class="card p-0" data-power-card>
-                <div class="card-block d-flex flex-wrap align-items-start justify-content-between">
-                    <h5 class="m-0 mr-3 mb-2">Power</h5>
+                <div class="card-header">
+                    <h5><i class="feather icon-power text-c-blue"></i> Power</h5>
+                </div>
+                <div class="card-block">
                     <div class="d-flex flex-wrap mlsc-power-actions">${actions}</div>
                 </div>
                 <div class="card-block pt-0" data-power-error-block></div>
