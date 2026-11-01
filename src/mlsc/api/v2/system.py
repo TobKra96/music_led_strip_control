@@ -1,14 +1,17 @@
 import json
+from typing import Literal
 
 from flask_openapi3 import APIBlueprint, Tag
 from pydantic import BaseModel, Field, RootModel
 
-from mlsc import paths
+from mlsc import paths, server_logs
 from mlsc.api.v2.errors import READ_ERRORS, Problem, ProblemError
 from mlsc.api.v2.security import api_login_required
 from mlsc.config_migration import REPORT_FILE
 from mlsc.webserver.executer import Executer
 from mlsc.webserver.messages import MigrationReportNotFound, PowerActionBlocked, ServerError
+
+LOGS_TIMEOUT_SECONDS = 15
 
 tag = Tag(name="System", description="Server and host information")
 system_api = APIBlueprint("system_api_v2", __name__, url_prefix="/api/v2/system", abp_tags=[tag])
@@ -149,3 +152,37 @@ def reboot():
 def shutdown():
     """`409` with `PowerActionBlocked` when the host cannot do it (see `GET /system/power`)."""
     return _run_power_action("shutdown")
+
+
+class LogsQuery(BaseModel):
+    lines: int = Field(200, ge=1, le=1000, description="How many of the newest matching entries to return.")
+    level: Literal["trace", "debug", "info", "success", "warning", "error", "critical"] | None = Field(None, description="Minimum severity. All levels when omitted.")
+    q: str | None = Field(None, max_length=200, description="Case-insensitive text the message must contain.")
+
+
+class LogEntryOut(BaseModel):
+    time: str | None = Field(description="ISO 8601 UTC time from the journal.")
+    level: str | None = Field(description="Lowercase level. Lines that are not Loguru lines inherit the previous entry's level.")
+    source: str | None = Field(description="`module:function:line`, or `null` for continuation lines.")
+    message: str
+
+
+class LogsOut(BaseModel):
+    unavailable: str | None = Field(description="Why the logs cannot be read on this host. `null` when they can.")
+    persistent: bool | None = Field(description="`false` when the journal is kept in memory and cleared on reboot. `null` when unavailable.")
+    entries: list[LogEntryOut] = Field(description="Oldest to newest.")
+
+
+@system_api.get("/logs", summary="Get the Server Logs of the current boot", responses={"200": LogsOut, "401": Problem, "422": Problem, "500": Problem})
+@api_login_required
+def get_logs(query: LogsQuery):
+    """Scans the last 2000 journal entries; older matches are not found. Unavailable is a `200` with no entries; a `journalctl` failure is a `500`."""
+    host = Executer.instance.host
+    reason = host.server_logs_unavailable()
+    if reason is not None:
+        return {"unavailable": reason, "persistent": None, "entries": []}
+    code, output = host.run(server_logs.journal_command(), timeout=LOGS_TIMEOUT_SECONDS)
+    if code != 0:
+        raise ProblemError(ServerError, output[-500:])
+    entries = server_logs.filter_entries(server_logs.parse_entries(output), query.lines, query.level, query.q)
+    return {"unavailable": None, "persistent": host.journal_is_persistent(), "entries": entries}

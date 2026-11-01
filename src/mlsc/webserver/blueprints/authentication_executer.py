@@ -81,7 +81,7 @@ class AuthenticationExecuter(ExecuterBase):
             self.reset_config()
             dataset = self.config.read(self.config_path)
 
-        logger.debug(f"PIN config: {self.config}, dataset: {dataset}")
+        logger.debug(f"PIN config files read: {dataset}")
 
         if str(self.config_path) in dataset:
             try:

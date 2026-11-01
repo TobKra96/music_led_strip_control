@@ -15,6 +15,7 @@ BOOT_DIRS = (Path("/boot/firmware"), Path("/boot"))
 NET_CLASS = Path("/sys/class/net")
 WIFI_INTERFACE_PREFIXES = ("wl",)
 COMMAND_TIMEOUT_SECONDS = 5
+JOURNAL_DIR = Path("/var/log/journal")
 
 
 class Host:
@@ -96,6 +97,22 @@ class Host:
         if os.geteuid() != 0:
             return "MLSC must run as root to reboot or shut down the machine."
         return None
+
+    def server_logs_unavailable(self) -> str | None:
+        """Why the Server Logs cannot be read here, or None when they can. Needs Linux, `journalctl`, the systemd service and root."""
+        if sys.platform != "linux":
+            return "Server logs are only available on Linux."
+        if self.which("journalctl") is None:
+            return "`journalctl` was not found on this system."
+        if not (os.environ.get("INVOCATION_ID") or os.environ.get("JOURNAL_STREAM")):
+            return "MLSC is not running as a systemd service, so its logs are not in the journal."
+        if os.geteuid() != 0:
+            return "MLSC must run as root to read the system journal."
+        return None
+
+    def journal_is_persistent(self) -> bool:
+        """Whether the journal survives a reboot: `/var/log/journal` exists. Otherwise it lives in memory."""
+        return JOURNAL_DIR.is_dir()
 
     def which(self, command: str) -> str | None:
         return shutil.which(command)

@@ -4737,6 +4737,58 @@
         "title": "InfoOut",
         "type": "object"
       },
+      "LogEntryOut": {
+        "properties": {
+          "level": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Lowercase level. Lines that are not Loguru lines inherit the previous entry's level.",
+            "title": "Level"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          },
+          "source": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "`module:function:line`, or `null` for continuation lines.",
+            "title": "Source"
+          },
+          "time": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "ISO 8601 UTC time from the journal.",
+            "title": "Time"
+          }
+        },
+        "required": [
+          "time",
+          "level",
+          "source",
+          "message"
+        ],
+        "title": "LogEntryOut",
+        "type": "object"
+      },
       "LoginBody": {
         "properties": {
           "pin": {
@@ -4754,6 +4806,49 @@
           }
         },
         "title": "LoginBody",
+        "type": "object"
+      },
+      "LogsOut": {
+        "properties": {
+          "entries": {
+            "description": "Oldest to newest.",
+            "items": {
+              "$ref": "#/components/schemas/LogEntryOut"
+            },
+            "title": "Entries",
+            "type": "array"
+          },
+          "persistent": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "`false` when the journal is kept in memory and cleared on reboot. `null` when unavailable.",
+            "title": "Persistent"
+          },
+          "unavailable": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Why the logs cannot be read on this host. `null` when they can.",
+            "title": "Unavailable"
+          }
+        },
+        "required": [
+          "unavailable",
+          "persistent",
+          "entries"
+        ],
+        "title": "LogsOut",
         "type": "object"
       },
       "MicLevelEvent": {
@@ -12855,6 +12950,122 @@
           }
         },
         "summary": "Check whether each device is reachable",
+        "tags": [
+          "System"
+        ]
+      }
+    },
+    "/api/v2/system/logs": {
+      "get": {
+        "description": "Scans the last 2000 journal entries; older matches are not found. Unavailable is a `200` with no entries; a `journalctl` failure is a `500`.",
+        "operationId": "system_api_v2_get_logs_logs_get",
+        "parameters": [
+          {
+            "description": "How many of the newest matching entries to return.",
+            "in": "query",
+            "name": "lines",
+            "required": false,
+            "schema": {
+              "default": 200,
+              "description": "How many of the newest matching entries to return.",
+              "maximum": 1000,
+              "minimum": 1.0,
+              "title": "Lines",
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Minimum severity. All levels when omitted.",
+            "in": "query",
+            "name": "level",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "trace",
+                    "debug",
+                    "info",
+                    "success",
+                    "warning",
+                    "error",
+                    "critical"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "description": "Minimum severity. All levels when omitted.",
+              "title": "Level"
+            }
+          },
+          {
+            "description": "Case-insensitive text the message must contain.",
+            "in": "query",
+            "name": "q",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 200,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "description": "Case-insensitive text the message must contain.",
+              "title": "Q"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LogsOut"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "Get the Server Logs of the current boot",
         "tags": [
           "System"
         ]
