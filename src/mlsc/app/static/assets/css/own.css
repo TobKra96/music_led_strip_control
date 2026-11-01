@@ -418,3 +418,23 @@ select.gradients {
     padding: 0.9rem;
     text-align: center;
 }
+
+/* Power card on the System Status page */
+.mlsc-power-actions { gap: 1rem; }
+.mlsc-power-action { max-width: 16rem; }
+.mlsc-power-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 1060;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    background: rgba(0, 0, 0, 0.5);
+}
+.mlsc-power-modal[hidden] { display: none; }
+.mlsc-power-dialog { width: 100%; max-width: 28rem; margin: 0; }
+@media (max-width: 575.98px) {
+    .mlsc-power-actions, .mlsc-power-action { width: 100%; max-width: none; }
+    .mlsc-power-action .btn { width: 100%; }
+}

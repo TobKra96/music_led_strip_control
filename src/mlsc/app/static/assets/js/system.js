@@ -1,6 +1,7 @@
 import { api } from "./classes/Api.js";
 import { events } from "./classes/Events.js";
 import Toast from "./classes/Toast.js";
+import PowerCard from "./classes/PowerCard.js";
 
 $(() => {
     // Do not collapse accordion when clicking on body.
@@ -232,6 +233,13 @@ $(() => {
         });
     }
     getVersion();
+
+    // Reboot and shut down. The reboot warning about logs only applies when the journal lives in memory.
+    const powerCard = new PowerCard(document.getElementById("power_card"), api);
+    powerCard.load();
+    api.get("/system/logs?lines=1")
+        .then((logs) => { powerCard.logsClearedOnReboot = logs.persistent !== true; })
+        .catch(() => {});
 
     /**
      * Convert bytes to gigabytes.
