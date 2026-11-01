@@ -2,6 +2,7 @@ import { api } from './classes/Api.js';
 import Banner from './classes/Banner.js';
 import { events } from './classes/Events.js';
 import { waitForOperation } from './classes/Operation.js';
+import { powerActionPending } from './classes/PowerFollower.js';
 import Toast from './classes/Toast.js';
 
 // Shown only when the stream stays down for a moment, so reloading or leaving the page does not flash it.
@@ -13,6 +14,9 @@ let disconnectTimer = null;
 events.on('disconnected', () => {
     if (disconnectTimer) return;
     disconnectTimer = setTimeout(() => {
+        disconnectTimer = null;
+        // A Power Action takes the machine down on purpose; its own banner explains it.
+        if (powerActionPending()) return;
         connectionBanner.show({
             level: 'warning',
             title: 'Connection lost',

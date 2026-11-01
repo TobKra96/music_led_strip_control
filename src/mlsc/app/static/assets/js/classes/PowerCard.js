@@ -1,3 +1,5 @@
+import PowerFollower from './PowerFollower.js';
+
 const ACTIONS = {
     reboot: {
         label: 'Reboot',
@@ -25,10 +27,12 @@ export default class PowerCard {
     /**
      * @param {HTMLElement} root Element the card is rendered into.
      * @param {{get: function(string): Promise.<any>, post: function(string): Promise.<any>}} api
-     * @param {{logsClearedOnReboot?: boolean}} [options] `false` when the journal survives a reboot.
+     * @param {{logsClearedOnReboot?: boolean, follower?: object}} [options] `logsClearedOnReboot` is `false` when the
+     *   journal survives a reboot; `follower` overrides the options of the PowerFollower (timings, navigation).
      */
-    constructor(root, api, { logsClearedOnReboot = true } = {}) {
+    constructor(root, api, { logsClearedOnReboot = true, follower = {} } = {}) {
         this.root = root;
+        this.followerOptions = follower;
         this.api = api;
         this.logsClearedOnReboot = logsClearedOnReboot;
         this.pending = null;
@@ -160,14 +164,52 @@ export default class PowerCard {
         );
     }
 
-    /** @param {string} action */
+    /**
+     * Replace the card with a banner and follow the machine until it is back, or off.
+     * @param {string} action
+     */
     goingDown(action) {
         this.pending = null;
+        const { progress } = ACTIONS[action];
+        const texts = {
+            going_down: { level: 'info', text: progress },
+            waiting_back: { level: 'info', text: 'Waiting for the machine to come back…' },
+            slow: {
+                level: 'warning',
+                text: 'The machine has not come back yet. It may still be starting; this page keeps checking.',
+                reload: true,
+            },
+            off: { level: 'info', text: 'The machine is off. Switch it on by hand to use MLSC again.' },
+        };
+        new PowerFollower(action, (state) => {
+            if (state === 'not_down') {
+                this.render();
+                this.showError('The machine did not seem to go down.');
+                this.busy = false;
+                this.load();
+                return;
+            }
+            this.showBanner(texts[state]);
+        }, this.followerOptions).start();
+    }
+
+    /** @param {{level: string, text: string, reload?: boolean}} banner */
+    showBanner({ level, text, reload = false }) {
         this.root.innerHTML = `
-            <div class="alert alert-info mlsc-banner" role="status" data-power-banner>
+            <div class="alert alert-${level} mlsc-banner" role="status" data-power-banner>
                 <i class="feather icon-info mr-2" aria-hidden="true"></i><strong></strong>
             </div>`;
-        this.el('[data-power-banner] strong').textContent = ACTIONS[action].progress;
+        const banner = this.el('[data-power-banner]');
+        this.el('[data-power-banner] strong').textContent = text;
+        if (reload) {
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = 'btn btn-sm btn-outline-secondary ml-3';
+            button.setAttribute('data-power-reload', '');
+            button.textContent = 'Reload';
+            button.addEventListener('click', () => window.location.reload());
+            banner.append(button);
+        }
     }
 
     /** @param {string|null} message */

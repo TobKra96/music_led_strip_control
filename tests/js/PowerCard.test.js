@@ -1,4 +1,4 @@
-import { beforeEach, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import PowerCard from '../../src/mlsc/app/static/assets/js/classes/PowerCard.js';
 import { ApiError } from '../../src/mlsc/app/static/assets/js/classes/Api.js';
 
@@ -7,6 +7,9 @@ const blocked = (reason) => ({ available: false, reason });
 
 let root;
 let api;
+let up;
+let navigate;
+const follower = () => ({ navigate, fetchFn: async () => { if (!up) throw new TypeError('down'); return { ok: true }; } });
 
 const flush = () => new Promise((resolve) => setTimeout(resolve));
 const q = (selector) => root.querySelector(selector);
@@ -15,11 +18,13 @@ const modal = () => q('[data-power-modal]');
 
 const load = async (capabilities, post = vi.fn().mockResolvedValue({ status: 'accepted' })) => {
     api = { get: vi.fn().mockResolvedValue(capabilities), post };
-    new PowerCard(root, api).load();
+    new PowerCard(root, api, { follower: follower() }).load();
     await flush();
 };
 
 beforeEach(() => {
+    up = true;
+    navigate = vi.fn();
     document.body.innerHTML = '<div id="power"></div>';
     root = document.getElementById('power');
 });
@@ -196,4 +201,63 @@ it('ignores a second click on confirm while the request runs', async () => {
     q('[data-power-confirm]').click();
 
     expect(api.post).toHaveBeenCalledTimes(1);
+});
+
+describe('following the action', () => {
+    beforeEach(() => vi.useFakeTimers());
+    afterEach(() => vi.useRealTimers());
+
+    const start = async (action, post) => {
+        api = { get: vi.fn().mockResolvedValue({ reboot: available, shutdown: available }), post: post || vi.fn().mockResolvedValue({}) };
+        new PowerCard(root, api, { follower: follower() }).load();
+        await vi.advanceTimersByTimeAsync(0);
+        button(action).click();
+        q('[data-power-confirm]').click();
+        await vi.advanceTimersByTimeAsync(0);
+    };
+    const banner = () => q('[data-power-banner]').textContent;
+
+    it('waits for the machine to come back after a reboot went down, then goes to /', async () => {
+        await start('reboot');
+        up = false;
+        await vi.advanceTimersByTimeAsync(2000);
+        expect(banner()).toContain('Waiting for the machine to come back');
+        up = true;
+        await vi.advanceTimersByTimeAsync(2000);
+        expect(navigate).toHaveBeenCalledWith('/');
+    });
+
+    it('keeps saying "Rebooting" while the server still answers', async () => {
+        await start('reboot');
+        await vi.advanceTimersByTimeAsync(10000);
+        expect(banner()).toContain('Rebooting');
+        expect(navigate).not.toHaveBeenCalled();
+    });
+
+    it('warns with a Reload button after 3 minutes and still redirects on a late return', async () => {
+        await start('reboot');
+        up = false;
+        await vi.advanceTimersByTimeAsync(182000);
+        expect(q('[data-power-banner]').classList.contains('alert-warning')).toBe(true);
+        expect(q('[data-power-reload]')).not.toBeNull();
+        up = true;
+        await vi.advanceTimersByTimeAsync(4000);
+        expect(navigate).toHaveBeenCalledWith('/');
+    });
+
+    it('brings the Power card back with a warning when the machine never went down', async () => {
+        await start('reboot');
+        await vi.advanceTimersByTimeAsync(30000);
+        expect(q('[data-power-error]').textContent).toContain('did not seem to go down');
+        expect(button('reboot')).not.toBeNull();
+        expect(button('reboot').disabled).toBe(false);
+    });
+
+    it('ends with the switch-it-on banner after a shutdown went down', async () => {
+        await start('shutdown');
+        up = false;
+        await vi.advanceTimersByTimeAsync(2000);
+        expect(banner()).toContain('Switch it on by hand');
+        expect(q('[data-power-reload]')).toBeNull();
+    });
 });
