@@ -9,9 +9,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from mlsc import paths
-from mlsc.host import Host
+from mlsc.host import SERVICE_NAME, Host
 
-SERVICE_NAME = "mlsc.service"
 UNIT_PATH = Path("/etc/systemd/system") / SERVICE_NAME
 MANAGED_MARKER = "# Managed by `mlsc service install`."
 SYSTEMCTL_TIMEOUT_SECONDS = 60

@@ -104,9 +104,10 @@ class PowerActionOut(BaseModel):
     reason: str | None = Field(description="Why the action cannot run on this host. `null` when it can.")
 
 
-class PowerOut(BaseModel):
+class PowerStatusOut(BaseModel):
     reboot: PowerActionOut
     shutdown: PowerActionOut
+    autostart_warning: str | None = Field(description="Set when `mlsc.service` is not installed or not enabled, so MLSC would not start again after a reboot. `null` otherwise.")
 
 
 class PowerAcceptedOut(BaseModel):
@@ -123,10 +124,10 @@ def _power_action_out(action: str) -> dict:
     return {"available": reason is None, "reason": reason}
 
 
-@system_api.get("/power", summary="Check whether the machine can be rebooted or shut down", responses={"200": PowerOut, "401": Problem})
+@system_api.get("/power", summary="Check whether the machine can be rebooted or shut down", responses={"200": PowerStatusOut, "401": Problem})
 @api_login_required
 def get_power():
-    return {action: _power_action_out(action) for action in POWER_ACTIONS}
+    return {**{action: _power_action_out(action) for action in POWER_ACTIONS}, "autostart_warning": Executer.instance.host.autostart_warning()}
 
 
 def _run_power_action(action: str):

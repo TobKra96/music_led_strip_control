@@ -43,6 +43,19 @@ it('enables both buttons when the host can do both', async () => {
     expect(q('[data-power-reason="reboot"]').textContent).toBe('');
 });
 
+it('hides the autostart warning when the API has none', async () => {
+    await load({ reboot: available, shutdown: available, autostart_warning: null });
+
+    expect(q('[data-power-autostart]').hidden).toBe(true);
+});
+
+it('shows the autostart warning from the API', async () => {
+    await load({ reboot: available, shutdown: available, autostart_warning: 'mlsc.service is not installed.' });
+
+    expect(q('[data-power-autostart]').hidden).toBe(false);
+    expect(q('[data-power-autostart]').textContent).toBe('mlsc.service is not installed.');
+});
+
 it('disables a blocked button and shows its reason under it', async () => {
     await load({ reboot: blocked('MLSC does not run as root.'), shutdown: available });
 

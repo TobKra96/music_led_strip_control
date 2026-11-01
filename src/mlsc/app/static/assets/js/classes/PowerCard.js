@@ -44,6 +44,9 @@ export default class PowerCard {
     /** Read which actions the host allows and enable the buttons accordingly. */
     load() {
         return this.api.get('/system/power').then((capabilities) => {
+            const warning = this.el('[data-power-autostart]');
+            warning.textContent = capabilities.autostart_warning || '';
+            warning.hidden = !capabilities.autostart_warning;
             Object.keys(ACTIONS).forEach((action) => {
                 const { available, reason } = capabilities[action] || { available: false, reason: 'Unknown.' };
                 this.button(action).disabled = !available;
@@ -83,6 +86,7 @@ export default class PowerCard {
                 </div>
                 <div class="card-block">
                     <div class="d-flex flex-wrap mlsc-power-actions">${actions}</div>
+                    <div class="alert alert-warning mb-0 mt-3" role="alert" data-power-autostart hidden></div>
                 </div>
                 <div class="card-block pt-0" data-power-error-block></div>
             </div>

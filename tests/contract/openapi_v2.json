@@ -5694,6 +5694,35 @@
         "title": "PowerOut",
         "type": "object"
       },
+      "PowerStatusOut": {
+        "properties": {
+          "autostart_warning": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Set when `mlsc.service` is not installed or not enabled, so MLSC would not start again after a reboot. `null` otherwise.",
+            "title": "Autostart Warning"
+          },
+          "reboot": {
+            "$ref": "#/components/schemas/PowerActionOut"
+          },
+          "shutdown": {
+            "$ref": "#/components/schemas/PowerActionOut"
+          }
+        },
+        "required": [
+          "reboot",
+          "shutdown",
+          "autostart_warning"
+        ],
+        "title": "PowerStatusOut",
+        "type": "object"
+      },
       "Problem": {
         "description": "RFC 9457 problem details.",
         "properties": {
@@ -13215,7 +13244,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PowerOut"
+                  "$ref": "#/components/schemas/PowerStatusOut"
                 }
               }
             },

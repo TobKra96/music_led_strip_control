@@ -16,6 +16,7 @@ NET_CLASS = Path("/sys/class/net")
 WIFI_INTERFACE_PREFIXES = ("wl",)
 COMMAND_TIMEOUT_SECONDS = 5
 JOURNAL_DIR = Path("/var/log/journal")
+SERVICE_NAME = "mlsc.service"
 
 
 class Host:
@@ -97,6 +98,20 @@ class Host:
         if os.geteuid() != 0:
             return "MLSC must run as root to reboot or shut down the machine."
         return None
+
+    def autostart_warning(self) -> str | None:
+        """Why MLSC would not be running again after a reboot, or None when it would (or when this host has no systemd to ask)."""
+        if sys.platform != "linux" or self.which("systemctl") is None:
+            return None
+        code, output = self.run(["systemctl", "is-enabled", SERVICE_NAME])
+        state = output.splitlines()[0].strip() if output else ""
+        if code == 0 and state == "enabled":
+            return None
+        if code == 127 or code == 124:
+            return None
+        if state == "not-found" or "No such file" in output or "does not exist" in output:
+            return f"{SERVICE_NAME} is not installed, so MLSC will not start again after a reboot. Run `sudo mlsc service install`."
+        return f"{SERVICE_NAME} is not enabled, so MLSC will not start again after a reboot. Run `sudo systemctl enable {SERVICE_NAME}`."
 
     def server_logs_unavailable(self) -> str | None:
         """Why the Server Logs cannot be read here, or None when they can. Needs Linux, `journalctl`, the systemd service and root."""

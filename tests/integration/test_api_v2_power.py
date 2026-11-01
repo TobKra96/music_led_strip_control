@@ -12,13 +12,17 @@ BLOCK = "MLSC must run as root to reboot or shut down the machine."
 
 
 class FakeHost:
-    def __init__(self, block=None, result=(0, "")) -> None:
+    def __init__(self, block=None, result=(0, ""), autostart=None) -> None:
         self.block = block
+        self.autostart = autostart
         self.result = result
         self.commands = []
 
     def power_action_block(self, action):  # ruff: ignore[unused-method-argument]
         return self.block
+
+    def autostart_warning(self):
+        return self.autostart
 
     def run(self, command, timeout=None):  # ruff: ignore[unused-method-argument]
         self.commands.append(command)
@@ -39,7 +43,14 @@ def test_power_reports_each_action_as_available_when_nothing_blocks_it(monkeypat
 
     assert client.get("/api/v2/system/power").get_json() == {
         "reboot": {"available": True, "reason": None}, "shutdown": {"available": True, "reason": None},
+        "autostart_warning": None,
     }
+
+
+def test_power_reports_the_autostart_warning(monkeypatch):
+    client = make_client(FakeHost(autostart="not enabled"), monkeypatch)
+
+    assert client.get("/api/v2/system/power").get_json()["autostart_warning"] == "not enabled"
 
 
 def test_power_reports_the_reason_when_blocked(monkeypatch):
