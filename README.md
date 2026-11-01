@@ -42,7 +42,7 @@
 - ✨ Modern web interface.
 - 📝 REST API with extensive documentation using SwaggerUI.
 - 🔒 Optional dashboard PIN lock.
-- 📈 System status dashboard.
+- 📈 System status dashboard with a Power card (reboot or shut down the machine) and a Server logs card.
 - 💡 27 effects with many configuration options.
 - 🎨 Customizable colors and color schemes.
 - ⚡ Multicore optimized for large LED strips (900+ LEDs).
