@@ -3,7 +3,7 @@ import pytest
 from mlsc import host as host_module
 from mlsc.host import Host
 
-pytestmark = pytest.mark.unit
+pytestmark = [pytest.mark.unit, pytest.mark.usefixtures("linux")]
 
 
 class SystemdHost(Host):
@@ -21,7 +21,7 @@ class SystemdHost(Host):
         return self.result
 
 
-@pytest.fixture(autouse=True)
+@pytest.fixture
 def linux(monkeypatch):
     monkeypatch.setattr(host_module.sys, "platform", "linux")
 
