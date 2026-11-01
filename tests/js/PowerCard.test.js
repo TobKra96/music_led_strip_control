@@ -234,7 +234,7 @@ describe('following the action', () => {
         await start('reboot');
         up = false;
         await vi.advanceTimersByTimeAsync(2000);
-        expect(banner()).toContain('Waiting for the machine to come back');
+        expect(banner()).toContain('Waiting for the machine to come back…');
         up = true;
         await vi.advanceTimersByTimeAsync(2000);
         expect(navigate).toHaveBeenCalledWith('/');

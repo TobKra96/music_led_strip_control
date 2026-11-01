@@ -179,7 +179,7 @@ export default class PowerCard {
         const { progress } = ACTIONS[action];
         const texts = {
             going_down: { level: 'info', text: progress },
-            waiting_back: { level: 'info', text: 'Waiting for the machine to come back…' },
+            waiting_back: { level: 'info', text: 'Waiting for the machine to come backâ€¦' },
             slow: {
                 level: 'warning',
                 text: 'The machine has not come back yet. It may still be starting; this page keeps checking.',
