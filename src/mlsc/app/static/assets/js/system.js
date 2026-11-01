@@ -2,6 +2,7 @@ import { api } from "./classes/Api.js";
 import { events } from "./classes/Events.js";
 import Toast from "./classes/Toast.js";
 import PowerCard from "./classes/PowerCard.js";
+import LogsCard from "./classes/LogsCard.js";
 
 $(() => {
     // Do not collapse accordion when clicking on body.
@@ -240,6 +241,8 @@ $(() => {
     api.get("/system/logs?lines=1")
         .then((logs) => { powerCard.logsClearedOnReboot = logs.persistent !== true; })
         .catch(() => {});
+
+    new LogsCard(document.getElementById("logs_card"), api).load();
 
     /**
      * Convert bytes to gigabytes.

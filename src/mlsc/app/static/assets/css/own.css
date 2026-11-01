@@ -438,3 +438,39 @@ select.gradients {
     .mlsc-power-actions, .mlsc-power-action { width: 100%; max-width: none; }
     .mlsc-power-action .btn { width: 100%; }
 }
+
+/* Server logs card on the System Status page */
+.mlsc-logs-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 0.75rem;
+    margin-bottom: 0.75rem;
+}
+.mlsc-logs-toolbar .form-control { width: auto; flex: 0 1 auto; }
+.mlsc-logs-toolbar input[type="search"] { flex: 1 1 12rem; min-width: 8rem; }
+.mlsc-logs-pane {
+    height: 24rem;
+    overflow: auto;
+    padding: 0.5rem 0.75rem;
+    background: #1e1e1e;
+    color: #d4d4d4;
+    border-radius: 4px;
+    font-family: SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+    font-size: 0.8rem;
+    line-height: 1.4;
+}
+.mlsc-logs-pane[hidden] { display: none; }
+.mlsc-logs-line { white-space: pre-wrap; word-break: break-word; }
+.mlsc-logs-time { color: #8a8a8a; margin-right: 0.75rem; }
+.mlsc-logs-level { display: inline-block; min-width: 4.5rem; margin-right: 0.5rem; font-weight: 600; }
+.mlsc-logs-level-info, .mlsc-logs-level-success { color: #4fc1ff; }
+.mlsc-logs-level-warning { color: #e5c07b; }
+.mlsc-logs-level-error, .mlsc-logs-level-critical { color: #f48771; }
+.mlsc-logs-level-debug, .mlsc-logs-level-trace { color: #8a8a8a; }
+.mlsc-logs-empty { color: #8a8a8a; }
+[data-logs-toggle] { cursor: pointer; }
+@media (max-width: 575.98px) {
+    .mlsc-logs-toolbar .form-control, .mlsc-logs-toolbar .btn { flex: 1 1 40%; }
+    .mlsc-logs-pane { height: 18rem; }
+}
